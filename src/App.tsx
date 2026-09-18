@@ -3,7 +3,7 @@ import './index.css'
 
 // Tipos para la aplicación
 type UserRole = 'parent' | 'child'
-type LearningTopic = 'coima' | 'corruption' | 'recognition' | 'impact' | 'test'
+type LearningTopic = 'coima' | 'recognition' | 'impact' | 'test'
 type ProgressLevel = 'beginner' | 'intermediate' | 'advanced'
 
 interface UserProgress {
@@ -77,15 +77,16 @@ export default function App() {
   // Actualizar progreso
   const updateProgress = (pointsToAdd: number, activitiesIncrement: number = 1) => {
     setProgress(prev => {
-      const newPoints = prev.points + pointsToAdd
-      const newActivities = prev.completedActivities + activitiesIncrement
+      const p: UserProgress = prev
+      const newPoints = p.points + pointsToAdd
+      const newActivities = p.completedActivities + activitiesIncrement
       const newLevel = Object.entries(levelTitles)
         .reverse()
         .find(([threshold]) => newPoints >= parseInt(threshold))
         ?.[1] || 'Primer paso'
       
       return {
-        ...prev,
+        ...p,
         points: newPoints,
         completedActivities: newActivities,
         level: newLevel,
@@ -206,13 +207,13 @@ export default function App() {
               <p>¿Quién está usando la app?</p>
               <div className="grid grid-cols-2 gap-2">
                 <button
-                  onClick=() => setSelectedRole('parent')
+                  onClick={() => setSelectedRole('parent')}
                   className={selectedRole === 'parent' ? 'btn-primary bg-primary/20 text-primary' : 'btn-outline'}
                 >
                   Padre / Madre
                 </button>
                 <button
-                  onClick=() => setSelectedRole('child')
+                  onClick={() => setSelectedRole('child')}
                   className={selectedRole === 'child' ? 'btn-primary bg-primary/20 text-primary' : 'btn-outline'}
                 >
                   Hijo / Hija
@@ -222,25 +223,25 @@ export default function App() {
               <p>¿Qué quieres aprender hoy?</p>
               <div className="grid grid-cols-2 gap-2">
                 <button
-                  onClick=() => { setSelectedTopic('coima'); setCurrentScreen('home') }
+                  onClick={() => { setSelectedTopic('coima'); setCurrentScreen('home'); } }
                   className={selectedTopic === 'coima' ? 'btn-primary bg-primary/20 text-primary' : 'btn-outline'}
                 >
                   ¿Qué es una coima?
                 </button>
                 <button
-                  onClick=() => { setSelectedTopic('recognition'); setCurrentScreen('home') }
+                  onClick={() => { setSelectedTopic('recognition'); setCurrentScreen('home'); } }
                   className={selectedTopic === 'recognition' ? 'btn-primary bg-primary/20 text-primary' : 'btn-outline'}
                 >
                   ¿Cómo reconocer una situación de corrupción?
                 </button>
                 <button
-                  onClick=() => { setSelectedTopic('impact'); setCurrentScreen('home') }
+                  onClick={() => { setSelectedTopic('impact'); setCurrentScreen('home'); } }
                   className={selectedTopic === 'impact' ? 'btn-primary bg-primary/20 text-primary' : 'btn-outline'}
                 >
                   ¿Por qué las coimas hacen daño?
                 </button>
                 <button
-                  onClick=() => { setCurrentScreen('games') }
+                  onClick={() => { setCurrentScreen('games'); } }
                   className={selectedTopic === 'test' ? 'btn-primary bg-primary/20 text-primary' : 'btn-outline'}
                 >
                   Quiero ponerme a prueba.
@@ -677,14 +678,14 @@ export default function App() {
                 <div key={prompt.id} className="mb-4">
                   <p className="font-medium text-gray-800 mb-2">{prompt.question}</p>
                   <button
-                    onClick=() => {
+                    onClick={() => {
                       // Marcar como preguntado y guardar progreso
                       const updatedPrompts = conversationPrompts.map(p => 
                         p.id === prompt.id ? { ...p, asked: true } : p
                       )
                       // No actualizamos el estado directamente, solo para el ejemplo
                       completeConversation()
-                    }
+                    }}
                     className="btn-primary py-2 px-4 rounded text-sm"
                   >
                     Empezar conversación
@@ -879,7 +880,7 @@ export default function App() {
             <div className="text-center mb-8">
               <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path className="w-10 h-10" strokeLineCap="round" strokeLineJoin="round" d="M16 7a4 4 0 014 4v3a4 4 0 01-4 4V3a4 4 0 01-4-4zM5 7a2 2 0 012-2h4a2 2 0 012 2v3a2 2 0 01-2h4a2 2 0 01-2v-3zM8 21a4 4 0 01-4-4v-3a4 4 0 014-4h6a4 4 0 014 4v3a4 4 0 01-4 4zm8-13a4 4 0 01-4-4V7a4 4 0 014-4h3a4 4 0 014 4v3a4 4 0 01-4 4h-3z"></path>
+                  <path className="w-10 h-10" strokeLinecap="round" strokeLineJoin="round" d="M16 7a4 4 0 014 4v3a4 4 0 01-4 4V3a4 4 0 01-4-4zM5 7a2 2 0 012-2h4a2 2 0 012 2v3a2 2 0 01-2h4a2 2 0 01-2v-3zM8 21a4 4 0 01-4-4v-3a4 4 0 014-4h6a4 4 0 014 4v3a4 4 0 01-4 4zm8-13a4 4 0 01-4-4V7a4 4 0 014-4h3a4 4 0 014 4v3a4 4 0 01-4 4h-3z"></path>
                 </svg>
               </div>
               <h2 className="text-2xl font-bold text-primary">Familia</h2>
