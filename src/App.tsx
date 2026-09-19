@@ -768,7 +768,7 @@ export default function App() {
               </button>
             </div>
 
-            <hr className="border-gray-200 my-10" />
+            <hr className="border-gray-200 my-16" />
 
             <div className="glass-card rounded-2xl p-6 card-hover">
               <h3 className="font-bold text-warning text-lg mb-2">{t('familyActivity')}</h3>
