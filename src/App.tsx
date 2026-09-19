@@ -109,6 +109,7 @@ const translations = {
     spanish: '🇪🇸 Español',
     quechua: '🦙 Quechua',
     whichTopic: '¿Qué quieres aprender hoy?',
+    goHome: 'Ir a la pantalla principal',
     whatIsCoima: '¿Qué es una coima?',
     recognize: '¿Cómo reconocer una situación de corrupción?',
     impact: '¿Por qué las coimas hacen daño?',
@@ -165,6 +166,7 @@ const translations = {
     spanish: '🇪🇸 Castellano',
     quechua: '🦙 Runa Simi',
     whichTopic: '¿Imatam kunan yachayta munanki?',
+    goHome: 'Wasiman kutiy',
     whatIsCoima: '¿Imam coima?',
     recognize: '¿Imaynatam riqsin manam allin kaqta?',
     impact: '¿Imaraykum coimakuna dañan?',
@@ -626,25 +628,25 @@ export default function App() {
                   {t('recognize')}
                 </button>
                 <button
-                  onClick={() => { setSelectedTopic('impact'); setCurrentScreen('home'); } }
+                  onClick={() => goHomeWithTopic('impact')}
                   className={selectedTopic === 'impact' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all card-hover'}
                 >
                   {t('impact')}
                 </button>
                 <button
-                  onClick={() => { setSelectedTopic('consequences'); setCurrentScreen('home'); } }
+                  onClick={() => goHomeWithTopic('consequences')}
                   className={selectedTopic === 'consequences' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all card-hover'}
                 >
                   {t('legal')}
                 </button>
                 <button
-                  onClick={() => { setSelectedTopic('prevention'); setCurrentScreen('home'); } }
+                  onClick={() => goHomeWithTopic('prevention')}
                   className={selectedTopic === 'prevention' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all card-hover'}
                 >
                   {t('prevent')}
                 </button>
                 <button
-                  onClick={() => { setSelectedTopic('test'); setCurrentScreen('home'); } }
+                  onClick={() => goHomeWithTopic('test')}
                   className={selectedTopic === 'test' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all card-hover'}
                 >
                   {t('wantTest')}
@@ -664,6 +666,13 @@ export default function App() {
                 {progress.completedActivities} de {progress.totalActivities} actividades completadas
               </p>
             </div>
+
+            <button
+              onClick={() => setCurrentScreen('home')}
+              className="btn-glow bg-primary text-white font-bold py-4 px-6 rounded-xl text-lg w-full mt-6"
+            >
+              🏠 {t('goHome')}
+            </button>
           </div>
         </div>
       )
