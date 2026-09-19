@@ -5,6 +5,7 @@ import './index.css'
 type UserRole = 'parent' | 'child'
 type LearningTopic = 'coima' | 'recognition' | 'impact' | 'consequences' | 'prevention' | 'test'
 type PlayMode = 'individual' | 'family'
+type BadgeType = 'topics-explorer' | 'game-master' | 'integrity-champion'
 
 interface Avatar {
   id: number
@@ -13,11 +14,18 @@ interface Avatar {
   emoji: string
 }
 
+interface Badge {
+  id: BadgeType
+  name: string
+  emoji: string
+  color: string
+  unlocked: boolean
+}
+
 interface UserProgress {
   totalActivities: number
   completedActivities: number
-  points: number
-  level: string
+  badges: Badge[]
   conversations: number
 }
 
@@ -36,14 +44,19 @@ const avatars: Avatar[] = [
   { id: 6, name: 'Brillante', color: '#EC4899', emoji: '✨' },
 ]
 
+const allBadges: Badge[] = [
+  { id: 'topics-explorer', name: 'Explorador de Temas', emoji: '📚', color: '#3B82F6', unlocked: false },
+  { id: 'game-master', name: 'Maestro del Juego', emoji: '🎮', color: '#8B5CF6', unlocked: false },
+  { id: 'integrity-champion', name: 'Campeón de la Integridad', emoji: '🏆', color: '#F59E0B', unlocked: false },
+]
+
 const getStoredProgress = (): UserProgress => {
   const stored = localStorage.getItem('hablemos-claro-progress')
   if (stored) return JSON.parse(stored)
   return {
     totalActivities: 0,
     completedActivities: 0,
-    points: 0,
-    level: 'Primer paso',
+    badges: [...allBadges],
     conversations: 0,
   }
 }
@@ -61,22 +74,12 @@ const conversationPrompts: ConversationPrompt[] = [
   { id: '5', question: '¿Por qué es importante respetar las reglas?', asked: false },
 ]
 
-// Niveles del sistema de puntos
-const levelTitles: Record<string, string> = {
-  '0': 'Explorador de la honestidad',
-  '20': 'Detective de decisiones',
-  '40': 'Ciudadano responsable',
-  '60': 'Agente de cambio',
-  '80': 'Defensor de la justicia',
-  '100': 'Campeón de la integridad',
-}
-
 // Estado global de la aplicación
 const initialProgress = getStoredProgress()
 
 export default function App() {
   const [progress, setProgress] = useState<UserProgress>(initialProgress)
-  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'avatar' | 'config' | 'home' | 'learn' | 'quiz' | 'result' | 'games' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents'>('welcome')
+  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'avatar' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents'>('welcome')
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null)
   const [selectedTopic, setSelectedTopic] = useState<LearningTopic | null>(null)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -87,37 +90,48 @@ export default function App() {
   const [currentCoimaCase, setCurrentCoimaCase] = useState(0)
   const [selectedAvatar, setSelectedAvatar] = useState<Avatar | null>(null)
   const [playMode, setPlayMode] = useState<PlayMode>('individual')
+  const [_device, _setDevice] = useState<'phone' | 'tablet' | 'pc'>('pc')
+  const [_showBadgeCelebration, _setShowBadgeCelebration] = useState(false)
+  const [_earnedBadge, _setEarnedBadge] = useState<Badge | null>(null)
 
   // Navegar a siguiente pantalla
   const navigateTo = (screen: typeof currentScreen) => {
     setCurrentScreen(screen)
   }
 
-  // Actualizar progreso
-  const updateProgress = (pointsToAdd: number, activitiesIncrement: number = 1) => {
+  // Actualizar progreso y verificar insignias
+  const updateProgress = (activitiesIncrement: number = 1) => {
     setProgress(prev => {
-      const p: UserProgress = prev
-      const newPoints = p.points + pointsToAdd
-      const newActivities = p.completedActivities + activitiesIncrement
-      const newLevel = Object.entries(levelTitles)
-        .reverse()
-        .find(([threshold]) => newPoints >= parseInt(threshold))
-        ?.[1] || 'Primer paso'
-      
-      return {
-        ...p,
-        points: newPoints,
-        completedActivities: newActivities,
-        level: newLevel,
-      }
-    })
-    saveProgress(getUpdatedProgress())
-  }
+      const newActivities = prev.completedActivities + activitiesIncrement
+      const newBadges = [...prev.badges]
+      let newBadgeToShow: Badge | null = null
 
-  const getUpdatedProgress = (): UserProgress => {
-    const stored = localStorage.getItem('hablemos-claro-progress')
-    if (stored) return JSON.parse(stored)
-    return initialProgress
+      // Verificar si completar todos los temas
+      const allTopicsCompleted = ['coima', 'recognition', 'impact', 'consequences', 'prevention', 'test'].every(_t => prev.completedActivities > 0)
+      if (allTopicsCompleted && !newBadges.find(b => b.id === 'topics-explorer')) {
+        newBadges.find(b => b.id === 'topics-explorer')!.unlocked = true
+        newBadgeToShow = { ...newBadges.find(b => b.id === 'topics-explorer')!, unlocked: true }
+      }
+
+      // Verificar si completar el juego (quiz)
+      if (prev.completedActivities > 3 && !newBadges.find(b => b.id === 'game-master')) {
+        newBadges.find(b => b.id === 'game-master')!.unlocked = true
+        newBadgeToShow = { ...newBadges.find(b => b.id === 'game-master')!, unlocked: true }
+      }
+
+      // Verificar si ambas insignias desbloqueadas → campeón
+      if (newBadges.find(b => b.id === 'topics-explorer')!.unlocked && newBadges.find(b => b.id === 'game-master')!.unlocked && !newBadges.find(b => b.id === 'integrity-champion')) {
+        newBadges.find(b => b.id === 'integrity-champion')!.unlocked = true
+        newBadgeToShow = { ...newBadges.find(b => b.id === 'integrity-champion')!, unlocked: true }
+      }
+
+      saveProgress({ ...prev, completedActivities: newActivities, badges: newBadges })
+      if (newBadgeToShow) {
+        _setEarnedBadge(newBadgeToShow)
+        _setShowBadgeCelebration(true)
+      }
+      return { ...prev, completedActivities: newActivities, badges: newBadges }
+    })
   }
 
   // Responder pregunta del quiz
@@ -131,10 +145,10 @@ export default function App() {
     
     if (isCorrect) {
       setFeedbackMessage('¡Correcto! Has aprendido algo nuevo.')
-      updateProgress(10, 1)
+      updateProgress()
     } else {
       setFeedbackMessage('Casi. Recuerda que una coima es cuando alguien ofrece algo de valor para obtener un beneficio injusto.')
-      updateProgress(5, 1) // Puntos por intentarlo
+      updateProgress()
     }
   }
 
@@ -168,7 +182,6 @@ export default function App() {
       ...prev,
       conversations: prev.conversations + 1,
     }))
-    saveProgress(getUpdatedProgress())
   }
 
   // Reiniciar aplicación
@@ -526,7 +539,7 @@ export default function App() {
                       const isCorrect = currentCase.isCoima === true
                       setFeedbackMessage(isCorrect ? currentCase.explanation : 'Incorrecto. ' + currentCase.explanation)
                       setShowFeedback(true)
-                      updateProgress(isCorrect ? 15 : 5, 1)
+                      updateProgress()
                     }}
                     className="btn-primary py-4 px-6 rounded-lg text-lg font-medium"
                   >
@@ -537,7 +550,7 @@ export default function App() {
                       const isCorrect = currentCase.isCoima === false
                       setFeedbackMessage(isCorrect ? currentCase.explanation : 'Incorrecto. ' + currentCase.explanation)
                       setShowFeedback(true)
-                      updateProgress(isCorrect ? 15 : 5, 1)
+                      updateProgress()
                     }}
                     className="btn-outline py-4 px-6 rounded-lg text-lg font-medium border-2 border-primary text-primary"
                   >
@@ -603,7 +616,7 @@ export default function App() {
                 <div className="mt-6 flex gap-2">
                   <button
                     onClick={() => handleAnswer(0)}
-                    className={progress.points > 0 ? 'btn-outline' : 'btn-primary w-48 py-2 px-4 rounded'}
+                    className={progress.completedActivities > 0 ? 'btn-outline' : 'btn-primary w-48 py-2 px-4 rounded'}
                   >
                     ✅ {currentTopicData.correct}
                   </button>
@@ -881,8 +894,8 @@ export default function App() {
             </div>
 
             <div className="mt-8 p-4 bg-primary/5 rounded">
-              <p className="font-medium">Puntuación: {progress.points} ⭐</p>
-              <p className="text-xs">Sistema de puntos para motivar el aprendizaje</p>
+              <p className="font-medium">Insignias: {progress.badges.filter(b => b.unlocked).length}/3 ⭐</p>
+              <p className="text-xs">Desbloquea todas para ser Campeón</p>
             </div>
 
             <button
@@ -1121,8 +1134,8 @@ export default function App() {
             <div className="glass-card rounded-2xl p-6 shadow-custom-lg mb-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-3">
-                  <div className="text-3xl font-bold gradient-text">{progress.points} ⭐</div>
-                  <div className="text-sm text-gray-500 mt-1">Puntos</div>
+                  <div className="text-3xl font-bold gradient-text">{progress.badges.filter(b => b.unlocked).length}/3</div>
+                  <div className="text-sm text-gray-500 mt-1">Insignias</div>
                 </div>
                 <div className="text-center p-3">
                   <div className="text-3xl font-bold text-secondary">{progress.completedActivities}</div>
@@ -1133,8 +1146,8 @@ export default function App() {
                   <div className="text-sm text-gray-500 mt-1">Conversaciones</div>
                 </div>
                 <div className="text-center p-3">
-                  <div className="text-lg font-bold text-primary">{progress.level}</div>
-                  <div className="text-sm text-gray-500 mt-1">Nivel</div>
+                  <div className="text-lg font-bold text-primary">{progress.badges.find(b => b.id === 'integrity-champion')?.unlocked ? '🏆 Campeón' : 'En progreso'}</div>
+                  <div className="text-sm text-gray-500 mt-1">Estado</div>
                 </div>
               </div>
             </div>
@@ -1154,11 +1167,15 @@ export default function App() {
             </div>
 
             <div className="glass-card rounded-2xl p-6 mb-4">
-              <h3 className="font-bold text-dark mb-2">🎯 Tu Nivel</h3>
-              <p className="text-lg font-bold gradient-text">{progress.level}</p>
-              <p className="text-sm text-gray-500 mt-1">
-                {progress.totalActivities > 0 ? Math.round((progress.completedActivities / progress.totalActivities) * 100) : 0}% completado
-              </p>
+              <h3 className="font-bold text-dark mb-2">🎯 Tus Insignias</h3>
+              <div className="flex gap-3 mt-3">
+                {progress.badges.map(badge => (
+                  <div key={badge.id} className={`text-center p-3 rounded-xl ${badge.unlocked ? '' : 'opacity-40 grayscale'}`} style={{ border: badge.unlocked ? `2px solid ${badge.color}` : '2px solid gray' }}>
+                    <div className="text-2xl">{badge.emoji}</div>
+                    <div className="text-xs font-bold mt-1" style={{ color: badge.color }}>{badge.name}</div>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="mt-6">
