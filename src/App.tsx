@@ -60,6 +60,121 @@ const reelsMessages = [
   { id: '6', author: 'Transparencia Total', message: 'La información es un derecho, no un privilegio. La luz es la mejor herramienta contra la corrupción. 💡', time: 'Hace 2d' },
 ]
 
+const translations = {
+  es: {
+    greeting: '¡Hola! 👋',
+    welcomeLine: 'Hoy podemos aprender algo nuevo juntos.',
+    welcomeTitle: 'Hablemos Claro',
+    welcomeSub: 'Aprender sobre las coimas también es aprender a tomar buenas decisiones.',
+    start: '🎮 Empezar Aventura',
+    howItWorks: '¿Cómo funciona?',
+    badges: '🏅 Tus insignias',
+    themes: 'Temas',
+    themesDesc: 'Aprende sobre las coimas',
+    game: 'Juego',
+    gameDesc: 'Pon a prueba lo que sabes',
+    reels: 'Reels',
+    reelsDesc: 'Mensajes de integridad',
+    profile: 'Perfil',
+    profileDesc: 'Tu progreso e insignias',
+    familyActivity: '💬 Actividad familiar',
+    familyDesc: 'Habla con tu hijo/a sobre una situación en la que alguien podría intentar conseguir algo de manera injusta.',
+    converse: 'Conversar →',
+    back: '← Atrás',
+    continue: 'Continuar',
+    profileTitle: 'Tu perfil',
+    profileSub: 'Tu progreso de aprendizaje',
+    myBadges: '🎯 Tus Insignias',
+    status: 'Estado',
+    champion: '🏆 Campeón',
+    inProgress: 'En progreso',
+    activities: 'Actividades',
+    conversations: 'Conversaciones',
+    generalProgress: 'Progreso General',
+    aboutTitle: '¿Cómo funciona?',
+    aboutSub: 'Todo lo que necesitas saber antes de empezar.',
+    configTitle: 'Configuración',
+    yourData: '📝 Tus datos',
+    name: 'Nombre',
+    age: 'Edad',
+    district: 'Distrito del Perú',
+    roleQuestion: '¿Quién está usando la app?',
+    parent: 'Padre / Madre',
+    child: 'Hijo / Hija',
+    deviceQuestion: '¿Qué dispositivo estás usando?',
+    darkModeTitle: '🌙 Modo de color',
+    light: '☀️ Claro',
+    dark: '🌙 Oscuro',
+    languageTitle: '🗣️ Idioma',
+    spanish: '🇪🇸 Español',
+    quechua: '🦙 Quechua',
+    whichTopic: '¿Qué quieres aprender hoy?',
+    whatIsCoima: '¿Qué es una coima?',
+    recognize: '¿Cómo reconocer una situación de corrupción?',
+    impact: '¿Por qué las coimas hacen daño?',
+    legal: 'Consecuencias legales',
+    prevent: 'Cómo prevenir la corrupción',
+    wantTest: 'Quiero ponerme a prueba.',
+    ageYears: 'años',
+  },
+  qu: {
+    greeting: '¡Napaykullayki! 👋',
+    welcomeLine: 'Kunanqa musuq imatapas yachaykushwan.',
+    welcomeTitle: 'Hablemos Claro',
+    welcomeSub: 'Coimamanta yachayqa, allin ruwaykunamanta yachaymi.',
+    start: '🎮 Qallariy Aventura',
+    howItWorks: '¿Imaynatam ruwan?',
+    badges: '🏅 Insigniykikuna',
+    themes: 'Yachaykuna',
+    themesDesc: 'Coimakunamanta yachay',
+    game: 'Pukllay',
+    gameDesc: 'Yachasqaykita kamachiy',
+    reels: 'Reels',
+    reelsDesc: 'Allin kawsay willakuykuna',
+    profile: 'Kaynin',
+    profileDesc: 'Progresoyki, insigniykikuna',
+    familyActivity: '💬 Ayllu ruway',
+    familyDesc: 'Wawaykiwan rimariy, imaynatam mana allin hapinakuyta mana allin harkaymanta.',
+    converse: 'Rimay →',
+    back: '← Kutiy',
+    continue: 'Katichiy',
+    profileTitle: 'Kayniykikuna',
+    profileSub: 'Yachay ñanniyki',
+    myBadges: '🎯 Insigniykikuna',
+    status: 'Kaynin',
+    champion: '🏆 Atipaq',
+    inProgress: 'Kunan ruwakuchkan',
+    activities: 'Ruwaykuna',
+    conversations: 'Rimaykuna',
+    generalProgress: 'Wiñay Progreso',
+    aboutTitle: '¿Imaynatam ruwan?',
+    aboutSub: 'Qallarinaykipaq tukuynintam riqsi.',
+    configTitle: 'Kamachiykuna',
+    yourData: '📝 Kayniykikuna',
+    name: 'Suti',
+    age: 'Watakuna',
+    district: 'Piruw distrito',
+    roleQuestion: '¿Pitaq kayta llamkachkan?',
+    parent: 'Tayta / Mama',
+    child: 'Wawa',
+    deviceQuestion: '¿Imaykanatam llamkachkanki?',
+    darkModeTitle: '🌙 Llimpikuna',
+    light: "☀️ K'anchaq",
+    dark: '🌙 Tutayay',
+    languageTitle: '🗣️ Simi',
+    spanish: '🇪🇸 Castellano',
+    quechua: '🦙 Runa Simi',
+    whichTopic: '¿Imatam kunan yachayta munanki?',
+    whatIsCoima: '¿Imam coima?',
+    recognize: '¿Imaynatam riqsin manam allin kaqta?',
+    impact: '¿Imaraykum coimakuna dañan?',
+    legal: 'Kamachiy harkaykuna',
+    prevent: 'Imaynatam harkayman coimata',
+    wantTest: 'Kunanmi yachayta munani.',
+    ageYears: 'wata',
+  },
+}
+
 const getStoredProgress = (): UserProgress => {
   const stored = localStorage.getItem('hablemos-claro-progress')
   if (stored) return JSON.parse(stored)
@@ -104,11 +219,31 @@ export default function App() {
   const [showBadgeCelebration, setShowBadgeCelebration] = useState(false)
   const [earnedBadge, setEarnedBadge] = useState<Badge | null>(null)
   const [darkMode, setDarkMode] = useState<boolean>(() => localStorage.getItem('hablemos-claro-dark') === 'true')
+  const [userName, setUserName] = useState<string>(() => localStorage.getItem('hablemos-claro-name') || '')
+  const [userAge, setUserAge] = useState<string>(() => localStorage.getItem('hablemos-claro-age') || '')
+  const [userDistrict, setUserDistrict] = useState<string>(() => localStorage.getItem('hablemos-claro-district') || '')
+  const [language, setLanguage] = useState<'es' | 'qu'>(() => (localStorage.getItem('hablemos-claro-lang') as 'es' | 'qu') || 'es')
+
+  // Traducción según idioma
+  const t = (key: keyof typeof translations['es']) => translations[language][key] ?? translations['es'][key]
+
+  // Guardar datos personales
+  const saveUserData = () => {
+    localStorage.setItem('hablemos-claro-name', userName)
+    localStorage.setItem('hablemos-claro-age', userAge)
+    localStorage.setItem('hablemos-claro-district', userDistrict)
+  }
 
   // Cambiar modo claro/oscuro
   const changeDarkMode = (value: boolean) => {
     setDarkMode(value)
     localStorage.setItem('hablemos-claro-dark', String(value))
+  }
+
+  // Cambiar idioma
+  const changeLanguage = (value: 'es' | 'qu') => {
+    setLanguage(value)
+    localStorage.setItem('hablemos-claro-lang', value)
   }
 
   // Navegar a siguiente pantalla
@@ -212,21 +347,21 @@ export default function App() {
       return (
         <div className="min-h-screen welcome-bg flex items-center justify-center p-4">
           <div className="max-w-5xl mx-auto text-center text-white animate-fade-in">
-            <h1 className="text-5xl font-bold mb-4 drop-shadow-lg">Hablemos Claro</h1>
-            <p className="text-xl mb-8 opacity-90">Aprender sobre las coimas también es aprender a tomar buenas decisiones.</p>
+            <h1 className="text-5xl font-bold mb-4 drop-shadow-lg">{t('welcomeTitle')}</h1>
+            <p className="text-xl mb-8 opacity-90">{t('welcomeSub')}</p>
             
             <div className="space-y-4">
               <button
                 onClick={() => setCurrentScreen('avatar')}
                 className="btn-glow bg-white text-primary font-bold py-4 px-8 rounded-full text-lg shadow-lg w-full"
               >
-                🎮 Empezar Aventura
+                {t('start')}
               </button>
               <button
                 onClick={() => setCurrentScreen('about')}
                 className="bg-white/20 backdrop-blur-sm border-2 border-white/30 text-white font-bold py-4 px-8 rounded-full text-lg w-full hover:bg-white/30 transition-all"
               >
-                ¿Cómo funciona?
+                {t('howItWorks')}
               </button>
             </div>
           </div>
@@ -300,12 +435,12 @@ export default function App() {
         <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-success/10 p-4">
           <div className="max-w-3xl mx-auto animate-slide-up">
             <div className="flex items-center justify-between mb-2">
-              <h1 className="text-3xl font-bold gradient-text">¿Cómo funciona?</h1>
+              <h1 className="text-3xl font-bold gradient-text">{t('aboutTitle')}</h1>
               <button onClick={() => setCurrentScreen('welcome')} className="glass-card px-3 py-1 rounded-xl text-gray-600 text-sm hover:bg-gray-100 transition-all">
-                ← Atrás
+                {t('back')}
               </button>
             </div>
-            <p className="text-gray-500 mb-8">Todo lo que necesitas saber antes de empezar.</p>
+            <p className="text-gray-500 mb-8">{t('aboutSub')}</p>
 
             <div className="glass-card rounded-2xl p-6 mb-4 card-hover">
               <h2 className="text-xl font-bold text-primary mb-3">🔎 ¿De qué trata la app?</h2>
@@ -353,26 +488,69 @@ export default function App() {
       return (
         <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-success/10 p-4">
           <div className="max-w-4xl mx-auto animate-slide-up">
-            <h2 className="text-3xl font-bold gradient-text mb-6 text-center">Configuración</h2>
+            <h2 className="text-3xl font-bold gradient-text mb-6 text-center">{t('configTitle')}</h2>
             
             <div className="space-y-4">
-              <p className="text-dark font-medium text-center">¿Quién está usando la app?</p>
+              <div className="glass-card rounded-2xl p-6 mb-4">
+                <h3 className="font-bold text-lg mb-4 text-center">{t('yourData')}</h3>
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-sm font-medium text-dark">{t('name')}</label>
+                    <input
+                      type="text"
+                      value={userName}
+                      onChange={e => setUserName(e.target.value)}
+                      onBlur={saveUserData}
+                      placeholder={t('name')}
+                      className="mt-1 w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-dark focus:outline-none focus:ring-2 focus:ring-primary font-medium"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-sm font-medium text-dark">{t('age')}</label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="120"
+                        value={userAge}
+                        onChange={e => setUserAge(e.target.value)}
+                        onBlur={saveUserData}
+                        placeholder={t('age')}
+                        className="mt-1 w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-dark focus:outline-none focus:ring-2 focus:ring-primary font-medium"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-dark">{t('district')}</label>
+                      <input
+                        type="text"
+                        value={userDistrict}
+                        onChange={e => setUserDistrict(e.target.value)}
+                        onBlur={saveUserData}
+                        placeholder={t('district')}
+                        className="mt-1 w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-dark focus:outline-none focus:ring-2 focus:ring-primary font-medium"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-dark font-medium text-center">{t('roleQuestion')}</p>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => setSelectedRole('parent')}
                   className={selectedRole === 'parent' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all'}
                 >
-                  Padre / Madre
+                  {t('parent')}
                 </button>
                 <button
                   onClick={() => setSelectedRole('child')}
                   className={selectedRole === 'child' ? 'bg-secondary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-secondary/20 transition-all'}
                 >
-                  Hijo / Hija
+                  {t('child')}
                 </button>
               </div>
 
-              <p className="text-dark font-medium text-center mt-6">¿Qué dispositivo estás usando?</p>
+              <p className="text-dark font-medium text-center mt-6">{t('deviceQuestion')}</p>
               <div className="grid grid-cols-3 gap-3">
                 <button
                   onClick={() => setDevice('pc')}
@@ -394,59 +572,75 @@ export default function App() {
                 </button>
               </div>
 
-              <p className="text-dark font-medium text-center mt-6">🌙 Modo de color</p>
+              <p className="text-dark font-medium text-center mt-6">{t('darkModeTitle')}</p>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => changeDarkMode(false)}
                   className={!darkMode ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all'}
                 >
-                  ☀️ Claro
+                  {t('light')}
                 </button>
                 <button
                   onClick={() => changeDarkMode(true)}
                   className={darkMode ? 'bg-secondary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-secondary/20 transition-all'}
                 >
-                  🌙 Oscuro
+                  {t('dark')}
                 </button>
               </div>
 
-              <p className="text-dark font-medium text-center mt-6">¿Qué quieres aprender hoy?</p>
+              <p className="text-dark font-medium text-center mt-6">{t('languageTitle')}</p>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => changeLanguage('es')}
+                  className={language === 'es' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all'}
+                >
+                  {t('spanish')}
+                </button>
+                <button
+                  onClick={() => changeLanguage('qu')}
+                  className={language === 'qu' ? 'bg-secondary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-secondary/20 transition-all'}
+                >
+                  {t('quechua')}
+                </button>
+              </div>
+
+              <p className="text-dark font-medium text-center mt-6">{t('whichTopic')}</p>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => { setSelectedTopic('coima'); setCurrentScreen('home'); } }
                   className={selectedTopic === 'coima' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all card-hover'}
                 >
-                  ¿Qué es una coima?
+                  {t('whatIsCoima')}
                 </button>
                 <button
                   onClick={() => { setSelectedTopic('recognition'); setCurrentScreen('home'); } }
                   className={selectedTopic === 'recognition' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all card-hover'}
                 >
-                  ¿Cómo reconocer una situación de corrupción?
+                  {t('recognize')}
                 </button>
                 <button
                   onClick={() => { setSelectedTopic('impact'); setCurrentScreen('home'); } }
                   className={selectedTopic === 'impact' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all card-hover'}
                 >
-                  ¿Por qué las coimas hacen daño?
+                  {t('impact')}
                 </button>
                 <button
                   onClick={() => { setSelectedTopic('consequences'); setCurrentScreen('home'); } }
                   className={selectedTopic === 'consequences' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all card-hover'}
                 >
-                  Consecuencias legales
+                  {t('legal')}
                 </button>
                 <button
                   onClick={() => { setSelectedTopic('prevention'); setCurrentScreen('home'); } }
                   className={selectedTopic === 'prevention' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all card-hover'}
                 >
-                  Cómo prevenir la corrupción
+                  {t('prevent')}
                 </button>
                 <button
                   onClick={() => { setSelectedTopic('test'); setCurrentScreen('home'); } }
                   className={selectedTopic === 'test' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all card-hover'}
                 >
-                  Quiero ponerme a prueba.
+                  {t('wantTest')}
                 </button>
               </div>
             </div>
@@ -478,21 +672,21 @@ export default function App() {
                   {selectedAvatar ? selectedAvatar.emoji : '🦸'}
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold gradient-text">¡Hola! 👋</h1>
+                  <h1 className="text-2xl font-bold gradient-text">{t('greeting')}</h1>
                   <p className="text-sm text-gray-500">{device === 'phone' ? '📱 Móvil' : device === 'laptop' ? '💻 Laptop' : '🖥️ PC'}</p>
                 </div>
               </div>
               <button onClick={() => setCurrentScreen('profile')} className="glass-card px-4 py-2 rounded-xl text-primary text-sm font-medium hover:bg-primary/10 transition-all">
-                Perfil ⭐
+                {t('profile')} ⭐
               </button>
             </div>
 
-            <p className="text-lg text-gray-600 mb-6">Hoy podemos aprender algo nuevo juntos.</p>
+            <p className="text-lg text-gray-600 mb-6">{t('welcomeLine')}</p>
 
             {/* Progreso + insignias */}
             <div className="glass-card rounded-2xl p-6 mb-6 card-hover">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-bold text-secondary text-lg">🏅 Tus insignias</h3>
+                <h3 className="font-bold text-secondary text-lg">{t('badges')}</h3>
                 <span className="text-sm font-bold text-primary">{unlockedCount}/3</span>
               </div>
               <div className="flex gap-3 mb-4">
@@ -518,45 +712,45 @@ export default function App() {
                 className="glass-card rounded-2xl p-6 text-left card-hover shadow-custom-lg"
               >
                 <div className="text-4xl mb-2">📚</div>
-                <h3 className="font-bold text-primary">Temas</h3>
-                <p className="text-sm text-gray-500">Aprende sobre las coimas</p>
+                <h3 className="font-bold text-primary">{t('themes')}</h3>
+                <p className="text-sm text-gray-500">{t('themesDesc')}</p>
               </button>
               <button
                 onClick={() => setCurrentScreen('games')}
                 className="glass-card rounded-2xl p-6 text-left card-hover shadow-custom-lg"
               >
                 <div className="text-4xl mb-2">🎮</div>
-                <h3 className="font-bold text-secondary">Juego</h3>
-                <p className="text-sm text-gray-500">Pon a prueba lo que sabes</p>
+                <h3 className="font-bold text-secondary">{t('game')}</h3>
+                <p className="text-sm text-gray-500">{t('gameDesc')}</p>
               </button>
               <button
                 onClick={() => setCurrentScreen('reels')}
                 className="glass-card rounded-2xl p-6 text-left card-hover shadow-custom-lg"
               >
                 <div className="text-4xl mb-2">📱</div>
-                <h3 className="font-bold text-warning">Reels</h3>
-                <p className="text-sm text-gray-500">Mensajes de integridad</p>
+                <h3 className="font-bold text-warning">{t('reels')}</h3>
+                <p className="text-sm text-gray-500">{t('reelsDesc')}</p>
               </button>
               <button
                 onClick={() => setCurrentScreen('profile')}
                 className="glass-card rounded-2xl p-6 text-left card-hover shadow-custom-lg"
               >
                 <div className="text-4xl mb-2">👤</div>
-                <h3 className="font-bold text-success">Perfil</h3>
-                <p className="text-sm text-gray-500">Tu progreso e insignias</p>
+                <h3 className="font-bold text-success">{t('profile')}</h3>
+                <p className="text-sm text-gray-500">{t('profileDesc')}</p>
               </button>
             </div>
 
             <div className="glass-card rounded-2xl p-6 card-hover">
-              <h3 className="font-bold text-warning text-lg mb-2">💬 Actividad familiar</h3>
+              <h3 className="font-bold text-warning text-lg mb-2">{t('familyActivity')}</h3>
               <p className="text-gray-600 text-sm mb-4">
-                Habla con tu hijo/a sobre una situación en la que alguien podría intentar conseguir algo de manera injusta.
+                {t('familyDesc')}
               </p>
               <button
                 onClick={() => setCurrentScreen('converse')}
                 className="btn-glow bg-warning text-white font-bold py-3 px-6 rounded-xl text-sm w-full"
               >
-                Conversar →
+                {t('converse')}
               </button>
             </div>
           </div>
@@ -569,11 +763,11 @@ export default function App() {
           <div className="max-w-5xl mx-auto animate-slide-up">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h1 className="text-3xl font-bold gradient-text">Reels 📱</h1>
-                <p className="text-sm text-gray-500">Mensajes cortos para reflexionar</p>
+                <h1 className="text-3xl font-bold gradient-text">{t('reels')} 📱</h1>
+                <p className="text-sm text-gray-500">{t('reelsDesc')}</p>
               </div>
               <button onClick={() => navigateTo('home')} className="glass-card px-3 py-1 rounded-xl text-gray-600 text-sm hover:bg-gray-100 transition-all">
-                ← Atrás
+                {t('back')}
               </button>
             </div>
 
@@ -1303,38 +1497,50 @@ export default function App() {
         <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/5 to-warning/10 p-4">
           <div className="max-w-4xl mx-auto animate-slide-up">
             <div className="text-center mb-8">
-              <div className="w-24 h-24 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-float">
-                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 014 4v3a4 4 0 01-4 4V3a4 4 0 01-4-4zM5 7a2 2 0 012-2h4a2 2 0 012 2v3a2 2 0 01-2h4a2 2 0 01-2v-3zM8 21a4 4 0 01-4-4v-3a4 4 0 014-4h6a4 4 0 014 4v3a4 4 0 01-4 4zm8-13a4 4 0 01-4-4V7a4 4 0 014-4h3a4 4 0 014 4v3a4 4 0 01-4 4h-3z"></path>
-                </svg>
+              <div className="w-24 h-24 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-float text-5xl">
+                {selectedAvatar ? selectedAvatar.emoji : '👤'}
               </div>
-              <h2 className="text-3xl font-bold gradient-text">Familia 👨‍👩‍👧‍👦</h2>
-              <p className="text-gray-500 mt-1">Tu progreso de aprendizaje</p>
+              <h2 className="text-3xl font-bold gradient-text">{userName || 'Familia 👨‍👩‍👧‍👦'}</h2>
+              <p className="text-gray-500 mt-1">{t('profileSub')}</p>
+              {(userAge || userDistrict) && (
+                <div className="flex justify-center gap-2 mt-3 flex-wrap">
+                  {userAge && (
+                    <span className="px-4 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
+                      🎂 {userAge} {t('ageYears')}
+                    </span>
+                  )}
+                  {userDistrict && (
+                    <span className="px-4 py-1 rounded-full bg-secondary/10 text-secondary text-sm font-medium">
+                      📍 {userDistrict}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="glass-card rounded-2xl p-6 shadow-custom-lg mb-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-3">
                   <div className="text-3xl font-bold gradient-text">{progress.badges.filter(b => b.unlocked).length}/3</div>
-                  <div className="text-sm text-gray-500 mt-1">Insignias</div>
+                  <div className="text-sm text-gray-500 mt-1">{t('myBadges')}</div>
                 </div>
                 <div className="text-center p-3">
                   <div className="text-3xl font-bold text-secondary">{progress.completedActivities}</div>
-                  <div className="text-sm text-gray-500 mt-1">Actividades</div>
+                  <div className="text-sm text-gray-500 mt-1">{t('activities')}</div>
                 </div>
                 <div className="text-center p-3">
                   <div className="text-3xl font-bold text-warning">{progress.conversations}</div>
-                  <div className="text-sm text-gray-500 mt-1">Conversaciones</div>
+                  <div className="text-sm text-gray-500 mt-1">{t('conversations')}</div>
                 </div>
                 <div className="text-center p-3">
-                  <div className="text-lg font-bold text-primary">{progress.badges.find(b => b.id === 'integrity-champion')?.unlocked ? '🏆 Campeón' : 'En progreso'}</div>
-                  <div className="text-sm text-gray-500 mt-1">Estado</div>
+                  <div className="text-lg font-bold text-primary">{progress.badges.find(b => b.id === 'integrity-champion')?.unlocked ? t('champion') : t('inProgress')}</div>
+                  <div className="text-sm text-gray-500 mt-1">{t('status')}</div>
                 </div>
               </div>
             </div>
 
             <div className="glass-card rounded-2xl p-6 mb-4">
-              <h3 className="font-bold text-dark mb-3">Progreso General</h3>
+              <h3 className="font-bold text-dark mb-3">{t('generalProgress')}</h3>
               <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
                 <div 
                   className="progress-bar h-full"
@@ -1348,7 +1554,7 @@ export default function App() {
             </div>
 
             <div className="glass-card rounded-2xl p-6 mb-4">
-              <h3 className="font-bold text-dark mb-2">🎯 Tus Insignias</h3>
+              <h3 className="font-bold text-dark mb-2">{t('myBadges')}</h3>
               <div className="flex gap-3 mt-3">
                 {progress.badges.map(badge => (
                   <div key={badge.id} className={`text-center p-3 rounded-xl ${badge.unlocked ? '' : 'opacity-40 grayscale'}`} style={{ border: badge.unlocked ? `2px solid ${badge.color}` : '2px solid gray' }}>
