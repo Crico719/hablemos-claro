@@ -1010,11 +1010,11 @@ export default function App() {
                 <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-primary rounded-full transition-width"
-                    style={{ width: `${progress.points / 100 * 100}%` }}
+                    style={{ width: `${progress.totalActivities > 0 ? (progress.completedActivities / progress.totalActivities) * 100 : 0}%` }}
                   ></div>
                 </div>
                 <p className="text-xs text-gray-600 mt-1">{progress.level}</p>
-                <p className="text-xs text-gray-600">60% completado</p>
+                <p className="text-xs text-gray-600">{progress.totalActivities > 0 ? Math.round((progress.completedActivities / progress.totalActivities) * 100) : 0}% completado</p>
               </div>
 
               <div>
@@ -1038,6 +1038,9 @@ export default function App() {
               <h3 className="font-medium text-gray-500 text-sm mb-3">Mi progreso</h3>
               <p className="text-gray-600 text-sm">
                 Llevas {progress.completedActivities} de {progress.totalActivities} actividades completadas
+              </p>
+              <p className="text-gray-600 text-sm">
+                {progress.totalActivities > 0 ? Math.round((progress.completedActivities / progress.totalActivities) * 100) : 0}% completado
               </p>
               <p className="text-gray-600 text-sm">
                 {progress.conversations} conversaciones familiares realizadas
