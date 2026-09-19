@@ -4,6 +4,14 @@ import './index.css'
 // Tipos para la aplicación
 type UserRole = 'parent' | 'child'
 type LearningTopic = 'coima' | 'recognition' | 'impact' | 'consequences' | 'prevention' | 'test'
+type PlayMode = 'individual' | 'family'
+
+interface Avatar {
+  id: number
+  name: string
+  color: string
+  emoji: string
+}
 
 interface UserProgress {
   totalActivities: number
@@ -19,7 +27,15 @@ interface ConversationPrompt {
   asked: boolean
 }
 
-// Datos de progreso simulados (usando localStorage)
+const avatars: Avatar[] = [
+  { id: 1, name: 'Valiente', color: '#EF4444', emoji: '🦸' },
+  { id: 2, name: 'Sabio', color: '#3B82F6', emoji: '🧠' },
+  { id: 3, name: 'Amigable', color: '#10B981', emoji: '🤝' },
+  { id: 4, name: 'Creativo', color: '#8B5CF6', emoji: '🎨' },
+  { id: 5, name: 'Fuerte', color: '#F59E0B', emoji: '💪' },
+  { id: 6, name: 'Brillante', color: '#EC4899', emoji: '✨' },
+]
+
 const getStoredProgress = (): UserProgress => {
   const stored = localStorage.getItem('hablemos-claro-progress')
   if (stored) return JSON.parse(stored)
@@ -60,7 +76,7 @@ const initialProgress = getStoredProgress()
 
 export default function App() {
   const [progress, setProgress] = useState<UserProgress>(initialProgress)
-  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'config' | 'home' | 'learn' | 'quiz' | 'result' | 'games' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents'>('welcome')
+  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'avatar' | 'config' | 'home' | 'learn' | 'quiz' | 'result' | 'games' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents'>('welcome')
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null)
   const [selectedTopic, setSelectedTopic] = useState<LearningTopic | null>(null)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -69,6 +85,8 @@ export default function App() {
   const [feedbackMessage, setFeedbackMessage] = useState<string>('')
   const [showCoimaONo, setShowCoimaONo] = useState(false)
   const [currentCoimaCase, setCurrentCoimaCase] = useState(0)
+  const [selectedAvatar, setSelectedAvatar] = useState<Avatar | null>(null)
+  const [playMode, setPlayMode] = useState<PlayMode>('individual')
 
   // Navegar a siguiente pantalla
   const navigateTo = (screen: typeof currentScreen) => {
@@ -155,13 +173,6 @@ export default function App() {
 
   // Reiniciar aplicación
 
-  // Lógica por pantalla
-  const handleStart = () => {
-    setSelectedRole('parent') // Por defecto, o podríamos preguntar
-    setSelectedTopic('coima')
-    setCurrentScreen('home')
-  }
-
   // Renderizar según pantalla
   switch (currentScreen) {
     case 'welcome':
@@ -173,10 +184,10 @@ export default function App() {
             
             <div className="space-y-4">
               <button
-                onClick={handleStart}
+                onClick={() => setCurrentScreen('avatar')}
                 className="btn-glow bg-white text-primary font-bold py-4 px-8 rounded-full text-lg shadow-lg w-full"
               >
-                Comenzar
+                🎮 Empezar Aventura
               </button>
               <button
                 onClick={() => setCurrentScreen('config')}
@@ -185,6 +196,68 @@ export default function App() {
                 ¿Cómo funciona?
               </button>
             </div>
+          </div>
+        </div>
+      )
+
+    case 'avatar':
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-success/10 p-4">
+          <div className="max-w-2xl mx-auto animate-slide-up">
+            <h1 className="text-3xl font-bold gradient-text text-center mb-2">Crea tu Avatar</h1>
+            <p className="text-center text-gray-500 mb-6">Elige tu personaje para la aventura</p>
+
+            <div className="grid grid-cols-3 gap-4 mb-8">
+              {avatars.map((avatar) => (
+                <button
+                  key={avatar.id}
+                  onClick={() => setSelectedAvatar(avatar)}
+                  className={`glass-card rounded-2xl p-4 text-center card-hover ${selectedAvatar?.id === avatar.id ? 'ring-4 ring-primary border-primary' : ''}`}
+                  style={{ borderColor: selectedAvatar?.id === avatar.id ? avatar.color : 'transparent' }}
+                >
+                  <div className="text-5xl mb-2 animate-float">{avatar.emoji}</div>
+                  <div className="font-bold text-dark text-sm">{avatar.name}</div>
+                </button>
+              ))}
+            </div>
+
+            <div className="glass-card rounded-2xl p-6 mb-6">
+              <h3 className="font-bold text-lg mb-4 text-center">🎮 Modo de juego</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  onClick={() => setPlayMode('individual')}
+                  className={`py-4 px-6 rounded-xl font-bold transition-all ${playMode === 'individual' ? 'bg-primary text-white shadow-lg' : 'glass-card text-dark hover:bg-primary/10'}`}
+                >
+                  👤 Individual
+                </button>
+                <button
+                  onClick={() => setPlayMode('family')}
+                  className={`py-4 px-6 rounded-xl font-bold transition-all ${playMode === 'family' ? 'bg-secondary text-white shadow-lg' : 'glass-card text-dark hover:bg-secondary/10'}`}
+                >
+                  👨‍👩‍👧‍👦 Con familia
+                </button>
+              </div>
+            </div>
+
+            {selectedAvatar && (
+              <div className="glass-card rounded-2xl p-6 mb-6 animate-fade-in">
+                <div className="flex items-center justify-center gap-4 mb-4">
+                  <div className="text-6xl animate-float">{selectedAvatar.emoji}</div>
+                  <div>
+                    <div className="text-2xl font-bold" style={{ color: selectedAvatar.color }}>{selectedAvatar.name}</div>
+                    <div className="text-gray-500">{playMode === 'individual' ? 'Jugando solo' : 'Jugando con familia'}</div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <button
+              onClick={() => { if (selectedAvatar) setCurrentScreen('config'); }}
+              disabled={!selectedAvatar}
+              className={`w-full py-4 rounded-xl font-bold text-lg ${selectedAvatar ? 'btn-glow bg-primary text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+            >
+              Continuar →
+            </button>
           </div>
         </div>
       )
