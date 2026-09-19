@@ -12,6 +12,12 @@ body {
   min-height: 100vh;
 }
 
+@media (min-width: 1024px) {
+  html {
+    font-size: 19px;
+  }
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }

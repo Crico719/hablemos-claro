@@ -204,7 +204,7 @@ export default function App() {
     case 'welcome':
       return (
         <div className="min-h-screen welcome-bg flex items-center justify-center p-4">
-          <div className="max-w-2xl mx-auto text-center text-white animate-fade-in">
+          <div className="max-w-5xl mx-auto text-center text-white animate-fade-in">
             <h1 className="text-5xl font-bold mb-4 drop-shadow-lg">Hablemos Claro</h1>
             <p className="text-xl mb-8 opacity-90">Aprender sobre las coimas también es aprender a tomar buenas decisiones.</p>
             
@@ -229,7 +229,7 @@ export default function App() {
     case 'avatar':
       return (
         <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-success/10 p-4">
-          <div className="max-w-2xl mx-auto animate-slide-up">
+          <div className="max-w-5xl mx-auto animate-slide-up">
             <h1 className="text-3xl font-bold gradient-text text-center mb-2">Crea tu Avatar</h1>
             <p className="text-center text-gray-500 mb-6">Elige tu personaje para la aventura</p>
 
@@ -291,7 +291,7 @@ export default function App() {
     case 'config':
       return (
         <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-success/10 p-4">
-          <div className="max-w-md mx-auto animate-slide-up">
+          <div className="max-w-4xl mx-auto animate-slide-up">
             <h2 className="text-3xl font-bold gradient-text mb-6 text-center">Configuración</h2>
             
             <div className="space-y-4">
@@ -394,7 +394,7 @@ export default function App() {
       const unlockedCount = progress.badges.filter(b => b.unlocked).length
       return (
         <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-secondary/5 p-4">
-          <div className="max-w-3xl mx-auto animate-slide-up">
+          <div className="max-w-6xl mx-auto animate-slide-up">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-2xl shadow-lg animate-float">
@@ -489,7 +489,7 @@ export default function App() {
     case 'reels':
       return (
         <div className="min-h-screen bg-gradient-to-br from-warning/10 via-white to-primary/5 p-4">
-          <div className="max-w-xl mx-auto animate-slide-up">
+          <div className="max-w-5xl mx-auto animate-slide-up">
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h1 className="text-3xl font-bold gradient-text">Reels 📱</h1>
@@ -619,7 +619,7 @@ export default function App() {
         const currentCase = coimaCases[currentCoimaCase]
         return (
           <div className="min-h-screen bg-light text-dark p-4">
-            <div className="max-w-2xl mx-auto">
+            <div className="max-w-5xl mx-auto">
               <div className="flex items-center justify-between mb-4">
                 <h1 className="text-2xl font-bold text-primary">¿Coima o no?</h1>
                 <button onClick={() => { setShowCoimaONo(false); setCurrentCoimaCase(0); }} className="text-gray-500 hover:text-primary">
@@ -697,7 +697,7 @@ export default function App() {
 
       return (
         <div className="min-h-screen bg-light text-dark p-4">
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-5xl mx-auto">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-2xl font-bold text-primary">
                 {currentTopicData.title}
@@ -840,7 +840,7 @@ export default function App() {
 
       return (
         <div className="min-h-screen bg-gradient-to-br from-secondary/10 via-primary/5 to-success/10 p-4">
-          <div className="max-w-2xl mx-auto animate-slide-up">
+          <div className="max-w-5xl mx-auto animate-slide-up">
             <div className="flex items-center justify-between mb-6">
               <h1 className="text-3xl font-bold gradient-text">¿Qué harías?</h1>
               <button onClick={() => navigateTo('home')} className="glass-card px-3 py-1 rounded-xl text-gray-600 text-sm hover:bg-gray-100 transition-all">
@@ -893,7 +893,7 @@ export default function App() {
     case 'result':
       return (
         <div className="min-h-screen bg-light text-dark p-4">
-          <div className="max-w-2xl mx-auto text-center">
+          <div className="max-w-5xl mx-auto text-center">
             <h2 className="text-4xl font-bold text-primary mb-4">¡Actividad completada! 🎉</h2>
             <p className="text-3xl font-bold">{progress.completedActivities}/{progress.totalActivities}</p>
             <p className="text-gray-700 mt-4">Has aprendido a identificar algunas situaciones relacionadas con las coimas.</p>
@@ -923,7 +923,7 @@ export default function App() {
     case 'games':
       return (
         <div className="min-h-screen bg-light text-dark p-4">
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-5xl mx-auto">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-2xl font-bold text-primary">Pon a prueba lo que sabes 🎮</h1>
               <button onClick={() => navigateTo('home')} className="text-gray-500 hover:text-primary">
@@ -1015,7 +1015,7 @@ export default function App() {
     case 'converse':
       return (
         <div className="min-h-screen bg-light text-dark p-4">
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-5xl mx-auto">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-2xl font-bold text-primary">Conversemos en familia 💬</h1>
               <button onClick={() => navigateTo('home')} className="text-gray-500 hover:text-primary">
@@ -1068,7 +1068,7 @@ export default function App() {
     case 'activity':
       return (
         <div className="min-h-screen bg-light text-dark p-4">
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-5xl mx-auto">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-2xl font-bold text-family">Detectemos juntos</h1>
               <button onClick={() => navigateTo('converse')} className="text-gray-500 hover:text-primary">
@@ -1172,7 +1172,7 @@ export default function App() {
 
       return (
         <div className="min-h-screen bg-light text-dark p-4">
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-6xl mx-auto">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-2xl font-bold text-primary">Casos de la vida cotidiana</h1>
               <button onClick={() => navigateTo('activity')} className="text-gray-500 hover:text-primary">
@@ -1224,7 +1224,7 @@ export default function App() {
     case 'profile':
       return (
         <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/5 to-warning/10 p-4">
-          <div className="max-w-md mx-auto animate-slide-up">
+          <div className="max-w-4xl mx-auto animate-slide-up">
             <div className="text-center mb-8">
               <div className="w-24 h-24 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-float">
                 <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1294,7 +1294,7 @@ export default function App() {
     case 'content-for-parents':
       return (
         <div className="min-h-screen bg-light text-dark p-4">
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-5xl mx-auto">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-2xl font-bold text-primary">Guía para conversar</h1>
               <button onClick={() => navigateTo('home')} className="text-gray-500 hover:text-primary">
