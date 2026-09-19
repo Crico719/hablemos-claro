@@ -361,7 +361,7 @@ export default function App() {
             <div className="space-y-4">
               <button
                 onClick={() => { localStorage.setItem('hablemos-claro-configured', 'true'); setCurrentScreen('home'); }}
-                className="btn-glow bg-white text-primary font-bold py-4 px-8 rounded-full text-lg shadow-lg w-full"
+                className="btn-glow bg-white text-black font-bold py-4 px-8 rounded-full text-lg shadow-lg w-full"
               >
                 {t('start')}
               </button>
