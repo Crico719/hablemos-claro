@@ -89,7 +89,7 @@ const initialProgress = getStoredProgress()
 
 export default function App() {
   const [progress, setProgress] = useState<UserProgress>(initialProgress)
-  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'avatar' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents'>('welcome')
+  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents'>('welcome')
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null)
   const [selectedTopic, setSelectedTopic] = useState<LearningTopic | null>(null)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -223,7 +223,7 @@ export default function App() {
                 🎮 Empezar Aventura
               </button>
               <button
-                onClick={() => setCurrentScreen('config')}
+                onClick={() => setCurrentScreen('about')}
                 className="bg-white/20 backdrop-blur-sm border-2 border-white/30 text-white font-bold py-4 px-8 rounded-full text-lg w-full hover:bg-white/30 transition-all"
               >
                 ¿Cómo funciona?
@@ -290,6 +290,60 @@ export default function App() {
               className={`w-full py-4 rounded-xl font-bold text-lg ${selectedAvatar ? 'btn-glow bg-primary text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
             >
               Continuar →
+            </button>
+          </div>
+        </div>
+      )
+
+    case 'about':
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-success/10 p-4">
+          <div className="max-w-3xl mx-auto animate-slide-up">
+            <div className="flex items-center justify-between mb-2">
+              <h1 className="text-3xl font-bold gradient-text">¿Cómo funciona?</h1>
+              <button onClick={() => setCurrentScreen('welcome')} className="glass-card px-3 py-1 rounded-xl text-gray-600 text-sm hover:bg-gray-100 transition-all">
+                ← Atrás
+              </button>
+            </div>
+            <p className="text-gray-500 mb-8">Todo lo que necesitas saber antes de empezar.</p>
+
+            <div className="glass-card rounded-2xl p-6 mb-4 card-hover">
+              <h2 className="text-xl font-bold text-primary mb-3">🔎 ¿De qué trata la app?</h2>
+              <p className="text-gray-700 leading-relaxed">
+                <strong>Hablemos Claro</strong> es una aplicación educativa para que las familias aprendan a conversar sobre las <strong>coimas (sobornos)</strong> y la corrupción.
+              </p>
+              <ul className="text-gray-700 mt-3 space-y-2">
+                <li>📚 <strong>Temas:</strong> explica qué es una coima, cómo reconocerla, por qué hace daño y cómo prevenirla.</li>
+                <li>🎮 <strong>Juego:</strong> actividades para aplicar lo aprendido.</li>
+                <li>📱 <strong>Reels:</strong> mensajes cortos que refuerzan la integridad.</li>
+                <li>💬 <strong>Conversaciones:</strong> preguntas para dialogar en familia.</li>
+              </ul>
+            </div>
+
+            <div className="glass-card rounded-2xl p-6 mb-4 card-hover">
+              <h2 className="text-xl font-bold text-secondary mb-3">👨👩👧👦 ¿A quién está dirigida?</h2>
+              <p className="text-gray-700 leading-relaxed">
+                Está pensada para <strong>padres, madres, hijos e hijas</strong> de todas las edades, para que aprendan juntos en casa. También sirve a jóvenes y docentes interesados en entender la corrupción y promover valores como la honestidad y la transparencia.
+              </p>
+            </div>
+
+            <div className="glass-card rounded-2xl p-6 mb-8 card-hover">
+              <h2 className="text-xl font-bold text-warning mb-3">🛠️ ¿Cómo usar la app?</h2>
+              <ol className="text-gray-700 space-y-3 list-decimal list-inside">
+                <li><strong>Crea tu avatar:</strong> elige tu personaje.</li>
+                <li><strong>Elige el modo:</strong> individual 👤 o con familia 👨‍👩‍👧‍👦.</li>
+                <li><strong>Configura:</strong> tu rol (padre/hijo), tu dispositivo (PC, móvil o laptop) y el tema del día.</li>
+                <li><strong>Explora los Temas</strong> desde la pantalla de inicio.</li>
+                <li><strong>Juega y desbloquea las 3 insignias</strong> 🏅 del perfil.</li>
+                <li><strong>Mira los Reels</strong> para reforzar lo aprendido.</li>
+              </ol>
+            </div>
+
+            <button
+              onClick={() => setCurrentScreen('avatar')}
+              className="btn-glow bg-primary text-white font-bold py-4 px-6 rounded-xl text-lg w-full"
+            >
+              ¡Empezar aventura! 🎮
             </button>
           </div>
         </div>
