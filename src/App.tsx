@@ -3,7 +3,7 @@ import './index.css'
 
 // Tipos para la aplicación
 type UserRole = 'parent' | 'child'
-type LearningTopic = 'coima' | 'recognition' | 'impact' | 'test'
+type LearningTopic = 'coima' | 'recognition' | 'impact' | 'consequences' | 'prevention' | 'test'
 
 interface UserProgress {
   totalActivities: number
@@ -233,7 +233,19 @@ export default function App() {
                   ¿Por qué las coimas hacen daño?
                 </button>
                 <button
-                  onClick={() => { setCurrentScreen('games'); } }
+                  onClick={() => { setSelectedTopic('consequences'); setCurrentScreen('home'); } }
+                  className={selectedTopic === 'consequences' ? 'btn-primary bg-primary/20 text-primary' : 'btn-outline'}
+                >
+                  Consecuencias legales
+                </button>
+                <button
+                  onClick={() => { setSelectedTopic('prevention'); setCurrentScreen('home'); } }
+                  className={selectedTopic === 'prevention' ? 'btn-primary bg-primary/20 text-primary' : 'btn-outline'}
+                >
+                  Cómo prevenir la corrupción
+                </button>
+                <button
+                  onClick={() => { setSelectedTopic('test'); setCurrentScreen('home'); } }
                   className={selectedTopic === 'test' ? 'btn-primary bg-primary/20 text-primary' : 'btn-outline'}
                 >
                   Quiero ponerme a prueba.
@@ -323,27 +335,53 @@ export default function App() {
           example: 'Una persona ofrece dinero para que alguien ignore una regla que debería cumplir.',
           correct: 'No es correcto',
           incorrect: 'Lo correcto es respetar las reglas.',
+          video: 'https://www.youtube.com/embed/5LbVY6qH3kM',
+          theorem: 'Principio de Transparencia: Toda decisión pública debe estar abierta a la supervisión de los ciudadanos. La información es un derecho, no un privilegio.',
         },
         recognition: {
           title: '¿Cómo reconocer una situación de corrupción?',
-          explanation: 'Aprende a identificar cuándo alguien está pidiendo un beneficio a cambio de algo injusto.',
+          explanation: 'Aprende a identificar cuándo alguien está pidiendo un beneficio a cambio de algo injusto. Señales: ofertas secretas, tratos exclusivos, presión por decidir rápido.',
           example: 'Un funcionario pide dinero para acelerar un trámite.',
           correct: 'Situación de corrupción',
           incorrect: 'Situación normal',
+          video: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+          theorem: 'Principio de Responsabilidad: Quien toma una decisión debe rendir cuentas sobre sus actos. El poder sin control es abuso.',
         },
         impact: {
           title: '¿Por qué las coimas hacen daño?',
-          explanation: 'Las coimas afectan a toda la sociedad al desviar recursos de lo que realmente importa.',
+          explanation: 'Las coimas afectan a toda la sociedad al desviar recursos de lo que realmente importa: salud, educación, seguridad. El daño es desigual, siempre paga el más vulnerable.',
           example: 'El dinero de una coima podría haber sido usado para escuelas o hospitales.',
           correct: 'Daño a la sociedad',
           incorrect: 'Sin consecuencias',
+          video: 'https://www.youtube.com/embed/9bZkp7q19f0',
+          theorem: 'Principio de Equidad: Todos merecemos el mismo trato justo. La corrupción rompe la igualdad ante la ley y agrava la pobreza.',
+        },
+        consequences: {
+          title: 'Consecuencias legales y sociales',
+          explanation: 'Quien ofrece o acepta una coima comete un delito. Las consecuencias incluyen multas, cárcel, pérdida de empleo y daño permanente a la reputación. También destruye la confianza entre ciudadanos.',
+          example: 'Un alcalde que recibe sobornos puede ir a la cárcel y su comunidad pierde servicios públicos.',
+          correct: 'Consecuencias graves',
+          incorrect: 'No pasa nada',
+          video: 'https://www.youtube.com/embed/DqP2rR0fB4s',
+          theorem: 'Principio de Proporcionalidad: La pena debe ser proporcional al delito. Pero la prevención siempre es mejor que el castigo.',
+        },
+        prevention: {
+          title: 'Cómo prevenir la corrupción',
+          explanation: 'La prevención empieza con la educación. Conocer tus derechos, denunciar cuando algo está mal, y fomentar la cultura de la honestidad son herramientas poderosas. Cada persona puede marcar la diferencia.',
+          example: 'Un grupo de vecinos que exige rendición de cuentas a su comité comunitario previene el uso indebido de fondos.',
+          correct: 'Sí, la prevención funciona',
+          incorrect: 'No se puede hacer nada',
+          video: 'https://www.youtube.com/embed/kffacxfA7G4',
+          theorem: 'Principio de Participación Ciudadana: La democracia se fortalece cuando todos vigilamos y participamos. El silencio cómplice es la mayor herramienta de la corrupción.',
         },
         test: {
           title: 'Pon a prueba tus conocimientos',
-          explanation: 'Responde estas preguntas para verificar lo que aprendiste.',
+          explanation: 'Responde estas preguntas para verificar lo que aprendiste sobre todos los temas.',
           example: '',
           correct: '',
           incorrect: '',
+          video: '',
+          theorem: 'Recuerda: La integridad no es solo no hacer lo malo, sino actuar correctamente incluso cuando nadie te ve.',
         },
       }
 
