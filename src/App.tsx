@@ -1348,7 +1348,30 @@ export default function App() {
 
   return (
     <>
-      {renderScreen()}
+      {device === 'phone' ? (
+        // Marco de móvil: la app se muestra como un celular centrado
+        <div className="min-h-screen flex items-center justify-center p-3" style={{ background: 'linear-gradient(135deg, #0f172a, #1e293b, #0f172a)' }}>
+          <div className="relative w-[390px] max-w-full h-screen rounded-[3rem] bg-slate-900 p-2.5 shadow-2xl">
+            <div className="absolute top-5 left-1/2 -translate-x-1/2 w-32 h-5 rounded-full bg-slate-900 border border-slate-700 z-20 pointer-events-none"></div>
+            <div className="h-full rounded-[2rem] overflow-y-auto overflow-x-hidden bg-white">
+              {renderScreen()}
+            </div>
+          </div>
+        </div>
+      ) : device === 'laptop' ? (
+        // Marco de laptop: formato de computadora portátil centrado
+        <div className="min-h-screen flex items-center justify-center p-6" style={{ background: 'linear-gradient(135deg, #334155, #1e293b, #334155)' }}>
+          <div className="w-full max-w-[1280px] h-screen rounded-2xl overflow-hidden shadow-2xl bg-white relative">
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-slate-400 z-20 pointer-events-none"></div>
+            <div className="max-w-6xl mx-auto">
+              {renderScreen()}
+            </div>
+          </div>
+        </div>
+      ) : (
+        // PC: la app ocupa toda la pantalla
+        renderScreen()
+      )}
       {showBadgeCelebration && earnedBadge && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
           <div className="rounded-3xl p-8 max-w-sm w-full text-center text-white animate-slide-up shadow-2xl" style={{ background: 'linear-gradient(135deg, #1e3a8a, #6d28d9, #b45309)' }}>
