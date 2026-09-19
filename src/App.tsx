@@ -66,8 +66,8 @@ const translations = {
     welcomeLine: 'Hoy podemos aprender algo nuevo juntos.',
     welcomeTitle: 'Hablemos Claro',
     welcomeSub: 'Aprender sobre las coimas también es aprender a tomar buenas decisiones.',
-    start: '🎮 Empezar Aventura',
-    howItWorks: '¿Cómo funciona?',
+    start: '🎮 Empecemos',
+    howItWorks: '¿Cómo funciona la app?',
     badges: '🏅 Tus insignias',
     themes: 'Temas',
     themesDesc: 'Aprende sobre las coimas',
@@ -204,7 +204,7 @@ const initialProgress = getStoredProgress()
 
 export default function App() {
   const [progress, setProgress] = useState<UserProgress>(initialProgress)
-  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents'>('welcome')
+  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents'>(() => localStorage.getItem('hablemos-claro-configured') === 'true' ? 'home' : 'welcome')
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null)
   const [selectedTopic, setSelectedTopic] = useState<LearningTopic | null>(null)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -244,6 +244,13 @@ export default function App() {
   const changeLanguage = (value: 'es' | 'qu') => {
     setLanguage(value)
     localStorage.setItem('hablemos-claro-lang', value)
+  }
+
+  // Ir al inicio marcando la app como configurada
+  const goHomeWithTopic = (topic: LearningTopic) => {
+    setSelectedTopic(topic)
+    localStorage.setItem('hablemos-claro-configured', 'true')
+    setCurrentScreen('home')
   }
 
   // Navegar a siguiente pantalla
@@ -352,7 +359,7 @@ export default function App() {
             
             <div className="space-y-4">
               <button
-                onClick={() => setCurrentScreen('avatar')}
+                onClick={() => { localStorage.setItem('hablemos-claro-configured', 'true'); setCurrentScreen('home'); }}
                 className="btn-glow bg-white text-primary font-bold py-4 px-8 rounded-full text-lg shadow-lg w-full"
               >
                 {t('start')}
@@ -607,13 +614,13 @@ export default function App() {
               <p className="text-dark font-medium text-center mt-6">{t('whichTopic')}</p>
               <div className="grid grid-cols-2 gap-3">
                 <button
-                  onClick={() => { setSelectedTopic('coima'); setCurrentScreen('home'); } }
+                  onClick={() => goHomeWithTopic('coima')}
                   className={selectedTopic === 'coima' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all card-hover'}
                 >
                   {t('whatIsCoima')}
                 </button>
                 <button
-                  onClick={() => { setSelectedTopic('recognition'); setCurrentScreen('home'); } }
+                  onClick={() => goHomeWithTopic('recognition')}
                   className={selectedTopic === 'recognition' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all card-hover'}
                 >
                   {t('recognize')}
@@ -738,6 +745,19 @@ export default function App() {
                 <div className="text-4xl mb-2">👤</div>
                 <h3 className="font-bold text-success">{t('profile')}</h3>
                 <p className="text-sm text-gray-500">{t('profileDesc')}</p>
+              </button>
+              <button
+                onClick={() => setCurrentScreen('config')}
+                className="glass-card rounded-2xl p-6 text-left card-hover shadow-custom-lg col-span-2 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="text-4xl">⚙️</div>
+                  <div>
+                    <h3 className="font-bold text-dark">{t('configTitle')}</h3>
+                    <p className="text-sm text-gray-500">{t('languageTitle')} · {t('darkModeTitle')} · {t('deviceQuestion')}</p>
+                  </div>
+                </div>
+                <span className="text-primary font-bold text-2xl">→</span>
               </button>
             </div>
 
