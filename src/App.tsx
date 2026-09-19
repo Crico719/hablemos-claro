@@ -1,10 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import './index.css'
 
 // Tipos para la aplicación
 type UserRole = 'parent' | 'child'
 type LearningTopic = 'coima' | 'recognition' | 'impact' | 'test'
-type ProgressLevel = 'beginner' | 'intermediate' | 'advanced'
 
 interface UserProgress {
   totalActivities: number
@@ -61,13 +60,15 @@ const initialProgress = getStoredProgress()
 
 export default function App() {
   const [progress, setProgress] = useState<UserProgress>(initialProgress)
-  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'config' | 'home' | 'learn' | 'quiz' | 'result' | 'games' | 'converse' | 'activity' | 'cases' | 'profile'> 'welcome'
+  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'config' | 'home' | 'learn' | 'quiz' | 'result' | 'games' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents'>('welcome')
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null)
   const [selectedTopic, setSelectedTopic] = useState<LearningTopic | null>(null)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [userAnswers, setUserAnswers] = useState<number[]>([])
   const [showFeedback, setShowFeedback] = useState(false)
   const [feedbackMessage, setFeedbackMessage] = useState<string>('')
+  const [showCoimaONo, setShowCoimaONo] = useState(false)
+  const [currentCoimaCase, setCurrentCoimaCase] = useState(0)
 
   // Navegar a siguiente pantalla
   const navigateTo = (screen: typeof currentScreen) => {
@@ -153,15 +154,6 @@ export default function App() {
   }
 
   // Reiniciar aplicación
-  const resetApp = () => {
-    setProgress(initialProgress)
-    setCurrentScreen('welcome')
-    setSelectedRole(null)
-    setSelectedTopic(null)
-    setCurrentQuestionIndex(0)
-    setUserAnswers([])
-    localStorage.removeItem('hablemos-claro-progress')
-  }
 
   // Lógica por pantalla
   const handleStart = () => {
@@ -349,31 +341,148 @@ export default function App() {
         test: {
           title: 'Pon a prueba tus conocimientos',
           explanation: 'Responde estas preguntas para verificar lo que aprendiste.',
+          example: '',
+          correct: '',
+          incorrect: '',
         },
       }
 
-      const currentTopic = selectedTopic ? topics[selectedTopic] : topics.coima
+      const coimaCases = [
+        {
+          id: 1,
+          situation: 'Una persona ofrece dinero para que le den un trato especial que no le corresponde.',
+          isCoima: true,
+          explanation: 'Correcto. Se está ofreciendo algo para obtener un beneficio que no corresponde.'
+        },
+        {
+          id: 2,
+          situation: 'Un funcionario pide un "extra" para acelerar un trámite importante.',
+          isCoima: true,
+          explanation: 'Correcto. Pedir dinero extra por hacer su trabajo es una coima.'
+        },
+        {
+          id: 3,
+          situation: 'Un amigo te presta su cuaderno para que copies la tarea.',
+          isCoima: false,
+          explanation: 'Correcto. Prestar un cuaderno entre amigos no es una coima, es ayuda entre compañeros.'
+        },
+        {
+          id: 4,
+          situation: 'Una persona ofrece un regalo caro a un juez para que falle a su favor.',
+          isCoima: true,
+          explanation: 'Correcto. Ofrecer regalos a autoridades para influir en decisiones es coima.'
+        },
+        {
+          id: 5,
+          situation: 'Un comerciante paga el precio justo por un producto en el mercado.',
+          isCoima: false,
+          explanation: 'Correcto. Pagar el precio acordado en una transacción honesta no es coima.'
+        },
+      ]
+
+      const currentTopicData = selectedTopic ? topics[selectedTopic] : topics.coima
+
+      // Pantalla "¿Coima o no?"
+      if (showCoimaONo) {
+        const currentCase = coimaCases[currentCoimaCase]
+        return (
+          <div className="min-h-screen bg-light text-dark p-4">
+            <div className="max-w-2xl mx-auto">
+              <div className="flex items-center justify-between mb-4">
+                <h1 className="text-2xl font-bold text-primary">¿Coima o no?</h1>
+                <button onClick={() => { setShowCoimaONo(false); setCurrentCoimaCase(0); }} className="text-gray-500 hover:text-primary">
+                  ← Atrás
+                </button>
+              </div>
+
+              <div className="bg-white rounded-lg p-6 mb-8 shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-sm text-gray-500">Caso {currentCoimaCase + 1} de {coimaCases.length}</span>
+                  <div className="h-2 bg-gray-200 rounded-full overflow-hidden w-48">
+                    <div className="h-full bg-primary rounded-full transition-all duration-300" style={{ width: `${((currentCoimaCase + 1) / coimaCases.length) * 100}%` }}></div>
+                  </div>
+                </div>
+
+                <p className="text-lg text-gray-700 mb-6">{currentCase.situation}</p>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <button
+                    onClick={() => {
+                      const isCorrect = currentCase.isCoima === true
+                      setFeedbackMessage(isCorrect ? currentCase.explanation : 'Incorrecto. ' + currentCase.explanation)
+                      setShowFeedback(true)
+                      updateProgress(isCorrect ? 15 : 5, 1)
+                    }}
+                    className="btn-primary py-4 px-6 rounded-lg text-lg font-medium"
+                  >
+                    Sí, es una coima
+                  </button>
+                  <button
+                    onClick={() => {
+                      const isCorrect = currentCase.isCoima === false
+                      setFeedbackMessage(isCorrect ? currentCase.explanation : 'Incorrecto. ' + currentCase.explanation)
+                      setShowFeedback(true)
+                      updateProgress(isCorrect ? 15 : 5, 1)
+                    }}
+                    className="btn-outline py-4 px-6 rounded-lg text-lg font-medium border-2 border-primary text-primary"
+                  >
+                    No, no es una coima
+                  </button>
+                </div>
+              </div>
+
+              {showFeedback && (
+                <div className="mt-6 p-4 rounded-lg bg-white shadow-sm">
+                  <p className="font-medium {feedbackMessage.includes('Correcto') ? 'text-primary' : 'text-alert'}">
+                    {feedbackMessage}
+                  </p>
+                </div>
+              )}
+
+              {showFeedback && (
+                <div className="mt-6">
+                  <button
+                    onClick={() => {
+                      setShowFeedback(false)
+                      if (currentCoimaCase < coimaCases.length - 1) {
+                        setCurrentCoimaCase(prev => prev + 1)
+                      } else {
+                        setShowCoimaONo(false)
+                        setCurrentCoimaCase(0)
+                        navigateTo('home')
+                      }
+                    }}
+                    className="btn-primary w-full py-3 px-6 rounded-lg text-lg"
+                  >
+                    {currentCoimaCase < coimaCases.length - 1 ? 'Siguiente caso' : 'Volver al inicio'}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )
+      }
 
       return (
         <div className="min-h-screen bg-light text-dark p-4">
           <div className="max-w-2xl mx-auto">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-2xl font-bold text-primary">
-                {currentTopic.title}
+                {currentTopicData.title}
               </h1>
               <button onClick={() => navigateTo('home')} className="text-gray-500 hover:text-primary">
                 ← Atrás
               </button>
             </div>
 
-            {selectedTopic !== 'test' && (
+            {selectedTopic !== 'test' && !showCoimaONo && (
               <div className="bg-white rounded-lg p-6 mb-8 shadow-sm">
                 <h2 className="text-xl font-bold text-primary mb-4">Explicación</h2>
-                <p className="text-gray-700">{currentTopic.explanation}</p>
+                <p className="text-gray-700">{currentTopicData.explanation}</p>
                 
                 <div className="mt-4 p-3 bg-primary/5 rounded">
                   <p className="font-medium text-primary">Ejemplo:</p>
-                  <p className="text-gray-700 mt-1">{currentTopic.example}</p>
+                  <p className="text-gray-700 mt-1">{currentTopicData.example}</p>
                 </div>
 
                 <div className="mt-6 flex gap-2">
@@ -381,15 +490,28 @@ export default function App() {
                     onClick={() => handleAnswer(0)}
                     className={progress.points > 0 ? 'btn-outline' : 'btn-primary w-48 py-2 px-4 rounded'}
                   >
-                    ✅ {currentTopic.correct}
+                    ✅ {currentTopicData.correct}
                   </button>
                   <button
                     onClick={() => handleAnswer(1)}
                     className="btn-outline w-48 py-2 px-4 rounded"
                   >
-                    ❌ {currentTopic.incorrect}
+                    ❌ {currentTopicData.incorrect}
                   </button>
                 </div>
+              </div>
+            )}
+
+            {selectedTopic !== 'test' && !showCoimaONo && (
+              <div className="bg-white rounded-lg p-6 mb-8 shadow-sm">
+                <h2 className="text-xl font-bold text-primary mb-4">¿Coima o no?</h2>
+                <p className="text-gray-700 mb-4">Pon a prueba tu criterio con situaciones de la vida real.</p>
+                <button
+                  onClick={() => setShowCoimaONo(true)}
+                  className="btn-primary w-full py-3 px-6 rounded-lg text-lg"
+                >
+                  Empezar test
+                </button>
               </div>
             )}
 
@@ -397,7 +519,7 @@ export default function App() {
               <div className="bg-white rounded-lg p-6 mb-8 shadow-sm">
                 <h2 className="text-xl font-bold text-primary mb-4">Pon a prueba tus conocimientos</h2>
                 <p className="text-gray-700 mb-4">
-                  Responde las siguientes preguntasSeleccionando la opción correcta.
+                  Responde las siguientes preguntas seleccionando la opción correcta.
                 </p>
                 
                 {/* Pregunta 1 */}
@@ -497,7 +619,7 @@ export default function App() {
             <div className="bg-white rounded-lg p-6 shadow-sm mb-8">
               <p className="text-gray-700 mb-4">{quizCases[currentQuestionIndex].situation}</p>
               
-              {quizCases[currentQuestionIndex].options.map((opt, i) => (
+              {quizCases[currentQuestionIndex].options.map((opt, _i) => (
                 <div key={opt.id} className="mb-2">
                   <button
                     onClick={() => handleAnswer(opt.id)}
@@ -674,17 +796,13 @@ export default function App() {
             <div className="bg-white rounded-lg p-6 shadow-sm mb-8">
               <h2 className="text-xl font-bold text-primary mb-6">Preguntas para conversar</h2>
               
-              {conversationPrompts.map((prompt, index) => (
+              {conversationPrompts.map((prompt, _index) => (
                 <div key={prompt.id} className="mb-4">
                   <p className="font-medium text-gray-800 mb-2">{prompt.question}</p>
                   <button
                     onClick={() => {
-                      // Marcar como preguntado y guardar progreso
-                      const updatedPrompts = conversationPrompts.map(p => 
-                        p.id === prompt.id ? { ...p, asked: true } : p
-                      )
-                      // No actualizamos el estado directamente, solo para el ejemplo
-                      completeConversation()
+// Marcar como preguntado y guardar progreso
+                       completeConversation()
                     }}
                     className="btn-primary py-2 px-4 rounded text-sm"
                   >
@@ -880,7 +998,7 @@ export default function App() {
             <div className="text-center mb-8">
               <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path className="w-10 h-10" strokeLinecap="round" strokeLineJoin="round" d="M16 7a4 4 0 014 4v3a4 4 0 01-4 4V3a4 4 0 01-4-4zM5 7a2 2 0 012-2h4a2 2 0 012 2v3a2 2 0 01-2h4a2 2 0 01-2v-3zM8 21a4 4 0 01-4-4v-3a4 4 0 014-4h6a4 4 0 014 4v3a4 4 0 01-4 4zm8-13a4 4 0 01-4-4V7a4 4 0 014-4h3a4 4 0 014 4v3a4 4 0 01-4 4h-3z"></path>
+                  <path className="w-10 h-10" strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 014 4v3a4 4 0 01-4 4V3a4 4 0 01-4-4zM5 7a2 2 0 012-2h4a2 2 0 012 2v3a2 2 0 01-2h4a2 2 0 01-2v-3zM8 21a4 4 0 01-4-4v-3a4 4 0 014-4h6a4 4 0 014 4v3a4 4 0 01-4 4zm8-13a4 4 0 01-4-4V7a4 4 0 014-4h3a4 4 0 014 4v3a4 4 0 01-4 4h-3z"></path>
                 </svg>
               </div>
               <h2 className="text-2xl font-bold text-primary">Familia</h2>
