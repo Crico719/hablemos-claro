@@ -208,7 +208,7 @@ export default function App() {
   const [progress, setProgress] = useState<UserProgress>(initialProgress)
   const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents'>(() => localStorage.getItem('hablemos-claro-configured') === 'true' ? 'home' : 'welcome')
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null)
-  const [selectedTopic, setSelectedTopic] = useState<LearningTopic | null>(null)
+  const [selectedTopic] = useState<LearningTopic | null>(null)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [userAnswers, setUserAnswers] = useState<number[]>([])
   const [showFeedback, setShowFeedback] = useState(false)
@@ -249,8 +249,7 @@ export default function App() {
   }
 
   // Ir al inicio marcando la app como configurada
-  const goHomeWithTopic = (topic: LearningTopic) => {
-    setSelectedTopic(topic)
+  const goHome = () => {
     localStorage.setItem('hablemos-claro-configured', 'true')
     setCurrentScreen('home')
   }
@@ -612,46 +611,6 @@ export default function App() {
                   {t('quechua')}
                 </button>
               </div>
-
-              <p className="text-dark font-medium text-center mt-6">{t('whichTopic')}</p>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={() => goHomeWithTopic('coima')}
-                  className={selectedTopic === 'coima' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all card-hover'}
-                >
-                  {t('whatIsCoima')}
-                </button>
-                <button
-                  onClick={() => goHomeWithTopic('recognition')}
-                  className={selectedTopic === 'recognition' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all card-hover'}
-                >
-                  {t('recognize')}
-                </button>
-                <button
-                  onClick={() => goHomeWithTopic('impact')}
-                  className={selectedTopic === 'impact' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all card-hover'}
-                >
-                  {t('impact')}
-                </button>
-                <button
-                  onClick={() => goHomeWithTopic('consequences')}
-                  className={selectedTopic === 'consequences' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all card-hover'}
-                >
-                  {t('legal')}
-                </button>
-                <button
-                  onClick={() => goHomeWithTopic('prevention')}
-                  className={selectedTopic === 'prevention' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all card-hover'}
-                >
-                  {t('prevent')}
-                </button>
-                <button
-                  onClick={() => goHomeWithTopic('test')}
-                  className={selectedTopic === 'test' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all card-hover'}
-                >
-                  {t('wantTest')}
-                </button>
-              </div>
             </div>
 
             <div className="mt-8 p-5 glass-card rounded-2xl">
@@ -668,7 +627,7 @@ export default function App() {
             </div>
 
             <button
-              onClick={() => setCurrentScreen('home')}
+              onClick={goHome}
               className="btn-glow bg-primary text-white font-bold py-4 px-6 rounded-xl text-lg w-full mt-6"
             >
               🏠 {t('goHome')}
