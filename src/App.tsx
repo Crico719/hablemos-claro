@@ -6,6 +6,7 @@ type UserRole = 'parent' | 'child'
 type LearningTopic = 'coima' | 'recognition' | 'impact' | 'consequences' | 'prevention' | 'test'
 type PlayMode = 'individual' | 'family'
 type BadgeType = 'topics-explorer' | 'game-master' | 'integrity-champion'
+type DeviceType = 'pc' | 'phone' | 'laptop'
 
 interface Avatar {
   id: number
@@ -50,6 +51,15 @@ const allBadges: Badge[] = [
   { id: 'integrity-champion', name: 'Campeón de la Integridad', emoji: '🏆', color: '#F59E0B', unlocked: false },
 ]
 
+const reelsMessages = [
+  { id: '1', author: 'Integridad Plus', message: '¿Sabías que la corrupción afecta a más del 50% de la población mundial? 🌍', time: 'Hace 2h' },
+  { id: '2', author: 'Ciudadano Global', message: 'Respetar las reglas no es solo obligación, es una elección. 💪', time: 'Hace 5h' },
+  { id: '3', author: 'Educación Primero', message: 'Una familia que conversa sobre valores crea ciudadanos más fuertes. 🏠', time: 'Hace 8h' },
+  { id: '4', author: 'Sin Coimas', message: 'Denunciar es un acto de valentía. El silencio cómplice alimenta la corrupción. 📢', time: 'Hace 1d' },
+  { id: '5', author: 'Jóvenes Valientes', message: 'Aprender sobre integridad desde joven te protege toda la vida. 🌟', time: 'Hace 1d' },
+  { id: '6', author: 'Transparencia Total', message: 'La información es un derecho, no un privilegio. La luz es la mejor herramienta contra la corrupción. 💡', time: 'Hace 2d' },
+]
+
 const getStoredProgress = (): UserProgress => {
   const stored = localStorage.getItem('hablemos-claro-progress')
   if (stored) return JSON.parse(stored)
@@ -90,9 +100,9 @@ export default function App() {
   const [currentCoimaCase, setCurrentCoimaCase] = useState(0)
   const [selectedAvatar, setSelectedAvatar] = useState<Avatar | null>(null)
   const [playMode, setPlayMode] = useState<PlayMode>('individual')
-  const [_device, _setDevice] = useState<'phone' | 'tablet' | 'pc'>('pc')
-  const [_showBadgeCelebration, _setShowBadgeCelebration] = useState(false)
-  const [_earnedBadge, _setEarnedBadge] = useState<Badge | null>(null)
+  const [device, setDevice] = useState<DeviceType>('pc')
+  const [showBadgeCelebration, setShowBadgeCelebration] = useState(false)
+  const [earnedBadge, setEarnedBadge] = useState<Badge | null>(null)
 
   // Navegar a siguiente pantalla
   const navigateTo = (screen: typeof currentScreen) => {
@@ -106,29 +116,31 @@ export default function App() {
       const newBadges = [...prev.badges]
       let newBadgeToShow: Badge | null = null
 
-      // Verificar si completar todos los temas
-      const allTopicsCompleted = ['coima', 'recognition', 'impact', 'consequences', 'prevention', 'test'].every(_t => prev.completedActivities > 0)
-      if (allTopicsCompleted && !newBadges.find(b => b.id === 'topics-explorer')) {
-        newBadges.find(b => b.id === 'topics-explorer')!.unlocked = true
-        newBadgeToShow = { ...newBadges.find(b => b.id === 'topics-explorer')!, unlocked: true }
+      // Explorador de Temas: completar la primera actividad
+      const isExplorer = newBadges.find(b => b.id === 'topics-explorer')!
+      if (!isExplorer.unlocked && newActivities >= 1) {
+        isExplorer.unlocked = true
+        newBadgeToShow = { ...isExplorer }
       }
 
-      // Verificar si completar el juego (quiz)
-      if (prev.completedActivities > 3 && !newBadges.find(b => b.id === 'game-master')) {
-        newBadges.find(b => b.id === 'game-master')!.unlocked = true
-        newBadgeToShow = { ...newBadges.find(b => b.id === 'game-master')!, unlocked: true }
+      // Maestro del Juego: completar 5+ actividades
+      const isMaster = newBadges.find(b => b.id === 'game-master')!
+      if (!isMaster.unlocked && newActivities >= 5) {
+        isMaster.unlocked = true
+        newBadgeToShow = { ...isMaster }
       }
 
-      // Verificar si ambas insignias desbloqueadas → campeón
-      if (newBadges.find(b => b.id === 'topics-explorer')!.unlocked && newBadges.find(b => b.id === 'game-master')!.unlocked && !newBadges.find(b => b.id === 'integrity-champion')) {
-        newBadges.find(b => b.id === 'integrity-champion')!.unlocked = true
-        newBadgeToShow = { ...newBadges.find(b => b.id === 'integrity-champion')!, unlocked: true }
+      // Campeón de la Integridad: ambas insignias desbloqueadas
+      const isChampion = newBadges.find(b => b.id === 'integrity-champion')!
+      if (!isChampion.unlocked && isExplorer.unlocked && isMaster.unlocked) {
+        isChampion.unlocked = true
+        newBadgeToShow = { ...isChampion }
       }
 
       saveProgress({ ...prev, completedActivities: newActivities, badges: newBadges })
       if (newBadgeToShow) {
-        _setEarnedBadge(newBadgeToShow)
-        _setShowBadgeCelebration(true)
+        setEarnedBadge(newBadgeToShow)
+        setShowBadgeCelebration(true)
       }
       return { ...prev, completedActivities: newActivities, badges: newBadges }
     })
@@ -187,7 +199,8 @@ export default function App() {
   // Reiniciar aplicación
 
   // Renderizar según pantalla
-  switch (currentScreen) {
+  const renderScreen = () => {
+    switch (currentScreen) {
     case 'welcome':
       return (
         <div className="min-h-screen welcome-bg flex items-center justify-center p-4">
@@ -298,7 +311,29 @@ export default function App() {
                 </button>
               </div>
 
-              <p className="text-dark font-medium text-center mt-4">¿Qué quieres aprender hoy?</p>
+              <p className="text-dark font-medium text-center mt-6">¿Qué dispositivo estás usando?</p>
+              <div className="grid grid-cols-3 gap-3">
+                <button
+                  onClick={() => setDevice('pc')}
+                  className={device === 'pc' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all'}
+                >
+                  💻 PC
+                </button>
+                <button
+                  onClick={() => setDevice('phone')}
+                  className={device === 'phone' ? 'bg-secondary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-secondary/20 transition-all'}
+                >
+                  📱 Móvil
+                </button>
+                <button
+                  onClick={() => setDevice('laptop')}
+                  className={device === 'laptop' ? 'bg-warning text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-warning/20 transition-all'}
+                >
+                  🖥️ Laptop
+                </button>
+              </div>
+
+              <p className="text-dark font-medium text-center mt-6">¿Qué quieres aprender hoy?</p>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => { setSelectedTopic('coima'); setCurrentScreen('home'); } }
@@ -356,48 +391,83 @@ export default function App() {
       )
 
     case 'home':
+      const unlockedCount = progress.badges.filter(b => b.unlocked).length
       return (
         <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-secondary/5 p-4">
           <div className="max-w-3xl mx-auto animate-slide-up">
             <div className="flex items-center justify-between mb-6">
-              <h1 className="text-3xl font-bold gradient-text">¡Hola! 👋</h1>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-2xl shadow-lg animate-float">
+                  {selectedAvatar ? selectedAvatar.emoji : '🦸'}
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold gradient-text">¡Hola! 👋</h1>
+                  <p className="text-sm text-gray-500">{device === 'phone' ? '📱 Móvil' : device === 'laptop' ? '🖥️ Laptop' : '💻 PC'}</p>
+                </div>
+              </div>
               <button onClick={() => setCurrentScreen('profile')} className="glass-card px-4 py-2 rounded-xl text-primary text-sm font-medium hover:bg-primary/10 transition-all">
                 Perfil ⭐
               </button>
             </div>
-            
-            <p className="text-lg text-gray-600 mb-6">Hoy podemos aprender algo nuevo.</p>
 
-            <div className="glass-card rounded-2xl p-6 mb-6 shadow-custom-lg card-hover">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h2 className="text-xl font-bold text-primary">🎯 Tema de hoy:</h2>
-                  <p className="text-gray-600 mt-1 text-lg">¿Qué es una coima?</p>
-                </div>
-                <button
-                  onClick={() => setCurrentScreen('learn')}
-                  className="btn-glow bg-primary text-white font-bold py-3 px-6 rounded-xl text-sm"
-                >
-                  Aprender ahora →
-                </button>
+            <p className="text-lg text-gray-600 mb-6">Hoy podemos aprender algo nuevo juntos.</p>
+
+            {/* Progreso + insignias */}
+            <div className="glass-card rounded-2xl p-6 mb-6 card-hover">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-bold text-secondary text-lg">🏅 Tus insignias</h3>
+                <span className="text-sm font-bold text-primary">{unlockedCount}/3</span>
+              </div>
+              <div className="flex gap-3 mb-4">
+                {progress.badges.map(badge => (
+                  <div key={badge.id} className={`flex-1 text-center p-3 rounded-xl ${badge.unlocked ? 'animate-float' : 'opacity-30 grayscale'}`}>
+                    <div className="text-3xl">{badge.emoji}</div>
+                    <div className="text-[10px] font-bold mt-1 truncate">{badge.name}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  className="progress-bar h-full"
+                  style={{ width: `${Math.min((unlockedCount / 3) * 100, 100)}%` }}
+                ></div>
               </div>
             </div>
 
-            <div className="glass-card rounded-2xl p-6 mb-6 card-hover">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <h3 className="font-bold text-secondary text-lg">📊 Tu progreso</h3>
-                </div>
-              </div>
-              <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
-                <div 
-                  className="progress-bar h-full"
-                  style={{ width: `${(progress.completedActivities / Math.max(progress.totalActivities, 1)) * 100}%` }}
-                ></div>
-              </div>
-              <p className="text-sm text-gray-500 mt-2">
-                {progress.completedActivities} de {progress.totalActivities} actividades completadas
-              </p>
+            {/* Accesos principales */}
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <button
+                onClick={() => setCurrentScreen('learn')}
+                className="glass-card rounded-2xl p-6 text-left card-hover shadow-custom-lg"
+              >
+                <div className="text-4xl mb-2">📚</div>
+                <h3 className="font-bold text-primary">Temas</h3>
+                <p className="text-sm text-gray-500">Aprende sobre las coimas</p>
+              </button>
+              <button
+                onClick={() => setCurrentScreen('games')}
+                className="glass-card rounded-2xl p-6 text-left card-hover shadow-custom-lg"
+              >
+                <div className="text-4xl mb-2">🎮</div>
+                <h3 className="font-bold text-secondary">Juego</h3>
+                <p className="text-sm text-gray-500">Pon a prueba lo que sabes</p>
+              </button>
+              <button
+                onClick={() => setCurrentScreen('reels')}
+                className="glass-card rounded-2xl p-6 text-left card-hover shadow-custom-lg"
+              >
+                <div className="text-4xl mb-2">📱</div>
+                <h3 className="font-bold text-warning">Reels</h3>
+                <p className="text-sm text-gray-500">Mensajes de integridad</p>
+              </button>
+              <button
+                onClick={() => setCurrentScreen('profile')}
+                className="glass-card rounded-2xl p-6 text-left card-hover shadow-custom-lg"
+              >
+                <div className="text-4xl mb-2">👤</div>
+                <h3 className="font-bold text-success">Perfil</h3>
+                <p className="text-sm text-gray-500">Tu progreso e insignias</p>
+              </button>
             </div>
 
             <div className="glass-card rounded-2xl p-6 card-hover">
@@ -411,6 +481,40 @@ export default function App() {
               >
                 Conversar →
               </button>
+            </div>
+          </div>
+        </div>
+      )
+
+    case 'reels':
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-warning/10 via-white to-primary/5 p-4">
+          <div className="max-w-xl mx-auto animate-slide-up">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h1 className="text-3xl font-bold gradient-text">Reels 📱</h1>
+                <p className="text-sm text-gray-500">Mensajes cortos para reflexionar</p>
+              </div>
+              <button onClick={() => navigateTo('home')} className="glass-card px-3 py-1 rounded-xl text-gray-600 text-sm hover:bg-gray-100 transition-all">
+                ← Atrás
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {reelsMessages.map((reel, index) => (
+                <div key={reel.id} className="glass-card rounded-2xl p-6 shadow-custom-lg card-hover animate-slide-up" style={{ animationDelay: `${index * 80}ms` }}>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-warning to-primary flex items-center justify-center text-white font-bold">
+                      {reel.author[0]}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-dark">{reel.author}</p>
+                      <p className="text-xs text-gray-500">{reel.time}</p>
+                    </div>
+                  </div>
+                  <p className="text-lg text-gray-700 leading-relaxed">{reel.message}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -1239,5 +1343,28 @@ export default function App() {
 
     default:
       return null
+    }
   }
+
+  return (
+    <>
+      {renderScreen()}
+      {showBadgeCelebration && earnedBadge && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="rounded-3xl p-8 max-w-sm w-full text-center text-white animate-slide-up shadow-2xl" style={{ background: 'linear-gradient(135deg, #1e3a8a, #6d28d9, #b45309)' }}>
+            <div className="text-7xl mb-4 animate-float">{earnedBadge.emoji}</div>
+            <p className="text-2xl font-bold mb-1">¡Insignia desbloqueada!</p>
+            <p className="text-lg mb-6" style={{ color: earnedBadge.color }}>{earnedBadge.name}</p>
+            <p className="text-sm text-white/70 mb-6">Sigue aprendiendo para conseguir las demás insignias. 🌟</p>
+            <button
+              onClick={() => setShowBadgeCelebration(false)}
+              className="bg-white text-primary font-bold py-3 px-8 rounded-full text-lg w-full"
+            >
+              ¡Genial! 🎉
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  )
 }
