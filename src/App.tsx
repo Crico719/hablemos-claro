@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './index.css'
 
 // Tipos para la aplicación
@@ -7,6 +7,7 @@ type LearningTopic = 'coima' | 'recognition' | 'impact' | 'consequences' | 'prev
 type PlayMode = 'individual' | 'family'
 type BadgeType = 'topics-explorer' | 'game-master' | 'integrity-champion'
 type DeviceType = 'pc' | 'phone' | 'laptop'
+type ProfileType = 'student' | 'family'
 
 interface Avatar {
   id: number
@@ -28,6 +29,34 @@ interface UserProgress {
   completedActivities: number
   badges: Badge[]
   conversations: number
+  topicProgress: Record<LearningTopic, number>
+  quizScores: number[]
+  lastActiveDate: string
+  streakDays: number
+}
+
+interface StudentProfile {
+  name: string
+  age: string
+  district: string
+  photo: string
+  avatarId: number | null
+  progress: UserProgress
+  customization: ProfileCustomization
+}
+
+interface FamilyProfile {
+  name: string
+  members: string[]
+  progress: UserProgress
+}
+
+interface ProfileCustomization {
+  themeColor: string
+  backgroundType: 'gradient' | 'pattern' | 'solid'
+  backgroundValue: string
+  cardStyle: 'glass' | 'solid' | 'outlined'
+  decorations: string[]
 }
 
 interface ConversationPrompt {
@@ -58,6 +87,39 @@ const reelsMessages = [
   { id: '4', author: 'Sin Coimas', message: 'Denunciar es un acto de valentía. El silencio cómplice alimenta la corrupción. 📢', time: 'Hace 1d' },
   { id: '5', author: 'Jóvenes Valientes', message: 'Aprender sobre integridad desde joven te protege toda la vida. 🌟', time: 'Hace 1d' },
   { id: '6', author: 'Transparencia Total', message: 'La información es un derecho, no un privilegio. La luz es la mejor herramienta contra la corrupción. 💡', time: 'Hace 2d' },
+]
+
+const themeColors = [
+  { name: 'Azul', value: '#2563EB', gradient: 'linear-gradient(135deg, #2563EB, #7C3AED)' },
+  { name: 'Verde', value: '#10B981', gradient: 'linear-gradient(135deg, #10B981, #059669)' },
+  { name: 'Morado', value: '#8B5CF6', gradient: 'linear-gradient(135deg, #8B5CF6, #7C3AED)' },
+  { name: 'Naranja', value: '#F59E0B', gradient: 'linear-gradient(135deg, #F59E0B, #EA580C)' },
+  { name: 'Rosa', value: '#EC4899', gradient: 'linear-gradient(135deg, #EC4899, #DB2777)' },
+  { name: 'Rojo', value: '#EF4444', gradient: 'linear-gradient(135deg, #EF4444, #DC2626)' },
+  { name: 'Cian', value: '#06B6D4', gradient: 'linear-gradient(135deg, #06B6D4, #0891B2)' },
+  { name: 'Índigo', value: '#6366F1', gradient: 'linear-gradient(135deg, #6366F1, #4F46E5)' },
+]
+
+const backgrounds: Array<{ name: string; type: 'gradient' | 'pattern' | 'solid'; value: string }> = [
+  { name: 'Gradiente', type: 'gradient', value: 'linear-gradient(135deg, #2563EB, #7C3AED)' },
+  { name: 'Ondas', type: 'pattern', value: 'radial-gradient(circle at 25% 25%, #2563EB20 0%, transparent 50%), radial-gradient(circle at 75% 75%, #7C3AED20 0%, transparent 50%)' },
+  { name: 'Puntos', type: 'pattern', value: 'radial-gradient(#2563EB30 1px, transparent 1px)' },
+  { name: 'Rayas', type: 'pattern', value: 'repeating-linear-gradient(45deg, #2563EB15, #2563EB15 10px, transparent 10px, transparent 20px)' },
+  { name: 'Sólido Claro', type: 'solid', value: '#F8FAFC' },
+  { name: 'Sólido Oscuro', type: 'solid', value: '#1E293B' },
+]
+
+const cardStyles: Array<{ name: string; value: 'glass' | 'solid' | 'outlined' }> = [
+  { name: 'Cristal', value: 'glass' },
+  { name: 'Sólido', value: 'solid' },
+  { name: 'Bordes', value: 'outlined' },
+]
+
+const decorations: Array<{ name: string; value: 'stars' | 'hearts' | 'sparkles' | 'none' }> = [
+  { name: 'Estrellas', value: 'stars' },
+  { name: 'Corazones', value: 'hearts' },
+  { name: 'Brillos', value: 'sparkles' },
+  { name: 'Ninguna', value: 'none' },
 ]
 
 const translations = {
@@ -118,6 +180,29 @@ const translations = {
     prevent: 'Cómo prevenir la corrupción',
     wantTest: 'Quiero ponerme a prueba.',
     ageYears: 'años',
+    // Profile types
+    studentProfile: '👤 Perfil Estudiante',
+    familyProfile: '👨‍👩‍👧 Perfil Familia',
+    chooseProfile: '¿Quién usa la app?',
+    editPhoto: 'Editar foto',
+    choosePhoto: 'Elegir foto',
+    takePhoto: 'Tomar foto',
+    useAvatar: 'Usar avatar',
+    customization: '🎨 Personalizar mi app',
+    themeColors: 'Colores del tema',
+    backgrounds: 'Fondos',
+    cardStyles: 'Estilo de tarjetas',
+    decorations: 'Decoraciones',
+    preview: 'Vista previa',
+    resetCustomization: 'Restablecer',
+    noBadgesYet: 'Aún no tienes insignias',
+    yourStats: 'Tus estadísticas',
+    topicsCompleted: 'Temas completados',
+    avgQuizScore: 'Promedio en quizzes',
+    activitiesDone: 'Actividades realizadas',
+    timeSpent: 'Tiempo invertido',
+    streak: 'Racha de días',
+    topicProgress: 'Progreso por tema',
   },
   qu: {
     greeting: '¡Napaykullayki! 👋',
@@ -176,22 +261,88 @@ const translations = {
     prevent: 'Imaynatam harkayman coimata',
     wantTest: 'Kunanmi yachayta munani.',
     ageYears: 'wata',
+    // Profile types
+    studentProfile: '👤 Kayni Wawa',
+    familyProfile: '👨‍👩‍👧 Kayni Ayllu',
+    chooseProfile: '¿Pitaq kayta llamkachkan?',
+    editPhoto: 'Riqchiy rikin',
+    choosePhoto: 'Aqllay rikin',
+    takePhoto: 'Riqsiy rikin',
+    useAvatar: 'Avatarta llaqtay',
+    customization: '🎨 Kaynin ñiqqiy',
+    themeColors: 'Llimpi kullkikuna',
+    backgrounds: 'Ukukuna',
+    cardStyles: 'Tarjeta kullkikuna',
+    decorations: 'Willakuykuna',
+    preview: 'Rikchiy',
+    resetCustomization: 'Kunanta qaykuy',
+    noBadgesYet: 'Manam insigniykikichu kanqanchik',
+    yourStats: 'Estadístikaykikik',
+    topicsCompleted: 'Yachaykuna yuraykukuna',
+    avgQuizScore: 'Quiz promedio',
+    activitiesDone: 'Ruwaykuna yuraykukuna',
+    timeSpent: 'Hora qawaykuy',
+    streak: 'Punchaw qallariy',
+    topicProgress: 'Yachay ñanni',
   },
 }
 
-const getStoredProgress = (): UserProgress => {
-  const stored = localStorage.getItem('hablemos-claro-progress')
+const defaultCustomization: ProfileCustomization = {
+  themeColor: '#2563EB',
+  backgroundType: 'gradient',
+  backgroundValue: 'linear-gradient(135deg, #2563EB, #7C3AED)',
+  cardStyle: 'glass',
+  decorations: [],
+}
+
+const defaultStudentProgress: UserProgress = {
+  totalActivities: 0,
+  completedActivities: 0,
+  badges: [...allBadges],
+  conversations: 0,
+  topicProgress: {
+    coima: 0,
+    recognition: 0,
+    impact: 0,
+    consequences: 0,
+    prevention: 0,
+    test: 0,
+  },
+  quizScores: [],
+  lastActiveDate: '',
+  streakDays: 0,
+}
+
+const getStoredStudentProfile = (): StudentProfile => {
+  const stored = localStorage.getItem('hablemos-claro-student-profile')
   if (stored) return JSON.parse(stored)
   return {
-    totalActivities: 0,
-    completedActivities: 0,
-    badges: [...allBadges],
-    conversations: 0,
+    name: '',
+    age: '',
+    district: '',
+    photo: '',
+    avatarId: null,
+    progress: defaultStudentProgress,
+    customization: defaultCustomization,
   }
 }
 
-const saveProgress = (progress: UserProgress) => {
-  localStorage.setItem('hablemos-claro-progress', JSON.stringify(progress))
+const getStoredFamilyProfile = (): FamilyProfile => {
+  const stored = localStorage.getItem('hablemos-claro-family-profile')
+  if (stored) return JSON.parse(stored)
+  return {
+    name: '',
+    members: [],
+    progress: defaultStudentProgress,
+  }
+}
+
+const saveStudentProfile = (profile: StudentProfile) => {
+  localStorage.setItem('hablemos-claro-student-profile', JSON.stringify(profile))
+}
+
+const saveFamilyProfile = (profile: FamilyProfile) => {
+  localStorage.setItem('hablemos-claro-family-profile', JSON.stringify(profile))
 }
 
 // Datos de preguntas para la sección Conversemos
@@ -204,11 +355,13 @@ const conversationPrompts: ConversationPrompt[] = [
 ]
 
 // Estado global de la aplicación
-const initialProgress = getStoredProgress()
+const initialStudentProfile = getStoredStudentProfile()
+const initialFamilyProfile = getStoredFamilyProfile()
 
 export default function App() {
-  const [progress, setProgress] = useState<UserProgress>(initialProgress)
-  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'device' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents'>('welcome')
+  const [studentProfile, setStudentProfile] = useState<StudentProfile>(initialStudentProfile)
+  const [familyProfile, setFamilyProfile] = useState<FamilyProfile>(initialFamilyProfile)
+  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'device' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents' | 'profile-type'>('welcome')
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null)
   const [selectedTopic] = useState<LearningTopic | null>(null)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -227,15 +380,35 @@ export default function App() {
   const [userAge, setUserAge] = useState<string>(() => localStorage.getItem('hablemos-claro-age') || '')
   const [userDistrict, setUserDistrict] = useState<string>(() => localStorage.getItem('hablemos-claro-district') || '')
   const [language, setLanguage] = useState<'es' | 'qu'>(() => (localStorage.getItem('hablemos-claro-lang') as 'es' | 'qu') || 'es')
+  const [profileType, setProfileType] = useState<ProfileType>('student')
+  const [editPhotoModal, setEditPhotoModal] = useState(false)
+  const [_tempPhoto, setTempPhoto] = useState<string>('')
+
+  // Sincronizar userName/userAge/userDistrict con studentProfile
+  useEffect(() => {
+    setUserName(studentProfile.name)
+    setUserAge(studentProfile.age)
+    setUserDistrict(studentProfile.district)
+  }, [studentProfile])
+
+  useEffect(() => {
+    localStorage.setItem('hablemos-claro-name', studentProfile.name)
+    localStorage.setItem('hablemos-claro-age', studentProfile.age)
+    localStorage.setItem('hablemos-claro-district', studentProfile.district)
+  }, [studentProfile.name, studentProfile.age, studentProfile.district])
 
   // Traducción según idioma
   const t = (key: keyof typeof translations['es']) => translations[language][key] ?? translations['es'][key]
 
+  // Helper to get current profile's progress
+  const getProgress = () => profileType === 'student' ? studentProfile.progress : familyProfile.progress
+  const getBadges = () => profileType === 'student' ? studentProfile.progress.badges : familyProfile.progress.badges
+
   // Guardar datos personales
   const saveUserData = () => {
-    localStorage.setItem('hablemos-claro-name', userName)
-    localStorage.setItem('hablemos-claro-age', userAge)
-    localStorage.setItem('hablemos-claro-district', userDistrict)
+    const updatedStudent = { ...studentProfile, name: userName, age: userAge, district: userDistrict }
+    setStudentProfile(updatedStudent)
+    saveStudentProfile(updatedStudent)
   }
 
   // Cambiar modo claro/oscuro
@@ -263,39 +436,58 @@ export default function App() {
 
   // Actualizar progreso y verificar insignias
   const updateProgress = (activitiesIncrement: number = 1) => {
-    setProgress(prev => {
-      const newActivities = prev.completedActivities + activitiesIncrement
-      const newBadges = [...prev.badges]
-      let newBadgeToShow: Badge | null = null
+    const currentProfile = profileType === 'student' ? studentProfile : familyProfile
+    const newProgress = { ...currentProfile.progress }
+    newProgress.completedActivities += activitiesIncrement
+    newProgress.totalActivities = Math.max(newProgress.totalActivities, newProgress.completedActivities)
+    
+    const newBadges = [...newProgress.badges]
+    let newBadgeToShow: Badge | null = null
 
-      // Explorador de Temas: completar la primera actividad
-      const isExplorer = newBadges.find(b => b.id === 'topics-explorer')!
-      if (!isExplorer.unlocked && newActivities >= 1) {
-        isExplorer.unlocked = true
-        newBadgeToShow = { ...isExplorer }
-      }
+    const isExplorer = newBadges.find(b => b.id === 'topics-explorer')!
+    if (!isExplorer.unlocked && newProgress.completedActivities >= 1) {
+      isExplorer.unlocked = true
+      newBadgeToShow = { ...isExplorer }
+    }
 
-      // Maestro del Juego: completar 5+ actividades
-      const isMaster = newBadges.find(b => b.id === 'game-master')!
-      if (!isMaster.unlocked && newActivities >= 5) {
-        isMaster.unlocked = true
-        newBadgeToShow = { ...isMaster }
-      }
+    const isMaster = newBadges.find(b => b.id === 'game-master')!
+    if (!isMaster.unlocked && newProgress.completedActivities >= 5) {
+      isMaster.unlocked = true
+      newBadgeToShow = { ...isMaster }
+    }
 
-      // Campeón de la Integridad: ambas insignias desbloqueadas
-      const isChampion = newBadges.find(b => b.id === 'integrity-champion')!
-      if (!isChampion.unlocked && isExplorer.unlocked && isMaster.unlocked) {
-        isChampion.unlocked = true
-        newBadgeToShow = { ...isChampion }
-      }
+    const isChampion = newBadges.find(b => b.id === 'integrity-champion')!
+    if (!isChampion.unlocked && isExplorer.unlocked && isMaster.unlocked) {
+      isChampion.unlocked = true
+      newBadgeToShow = { ...isChampion }
+    }
 
-      saveProgress({ ...prev, completedActivities: newActivities, badges: newBadges })
-      if (newBadgeToShow) {
-        setEarnedBadge(newBadgeToShow)
-        setShowBadgeCelebration(true)
-      }
-      return { ...prev, completedActivities: newActivities, badges: newBadges }
-    })
+    newProgress.badges = newBadges
+    
+    if (profileType === 'student') {
+      setStudentProfile({ ...studentProfile, progress: newProgress })
+      saveStudentProfile({ ...studentProfile, progress: newProgress })
+    } else {
+      setFamilyProfile({ ...familyProfile, progress: newProgress })
+      saveFamilyProfile({ ...familyProfile, progress: newProgress })
+    }
+    
+    if (newBadgeToShow) {
+      setEarnedBadge(newBadgeToShow)
+      setShowBadgeCelebration(true)
+    }
+  }
+
+  const completeConversation = () => {
+    const currentProfile = profileType === 'student' ? studentProfile : familyProfile
+    const newProgress = { ...currentProfile.progress, conversations: currentProfile.progress.conversations + 1 }
+    if (profileType === 'student') {
+      setStudentProfile({ ...studentProfile, progress: newProgress })
+      saveStudentProfile({ ...studentProfile, progress: newProgress })
+    } else {
+      setFamilyProfile({ ...familyProfile, progress: newProgress })
+      saveFamilyProfile({ ...familyProfile, progress: newProgress })
+    }
   }
 
   // Responder pregunta del quiz
@@ -341,12 +533,7 @@ export default function App() {
   }
 
   // Completar conversación
-  const completeConversation = () => {
-    setProgress(prev => ({
-      ...prev,
-      conversations: prev.conversations + 1,
-    }))
-  }
+  // (ya definida arriba)
 
   // Reiniciar aplicación
 
@@ -361,8 +548,8 @@ export default function App() {
             <p className="text-xl mb-8 opacity-90">{t('welcomeSub')}</p>
             
             <div className="space-y-4">
-              <button
-                onClick={() => setCurrentScreen('device')}
+<button
+                onClick={() => setCurrentScreen('profile-type')}
                 className="btn-glow bg-white text-black font-bold py-4 px-8 rounded-full text-lg shadow-lg w-full"
               >
                 {t('start')}
@@ -378,12 +565,54 @@ export default function App() {
         </div>
       )
 
+    case 'profile-type':
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-success/10 p-8">
+          <div className="max-w-3xl mx-auto animate-slide-up text-center">
+            <h1 className="text-3xl font-bold gradient-text mb-2">{t('chooseProfile')}</h1>
+            <p className="text-gray-500 mb-8">{t('welcomeSub')}</p>
+            
+            <div className="grid grid-cols-2 gap-6 mb-10">
+              <button
+                onClick={() => {
+                  setProfileType('student')
+                  setCurrentScreen('avatar')
+                }}
+                className="glass-card rounded-2xl p-8 card-hover shadow-custom-lg border-2 border-primary/20"
+              >
+                <div className="text-6xl mb-4">👤</div>
+                <h3 className="text-xl font-bold text-primary mb-2">{t('studentProfile')}</h3>
+                <p className="text-gray-600 text-sm">Tu perfil personal con insignias, progreso y personalización</p>
+              </button>
+              <button
+                onClick={() => {
+                  setProfileType('family')
+                  setCurrentScreen('avatar')
+                }}
+                className="glass-card rounded-2xl p-8 card-hover shadow-custom-lg border-2 border-secondary/20"
+              >
+                <div className="text-6xl mb-4">👨‍👩‍👧</div>
+                <h3 className="text-xl font-bold text-secondary mb-2">{t('familyProfile')}</h3>
+                <p className="text-gray-600 text-sm">Perfil familiar compartido con actividades en conjunto</p>
+              </button>
+            </div>
+            
+            <button
+              onClick={() => setCurrentScreen('welcome')}
+              className="glass-card px-4 py-2 rounded-xl text-gray-600 text-sm hover:bg-gray-100 transition-all"
+            >
+              {t('back')}
+            </button>
+          </div>
+        </div>
+      )
+
     case 'avatar':
       return (
         <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-success/10 p-8">
           <div className="max-w-5xl mx-auto animate-slide-up">
-            <h1 className="text-3xl font-bold gradient-text text-center mb-2">Crea tu Avatar</h1>
-            <p className="text-center text-gray-500 mb-6">Elige tu personaje para la aventura</p>
+            <h1 className="text-3xl font-bold gradient-text text-center mb-2">{profileType === 'student' ? 'Crea tu Avatar' : 'Avatar Familiar'}</h1>
+            <p className="text-center text-gray-500 mb-6">{profileType === 'student' ? 'Elige tu personaje para la aventura' : 'Elige un avatar para la familia'}</p>
 
             <div className="grid grid-cols-3 gap-6 mb-10">
               {avatars.map((avatar) => (
@@ -430,11 +659,18 @@ export default function App() {
             )}
 
             <button
-              onClick={() => { if (selectedAvatar) setCurrentScreen('config'); }}
+              onClick={() => { if (selectedAvatar) { 
+                if (profileType === 'student') {
+                  const updated = { ...studentProfile, avatarId: selectedAvatar.id }
+                  setStudentProfile(updated)
+                  saveStudentProfile(updated)
+                }
+                setCurrentScreen('home'); 
+              }}}
               disabled={!selectedAvatar}
               className={`w-full py-4 rounded-xl font-bold text-lg ${selectedAvatar ? 'btn-glow bg-primary text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
             >
-              Continuar →
+              {t('continue')} →
             </button>
           </div>
         </div>
@@ -746,22 +982,23 @@ export default function App() {
       )
 
     case 'home':
-      const unlockedCount = progress.badges.filter(b => b.unlocked).length
+      const currentProgress = getProgress()
+      const unlockedCount = currentProgress.badges.filter(b => b.unlocked).length
       return (
         <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-secondary/5 p-8">
           <div className="max-w-6xl mx-auto animate-slide-up">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-2xl shadow-lg animate-float">
-                  {selectedAvatar ? selectedAvatar.emoji : '🦸'}
+                <div className="glass-card px-4 py-2 rounded-xl text-primary font-bold text-lg shadow-lg">
+                  🏅 {unlockedCount}/3
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold gradient-text">{t('greeting')}</h1>
                   <p className="text-sm text-gray-500">{device === 'phone' ? '📱 Móvil' : device === 'laptop' ? '💻 Laptop' : '🖥️ PC'}</p>
                 </div>
               </div>
-              <button onClick={() => setCurrentScreen('profile')} className="glass-card px-4 py-2 rounded-xl text-primary text-sm font-medium hover:bg-primary/10 transition-all">
-                {t('profile')} ⭐
+              <button onClick={() => setCurrentScreen('config')} className="glass-card px-4 py-2 rounded-xl text-primary text-sm font-medium hover:bg-primary/10 transition-all">
+                ⚙️ {t('configTitle')}
               </button>
             </div>
 
@@ -774,7 +1011,7 @@ export default function App() {
                 <span className="text-sm font-bold text-primary">{unlockedCount}/3</span>
               </div>
               <div className="flex gap-4 mb-6">
-                {progress.badges.map(badge => (
+                {currentProgress.badges.map(badge => (
                   <div key={badge.id} className={`flex-1 text-center p-3 rounded-xl ${badge.unlocked ? 'animate-float' : 'opacity-30 grayscale'}`}>
                     <div className="text-3xl">{badge.emoji}</div>
                     <div className="text-[10px] font-bold mt-1 truncate">{badge.name}</div>
@@ -1090,7 +1327,7 @@ export default function App() {
                 <div className="mt-6 flex gap-2">
                   <button
                     onClick={() => handleAnswer(0)}
-                    className={progress.completedActivities > 0 ? 'btn-outline' : 'btn-primary w-48 py-2 px-4 rounded'}
+                    className={getProgress().completedActivities > 0 ? 'btn-outline' : 'btn-primary w-48 py-2 px-4 rounded'}
                   >
                     ✅ {currentTopicData.correct}
                   </button>
@@ -1261,11 +1498,12 @@ export default function App() {
       )
 
     case 'result':
+      const resultProgress = getProgress()
       return (
         <div className="min-h-screen bg-light text-dark p-8">
           <div className="max-w-5xl mx-auto text-center">
             <h2 className="text-4xl font-bold text-primary mb-4">¡Actividad completada! 🎉</h2>
-            <p className="text-3xl font-bold">{progress.completedActivities}/{progress.totalActivities}</p>
+            <p className="text-3xl font-bold">{resultProgress.completedActivities}/{resultProgress.totalActivities}</p>
             <p className="text-gray-700 mt-4">Has aprendido a identificar algunas situaciones relacionadas con las coimas.</p>
             
             <div className="mt-6 p-4 bg-primary/5 rounded">
@@ -1299,6 +1537,35 @@ export default function App() {
               <button onClick={() => navigateTo('home')} className="text-gray-500 hover:text-primary">
                 ← Atrás
               </button>
+            </div>
+
+            {/* Avatar Selection for Games */}
+            <div className="glass-card rounded-2xl p-6 mb-8 card-hover">
+              <h2 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">🎭 {profileType === 'student' ? 'Tu personaje de juego' : 'Avatar familiar'}</h2>
+              <div className="grid grid-cols-3 gap-4">
+                {avatars.map((avatar) => (
+                  <button
+                    key={avatar.id}
+                    onClick={() => {
+                      if (profileType === 'student') {
+                        const updated = { ...studentProfile, avatarId: avatar.id }
+                        setStudentProfile(updated)
+                        saveStudentProfile(updated)
+                      }
+                    }}
+                    className={`glass-card rounded-xl p-4 text-center card-hover transition-all ${
+                      (profileType === 'student' && studentProfile.avatarId === avatar.id) 
+                        ? 'ring-3 ring-primary scale-105' 
+                        : 'hover:border-primary/50'
+                    }`}
+                    style={{ borderColor: (profileType === 'student' && studentProfile.avatarId === avatar.id) ? avatar.color : 'transparent' }}
+                  >
+                    <div className="text-4xl mb-2 animate-float">{avatar.emoji}</div>
+                    <div className="font-bold text-dark text-sm">{avatar.name}</div>
+                    <div className="text-xs text-gray-500 mt-1">{avatar.color}</div>
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="bg-white rounded-lg p-6 shadow-sm mb-8">
@@ -1368,7 +1635,7 @@ export default function App() {
             </div>
 
             <div className="mt-8 p-4 bg-primary/5 rounded">
-              <p className="font-medium">Insignias: {progress.badges.filter(b => b.unlocked).length}/3 ⭐</p>
+              <p className="font-medium">Insignias: {getBadges().filter(b => b.unlocked).length}/3 ⭐</p>
               <p className="text-xs">Desbloquea todas para ser Campeón</p>
             </div>
 
@@ -1592,83 +1859,419 @@ export default function App() {
       )
 
     case 'profile':
+      const currentBadges = getBadges()
+      const currentUnlockedCount = currentBadges.filter(b => b.unlocked).length
+      
       return (
         <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/5 to-warning/10 p-8">
-          <div className="max-w-4xl mx-auto animate-slide-up">
-            <div className="text-center mb-8">
-              <div className="w-24 h-24 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-float text-5xl">
-                {selectedAvatar ? selectedAvatar.emoji : '👤'}
-              </div>
-              <h2 className="text-3xl font-bold gradient-text">{userName || 'Familia 👨‍👩‍👧‍👦'}</h2>
-              <p className="text-gray-500 mt-1">{t('profileSub')}</p>
-              {(userAge || userDistrict) && (
-                <div className="flex justify-center gap-2 mt-3 flex-wrap">
-                  {userAge && (
-                    <span className="px-4 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
-                      🎂 {userAge} {t('ageYears')}
-                    </span>
-                  )}
-                  {userDistrict && (
-                    <span className="px-4 py-1 rounded-full bg-secondary/10 text-secondary text-sm font-medium">
-                      📍 {userDistrict}
-                    </span>
-                  )}
-                </div>
-              )}
-            </div>
-
-            <div className="glass-card rounded-2xl p-6 shadow-custom-lg mb-4">
-              <div className="grid grid-cols-2 gap-8">
-                <div className="text-center p-3">
-                  <div className="text-3xl font-bold gradient-text">{progress.badges.filter(b => b.unlocked).length}/3</div>
-                  <div className="text-sm text-gray-500 mt-1">{t('myBadges')}</div>
-                </div>
-                <div className="text-center p-3">
-                  <div className="text-3xl font-bold text-secondary">{progress.completedActivities}</div>
-                  <div className="text-sm text-gray-500 mt-1">{t('activities')}</div>
-                </div>
-                <div className="text-center p-3">
-                  <div className="text-3xl font-bold text-warning">{progress.conversations}</div>
-                  <div className="text-sm text-gray-500 mt-1">{t('conversations')}</div>
-                </div>
-                <div className="text-center p-3">
-                  <div className="text-lg font-bold text-primary">{progress.badges.find(b => b.id === 'integrity-champion')?.unlocked ? t('champion') : t('inProgress')}</div>
-                  <div className="text-sm text-gray-500 mt-1">{t('status')}</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="glass-card rounded-2xl p-6 mb-4">
-              <h3 className="font-bold text-dark mb-3">{t('generalProgress')}</h3>
-              <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
-                <div 
-                  className="progress-bar h-full"
-                  style={{ width: `${progress.totalActivities > 0 ? (progress.completedActivities / progress.totalActivities) * 100 : 0}%` }}
-                ></div>
-              </div>
-              <div className="flex justify-between mt-2">
-                <span className="text-sm text-gray-500">{progress.completedActivities} de {progress.totalActivities}</span>
-                <span className="text-sm font-bold text-primary">{progress.totalActivities > 0 ? Math.round((progress.completedActivities / progress.totalActivities) * 100) : 0}%</span>
-              </div>
-            </div>
-
-            <div className="glass-card rounded-2xl p-6 mb-4">
-              <h3 className="font-bold text-dark mb-2">{t('myBadges')}</h3>
-              <div className="flex gap-3 mt-3">
-                {progress.badges.map(badge => (
-                  <div key={badge.id} className={`text-center p-3 rounded-xl ${badge.unlocked ? '' : 'opacity-40 grayscale'}`} style={{ border: badge.unlocked ? `2px solid ${badge.color}` : '2px solid gray' }}>
-                    <div className="text-2xl">{badge.emoji}</div>
-                    <div className="text-xs font-bold mt-1" style={{ color: badge.color }}>{badge.name}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <button onClick={() => setCurrentScreen('home')} className="btn-glow bg-primary text-white font-bold py-4 px-6 rounded-xl text-lg w-full">
-                ← Volver al inicio
+          <div className="max-w-6xl mx-auto animate-slide-up">
+            {/* Profile Type Tabs */}
+            <div className="glass-card rounded-2xl p-2 mb-6 flex gap-2">
+              <button
+                onClick={() => setProfileType('student')}
+                className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm transition-all ${
+                  profileType === 'student' ? 'bg-primary text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                {t('studentProfile')}
+              </button>
+              <button
+                onClick={() => setProfileType('family')}
+                className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm transition-all ${
+                  profileType === 'family' ? 'bg-secondary text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                {t('familyProfile')}
               </button>
             </div>
+
+            {profileType === 'student' ? (
+              // STUDENT PROFILE
+              <>
+                {/* Header with editable photo */}
+                <div className="text-center mb-8 relative">
+                  <div className="relative inline-block">
+                    <div className="w-28 h-28 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-float text-6xl overflow-hidden border-4 border-white">
+                      {studentProfile.photo ? (
+                        <img src={studentProfile.photo} alt="Perfil" className="w-full h-full object-cover rounded-full" />
+                      ) : (
+                        studentProfile.avatarId ? (
+                          avatars.find(a => a.id === studentProfile.avatarId)?.emoji || '👤'
+                        ) : '👤'
+                      )}
+                    </div>
+                    {/* Edit photo button - pencil icon */}
+                    <button
+                      onClick={() => {
+                        setTempPhoto(studentProfile.photo)
+                        setEditPhotoModal(true)
+                      }}
+                      className="absolute bottom-1 right-1 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:bg-primary/90 transition-all"
+                      aria-label={t('editPhoto')}
+                    >
+                      ✏️
+                    </button>
+                  </div>
+                  <h2 className="text-3xl font-bold gradient-text">{studentProfile.name || 'Estudiante'}</h2>
+                  <p className="text-gray-500 mt-1">{t('profileSub')}</p>
+                  {(studentProfile.age || studentProfile.district) && (
+                    <div className="flex justify-center gap-2 mt-3 flex-wrap">
+                      {studentProfile.age && (
+                        <span className="px-4 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
+                          🎂 {studentProfile.age} {t('ageYears')}
+                        </span>
+                      )}
+                      {studentProfile.district && (
+                        <span className="px-4 py-1 rounded-full bg-secondary/10 text-secondary text-sm font-medium">
+                          📍 {studentProfile.district}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Stats Cards */}
+                <div className="glass-card rounded-2xl p-6 shadow-custom-lg mb-6">
+                  <div className="grid grid-cols-4 gap-4">
+                    <div className="text-center p-3">
+                      <div className="text-3xl font-bold gradient-text">{currentUnlockedCount}/3</div>
+                      <div className="text-sm text-gray-500 mt-1">{t('myBadges')}</div>
+                    </div>
+                    <div className="text-center p-3">
+                      <div className="text-3xl font-bold text-secondary">{getProgress().completedActivities}</div>
+                      <div className="text-sm text-gray-500 mt-1">{t('activities')}</div>
+                    </div>
+                    <div className="text-center p-3">
+                      <div className="text-3xl font-bold text-warning">{getProgress().conversations}</div>
+                      <div className="text-sm text-gray-500 mt-1">{t('conversations')}</div>
+                    </div>
+                    <div className="text-center p-3">
+                      <div className="text-lg font-bold text-primary">{getProgress().streakDays}</div>
+                      <div className="text-sm text-gray-500 mt-1">{t('streak')}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Badges or Stats when no badges */}
+                <div className="glass-card rounded-2xl p-6 mb-6">
+                  {currentUnlockedCount > 0 ? (
+                    <>
+                      <h3 className="font-bold text-dark mb-4">{t('myBadges')}</h3>
+                      <div className="flex gap-4 justify-center">
+                        {currentBadges.map(badge => (
+                          <div key={badge.id} className={`text-center p-4 rounded-xl ${badge.unlocked ? '' : 'opacity-40 grayscale'}`} style={{ border: badge.unlocked ? `3px solid ${badge.color}` : '2px dashed gray' }}>
+                            <div className="text-3xl">{badge.emoji}</div>
+                            <div className="text-xs font-bold mt-2" style={{ color: badge.color }}>{badge.name}</div>
+                            <div className="text-[10px] text-gray-500 mt-1">{badge.unlocked ? '✓ Desbloqueada' : 'Bloqueada'}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    // Stats/Graphs when no badges
+                    <>
+                      <h3 className="font-bold text-dark mb-4">{t('noBadgesYet')} - {t('yourStats')}</h3>
+                      <div className="space-y-6">
+                        {/* Progress bars per topic */}
+                        <div>
+                          <h4 className="font-bold text-primary mb-3">{t('topicProgress')}</h4>
+                          <div className="space-y-3">
+                            {Object.entries(getProgress().topicProgress).map(([topic, value]) => (
+                              <div key={topic} className="space-y-1">
+                                <div className="flex justify-between text-sm">
+                                  <span className="capitalize">{topic}</span>
+                                  <span className="font-bold text-primary">{value}%</span>
+                                </div>
+                                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                  <div 
+                                    className="h-full bg-gradient-to-r from-primary to-secondary rounded-full transition-all"
+                                    style={{ width: `${value}%` }}
+                                  ></div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        {/* Quiz scores chart */}
+                        {getProgress().quizScores.length > 0 && (
+                          <div>
+                            <h4 className="font-bold text-secondary mb-3">{t('avgQuizScore')}</h4>
+                            <div className="h-32 flex items-end justify-around gap-2">
+                              {getProgress().quizScores.slice(-6).map((score, i) => (
+                                <div key={i} className="flex-1 flex flex-col items-center">
+                                  <div 
+                                    className="w-full bg-gradient-to-t from-secondary to-primary rounded-t transition-all"
+                                    style={{ height: `${score}%` }}
+                                  ></div>
+                                  <span className="text-xs text-gray-500 mt-1">Q{i + 1}</span>
+                                </div>
+                              ))}
+                            </div>
+                            <p className="text-center text-sm text-gray-500 mt-2">
+                              Promedio: {Math.round(getProgress().quizScores.reduce((a, b) => a + b, 0) / getProgress().quizScores.length)}%
+                            </p>
+                          </div>
+                        )}
+                        
+                        {/* Summary stats */}
+                        <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+                          <div className="text-center p-3 bg-primary/5 rounded-xl">
+                            <div className="text-2xl font-bold text-primary">{getProgress().completedActivities}</div>
+                            <div className="text-xs text-gray-500">{t('activitiesDone')}</div>
+                          </div>
+                          <div className="text-center p-3 bg-secondary/5 rounded-xl">
+                            <div className="text-2xl font-bold text-secondary">{getProgress().conversations}</div>
+                            <div className="text-xs text-gray-500">{t('conversations')}</div>
+                          </div>
+                          <div className="text-center p-3 bg-warning/5 rounded-xl">
+                            <div className="text-2xl font-bold text-warning">{getProgress().streakDays}</div>
+                            <div className="text-xs text-gray-500">{t('streak')}</div>
+                          </div>
+                          <div className="text-center p-3 bg-success/5 rounded-xl">
+                            <div className="text-2xl font-bold text-success">{Object.values(getProgress().topicProgress).filter(v => v >= 100).length}</div>
+                            <div className="text-xs text-gray-500">{t('topicsCompleted')}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* General Progress */}
+                <div className="glass-card rounded-2xl p-6 mb-6">
+                  <h3 className="font-bold text-dark mb-3">{t('generalProgress')}</h3>
+                  <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
+                    <div 
+                      className="progress-bar h-full"
+                      style={{ width: `${getProgress().totalActivities > 0 ? (getProgress().completedActivities / getProgress().totalActivities) * 100 : 0}%` }}
+                    ></div>
+                  </div>
+                  <div className="flex justify-between mt-2">
+                    <span className="text-sm text-gray-500">{getProgress().completedActivities} de {getProgress().totalActivities}</span>
+                    <span className="text-sm font-bold text-primary">{getProgress().totalActivities > 0 ? Math.round((getProgress().completedActivities / getProgress().totalActivities) * 100) : 0}%</span>
+                  </div>
+                </div>
+
+                {/* Customization Panel */}
+                <div className="glass-card rounded-2xl p-6 mb-6">
+                  <h3 className="font-bold text-dark mb-4 flex items-center gap-2">{t('customization')}</h3>
+                  
+                  {/* Theme Colors */}
+                  <div className="mb-6">
+                    <h4 className="font-medium text-gray-700 mb-3">{t('themeColors')}</h4>
+                    <div className="grid grid-cols-4 gap-3">
+                      {themeColors.map(theme => (
+                        <button
+                          key={theme.name}
+                          onClick={() => {
+                            const updated = { 
+                              ...studentProfile, 
+                              customization: { 
+                                ...studentProfile.customization, 
+                                themeColor: theme.value,
+                                backgroundValue: theme.gradient 
+                              } 
+                            }
+                            setStudentProfile(updated)
+                            saveStudentProfile(updated)
+                          }}
+                          className={`w-12 h-12 rounded-xl border-3 transition-all ${
+                            studentProfile.customization.themeColor === theme.value ? 'ring-4 ring-primary scale-110' : 'border-transparent hover:border-gray-300'
+                          }`}
+                          style={{ background: theme.gradient }}
+                          title={theme.name}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Backgrounds */}
+                  <div className="mb-6">
+                    <h4 className="font-medium text-gray-700 mb-3">{t('backgrounds')}</h4>
+                    <div className="grid grid-cols-3 gap-3">
+                      {backgrounds.map(bg => (
+                        <button
+                          key={bg.name}
+                          onClick={() => {
+                            const updated = { 
+                              ...studentProfile, 
+                              customization: { 
+                                ...studentProfile.customization, 
+                                backgroundType: bg.type,
+                                backgroundValue: bg.value 
+                              } 
+                            }
+                            setStudentProfile(updated)
+                            saveStudentProfile(updated)
+                          }}
+                          className={`p-3 rounded-xl border-3 transition-all text-center ${
+                            studentProfile.customization.backgroundType === bg.type && studentProfile.customization.backgroundValue === bg.value 
+                              ? 'ring-4 ring-secondary' 
+                              : 'border-transparent hover:border-gray-300'
+                          }`}
+                          style={{ 
+                            background: bg.value,
+                            backgroundSize: bg.type === 'pattern' ? '50px 50px' : 'cover'
+                          }}
+                        >
+                          <span className="block text-xs font-medium text-gray-700 mt-2">{bg.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Card Styles */}
+                  <div className="mb-6">
+                    <h4 className="font-medium text-gray-700 mb-3">{t('cardStyles')}</h4>
+                    <div className="flex gap-4">
+                      {cardStyles.map(style => (
+                        <button
+                          key={style.name}
+                          onClick={() => {
+                            const updated = { 
+                              ...studentProfile, 
+                              customization: { ...studentProfile.customization, cardStyle: style.value } 
+                            }
+                            setStudentProfile(updated)
+                            saveStudentProfile(updated)
+                          }}
+                          className={`px-6 py-3 rounded-xl font-bold transition-all ${
+                            studentProfile.customization.cardStyle === style.value 
+                              ? 'bg-primary text-white' 
+                              : 'glass-card text-dark hover:bg-primary/10'
+                          }`}
+                        >
+                          {style.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Decorations */}
+                  <div className="mb-6">
+                    <h4 className="font-medium text-gray-700 mb-3">{t('decorations')}</h4>
+                    <div className="flex gap-4 flex-wrap">
+                      {decorations.map(dec => (
+                        <button
+                          key={dec.name}
+                          onClick={() => {
+                            const decs = studentProfile.customization.decorations.includes(dec.value)
+                              ? studentProfile.customization.decorations.filter(d => d !== dec.value)
+                              : [...studentProfile.customization.decorations, dec.value]
+                            const updated = { 
+                              ...studentProfile, 
+                              customization: { ...studentProfile.customization, decorations: decs } 
+                            }
+                            setStudentProfile(updated)
+                            saveStudentProfile(updated)
+                          }}
+                          className={`px-4 py-2 rounded-xl font-medium transition-all ${
+                            studentProfile.customization.decorations.includes(dec.value)
+                              ? 'bg-warning text-white'
+                              : 'glass-card text-dark hover:bg-warning/10'
+                          }`}
+                        >
+                          {dec.name === 'Ninguna' ? '✨' : dec.value === 'stars' ? '⭐' : dec.value === 'hearts' ? '❤️' : '✨'} {dec.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Reset button */}
+                  <button
+                    onClick={() => {
+                      const updated = { ...studentProfile, customization: defaultCustomization }
+                      setStudentProfile(updated)
+                      saveStudentProfile(updated)
+                    }}
+                    className="w-full py-2 px-4 rounded-xl text-sm text-gray-500 hover:text-primary hover:bg-gray-100 transition-all"
+                  >
+                    {t('resetCustomization')}
+                  </button>
+                </div>
+
+                {/* Back button */}
+                <div className="mt-6">
+                  <button onClick={() => setCurrentScreen('home')} className="btn-glow bg-primary text-white font-bold py-4 px-6 rounded-xl text-lg w-full">
+                    ← Volver al inicio
+                  </button>
+                </div>
+              </>
+            ) : (
+              // FAMILY PROFILE
+              <>
+                <div className="text-center mb-8">
+                  <div className="w-28 h-28 bg-gradient-to-br from-secondary to-warning rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-float text-5xl">
+                    👨‍👩‍👧
+                  </div>
+                  <h2 className="text-3xl font-bold gradient-text">{familyProfile.name || 'Familia'}</h2>
+                  <p className="text-gray-500 mt-1">Perfil familiar compartido</p>
+                  {familyProfile.members.length > 0 && (
+                    <div className="flex justify-center gap-2 mt-3 flex-wrap">
+                      {familyProfile.members.map((member, i) => (
+                        <span key={i} className="px-4 py-1 rounded-full bg-secondary/10 text-secondary text-sm font-medium">
+                          {member}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="glass-card rounded-2xl p-6 shadow-custom-lg mb-6">
+                  <div className="grid grid-cols-4 gap-4">
+                    <div className="text-center p-3">
+                      <div className="text-3xl font-bold gradient-text">{currentUnlockedCount}/3</div>
+                      <div className="text-sm text-gray-500 mt-1">{t('myBadges')}</div>
+                    </div>
+                    <div className="text-center p-3">
+                      <div className="text-3xl font-bold text-secondary">{getProgress().completedActivities}</div>
+                      <div className="text-sm text-gray-500 mt-1">{t('activities')}</div>
+                    </div>
+                    <div className="text-center p-3">
+                      <div className="text-3xl font-bold text-warning">{getProgress().conversations}</div>
+                      <div className="text-sm text-gray-500 mt-1">{t('conversations')}</div>
+                    </div>
+                    <div className="text-center p-3">
+                      <div className="text-lg font-bold text-primary">{familyProfile.members.length}</div>
+                      <div className="text-sm text-gray-500 mt-1">Integrantes</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="glass-card rounded-2xl p-6 mb-6">
+                  <h3 className="font-bold text-dark mb-3">{t('generalProgress')}</h3>
+                  <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
+                    <div 
+                      className="progress-bar h-full"
+                      style={{ width: `${getProgress().totalActivities > 0 ? (getProgress().completedActivities / getProgress().totalActivities) * 100 : 0}%` }}
+                    ></div>
+                  </div>
+                  <div className="flex justify-between mt-2">
+                    <span className="text-sm text-gray-500">{getProgress().completedActivities} de {getProgress().totalActivities}</span>
+                    <span className="text-sm font-bold text-primary">{getProgress().totalActivities > 0 ? Math.round((getProgress().completedActivities / getProgress().totalActivities) * 100) : 0}%</span>
+                  </div>
+                </div>
+
+                <div className="glass-card rounded-2xl p-6 mb-6">
+                  <h3 className="font-bold text-dark mb-4">{t('myBadges')}</h3>
+                  <div className="flex gap-4 justify-center">
+                    {currentBadges.map(badge => (
+                      <div key={badge.id} className={`text-center p-4 rounded-xl ${badge.unlocked ? '' : 'opacity-40 grayscale'}`} style={{ border: badge.unlocked ? `3px solid ${badge.color}` : '2px dashed gray' }}>
+                        <div className="text-3xl">{badge.emoji}</div>
+                        <div className="text-xs font-bold mt-2" style={{ color: badge.color }}>{badge.name}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <button onClick={() => setCurrentScreen('home')} className="btn-glow bg-primary text-white font-bold py-4 px-6 rounded-xl text-lg w-full">
+                    ← Volver al inicio
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )
@@ -1728,6 +2331,64 @@ export default function App() {
     }
   }
 
+    // Edit Photo Modal
+    const editPhotoModalContent = editPhotoModal ? (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+        <div className="glass-card rounded-3xl p-8 max-w-md w-full text-center animate-slide-up shadow-2xl">
+          <h3 className="text-2xl font-bold gradient-text mb-2">{t('editPhoto')}</h3>
+          <p className="text-gray-500 mb-6">{t('choosePhoto')}</p>
+          
+          <div className="space-y-3 mb-6">
+            <label className="cursor-pointer">
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0]
+                  if (file) {
+                    const reader = new FileReader()
+                    reader.onload = (event) => {
+                      const result = event.target?.result as string
+                      setTempPhoto(result)
+                      const updated = { ...studentProfile, photo: result }
+                      setStudentProfile(updated)
+                      saveStudentProfile(updated)
+                      setEditPhotoModal(false)
+                    }
+                    reader.readAsDataURL(file)
+                  }
+                }}
+              />
+              <button className="btn-glow bg-primary text-white font-bold py-3 px-6 rounded-xl w-full">
+                📷 {t('takePhoto')}
+              </button>
+            </label>
+            
+            <button
+              onClick={() => {
+                const updated = { ...studentProfile, photo: '' }
+                setStudentProfile(updated)
+                saveStudentProfile(updated)
+                setEditPhotoModal(false)
+              }}
+              className="btn-glow bg-secondary text-white font-bold py-3 px-6 rounded-xl w-full"
+            >
+              {t('useAvatar')} {(() => { const a = avatars.find(a => a.id === studentProfile.avatarId); return a ? `(${a.emoji} ${a.name})` : ''; })()}
+            </button>
+            
+            <button
+              onClick={() => setEditPhotoModal(false)}
+              className="text-gray-500 hover:text-primary text-sm font-medium"
+            >
+              {t('back')}
+            </button>
+          </div>
+        </div>
+      </div>
+    ) : null
+
   return (
     <div className={`${darkMode ? 'dark' : ''} ${device === 'pc' ? 'pc-mode' : ''}`}>
       {device === 'phone' ? (
@@ -1754,7 +2415,7 @@ export default function App() {
         // PC: la app ocupa toda la pantalla
         renderScreen()
       )}
-      {showBadgeCelebration && earnedBadge && (
+{showBadgeCelebration && earnedBadge && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
           <div className="rounded-3xl p-8 max-w-sm w-full text-center text-white animate-slide-up shadow-2xl" style={{ background: 'linear-gradient(135deg, #1e3a8a, #6d28d9, #b45309)' }}>
             <div className="text-7xl mb-4 animate-float">{earnedBadge.emoji}</div>
@@ -1765,11 +2426,12 @@ export default function App() {
               onClick={() => setShowBadgeCelebration(false)}
               className="bg-white text-primary font-bold py-3 px-8 rounded-full text-lg w-full"
             >
-              ¡Genial! 🎉
+              Continuar
             </button>
           </div>
         </div>
       )}
+      {editPhotoModalContent}
     </div>
   )
 }
