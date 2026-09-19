@@ -355,7 +355,7 @@ export default function App() {
     switch (currentScreen) {
     case 'welcome':
       return (
-        <div className="min-h-screen welcome-bg flex items-center justify-center p-4">
+        <div className="min-h-screen welcome-bg flex items-center justify-center p-8">
           <div className="max-w-5xl mx-auto text-center text-white animate-fade-in">
             <h1 className="text-5xl font-bold mb-4 drop-shadow-lg">{t('welcomeTitle')}</h1>
             <p className="text-xl mb-8 opacity-90">{t('welcomeSub')}</p>
@@ -380,12 +380,12 @@ export default function App() {
 
     case 'avatar':
       return (
-        <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-success/10 p-4">
+        <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-success/10 p-8">
           <div className="max-w-5xl mx-auto animate-slide-up">
             <h1 className="text-3xl font-bold gradient-text text-center mb-2">Crea tu Avatar</h1>
             <p className="text-center text-gray-500 mb-6">Elige tu personaje para la aventura</p>
 
-            <div className="grid grid-cols-3 gap-4 mb-8">
+            <div className="grid grid-cols-3 gap-6 mb-10">
               {avatars.map((avatar) => (
                 <button
                   key={avatar.id}
@@ -401,7 +401,7 @@ export default function App() {
 
             <div className="glass-card rounded-2xl p-6 mb-6">
               <h3 className="font-bold text-lg mb-4 text-center">🎮 Modo de juego</h3>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-8">
                 <button
                   onClick={() => setPlayMode('individual')}
                   className={`py-4 px-6 rounded-xl font-bold transition-all ${playMode === 'individual' ? 'bg-primary text-white shadow-lg' : 'glass-card text-dark hover:bg-primary/10'}`}
@@ -442,7 +442,7 @@ export default function App() {
 
     case 'about':
       return (
-        <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-success/10 p-4">
+        <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-success/10 p-8">
           <div className="max-w-3xl mx-auto animate-slide-up">
             <div className="flex items-center justify-between mb-2">
               <h1 className="text-3xl font-bold gradient-text">{t('aboutTitle')}</h1>
@@ -496,7 +496,7 @@ export default function App() {
 
     case 'device':
       return (
-        <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-success/10 p-4">
+        <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-success/10 p-8">
           <div className="max-w-3xl mx-auto animate-slide-up text-center">
             <div className="flex items-center justify-between mb-2">
               <button onClick={() => setCurrentScreen('welcome')} className="glass-card px-3 py-1 rounded-xl text-gray-600 text-sm hover:bg-gray-100 transition-all">
@@ -507,7 +507,7 @@ export default function App() {
             <h1 className="text-3xl font-bold gradient-text mb-2 mt-4">{t('deviceQuestion')}</h1>
             <p className="text-gray-500 mb-8">{t('deviceSub')}</p>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-8">
               <button
                 onClick={() => setDevice('pc')}
                 className={`glass-card rounded-2xl p-6 card-hover shadow-custom-lg ${device === 'pc' ? 'ring-4 ring-primary' : ''}`}
@@ -546,7 +546,7 @@ export default function App() {
 
     case 'config':
       return (
-        <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-success/10 p-4">
+        <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-success/10 p-8">
           <div className="max-w-4xl mx-auto animate-slide-up">
             <h2 className="text-3xl font-bold gradient-text mb-6 text-center">{t('configTitle')}</h2>
             
@@ -678,9 +678,9 @@ export default function App() {
     case 'home':
       const unlockedCount = progress.badges.filter(b => b.unlocked).length
       return (
-        <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-secondary/5 p-4">
+        <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-secondary/5 p-8">
           <div className="max-w-6xl mx-auto animate-slide-up">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-2xl shadow-lg animate-float">
                   {selectedAvatar ? selectedAvatar.emoji : '🦸'}
@@ -695,15 +695,15 @@ export default function App() {
               </button>
             </div>
 
-            <p className="text-lg text-gray-600 mb-6">{t('welcomeLine')}</p>
+            <p className="text-lg text-gray-600 mb-8">{t('welcomeLine')}</p>
 
             {/* Progreso + insignias */}
-            <div className="glass-card rounded-2xl p-6 mb-6 card-hover">
-              <div className="flex items-center justify-between mb-3">
+            <div className="glass-card rounded-2xl p-8 mb-8 card-hover">
+              <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold text-secondary text-lg">{t('badges')}</h3>
                 <span className="text-sm font-bold text-primary">{unlockedCount}/3</span>
               </div>
-              <div className="flex gap-3 mb-4">
+              <div className="flex gap-4 mb-6">
                 {progress.badges.map(badge => (
                   <div key={badge.id} className={`flex-1 text-center p-3 rounded-xl ${badge.unlocked ? 'animate-float' : 'opacity-30 grayscale'}`}>
                     <div className="text-3xl">{badge.emoji}</div>
@@ -720,7 +720,7 @@ export default function App() {
             </div>
 
             {/* Accesos principales */}
-            <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-2 gap-6 mb-8">
               <button
                 onClick={() => setCurrentScreen('learn')}
                 className="glass-card rounded-2xl p-6 text-left card-hover shadow-custom-lg"
@@ -757,7 +757,7 @@ export default function App() {
                 onClick={() => setCurrentScreen('config')}
                 className="glass-card rounded-2xl p-6 text-left card-hover shadow-custom-lg col-span-2 flex items-center justify-between"
               >
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-8">
                   <div className="text-4xl">⚙️</div>
                   <div>
                     <h3 className="font-bold text-dark">{t('configTitle')}</h3>
@@ -786,7 +786,7 @@ export default function App() {
 
     case 'reels':
       return (
-        <div className="min-h-screen bg-gradient-to-br from-warning/10 via-white to-primary/5 p-4">
+        <div className="min-h-screen bg-gradient-to-br from-warning/10 via-white to-primary/5 p-8">
           <div className="max-w-5xl mx-auto animate-slide-up">
             <div className="flex items-center justify-between mb-6">
               <div>
@@ -916,7 +916,7 @@ export default function App() {
       if (showCoimaONo) {
         const currentCase = coimaCases[currentCoimaCase]
         return (
-          <div className="min-h-screen bg-light text-dark p-4">
+          <div className="min-h-screen bg-light text-dark p-8">
             <div className="max-w-5xl mx-auto">
               <div className="flex items-center justify-between mb-4">
                 <h1 className="text-2xl font-bold text-primary">¿Coima o no?</h1>
@@ -935,7 +935,7 @@ export default function App() {
 
                 <p className="text-lg text-gray-700 mb-6">{currentCase.situation}</p>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-8">
                   <button
                     onClick={() => {
                       const isCorrect = currentCase.isCoima === true
@@ -994,7 +994,7 @@ export default function App() {
       }
 
       return (
-        <div className="min-h-screen bg-light text-dark p-4">
+        <div className="min-h-screen bg-light text-dark p-8">
           <div className="max-w-5xl mx-auto">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-2xl font-bold text-primary">
@@ -1137,7 +1137,7 @@ export default function App() {
       ]
 
       return (
-        <div className="min-h-screen bg-gradient-to-br from-secondary/10 via-primary/5 to-success/10 p-4">
+        <div className="min-h-screen bg-gradient-to-br from-secondary/10 via-primary/5 to-success/10 p-8">
           <div className="max-w-5xl mx-auto animate-slide-up">
             <div className="flex items-center justify-between mb-6">
               <h1 className="text-3xl font-bold gradient-text">¿Qué harías?</h1>
@@ -1190,7 +1190,7 @@ export default function App() {
 
     case 'result':
       return (
-        <div className="min-h-screen bg-light text-dark p-4">
+        <div className="min-h-screen bg-light text-dark p-8">
           <div className="max-w-5xl mx-auto text-center">
             <h2 className="text-4xl font-bold text-primary mb-4">¡Actividad completada! 🎉</h2>
             <p className="text-3xl font-bold">{progress.completedActivities}/{progress.totalActivities}</p>
@@ -1220,7 +1220,7 @@ export default function App() {
 
     case 'games':
       return (
-        <div className="min-h-screen bg-light text-dark p-4">
+        <div className="min-h-screen bg-light text-dark p-8">
           <div className="max-w-5xl mx-auto">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-2xl font-bold text-primary">Pon a prueba lo que sabes 🎮</h1>
@@ -1312,7 +1312,7 @@ export default function App() {
 
     case 'converse':
       return (
-        <div className="min-h-screen bg-light text-dark p-4">
+        <div className="min-h-screen bg-light text-dark p-8">
           <div className="max-w-5xl mx-auto">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-2xl font-bold text-primary">Conversemos en familia 💬</h1>
@@ -1365,7 +1365,7 @@ export default function App() {
 
     case 'activity':
       return (
-        <div className="min-h-screen bg-light text-dark p-4">
+        <div className="min-h-screen bg-light text-dark p-8">
           <div className="max-w-5xl mx-auto">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-2xl font-bold text-family">Detectemos juntos</h1>
@@ -1379,7 +1379,7 @@ export default function App() {
                 "Una persona quiere obtener un beneficio que no le corresponde y ofrece dinero para conseguirlo."
               </p>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-8">
                 <div>
                   <p className="font-medium">Señales de alerta:</p>
                   <ul className="text-sm text-gray-600 space-y-1">
@@ -1469,7 +1469,7 @@ export default function App() {
       ]
 
       return (
-        <div className="min-h-screen bg-light text-dark p-4">
+        <div className="min-h-screen bg-light text-dark p-8">
           <div className="max-w-6xl mx-auto">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-2xl font-bold text-primary">Casos de la vida cotidiana</h1>
@@ -1521,7 +1521,7 @@ export default function App() {
 
     case 'profile':
       return (
-        <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/5 to-warning/10 p-4">
+        <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/5 to-warning/10 p-8">
           <div className="max-w-4xl mx-auto animate-slide-up">
             <div className="text-center mb-8">
               <div className="w-24 h-24 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-float text-5xl">
@@ -1546,7 +1546,7 @@ export default function App() {
             </div>
 
             <div className="glass-card rounded-2xl p-6 shadow-custom-lg mb-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-8">
                 <div className="text-center p-3">
                   <div className="text-3xl font-bold gradient-text">{progress.badges.filter(b => b.unlocked).length}/3</div>
                   <div className="text-sm text-gray-500 mt-1">{t('myBadges')}</div>
@@ -1603,7 +1603,7 @@ export default function App() {
 
     case 'content-for-parents':
       return (
-        <div className="min-h-screen bg-light text-dark p-4">
+        <div className="min-h-screen bg-light text-dark p-8">
           <div className="max-w-5xl mx-auto">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-2xl font-bold text-primary">Guía para conversar</h1>
