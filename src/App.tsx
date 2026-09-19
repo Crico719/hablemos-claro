@@ -450,38 +450,108 @@ export default function App() {
                 {t('back')}
               </button>
             </div>
-            <p className="text-gray-500 mb-8">{t('aboutSub')}</p>
+            <p className="text-gray-500 mb-12">{t('aboutSub')}</p>
 
-            <div className="glass-card rounded-2xl p-6 mb-4 card-hover">
-              <h2 className="text-xl font-bold text-primary mb-3">🔎 ¿De qué trata la app?</h2>
-              <p className="text-gray-700 leading-relaxed">
+            {/* 1. ¿De qué trata la app? */}
+            <div className="glass-card rounded-3xl p-8 mb-10 card-hover shadow-custom-lg">
+              <div className="flex items-center gap-4 mb-5">
+                <div className="w-14 h-14 rounded-2xl bg-primary/15 flex items-center justify-center text-3xl">🔎</div>
+                <h2 className="text-2xl font-bold text-primary">¿De qué trata la app?</h2>
+              </div>
+              <p className="text-gray-700 leading-relaxed text-lg">
                 <strong>Hablemos Claro</strong> es una aplicación educativa para que las familias aprendan a conversar sobre las <strong>coimas (sobornos)</strong> y la corrupción.
               </p>
-              <ul className="text-gray-700 mt-3 space-y-2">
-                <li>📚 <strong>Temas:</strong> explica qué es una coima, cómo reconocerla, por qué hace daño y cómo prevenirla.</li>
-                <li>🎮 <strong>Juego:</strong> actividades para aplicar lo aprendido.</li>
-                <li>📱 <strong>Reels:</strong> mensajes cortos que refuerzan la integridad.</li>
-                <li>💬 <strong>Conversaciones:</strong> preguntas para dialogar en familia.</li>
-              </ul>
+              <div className="grid grid-cols-2 gap-6 mt-8">
+                <div className="rounded-2xl bg-primary/5 p-5 border border-primary/10">
+                  <div className="text-3xl mb-2">📚</div>
+                  <p className="font-bold text-primary mb-1">Temas</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">Explica qué es una coima, cómo reconocerla, por qué hace daño y cómo prevenirla.</p>
+                </div>
+                <div className="rounded-2xl bg-secondary/5 p-5 border border-secondary/10">
+                  <div className="text-3xl mb-2">🎮</div>
+                  <p className="font-bold text-secondary mb-1">Juego</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">Actividades para aplicar lo aprendido.</p>
+                </div>
+                <div className="rounded-2xl bg-warning/5 p-5 border border-warning/10">
+                  <div className="text-3xl mb-2">📱</div>
+                  <p className="font-bold text-warning mb-1">Reels</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">Mensajes cortos que refuerzan la integridad.</p>
+                </div>
+                <div className="rounded-2xl bg-success/5 p-5 border border-success/10">
+                  <div className="text-3xl mb-2">💬</div>
+                  <p className="font-bold text-success mb-1">Conversaciones</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">Preguntas para dialogar en familia.</p>
+                </div>
+              </div>
             </div>
 
-            <div className="glass-card rounded-2xl p-6 mb-4 card-hover">
-              <h2 className="text-xl font-bold text-secondary mb-3">👨👩👧👦 ¿A quién está dirigida?</h2>
-              <p className="text-gray-700 leading-relaxed">
+            {/* 2. ¿A quién está dirigida? */}
+            <div className="glass-card rounded-3xl p-8 mb-10 card-hover shadow-custom-lg">
+              <div className="flex items-center gap-4 mb-5">
+                <div className="w-14 h-14 rounded-2xl bg-secondary/15 flex items-center justify-center text-3xl">👨‍👩‍👧‍👦</div>
+                <h2 className="text-2xl font-bold text-secondary">¿A quién está dirigida?</h2>
+              </div>
+              <p className="text-gray-700 leading-relaxed text-lg">
                 Está pensada para <strong>padres, madres, hijos e hijas</strong> de todas las edades, para que aprendan juntos en casa. También sirve a jóvenes y docentes interesados en entender la corrupción y promover valores como la honestidad y la transparencia.
               </p>
+              <div className="flex flex-wrap gap-3 mt-8">
+                <span className="px-4 py-2 rounded-full bg-primary/10 text-primary font-bold">👨‍👩‍👧 Familias</span>
+                <span className="px-4 py-2 rounded-full bg-secondary/10 text-secondary font-bold">🧑‍🎓 Jóvenes</span>
+                <span className="px-4 py-2 rounded-full bg-warning/10 text-warning font-bold">📚 Docentes</span>
+                <span className="px-4 py-2 rounded-full bg-success/10 text-success font-bold">💡 Todos en casa</span>
+              </div>
             </div>
 
-            <div className="glass-card rounded-2xl p-6 mb-8 card-hover">
-              <h2 className="text-xl font-bold text-warning mb-3">🛠️ ¿Cómo usar la app?</h2>
-              <ol className="text-gray-700 space-y-3 list-decimal list-inside">
-                <li><strong>Crea tu avatar:</strong> elige tu personaje.</li>
-                <li><strong>Elige el modo:</strong> individual 👤 o con familia 👨‍👩‍👧‍👦.</li>
-                <li><strong>Configura:</strong> tu rol (padre/hijo), tu dispositivo (PC, móvil o laptop) y el tema del día.</li>
-                <li><strong>Explora los Temas</strong> desde la pantalla de inicio.</li>
-                <li><strong>Juega y desbloquea las 3 insignias</strong> 🏅 del perfil.</li>
-                <li><strong>Mira los Reels</strong> para reforzar lo aprendido.</li>
-              </ol>
+            {/* 3. ¿Cómo usar la app? */}
+            <div className="glass-card rounded-3xl p-8 mb-12 card-hover shadow-custom-lg">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-14 h-14 rounded-2xl bg-warning/15 flex items-center justify-center text-3xl">🛠️</div>
+                <h2 className="text-2xl font-bold text-warning">¿Cómo usar la app?</h2>
+              </div>
+              <div className="space-y-6">
+                <div className="flex gap-5 items-start">
+                  <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold shrink-0">1</div>
+                  <div>
+                    <p className="font-bold text-dark text-lg leading-tight">Crea tu avatar</p>
+                    <p className="text-gray-600 mt-1">Elige tu personaje favorito para personalizar tu perfil.</p>
+                  </div>
+                </div>
+                <div className="flex gap-5 items-start">
+                  <div className="w-10 h-10 rounded-full bg-secondary text-white flex items-center justify-center font-bold shrink-0">2</div>
+                  <div>
+                    <p className="font-bold text-dark text-lg leading-tight">Elige el modo</p>
+                    <p className="text-gray-600 mt-1">Individual 👤 o con familia 👨‍👩‍👧‍👦.</p>
+                  </div>
+                </div>
+                <div className="flex gap-5 items-start">
+                  <div className="w-10 h-10 rounded-full bg-warning text-white flex items-center justify-center font-bold shrink-0">3</div>
+                  <div>
+                    <p className="font-bold text-dark text-lg leading-tight">Configura la app</p>
+                    <p className="text-gray-600 mt-1">Tu rol (padre/hijo), tu dispositivo (PC, móvil o laptop) y el tema del día.</p>
+                  </div>
+                </div>
+                <div className="flex gap-5 items-start">
+                  <div className="w-10 h-10 rounded-full bg-success text-white flex items-center justify-center font-bold shrink-0">4</div>
+                  <div>
+                    <p className="font-bold text-dark text-lg leading-tight">Explora los Temas</p>
+                    <p className="text-gray-600 mt-1">Desde la pantalla de inicio.</p>
+                  </div>
+                </div>
+                <div className="flex gap-5 items-start">
+                  <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold shrink-0">5</div>
+                  <div>
+                    <p className="font-bold text-dark text-lg leading-tight">Juega y desbloquea las 3 insignias</p>
+                    <p className="text-gray-600 mt-1">🏅 Consíguelas todas desde tu perfil.</p>
+                  </div>
+                </div>
+                <div className="flex gap-5 items-start">
+                  <div className="w-10 h-10 rounded-full bg-secondary text-white flex items-center justify-center font-bold shrink-0">6</div>
+                  <div>
+                    <p className="font-bold text-dark text-lg leading-tight">Mira los Reels</p>
+                    <p className="text-gray-600 mt-1">Para reforzar lo aprendido.</p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <button
