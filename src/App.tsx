@@ -8,8 +8,9 @@ type LearningTopic = 'coima' | 'recognition' | 'impact' | 'consequences' | 'prev
 interface UserProgress {
   totalActivities: number
   completedActivities: number
-  points: number
-  level: string
+  badges: string[]
+  topicsCompleted: boolean
+  gameCompleted: boolean
   conversations: number
 }
 
@@ -26,8 +27,9 @@ const getStoredProgress = (): UserProgress => {
   return {
     totalActivities: 0,
     completedActivities: 0,
-    points: 0,
-    level: 'Primer paso',
+    badges: [],
+    topicsCompleted: false,
+    gameCompleted: false,
     conversations: 0,
   }
 }
@@ -45,14 +47,46 @@ const conversationPrompts: ConversationPrompt[] = [
   { id: '5', question: '¿Por qué es importante respetar las reglas?', asked: false },
 ]
 
-// Niveles del sistema de puntos
-const levelTitles: Record<string, string> = {
-  '0': 'Explorador de la honestidad',
-  '20': 'Detective de decisiones',
-  '40': 'Ciudadano responsable',
-  '60': 'Agente de cambio',
-  '80': 'Defensor de la justicia',
-  '100': 'Campeón de la integridad',
+// Insignias disponibles (solo existen tres)
+type BadgeId = 'temas' | 'juego' | 'campeon'
+
+const allBadges: { id: BadgeId; title: string; description: string; accent: string }[] = [
+  {
+    id: 'temas',
+    title: 'Explorador de Temas',
+    description: 'La ganas al completar todos los temas de aprendizaje.',
+    accent: 'from-primary to-secondary',
+  },
+  {
+    id: 'juego',
+    title: 'Maestro del Juego',
+    description: 'La ganas al terminar el juego "¿Coima o no?".',
+    accent: 'from-secondary to-primary',
+  },
+  {
+    id: 'campeon',
+    title: 'Campeón de la Integridad',
+    description: 'La ganas al completar los temas y el juego.',
+    accent: 'from-amber-400 to-orange-500',
+  },
+]
+
+function BadgeIcon({ className = 'w-5 h-5' }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="8" r="6" />
+      <path d="M8.21 13.89 7 22l5-3 5 3-1.21-8.11" />
+    </svg>
+  )
 }
 
 // Estado global de la aplicación
@@ -76,30 +110,34 @@ export default function App() {
   }
 
   // Actualizar progreso
-  const updateProgress = (pointsToAdd: number, activitiesIncrement: number = 1) => {
+  const updateProgress = (activitiesIncrement: number = 1) => {
     setProgress(prev => {
-      const p: UserProgress = prev
-      const newPoints = p.points + pointsToAdd
-      const newActivities = p.completedActivities + activitiesIncrement
-      const newLevel = Object.entries(levelTitles)
-        .reverse()
-        .find(([threshold]) => newPoints >= parseInt(threshold))
-        ?.[1] || 'Primer paso'
-      
-      return {
-        ...p,
-        points: newPoints,
-        completedActivities: newActivities,
-        level: newLevel,
+      const updated: UserProgress = {
+        ...prev,
+        completedActivities: prev.completedActivities + activitiesIncrement,
       }
+      saveProgress(updated)
+      return updated
     })
-    saveProgress(getUpdatedProgress())
   }
 
-  const getUpdatedProgress = (): UserProgress => {
-    const stored = localStorage.getItem('hablemos-claro-progress')
-    if (stored) return JSON.parse(stored)
-    return initialProgress
+  // Otorgar una insignia (sin duplicados) y la de campeón al completar ambas
+  const awardBadge = (id: 'temas' | 'juego') => {
+    setProgress(prev => {
+      const badges = new Set(prev.badges)
+      badges.add(id)
+      const topicsCompleted = prev.topicsCompleted || id === 'temas'
+      const gameCompleted = prev.gameCompleted || id === 'juego'
+      if (topicsCompleted && gameCompleted) badges.add('campeon')
+      const updated: UserProgress = {
+        ...prev,
+        badges: Array.from(badges),
+        topicsCompleted,
+        gameCompleted,
+      }
+      saveProgress(updated)
+      return updated
+    })
   }
 
   // Responder pregunta del quiz
@@ -113,10 +151,10 @@ export default function App() {
     
     if (isCorrect) {
       setFeedbackMessage('¡Correcto! Has aprendido algo nuevo.')
-      updateProgress(10, 1)
+      updateProgress(1)
     } else {
       setFeedbackMessage('Casi. Recuerda que una coima es cuando alguien ofrece algo de valor para obtener un beneficio injusto.')
-      updateProgress(5, 1) // Puntos por intentarlo
+      updateProgress(1)
     }
   }
 
@@ -130,10 +168,12 @@ export default function App() {
       case 'quiz':
         // Verificar si completaron todas las preguntas
         if (userAnswers.length >= 3) {
+          awardBadge('temas')
           navigateTo('result')
         }
         break
       case 'games':
+        awardBadge('juego')
         navigateTo('converse')
         break
       case 'activity':
@@ -183,8 +223,8 @@ export default function App() {
         },
         {
           step: '4',
-          title: 'Suma tu progreso',
-          description: 'Gana puntos, sube de nivel y conviértete en un verdadero campeón de la integridad.',
+          title: 'Gana tus insignias',
+          description: 'Completa los temas y el juego para ganar insignias y convertirte en un campeón de la integridad.',
         },
       ]
 
@@ -342,9 +382,6 @@ export default function App() {
       )
 
     case 'home':
-      const progressPct = Math.round(
-        (progress.completedActivities / Math.max(progress.totalActivities, 1)) * 100
-      )
       const hubSections = [
         {
           key: 'config' as const,
@@ -360,7 +397,7 @@ export default function App() {
         {
           key: 'games' as const,
           title: 'Juego',
-          description: 'Pon a prueba tu criterio con "¿Coima o no?" y minijuegos para ganar puntos.',
+          description: 'Pon a prueba tu criterio con "¿Coima o no?" y minijuegos para ganar tu insignia.',
           accent: 'from-secondary to-primary',
           icon: (
             <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
@@ -383,7 +420,7 @@ export default function App() {
         {
           key: 'profile' as const,
           title: 'Perfil',
-          description: 'Revisa tu progreso, puntos, nivel y las conversaciones que has tenido en familia.',
+          description: 'Revisa tus insignias, tu progreso y las conversaciones que has tenido en familia.',
           accent: 'from-primary to-alert',
           icon: (
             <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
@@ -410,25 +447,35 @@ export default function App() {
               </button>
             </header>
 
-            {/* Tarjeta de progreso */}
+            {/* Tarjeta de insignias */}
             <section className="rounded-2xl bg-gradient-to-r from-primary to-secondary p-6 sm:p-8 text-white shadow-lg mb-8">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <p className="text-white/80 text-sm">Tu nivel</p>
-                  <h2 className="text-xl sm:text-2xl font-bold">{progress.level}</h2>
+                  <p className="text-white/80 text-sm">Tus insignias</p>
+                  <h2 className="text-xl sm:text-2xl font-bold">
+                    {progress.badges.length === 3 ? '¡Campeón de la Integridad!' : 'Completa los temas y el juego'}
+                  </h2>
                 </div>
                 <div className="text-right">
-                  <p className="text-3xl font-bold">{progress.points}</p>
-                  <p className="text-white/80 text-sm">puntos</p>
+                  <p className="text-3xl font-bold">{progress.badges.length}/3</p>
+                  <p className="text-white/80 text-sm">insignias</p>
                 </div>
               </div>
-              <div className="mt-5">
-                <div className="h-2 bg-white/25 rounded-full overflow-hidden">
-                  <div className="h-full bg-white rounded-full transition-all" style={{ width: `${progressPct}%` }}></div>
-                </div>
-                <p className="text-white/80 text-xs mt-2">
-                  {progress.completedActivities} de {progress.totalActivities} actividades completadas
-                </p>
+              <div className="mt-5 flex gap-3">
+                {allBadges.map((badge) => {
+                  const earned = progress.badges.includes(badge.id)
+                  return (
+                    <div
+                      key={badge.id}
+                      className={`flex-1 rounded-xl p-3 text-center ${earned ? 'bg-white/20' : 'bg-white/5'}`}
+                    >
+                      <div className={`mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full ${earned ? 'bg-white text-primary' : 'bg-white/10 text-white/40'}`}>
+                        <BadgeIcon />
+                      </div>
+                      <p className={`text-xs font-medium ${earned ? 'text-white' : 'text-white/50'}`}>{badge.title}</p>
+                    </div>
+                  )
+                })}
               </div>
             </section>
 
@@ -617,6 +664,7 @@ export default function App() {
                       } else {
                         setShowCoimaONo(false)
                         setCurrentCoimaCase(0)
+                        awardBadge('temas')
                         navigateTo('home')
                       }
                     }}
@@ -656,7 +704,7 @@ export default function App() {
                 <div className="mt-6 flex gap-2">
                   <button
                     onClick={() => handleAnswer(0)}
-                    className={progress.points > 0 ? 'btn-outline' : 'btn-primary w-48 py-2 px-4 rounded'}
+                    className="btn-primary w-48 py-2 px-4 rounded"
                   >
                     ✅ {currentTopicData.correct}
                   </button>
@@ -837,7 +885,7 @@ export default function App() {
             <p className="text-gray-700 mt-4">Has aprendido a identificar algunas situaciones relacionadas con las coimas.</p>
             
             <div className="mt-6 p-4 bg-primary/5 rounded">
-              <p className="font-medium text-primary">+20 puntos</p>
+              <p className="font-medium text-primary">Insignia obtenida: Explorador de Temas</p>
             </div>
 
             <div className="mt-8 space-y-3">
@@ -936,12 +984,12 @@ export default function App() {
             </div>
 
             <div className="mt-8 p-4 bg-primary/5 rounded">
-              <p className="font-medium">Puntuación: {progress.points} ⭐</p>
-              <p className="text-xs">Sistema de puntos para motivar el aprendizaje</p>
+              <p className="font-medium text-primary">Insignias: {progress.badges.length}/3</p>
+              <p className="text-xs">Completa los temas y el juego para ganarlas todas.</p>
             </div>
 
             <button
-              onClick={() => navigateTo('converse')}
+              onClick={() => { awardBadge('juego'); navigateTo('converse') }}
               className="btn-primary w-full py-3 px-6 rounded-lg text-lg mt-4"
             >
                 Continuar a Conversemos
@@ -1181,7 +1229,7 @@ export default function App() {
                     style={{ width: `${progress.totalActivities > 0 ? (progress.completedActivities / progress.totalActivities) * 100 : 0}%` }}
                   ></div>
                 </div>
-                <p className="text-xs text-gray-600 mt-1">{progress.level}</p>
+                <p className="text-xs text-gray-600 mt-1">{progress.badges.length === 3 ? 'Campeón de la Integridad' : `${progress.badges.length}/3 insignias`}</p>
                 <p className="text-xs text-gray-600">{progress.totalActivities > 0 ? Math.round((progress.completedActivities / progress.totalActivities) * 100) : 0}% completado</p>
               </div>
 
@@ -1197,8 +1245,31 @@ export default function App() {
               </div>
 
               <div>
-                <h3 className="font-medium text-gray-500 text-sm mb-2">Puntos</h3>
-                <p className="text-2xl font-bold text-primary">{progress.points} ⭐</p>
+                <h3 className="font-medium text-gray-500 text-sm mb-2">Insignias</h3>
+                <p className="text-2xl font-bold text-primary">{progress.badges.length}/3</p>
+              </div>
+            </div>
+
+            <div className="mt-8">
+              <h3 className="font-medium text-gray-500 text-sm mb-3">Mis insignias</h3>
+              <div className="grid gap-3 sm:grid-cols-3">
+                {allBadges.map((badge) => {
+                  const earned = progress.badges.includes(badge.id)
+                  return (
+                    <div
+                      key={badge.id}
+                      className={`rounded-xl p-4 text-center border ${earned ? 'bg-white border-primary/20 shadow-sm' : 'bg-gray-50 border-gray-100'}`}
+                    >
+                      <div className={`mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br ${earned ? badge.accent + ' text-white' : 'from-gray-200 to-gray-200 text-gray-400'}`}>
+                        <BadgeIcon className="w-6 h-6" />
+                      </div>
+                      <p className={`font-medium text-sm ${earned ? 'text-dark' : 'text-gray-400'}`}>{badge.title}</p>
+                      <p className={`text-xs mt-1 ${earned ? 'text-gray-600' : 'text-gray-400'}`}>
+                        {earned ? '¡Obtenida!' : badge.description}
+                      </p>
+                    </div>
+                  )
+                })}
               </div>
             </div>
 
@@ -1214,7 +1285,7 @@ export default function App() {
                 {progress.conversations} conversaciones familiares realizadas
               </p>
               <p className="text-gray-600 text-sm">
-                {progress.points} puntos acumulados
+                {progress.badges.length} de 3 insignias obtenidas
               </p>
             </div>
 
