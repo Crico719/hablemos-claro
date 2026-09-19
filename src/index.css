@@ -199,9 +199,12 @@ body {
 .pc-mode [class~="max-w-5xl"],
 .pc-mode [class~="max-w-6xl"] {
   max-width: none !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  width: 100% !important;
 }
 
 .pc-mode .min-h-screen {
-  padding-left: 3rem;
-  padding-right: 3rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
 }
