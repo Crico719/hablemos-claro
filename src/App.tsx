@@ -60,7 +60,7 @@ const initialProgress = getStoredProgress()
 
 export default function App() {
   const [progress, setProgress] = useState<UserProgress>(initialProgress)
-  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'config' | 'home' | 'learn' | 'quiz' | 'result' | 'games' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents'>('welcome')
+  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'config' | 'home' | 'learn' | 'quiz' | 'result' | 'games' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents' | 'reels'>('welcome')
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null)
   const [selectedTopic, setSelectedTopic] = useState<LearningTopic | null>(null)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -342,57 +342,115 @@ export default function App() {
       )
 
     case 'home':
+      const progressPct = Math.round(
+        (progress.completedActivities / Math.max(progress.totalActivities, 1)) * 100
+      )
+      const hubSections = [
+        {
+          key: 'config' as const,
+          title: 'Temas',
+          description: 'Explora lecciones sobre las coimas, la honestidad y cómo tomar buenas decisiones.',
+          accent: 'from-primary to-secondary',
+          icon: (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+          ),
+        },
+        {
+          key: 'games' as const,
+          title: 'Juego',
+          description: 'Pon a prueba tu criterio con "¿Coima o no?" y minijuegos para ganar puntos.',
+          accent: 'from-secondary to-primary',
+          icon: (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+              <circle cx="12" cy="12" r="9" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          ),
+        },
+        {
+          key: 'reels' as const,
+          title: 'Reels',
+          description: 'Videos y mensajes cortos para aprender sobre integridad en pocos segundos.',
+          accent: 'from-alert to-secondary',
+          icon: (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+          ),
+        },
+        {
+          key: 'profile' as const,
+          title: 'Perfil',
+          description: 'Revisa tu progreso, puntos, nivel y las conversaciones que has tenido en familia.',
+          accent: 'from-primary to-alert',
+          icon: (
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          ),
+        },
+      ]
+
       return (
-        <div className="min-h-screen bg-light text-dark p-4">
-          <div className="max-w-3xl mx-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="text-2xl font-bold">¡Hola! 👋</h1>
-              <button onClick={() => setCurrentScreen('profile')} className="text-primary text-sm">Perfil</button>
-            </div>
-            
-            <p className="text-base">Hoy podemos aprender algo nuevo.</p>
-
-            <div className="mt-6 bg-white rounded-lg p-6 shadow-sm">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h2 className="text-xl font-bold text-primary">Tema de hoy:</h2>
-                  <p className="text-gray-600 mt-1">¿Qué es una coima?</p>
-                </div>
-                <button
-                  onClick={() => setCurrentScreen('learn')}
-                  className="btn-primary py-2 px-4 rounded text-sm"
-                >
-                  Aprender ahora
-                </button>
-              </div>
-            </div>
-
-            <div className="mt-8 grid grid-cols-2 gap-4">
+        <div className="min-h-screen bg-gradient-to-b from-light to-white text-dark">
+          <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
+            {/* Encabezado */}
+            <header className="flex items-center justify-between mb-8">
               <div>
-                <h3 className="font-medium">Tu progreso</h3>
-                <div className="h-2 bg-gray-200 rounded-full overflow-hidden mt-2">
-                  <div 
-                    className="h-full bg-primary rounded-full transition-width"
-                    style={{ width: `${(progress.completedActivities / Math.max(progress.totalActivities, 1) * 100)}%` }}
-                  ></div>
+                <p className="text-sm text-gray-500">Bienvenid@ a</p>
+                <h1 className="text-2xl sm:text-3xl font-bold text-primary">Hablemos Claro</h1>
+              </div>
+              <button
+                onClick={() => setCurrentScreen('welcome')}
+                className="text-gray-500 hover:text-primary text-sm"
+              >
+                Inicio
+              </button>
+            </header>
+
+            {/* Tarjeta de progreso */}
+            <section className="rounded-2xl bg-gradient-to-r from-primary to-secondary p-6 sm:p-8 text-white shadow-lg mb-8">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                  <p className="text-white/80 text-sm">Tu nivel</p>
+                  <h2 className="text-xl sm:text-2xl font-bold">{progress.level}</h2>
                 </div>
-                <p className="text-xs text-gray-600 mt-1">
+                <div className="text-right">
+                  <p className="text-3xl font-bold">{progress.points}</p>
+                  <p className="text-white/80 text-sm">puntos</p>
+                </div>
+              </div>
+              <div className="mt-5">
+                <div className="h-2 bg-white/25 rounded-full overflow-hidden">
+                  <div className="h-full bg-white rounded-full transition-all" style={{ width: `${progressPct}%` }}></div>
+                </div>
+                <p className="text-white/80 text-xs mt-2">
                   {progress.completedActivities} de {progress.totalActivities} actividades completadas
                 </p>
               </div>
-            </div>
+            </section>
 
-            <div>
-              <h3 className="font-medium mt-4">Actividad familiar</h3>
-              <p className="text-gray-600 text-sm mb-3">
-                Habla con tu hijo/a sobre una situación en la que alguien podría intentar conseguir algo de manera injusta.
-              </p>
-              <button
-                onClick={() => setCurrentScreen('converse')}
-                className="btn-primary w-full py-2 px-4 rounded text-sm mt-3"
-              >
-                Conversar
-              </button>
+            {/* Hub de secciones */}
+            <h2 className="text-lg font-bold mb-4">¿Qué quieres hacer hoy?</h2>
+            <div className="grid gap-5 sm:grid-cols-2">
+              {hubSections.map((section) => (
+                <button
+                  key={section.key}
+                  onClick={() => setCurrentScreen(section.key)}
+                  className="group text-left bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transition-all hover:shadow-md hover:-translate-y-1"
+                >
+                  <div className={`w-12 h-12 flex items-center justify-center rounded-xl bg-gradient-to-br ${section.accent} text-white mb-4`}>
+                    {section.icon}
+                  </div>
+                  <h3 className="font-bold text-lg mb-1 flex items-center gap-2">
+                    {section.title}
+                    <span className="text-primary transition-transform group-hover:translate-x-1">→</span>
+                  </h3>
+                  <p className="text-sm text-gray-600 leading-relaxed text-pretty">{section.description}</p>
+                </button>
+              ))}
             </div>
           </div>
         </div>
@@ -1215,6 +1273,76 @@ export default function App() {
                 </li>
               </ul>
             </div>
+          </div>
+        </div>
+      )
+
+    case 'reels':
+      const reels = [
+        {
+          tag: '¿Sabías que...?',
+          title: 'Una coima no siempre es dinero',
+          text: 'Un regalo caro, un favor o un "trato especial" también pueden ser una coima cuando buscan un beneficio injusto.',
+          accent: 'from-primary to-secondary',
+        },
+        {
+          tag: 'Piénsalo',
+          title: 'El daño lo paga toda la sociedad',
+          text: 'El dinero de una coima podría haber servido para escuelas, hospitales o parques. La corrupción nos quita a todos.',
+          accent: 'from-secondary to-alert',
+        },
+        {
+          tag: 'Tip del día',
+          title: 'Habla con un adulto de confianza',
+          text: 'Si alguien te ofrece algo a cambio de hacer algo incorrecto, lo más valiente es contarlo. No estás solo.',
+          accent: 'from-alert to-primary',
+        },
+        {
+          tag: 'Recuerda',
+          title: 'La honestidad se practica',
+          text: 'Ser íntegro es actuar bien incluso cuando nadie te ve. Cada buena decisión suma.',
+          accent: 'from-primary to-secondary',
+        },
+      ]
+
+      return (
+        <div className="min-h-screen bg-light text-dark">
+          <div className="max-w-2xl mx-auto px-4 py-8">
+            <div className="flex items-center justify-between mb-6">
+              <h1 className="text-2xl font-bold text-primary">Reels</h1>
+              <button onClick={() => navigateTo('home')} className="text-gray-500 hover:text-primary">
+                ← Atrás
+              </button>
+            </div>
+
+            <p className="text-gray-600 mb-6 text-pretty">
+              Mensajes cortos para aprender sobre integridad en pocos segundos. Deslízalos como un feed.
+            </p>
+
+            <div className="flex flex-col gap-6">
+              {reels.map((reel, index) => (
+                <article
+                  key={index}
+                  className={`rounded-2xl bg-gradient-to-br ${reel.accent} text-white p-8 shadow-lg aspect-[4/5] sm:aspect-video flex flex-col justify-between`}
+                >
+                  <span className="inline-block self-start px-3 py-1 rounded-full bg-white/20 text-sm font-semibold">
+                    {reel.tag}
+                  </span>
+                  <div>
+                    <h2 className="text-2xl sm:text-3xl font-bold mb-3 text-balance">{reel.title}</h2>
+                    <p className="text-white/90 text-lg text-pretty">{reel.text}</p>
+                  </div>
+                  <p className="text-white/70 text-sm">Reel {index + 1} de {reels.length}</p>
+                </article>
+              ))}
+            </div>
+
+            <button
+              onClick={() => navigateTo('games')}
+              className="btn-primary w-full py-3 px-6 rounded-xl text-lg mt-8"
+            >
+              Poner a prueba lo aprendido
+            </button>
           </div>
         </div>
       )
