@@ -103,6 +103,13 @@ export default function App() {
   const [device, setDevice] = useState<DeviceType>('pc')
   const [showBadgeCelebration, setShowBadgeCelebration] = useState(false)
   const [earnedBadge, setEarnedBadge] = useState<Badge | null>(null)
+  const [darkMode, setDarkMode] = useState<boolean>(() => localStorage.getItem('hablemos-claro-dark') === 'true')
+
+  // Cambiar modo claro/oscuro
+  const changeDarkMode = (value: boolean) => {
+    setDarkMode(value)
+    localStorage.setItem('hablemos-claro-dark', String(value))
+  }
 
   // Navegar a siguiente pantalla
   const navigateTo = (screen: typeof currentScreen) => {
@@ -330,6 +337,22 @@ export default function App() {
                   className={device === 'laptop' ? 'bg-warning text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-warning/20 transition-all'}
                 >
                   🖥️ Laptop
+                </button>
+              </div>
+
+              <p className="text-dark font-medium text-center mt-6">🌙 Modo de color</p>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => changeDarkMode(false)}
+                  className={!darkMode ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all'}
+                >
+                  ☀️ Claro
+                </button>
+                <button
+                  onClick={() => changeDarkMode(true)}
+                  className={darkMode ? 'bg-secondary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-secondary/20 transition-all'}
+                >
+                  🌙 Oscuro
                 </button>
               </div>
 
@@ -1347,7 +1370,7 @@ export default function App() {
   }
 
   return (
-    <>
+    <div className={darkMode ? 'dark' : ''}>
       {device === 'phone' ? (
         // Marco de móvil: la app se muestra como un celular centrado
         <div className="min-h-screen flex items-center justify-center p-3" style={{ background: 'linear-gradient(135deg, #0f172a, #1e293b, #0f172a)' }}>
@@ -1388,6 +1411,6 @@ export default function App() {
           </div>
         </div>
       )}
-    </>
+    </div>
   )
 }
