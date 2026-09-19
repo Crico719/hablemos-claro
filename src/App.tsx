@@ -611,27 +611,14 @@ export default function App() {
                   {t('quechua')}
                 </button>
               </div>
-            </div>
+</div>
 
-            <div className="mt-8 p-5 glass-card rounded-2xl">
-              <p className="text-sm font-medium text-dark">Barra de progreso general</p>
-              <div className="h-3 bg-gray-200 rounded-full overflow-hidden mt-3">
-                <div 
-                  className="progress-bar h-full"
-                  style={{ width: `${(progress.completedActivities / Math.max(progress.totalActivities, 1)) * 100}%` }}
-                ></div>
-              </div>
-              <p className="text-xs text-gray-500 mt-2">
-                {progress.completedActivities} de {progress.totalActivities} actividades completadas
-              </p>
-            </div>
-
-            <button
-              onClick={goHome}
-              className="btn-glow bg-primary text-white font-bold py-4 px-6 rounded-xl text-lg w-full mt-6"
-            >
-              🏠 {t('goHome')}
-            </button>
+              <button
+                onClick={goHome}
+                className="btn-glow bg-primary text-white font-bold py-4 px-6 rounded-xl text-lg w-full mt-6"
+              >
+                🏠 {t('goHome')}
+              </button>
           </div>
         </div>
       )
