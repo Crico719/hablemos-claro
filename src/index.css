@@ -192,3 +192,16 @@ body {
 .dark .text-gray-800 {
   color: #f1f5f9 !important;
 }
+
+/* ===== Modo PC: la app ocupa toda la pantalla ===== */
+.pc-mode [class~="max-w-2xl"],
+.pc-mode [class~="max-w-4xl"],
+.pc-mode [class~="max-w-5xl"],
+.pc-mode [class~="max-w-6xl"] {
+  max-width: none !important;
+}
+
+.pc-mode .min-h-screen {
+  padding-left: 3rem;
+  padding-right: 3rem;
+}

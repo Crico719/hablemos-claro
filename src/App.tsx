@@ -378,7 +378,7 @@ export default function App() {
                   onClick={() => setDevice('pc')}
                   className={device === 'pc' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all'}
                 >
-                  💻 PC
+                  🖥️ PC
                 </button>
                 <button
                   onClick={() => setDevice('phone')}
@@ -390,7 +390,7 @@ export default function App() {
                   onClick={() => setDevice('laptop')}
                   className={device === 'laptop' ? 'bg-warning text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-warning/20 transition-all'}
                 >
-                  🖥️ Laptop
+                  💻 Laptop
                 </button>
               </div>
 
@@ -479,7 +479,7 @@ export default function App() {
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold gradient-text">¡Hola! 👋</h1>
-                  <p className="text-sm text-gray-500">{device === 'phone' ? '📱 Móvil' : device === 'laptop' ? '🖥️ Laptop' : '💻 PC'}</p>
+                  <p className="text-sm text-gray-500">{device === 'phone' ? '📱 Móvil' : device === 'laptop' ? '💻 Laptop' : '🖥️ PC'}</p>
                 </div>
               </div>
               <button onClick={() => setCurrentScreen('profile')} className="glass-card px-4 py-2 rounded-xl text-primary text-sm font-medium hover:bg-primary/10 transition-all">
@@ -1424,7 +1424,7 @@ export default function App() {
   }
 
   return (
-    <div className={darkMode ? 'dark' : ''}>
+    <div className={`${darkMode ? 'dark' : ''} ${device === 'pc' ? 'pc-mode' : ''}`}>
       {device === 'phone' ? (
         // Marco de móvil: la app se muestra como un celular centrado
         <div className="min-h-screen flex items-center justify-center p-3" style={{ background: 'linear-gradient(135deg, #0f172a, #1e293b, #0f172a)' }}>
