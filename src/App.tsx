@@ -102,6 +102,7 @@ const translations = {
     parent: 'Padre / Madre',
     child: 'Hijo / Hija',
     deviceQuestion: '¿Qué dispositivo estás usando?',
+    deviceSub: 'Elige cómo quieres ver la app',
     darkModeTitle: '🌙 Modo de color',
     light: '☀️ Claro',
     dark: '🌙 Oscuro',
@@ -159,6 +160,7 @@ const translations = {
     parent: 'Tayta / Mama',
     child: 'Wawa',
     deviceQuestion: '¿Imaykanatam llamkachkanki?',
+    deviceSub: 'Aqllay imaynatam kayta rikuchiy',
     darkModeTitle: '🌙 Llimpikuna',
     light: "☀️ K'anchaq",
     dark: '🌙 Tutayay',
@@ -206,7 +208,7 @@ const initialProgress = getStoredProgress()
 
 export default function App() {
   const [progress, setProgress] = useState<UserProgress>(initialProgress)
-  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents'>('welcome')
+  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'device' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents'>('welcome')
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null)
   const [selectedTopic] = useState<LearningTopic | null>(null)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -360,7 +362,7 @@ export default function App() {
             
             <div className="space-y-4">
               <button
-                onClick={() => { localStorage.setItem('hablemos-claro-configured', 'true'); setCurrentScreen('home'); }}
+                onClick={() => setCurrentScreen('device')}
                 className="btn-glow bg-white text-black font-bold py-4 px-8 rounded-full text-lg shadow-lg w-full"
               >
                 {t('start')}
@@ -487,6 +489,56 @@ export default function App() {
               className="btn-glow bg-primary text-white font-bold py-4 px-6 rounded-xl text-lg w-full"
             >
               ¡Empezar aventura! 🎮
+            </button>
+          </div>
+        </div>
+      )
+
+    case 'device':
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-success/10 p-4">
+          <div className="max-w-3xl mx-auto animate-slide-up text-center">
+            <div className="flex items-center justify-between mb-2">
+              <button onClick={() => setCurrentScreen('welcome')} className="glass-card px-3 py-1 rounded-xl text-gray-600 text-sm hover:bg-gray-100 transition-all">
+                {t('back')}
+              </button>
+              <span className="text-xs text-gray-400 font-medium">1 / 2</span>
+            </div>
+            <h1 className="text-3xl font-bold gradient-text mb-2 mt-4">{t('deviceQuestion')}</h1>
+            <p className="text-gray-500 mb-8">{t('deviceSub')}</p>
+
+            <div className="grid grid-cols-3 gap-4">
+              <button
+                onClick={() => setDevice('pc')}
+                className={`glass-card rounded-2xl p-6 card-hover shadow-custom-lg ${device === 'pc' ? 'ring-4 ring-primary' : ''}`}
+              >
+                <div className="text-5xl mb-3 animate-float">🖥️</div>
+                <div className="font-bold text-dark">PC</div>
+                <p className="text-xs text-gray-500 mt-1">Pantalla completa</p>
+              </button>
+              <button
+                onClick={() => setDevice('phone')}
+                className={`glass-card rounded-2xl p-6 card-hover shadow-custom-lg ${device === 'phone' ? 'ring-4 ring-secondary' : ''}`}
+              >
+                <div className="text-5xl mb-3 animate-float">📱</div>
+                <div className="font-bold text-dark">Móvil</div>
+                <p className="text-xs text-gray-500 mt-1">Formato celular</p>
+              </button>
+              <button
+                onClick={() => setDevice('laptop')}
+                className={`glass-card rounded-2xl p-6 card-hover shadow-custom-lg ${device === 'laptop' ? 'ring-4 ring-warning' : ''}`}
+              >
+                <div className="text-5xl mb-3 animate-float">💻</div>
+                <div className="font-bold text-dark">Laptop</div>
+                <p className="text-xs text-gray-500 mt-1">Formato portátil</p>
+              </button>
+            </div>
+
+            <button
+              onClick={goHome}
+              className="btn-glow bg-primary text-white font-bold py-4 px-6 rounded-xl text-lg w-full mt-8"
+            >
+              {t('continue')} →
             </button>
           </div>
         </div>
