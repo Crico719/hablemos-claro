@@ -166,21 +166,21 @@ export default function App() {
   switch (currentScreen) {
     case 'welcome':
       return (
-        <div className="min-h-screen bg-light text-dark p-4">
-          <div className="max-w-2xl mx-auto text-center">
-            <h1 className="text-4xl font-bold text-primary mb-2">Hablemos Claro</h1>
-            <p className="text-xl text-secondary mb-8">Aprender sobre las coimas también es aprender a tomar buenas decisiones.</p>
+        <div className="min-h-screen welcome-bg flex items-center justify-center p-4">
+          <div className="max-w-2xl mx-auto text-center text-white animate-fade-in">
+            <h1 className="text-5xl font-bold mb-4 drop-shadow-lg">Hablemos Claro</h1>
+            <p className="text-xl mb-8 opacity-90">Aprender sobre las coimas también es aprender a tomar buenas decisiones.</p>
             
             <div className="space-y-4">
               <button
                 onClick={handleStart}
-                className="btn-primary w-full py-3 px-6 rounded-lg text-lg font-medium"
+                className="btn-glow bg-white text-primary font-bold py-4 px-8 rounded-full text-lg shadow-lg w-full"
               >
                 Comenzar
               </button>
               <button
                 onClick={() => setCurrentScreen('config')}
-                className="btn-secondary w-full py-3 px-6 rounded-lg text-lg font-medium"
+                className="bg-white/20 backdrop-blur-sm border-2 border-white/30 text-white font-bold py-4 px-8 rounded-full text-lg w-full hover:bg-white/30 transition-all"
               >
                 ¿Cómo funciona?
               </button>
@@ -191,77 +191,77 @@ export default function App() {
 
     case 'config':
       return (
-        <div className="min-h-screen bg-light text-dark p-4">
-          <div className="max-w-md mx-auto">
-            <h2 className="text-2xl font-bold text-primary mb-6">Configuración</h2>
+        <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-success/10 p-4">
+          <div className="max-w-md mx-auto animate-slide-up">
+            <h2 className="text-3xl font-bold gradient-text mb-6 text-center">Configuración</h2>
             
             <div className="space-y-4">
-              <p>¿Quién está usando la app?</p>
-              <div className="grid grid-cols-2 gap-2">
+              <p className="text-dark font-medium text-center">¿Quién está usando la app?</p>
+              <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => setSelectedRole('parent')}
-                  className={selectedRole === 'parent' ? 'btn-primary bg-primary/20 text-primary' : 'btn-outline'}
+                  className={selectedRole === 'parent' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all'}
                 >
                   Padre / Madre
                 </button>
                 <button
                   onClick={() => setSelectedRole('child')}
-                  className={selectedRole === 'child' ? 'btn-primary bg-primary/20 text-primary' : 'btn-outline'}
+                  className={selectedRole === 'child' ? 'bg-secondary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-secondary/20 transition-all'}
                 >
                   Hijo / Hija
                 </button>
               </div>
 
-              <p>¿Qué quieres aprender hoy?</p>
-              <div className="grid grid-cols-2 gap-2">
+              <p className="text-dark font-medium text-center mt-4">¿Qué quieres aprender hoy?</p>
+              <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => { setSelectedTopic('coima'); setCurrentScreen('home'); } }
-                  className={selectedTopic === 'coima' ? 'btn-primary bg-primary/20 text-primary' : 'btn-outline'}
+                  className={selectedTopic === 'coima' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all card-hover'}
                 >
                   ¿Qué es una coima?
                 </button>
                 <button
                   onClick={() => { setSelectedTopic('recognition'); setCurrentScreen('home'); } }
-                  className={selectedTopic === 'recognition' ? 'btn-primary bg-primary/20 text-primary' : 'btn-outline'}
+                  className={selectedTopic === 'recognition' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all card-hover'}
                 >
                   ¿Cómo reconocer una situación de corrupción?
                 </button>
                 <button
                   onClick={() => { setSelectedTopic('impact'); setCurrentScreen('home'); } }
-                  className={selectedTopic === 'impact' ? 'btn-primary bg-primary/20 text-primary' : 'btn-outline'}
+                  className={selectedTopic === 'impact' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all card-hover'}
                 >
                   ¿Por qué las coimas hacen daño?
                 </button>
                 <button
                   onClick={() => { setSelectedTopic('consequences'); setCurrentScreen('home'); } }
-                  className={selectedTopic === 'consequences' ? 'btn-primary bg-primary/20 text-primary' : 'btn-outline'}
+                  className={selectedTopic === 'consequences' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all card-hover'}
                 >
                   Consecuencias legales
                 </button>
                 <button
                   onClick={() => { setSelectedTopic('prevention'); setCurrentScreen('home'); } }
-                  className={selectedTopic === 'prevention' ? 'btn-primary bg-primary/20 text-primary' : 'btn-outline'}
+                  className={selectedTopic === 'prevention' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all card-hover'}
                 >
                   Cómo prevenir la corrupción
                 </button>
                 <button
                   onClick={() => { setSelectedTopic('test'); setCurrentScreen('home'); } }
-                  className={selectedTopic === 'test' ? 'btn-primary bg-primary/20 text-primary' : 'btn-outline'}
+                  className={selectedTopic === 'test' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all card-hover'}
                 >
                   Quiero ponerme a prueba.
                 </button>
               </div>
             </div>
 
-            <div className="mt-8 p-4 bg-white rounded-lg">
-              <p className="text-sm">Barra de progreso general</p>
-              <div className="h-2 bg-gray-200 rounded-full overflow-hidden mt-2">
+            <div className="mt-8 p-5 glass-card rounded-2xl">
+              <p className="text-sm font-medium text-dark">Barra de progreso general</p>
+              <div className="h-3 bg-gray-200 rounded-full overflow-hidden mt-3">
                 <div 
-                  className="h-full bg-primary rounded-full transition-width"
-                  style={{ width: `${(progress.completedActivities / progress.totalActivities || 0) * 100}%` }}
+                  className="progress-bar h-full"
+                  style={{ width: `${(progress.completedActivities / Math.max(progress.totalActivities, 1)) * 100}%` }}
                 ></div>
               </div>
-              <p className="text-xs text-gray-600 mt-1">
+              <p className="text-xs text-gray-500 mt-2">
                 {progress.completedActivities} de {progress.totalActivities} actividades completadas
               </p>
             </div>
@@ -271,55 +271,59 @@ export default function App() {
 
     case 'home':
       return (
-        <div className="min-h-screen bg-light text-dark p-4">
-          <div className="max-w-3xl mx-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="text-2xl font-bold">¡Hola! 👋</h1>
-              <button onClick={() => setCurrentScreen('profile')} className="text-primary text-sm">Perfil</button>
+        <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-secondary/5 p-4">
+          <div className="max-w-3xl mx-auto animate-slide-up">
+            <div className="flex items-center justify-between mb-6">
+              <h1 className="text-3xl font-bold gradient-text">¡Hola! 👋</h1>
+              <button onClick={() => setCurrentScreen('profile')} className="glass-card px-4 py-2 rounded-xl text-primary text-sm font-medium hover:bg-primary/10 transition-all">
+                Perfil ⭐
+              </button>
             </div>
             
-            <p className="text-base">Hoy podemos aprender algo nuevo.</p>
+            <p className="text-lg text-gray-600 mb-6">Hoy podemos aprender algo nuevo.</p>
 
-            <div className="mt-6 bg-white rounded-lg p-6 shadow-sm">
+            <div className="glass-card rounded-2xl p-6 mb-6 shadow-custom-lg card-hover">
               <div className="flex items-start justify-between">
                 <div>
-                  <h2 className="text-xl font-bold text-primary">Tema de hoy:</h2>
-                  <p className="text-gray-600 mt-1">¿Qué es una coima?</p>
+                  <h2 className="text-xl font-bold text-primary">🎯 Tema de hoy:</h2>
+                  <p className="text-gray-600 mt-1 text-lg">¿Qué es una coima?</p>
                 </div>
                 <button
                   onClick={() => setCurrentScreen('learn')}
-                  className="btn-primary py-2 px-4 rounded text-sm"
+                  className="btn-glow bg-primary text-white font-bold py-3 px-6 rounded-xl text-sm"
                 >
-                  Aprender ahora
+                  Aprender ahora →
                 </button>
               </div>
             </div>
 
-            <div className="mt-8 grid grid-cols-2 gap-4">
-              <div>
-                <h3 className="font-medium">Tu progreso</h3>
-                <div className="h-2 bg-gray-200 rounded-full overflow-hidden mt-2">
-                  <div 
-                    className="h-full bg-primary rounded-full transition-width"
-                    style={{ width: `${(progress.completedActivities / Math.max(progress.totalActivities, 1) * 100)}%` }}
-                  ></div>
+            <div className="glass-card rounded-2xl p-6 mb-6 card-hover">
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <h3 className="font-bold text-secondary text-lg">📊 Tu progreso</h3>
                 </div>
-                <p className="text-xs text-gray-600 mt-1">
-                  {progress.completedActivities} de {progress.totalActivities} actividades completadas
-                </p>
               </div>
+              <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                <div 
+                  className="progress-bar h-full"
+                  style={{ width: `${(progress.completedActivities / Math.max(progress.totalActivities, 1)) * 100}%` }}
+                ></div>
+              </div>
+              <p className="text-sm text-gray-500 mt-2">
+                {progress.completedActivities} de {progress.totalActivities} actividades completadas
+              </p>
             </div>
 
-            <div>
-              <h3 className="font-medium mt-4">Actividad familiar</h3>
-              <p className="text-gray-600 text-sm mb-3">
+            <div className="glass-card rounded-2xl p-6 card-hover">
+              <h3 className="font-bold text-warning text-lg mb-2">💬 Actividad familiar</h3>
+              <p className="text-gray-600 text-sm mb-4">
                 Habla con tu hijo/a sobre una situación en la que alguien podría intentar conseguir algo de manera injusta.
               </p>
               <button
                 onClick={() => setCurrentScreen('converse')}
-                className="btn-primary w-full py-2 px-4 rounded text-sm mt-3"
+                className="btn-glow bg-warning text-white font-bold py-3 px-6 rounded-xl text-sm w-full"
               >
-                Conversar
+                Conversar →
               </button>
             </div>
           </div>
@@ -645,23 +649,23 @@ export default function App() {
       ]
 
       return (
-        <div className="min-h-screen bg-light text-dark p-4">
-          <div className="max-w-2xl mx-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="text-2xl font-bold text-primary">¿Qué harías?</h1>
-              <button onClick={() => navigateTo('home')} className="text-gray-500 hover:text-primary">
+        <div className="min-h-screen bg-gradient-to-br from-secondary/10 via-primary/5 to-success/10 p-4">
+          <div className="max-w-2xl mx-auto animate-slide-up">
+            <div className="flex items-center justify-between mb-6">
+              <h1 className="text-3xl font-bold gradient-text">¿Qué harías?</h1>
+              <button onClick={() => navigateTo('home')} className="glass-card px-3 py-1 rounded-xl text-gray-600 text-sm hover:bg-gray-100 transition-all">
                 ← Atrás
               </button>
             </div>
 
-            <div className="bg-white rounded-lg p-6 shadow-sm mb-8">
-              <p className="text-gray-700 mb-4">{quizCases[currentQuestionIndex].situation}</p>
+            <div className="glass-card rounded-2xl p-6 shadow-custom-lg mb-6 card-hover">
+              <p className="text-lg text-gray-700 mb-4 leading-relaxed">{quizCases[currentQuestionIndex].situation}</p>
               
               {quizCases[currentQuestionIndex].options.map((opt, _i) => (
-                <div key={opt.id} className="mb-2">
+                <div key={opt.id} className="mb-3">
                   <button
                     onClick={() => handleAnswer(opt.id)}
-                    className="btn-outline w-full py-3 px-4 rounded text-left"
+                    className="btn-glow w-full py-4 px-5 rounded-xl text-left glass-card hover:border-primary/50 transition-all text-dark font-medium"
                   >
                     {opt.text}
                   </button>
@@ -670,28 +674,26 @@ export default function App() {
             </div>
 
             {showFeedback && (
-              <div className="mt-6 p-4 rounded-lg">
-                <p className="font-medium {feedbackMessage.includes('Correcto') ? 'text-primary' : 'text-alert'}">
-                  {feedbackMessage}
-                </p>
+              <div className="mt-4 p-5 rounded-xl bg-primary/10 border border-primary/20 animate-fade-in">
+                <p className="font-bold text-primary text-lg">{feedbackMessage}</p>
               </div>
             )}
 
             {!showFeedback && currentQuestionIndex < quizCases.length - 1 && (
               <button
                 onClick={() => setCurrentQuestionIndex(prev => prev + 1)}
-                className="btn-primary w-full py-3 px-6 rounded-lg text-lg mt-4"
+                className="btn-glow bg-primary text-white font-bold py-4 px-6 rounded-xl text-lg w-full mt-4"
               >
-                Siguiente caso
+                Siguiente caso →
               </button>
             )}
 
             {showFeedback && currentQuestionIndex >= quizCases.length - 1 && showFeedback && (
               <button
                 onClick={() => continueAfterFeedback()}
-                className="btn-primary w-full py-3 px-6 rounded-lg text-lg mt-4"
+                className="btn-glow bg-success text-white font-bold py-4 px-6 rounded-xl text-lg w-full mt-4"
               >
-                Terminar quiz
+                Terminar quiz →
               </button>
             )}
           </div>
@@ -1031,66 +1033,64 @@ export default function App() {
 
     case 'profile':
       return (
-        <div className="min-h-screen bg-light text-dark p-4">
-          <div className="max-w-md mx-auto">
+        <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/5 to-warning/10 p-4">
+          <div className="max-w-md mx-auto animate-slide-up">
             <div className="text-center mb-8">
-              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path className="w-10 h-10" strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 014 4v3a4 4 0 01-4 4V3a4 4 0 01-4-4zM5 7a2 2 0 012-2h4a2 2 0 012 2v3a2 2 0 01-2h4a2 2 0 01-2v-3zM8 21a4 4 0 01-4-4v-3a4 4 0 014-4h6a4 4 0 014 4v3a4 4 0 01-4 4zm8-13a4 4 0 01-4-4V7a4 4 0 014-4h3a4 4 0 014 4v3a4 4 0 01-4 4h-3z"></path>
+              <div className="w-24 h-24 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-float">
+                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 014 4v3a4 4 0 01-4 4V3a4 4 0 01-4-4zM5 7a2 2 0 012-2h4a2 2 0 012 2v3a2 2 0 01-2h4a2 2 0 01-2v-3zM8 21a4 4 0 01-4-4v-3a4 4 0 014-4h6a4 4 0 014 4v3a4 4 0 01-4 4zm8-13a4 4 0 01-4-4V7a4 4 0 014-4h3a4 4 0 014 4v3a4 4 0 01-4 4h-3z"></path>
                 </svg>
               </div>
-              <h2 className="text-2xl font-bold text-primary">Familia</h2>
+              <h2 className="text-3xl font-bold gradient-text">Familia 👨‍👩‍👧‍👦</h2>
+              <p className="text-gray-500 mt-1">Tu progreso de aprendizaje</p>
             </div>
 
-            <div className="grid grid-cols-2 gap-6">
-              <div>
-                <h3 className="font-medium text-gray-500 text-sm mb-2">Progreso</h3>
-                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-primary rounded-full transition-width"
-                    style={{ width: `${progress.totalActivities > 0 ? (progress.completedActivities / progress.totalActivities) * 100 : 0}%` }}
-                  ></div>
+            <div className="glass-card rounded-2xl p-6 shadow-custom-lg mb-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center p-3">
+                  <div className="text-3xl font-bold gradient-text">{progress.points} ⭐</div>
+                  <div className="text-sm text-gray-500 mt-1">Puntos</div>
                 </div>
-                <p className="text-xs text-gray-600 mt-1">{progress.level}</p>
-                <p className="text-xs text-gray-600">{progress.totalActivities > 0 ? Math.round((progress.completedActivities / progress.totalActivities) * 100) : 0}% completado</p>
-              </div>
-
-              <div>
-                <h3 className="font-medium text-gray-500 text-sm mb-2">Actividades</h3>
-                <p className="text-gray-600">{progress.completedActivities} completadas</p>
-                <p className="text-gray-600">de {progress.totalActivities}</p>
-              </div>
-
-              <div>
-                <h3 className="font-medium text-gray-500 text-sm mb-2">Conversaciones</h3>
-                <p className="text-gray-600">{progress.conversations} realizadas</p>
-              </div>
-
-              <div>
-                <h3 className="font-medium text-gray-500 text-sm mb-2">Puntos</h3>
-                <p className="text-2xl font-bold text-primary">{progress.points} ⭐</p>
+                <div className="text-center p-3">
+                  <div className="text-3xl font-bold text-secondary">{progress.completedActivities}</div>
+                  <div className="text-sm text-gray-500 mt-1">Actividades</div>
+                </div>
+                <div className="text-center p-3">
+                  <div className="text-3xl font-bold text-warning">{progress.conversations}</div>
+                  <div className="text-sm text-gray-500 mt-1">Conversaciones</div>
+                </div>
+                <div className="text-center p-3">
+                  <div className="text-lg font-bold text-primary">{progress.level}</div>
+                  <div className="text-sm text-gray-500 mt-1">Nivel</div>
+                </div>
               </div>
             </div>
 
-            <div className="mt-8 p-4 bg-white rounded-lg">
-              <h3 className="font-medium text-gray-500 text-sm mb-3">Mi progreso</h3>
-              <p className="text-gray-600 text-sm">
-                Llevas {progress.completedActivities} de {progress.totalActivities} actividades completadas
-              </p>
-              <p className="text-gray-600 text-sm">
+            <div className="glass-card rounded-2xl p-6 mb-4">
+              <h3 className="font-bold text-dark mb-3">Progreso General</h3>
+              <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                <div 
+                  className="progress-bar h-full"
+                  style={{ width: `${progress.totalActivities > 0 ? (progress.completedActivities / progress.totalActivities) * 100 : 0}%` }}
+                ></div>
+              </div>
+              <div className="flex justify-between mt-2">
+                <span className="text-sm text-gray-500">{progress.completedActivities} de {progress.totalActivities}</span>
+                <span className="text-sm font-bold text-primary">{progress.totalActivities > 0 ? Math.round((progress.completedActivities / progress.totalActivities) * 100) : 0}%</span>
+              </div>
+            </div>
+
+            <div className="glass-card rounded-2xl p-6 mb-4">
+              <h3 className="font-bold text-dark mb-2">🎯 Tu Nivel</h3>
+              <p className="text-lg font-bold gradient-text">{progress.level}</p>
+              <p className="text-sm text-gray-500 mt-1">
                 {progress.totalActivities > 0 ? Math.round((progress.completedActivities / progress.totalActivities) * 100) : 0}% completado
-              </p>
-              <p className="text-gray-600 text-sm">
-                {progress.conversations} conversaciones familiares realizadas
-              </p>
-              <p className="text-gray-600 text-sm">
-                {progress.points} puntos acumulados
               </p>
             </div>
 
             <div className="mt-6">
-              <button onClick={() => setCurrentScreen('home')} className="btn-outline w-full py-3 px-4 rounded text-sm">
-                Volver al inicio
+              <button onClick={() => setCurrentScreen('home')} className="btn-glow bg-primary text-white font-bold py-4 px-6 rounded-xl text-lg w-full">
+                ← Volver al inicio
               </button>
             </div>
           </div>
