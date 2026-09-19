@@ -165,26 +165,98 @@ export default function App() {
   // Renderizar según pantalla
   switch (currentScreen) {
     case 'welcome':
+      const howItWorks = [
+        {
+          step: '1',
+          title: 'Elige tu tema',
+          description: 'Selecciona quién usa la app y qué quieres aprender hoy sobre las coimas y la honestidad.',
+        },
+        {
+          step: '2',
+          title: 'Aprende y juega',
+          description: 'Descubre lecciones cortas, ejemplos reales y el juego "¿Coima o no?" para poner a prueba lo aprendido.',
+        },
+        {
+          step: '3',
+          title: 'Conversa en familia',
+          description: 'Usa las preguntas guía para hablar en familia y reflexionar juntos sobre buenas decisiones.',
+        },
+        {
+          step: '4',
+          title: 'Suma tu progreso',
+          description: 'Gana puntos, sube de nivel y conviértete en un verdadero campeón de la integridad.',
+        },
+      ]
+
       return (
-        <div className="min-h-screen bg-light text-dark p-4">
-          <div className="max-w-2xl mx-auto text-center">
-            <h1 className="text-4xl font-bold text-primary mb-2">Hablemos Claro</h1>
-            <p className="text-xl text-secondary mb-8">Aprender sobre las coimas también es aprender a tomar buenas decisiones.</p>
-            
-            <div className="space-y-4">
-              <button
-                onClick={handleStart}
-                className="btn-primary w-full py-3 px-6 rounded-lg text-lg font-medium"
-              >
-                Comenzar
-              </button>
-              <button
-                onClick={() => setCurrentScreen('config')}
-                className="btn-secondary w-full py-3 px-6 rounded-lg text-lg font-medium"
-              >
-                ¿Cómo funciona?
-              </button>
-            </div>
+        <div className="min-h-screen bg-gradient-to-b from-light to-white text-dark">
+          <div className="max-w-5xl mx-auto px-4 py-12 sm:py-16">
+            {/* Hero */}
+            <header className="text-center max-w-2xl mx-auto">
+              <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-5">
+                Educación para toda la familia
+              </span>
+              <h1 className="text-4xl sm:text-5xl font-bold text-primary mb-4 text-balance">Hablemos Claro</h1>
+              <p className="text-lg sm:text-xl text-secondary text-pretty">
+                Aprender sobre las coimas también es aprender a tomar buenas decisiones.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
+                <button
+                  onClick={handleStart}
+                  className="btn-primary py-3 px-8 rounded-xl text-lg font-medium shadow-lg shadow-primary/20 transition-transform hover:-translate-y-0.5"
+                >
+                  Comenzar
+                </button>
+                <button
+                  onClick={() => setCurrentScreen('config')}
+                  className="btn-secondary py-3 px-8 rounded-xl text-lg font-medium"
+                >
+                  ¿Cómo funciona?
+                </button>
+              </div>
+            </header>
+
+            {/* Cómo funciona */}
+            <section className="mt-16" aria-labelledby="como-funciona-titulo">
+              <h2 id="como-funciona-titulo" className="text-2xl font-bold text-center mb-2">
+                ¿Cómo funciona la app?
+              </h2>
+              <p className="text-gray-500 text-center mb-8 max-w-xl mx-auto text-pretty">
+                Cuatro pasos simples para aprender, jugar y conversar sobre la honestidad.
+              </p>
+
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                {howItWorks.map((item) => (
+                  <article
+                    key={item.step}
+                    className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transition-all hover:shadow-md hover:-translate-y-1"
+                  >
+                    <div className="w-11 h-11 flex items-center justify-center rounded-xl bg-primary/10 text-primary text-lg font-bold mb-4">
+                      {item.step}
+                    </div>
+                    <h3 className="font-bold text-lg mb-2">{item.title}</h3>
+                    <p className="text-sm text-gray-600 leading-relaxed text-pretty">{item.description}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            {/* Comenzar destacado */}
+            <section className="mt-14">
+              <div className="rounded-2xl bg-gradient-to-r from-primary to-secondary p-8 sm:p-10 text-center text-white shadow-lg">
+                <h2 className="text-2xl font-bold mb-2 text-balance">¿List@ para comenzar?</h2>
+                <p className="text-white/90 mb-6 max-w-lg mx-auto text-pretty">
+                  Da el primer paso hacia decisiones más honestas. Es gratis y solo toma unos minutos al día.
+                </p>
+                <button
+                  onClick={handleStart}
+                  className="bg-white text-primary py-3 px-8 rounded-xl text-lg font-semibold shadow-md transition-transform hover:-translate-y-0.5"
+                >
+                  Comenzar ahora
+                </button>
+              </div>
+            </section>
           </div>
         </div>
       )
