@@ -43,9 +43,10 @@ interface FamilyProfile {
   progress: UserProgress
   familyBadges: FamilyBadge[]
   activityLog: ActivityEntry[]
+  familyAvatar: string
 }
 
-type FamilyRole = 'Padre' | 'Madre' | 'Hijo' | 'Hija' | 'Tutor'
+type FamilyRole = 'Padre' | 'Madre' | 'Hijo' | 'Hija' | 'Tutor' | 'Abuelo' | 'Abuela'
 
 interface FamilyMember {
   id: string
@@ -123,7 +124,25 @@ const topicTitles: Record<LearningTopic, string> = {
 }
 
 const memberAvatars = ['😊', '👨', '👩', '👦', '👧', '👴', '👵', '🧑']
-const familyRoles: FamilyRole[] = ['Padre', 'Madre', 'Hijo', 'Hija', 'Tutor']
+const familyRoles: FamilyRole[] = ['Padre', 'Madre', 'Hijo', 'Hija', 'Tutor', 'Abuelo', 'Abuela']
+const familyAvatarOptions = ['👨‍👩‍👧‍👦', '👨‍👩‍👧', '👩‍👩‍👧‍👦', '👨‍👨‍👧‍👦', '👪', '🏠']
+const defaultFamilyAvatar = '👨‍👩‍👧‍👦'
+
+const roleAvatar: Record<FamilyRole, string> = {
+  Padre: '👨',
+  Madre: '👩',
+  Hijo: '👦',
+  Hija: '👧',
+  Tutor: '🧑',
+  Abuelo: '👴',
+  Abuela: '👵',
+}
+
+// Avatar seguro: nunca muestra imagen rota ni espacio vacío
+const avatarOrFallback = (avatar: string | undefined | null): string => {
+  if (typeof avatar === 'string' && avatar.trim() !== '') return avatar
+  return '😊'
+}
 
 const reelsMessages = [
   { id: '1', author: 'Integridad Plus', message: '¿Sabías que la corrupción afecta a más del 50% de la población mundial? 🌍', time: 'Hace 2h' },
@@ -413,7 +432,7 @@ const normalizeMembers = (raw: unknown): FamilyMember[] => {
     return {
       id: typeof m.id === 'string' ? m.id : `m-old-${i}`,
       name: typeof m.name === 'string' && m.name !== '' ? m.name : `Familiar ${i + 1}`,
-      role: (['Padre', 'Madre', 'Hijo', 'Hija', 'Tutor'] as FamilyRole[]).includes(m.role as FamilyRole) ? (m.role as FamilyRole) : 'Tutor',
+      role: (['Padre', 'Madre', 'Hijo', 'Hija', 'Tutor', 'Abuelo', 'Abuela'] as FamilyRole[]).includes(m.role as FamilyRole) ? (m.role as FamilyRole) : 'Tutor',
       avatar: typeof m.avatar === 'string' && m.avatar !== '' ? m.avatar : memberAvatars[i % memberAvatars.length],
       activities: typeof m.activities === 'number' ? m.activities : 0,
     }
@@ -436,6 +455,7 @@ const getStoredFamilyProfile = (): FamilyProfile => {
     return {
       name: typeof parsed.name === 'string' && parsed.name !== '' ? parsed.name : 'Mi familia',
       members: normalizeMembers(parsed.members),
+      familyAvatar: typeof parsed.familyAvatar === 'string' && parsed.familyAvatar !== '' ? parsed.familyAvatar : defaultFamilyAvatar,
       progress: {
         ...defaultStudentProgress,
         ...parsed.progress,
@@ -453,6 +473,7 @@ const getStoredFamilyProfile = (): FamilyProfile => {
   return {
     name: 'Mi familia',
     members: [defaultFamilyMember()],
+    familyAvatar: defaultFamilyAvatar,
     progress: defaultStudentProgress,
     familyBadges: defaultFamilyBadges.map(b => ({ ...b })),
     activityLog: [],
@@ -533,9 +554,10 @@ export default function App() {
   const dragStart = useRef<{ sx: number; sy: number; x: number; y: number } | null>(null)
   const [editingFamName, setEditingFamName] = useState(false)
   const [famNameDraft, setFamNameDraft] = useState('')
+  const [editingFamAvatar, setEditingFamAvatar] = useState(false)
   const [newMemberName, setNewMemberName] = useState('')
   const [newMemberRole, setNewMemberRole] = useState<FamilyRole>('Hijo')
-  const [newMemberAvatar, setNewMemberAvatar] = useState('😊')
+  const [newMemberAvatar, setNewMemberAvatar] = useState('👦')
   const [editingMemberId, setEditingMemberId] = useState<string | null>(null)
   const [memberNameDraft, setMemberNameDraft] = useState('')
   const badgesRef = useRef<HTMLDivElement | null>(null)
@@ -695,7 +717,7 @@ export default function App() {
     celebrateFamilyBadges(checked.unlocked)
     setNewMemberName('')
     setNewMemberRole('Hijo')
-    setNewMemberAvatar('😊')
+    setNewMemberAvatar('👦')
   }
 
   const registerMemberActivity = (id: string) => {
@@ -2258,7 +2280,16 @@ case 'about':
       
       return (
         <div className="min-h-screen p-8" style={{ background: cust13.backgroundValue, backgroundSize: cust13.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
-          <div className="max-w-6xl mx-auto animate-slide-up">
+          <div className="max-w-6xl mx-auto animate-slide-up relative">
+            <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+              <div className="absolute -top-10 -left-10 w-56 h-56 rounded-full bg-secondary/10 blur-2xl" />
+              <div className="absolute top-1/3 -right-12 w-64 h-64 rounded-full bg-warning/10 blur-2xl" />
+              <div className="absolute bottom-10 left-1/4 w-40 h-40 rounded-full bg-primary/10 blur-2xl" />
+              <span className="absolute top-28 right-6 text-3xl opacity-20 animate-float">💬</span>
+              <span className="absolute bottom-48 left-4 text-3xl opacity-20 animate-float">📚</span>
+              <span className="absolute top-1/2 left-1 text-2xl opacity-20">🤝</span>
+              <span className="absolute bottom-24 right-8 text-2xl opacity-20">💡</span>
+            </div>
             {/* Profile Type Tabs */}
             <div className="glass-card rounded-2xl p-3 mb-8 flex gap-3">
               <button
@@ -2519,10 +2550,45 @@ case 'about':
             ) : (
               // FAMILY PROFILE
               <>
-                <div className="text-center mb-8">
-                  <div className="w-28 h-28 bg-gradient-to-br from-secondary to-warning rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-float text-5xl">
-                    👨‍👩‍👧‍👦
+                <div className="text-center mb-8 relative">
+                  <div className="relative inline-block">
+                    <div className="w-28 h-28 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg text-6xl overflow-hidden border-4 border-white bg-gradient-to-br from-secondary to-warning">
+                      <span className="leading-none">{avatarOrFallback(familyProfile.familyAvatar)}</span>
+                    </div>
+                    <button
+                      onClick={() => setEditingFamAvatar(v => !v)}
+                      className="absolute bottom-3 right-0 w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
+                      aria-label={t('editName')}
+                    >
+                      ✏️
+                    </button>
                   </div>
+                  {editingFamAvatar && (
+                    <div className="bg-white rounded-2xl px-4 py-4 shadow-sm mb-4 animate-fade-in">
+                      <p className="text-sm font-bold text-dark mb-3">Elige el avatar de la familia</p>
+                      <div className="flex gap-2 justify-center flex-wrap">
+                        {familyAvatarOptions.map(a => (
+                          <button
+                            key={a}
+                            onClick={() => {
+                              const updated = { ...familyProfile, familyAvatar: a }
+                              setFamilyProfile(updated)
+                              saveFamilyProfile(updated)
+                              setEditingFamAvatar(false)
+                            }}
+                            className={`relative w-14 h-14 rounded-full text-3xl flex items-center justify-center transition-all hover:scale-110 ${
+                              familyProfile.familyAvatar === a
+                                ? 'bg-primary/15 ring-2 ring-primary scale-105'
+                                : 'bg-gray-100 hover:bg-gray-200'
+                            }`}
+                          >
+                            <span className="leading-none">{a}</span>
+                            {familyProfile.familyAvatar === a && <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-success text-white text-[10px] flex items-center justify-center font-bold">✓</span>}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   <div className="bg-white rounded-2xl px-6 py-5 shadow-sm">
                     {editingFamName ? (
                       <div className="flex gap-2 justify-center">
@@ -2612,7 +2678,9 @@ case 'about':
                 </div>
 
                 {/* Mis insignias */}
-                <div ref={badgesRef} className="glass-card rounded-2xl p-8 mb-8 scroll-mt-4">
+                <div ref={badgesRef} className="glass-card rounded-2xl p-8 mb-8 scroll-mt-4 relative overflow-hidden">
+                  <span aria-hidden className="pointer-events-none absolute top-3 right-5 text-xl opacity-30 animate-float">✨</span>
+                  <span aria-hidden className="pointer-events-none absolute top-3 left-5 text-xl opacity-30">🌟</span>
                   <h3 className="font-bold text-dark text-xl mb-1">🏅 {t('myBadges')}</h3>
                   <p className="text-gray-500 mb-6">{famUnlocked} de 6 desbloqueadas</p>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
@@ -2661,8 +2729,10 @@ case 'about':
                   <h3 className="font-bold text-dark text-xl mb-6">👨‍👩‍👧 {t('membersTitle')} ({familyProfile.members.length})</h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-5 mb-8">
                     {familyProfile.members.map(m => (
-                      <div key={m.id} className="bg-white rounded-2xl p-5 shadow-sm text-center border border-gray-100">
-                        <div className="text-5xl mb-2">{m.avatar}</div>
+                      <div key={m.id} className="bg-white rounded-2xl p-5 shadow-sm text-center border border-gray-100 transition-transform hover:-translate-y-1">
+                        <div className="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center text-4xl bg-gradient-to-br from-primary/15 to-secondary/15 border-2 border-white shadow overflow-hidden">
+                          <span className="leading-none">{avatarOrFallback(m.avatar)}</span>
+                        </div>
                         {editingMemberId === m.id ? (
                           <div className="flex gap-1 justify-center mb-2">
                             <input
@@ -2710,24 +2780,33 @@ case 'about':
                         <p className="text-sm font-medium text-dark mb-2">{t('memberRole')}</p>
                         <select
                           value={newMemberRole}
-                          onChange={e => setNewMemberRole(e.target.value as FamilyRole)}
+                          onChange={e => {
+                            const role = e.target.value as FamilyRole
+                            setNewMemberRole(role)
+                            setNewMemberAvatar(roleAvatar[role])
+                          }}
                           className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-dark font-medium"
                         >
                           {familyRoles.map(r => (
-                            <option key={r} value={r}>{r}</option>
+                            <option key={r} value={r}>{roleAvatar[r]} {r}</option>
                           ))}
                         </select>
                       </div>
                       <div>
                         <p className="text-sm font-medium text-dark mb-2">{t('memberAvatar')}</p>
-                        <div className="flex gap-1 flex-wrap">
+                        <div className="flex gap-2 flex-wrap">
                           {memberAvatars.map(a => (
                             <button
                               key={a}
                               onClick={() => setNewMemberAvatar(a)}
-                              className={`text-2xl p-1 rounded-lg ${newMemberAvatar === a ? 'bg-primary/15 ring-2 ring-primary' : 'hover:bg-gray-100'}`}
+                              className={`relative w-11 h-11 rounded-full text-2xl flex items-center justify-center transition-all hover:scale-110 ${
+                                newMemberAvatar === a
+                                  ? 'bg-primary/15 ring-2 ring-primary scale-105'
+                                  : 'bg-gray-100 hover:bg-gray-200'
+                              }`}
                             >
-                              {a}
+                              <span className="leading-none">{a}</span>
+                              {newMemberAvatar === a && <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-success text-white text-[9px] flex items-center justify-center font-bold">✓</span>}
                             </button>
                           ))}
                         </div>
