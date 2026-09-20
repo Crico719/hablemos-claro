@@ -534,7 +534,7 @@ export default function App() {
               <button
                 onClick={() => {
                   setProfileType('student')
-                  setCurrentScreen('avatar')
+                  setCurrentScreen('home')
                 }}
                 className="glass-card rounded-2xl p-8 card-hover shadow-custom-lg border-2 border-primary/20"
               >
@@ -545,7 +545,7 @@ export default function App() {
               <button
                 onClick={() => {
                   setProfileType('family')
-                  setCurrentScreen('avatar')
+                  setCurrentScreen('home')
                 }}
                 className="glass-card rounded-2xl p-8 card-hover shadow-custom-lg border-2 border-secondary/20"
               >
