@@ -915,7 +915,7 @@ case 'about':
             </div>
 
             {/* Accesos principales */}
-            <div className="grid grid-cols-2 gap-16 mb-20">
+            <div className="grid grid-cols-2 gap-16 mb-28">
               <button
                 onClick={() => setCurrentScreen('learn')}
                 className="glass-card rounded-2xl p-12 text-left card-hover shadow-custom-lg min-h-[200px] flex flex-col justify-between"
@@ -958,9 +958,9 @@ case 'about':
               </button>
             </div>
 
-            <hr className="border-gray-200 my-28" />
+            <hr className="border-gray-200 my-32" />
 
-            <div className="glass-card rounded-2xl p-8 card-hover">
+            <div className="glass-card rounded-2xl p-10 card-hover">
               <h3 className="font-bold text-warning text-xl mb-4">{t('familyActivity')}</h3>
               <p className="text-gray-600 mb-6 leading-relaxed">
                 {t('familyDesc')}
