@@ -662,13 +662,11 @@ case 'about':
       const cust2 = getCustomization();
       return (
         <div className="min-h-screen p-8" style={{ background: cust2.backgroundValue, backgroundSize: cust2.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
-          <div className="max-w-3xl mx-auto animate-slide-up text-center">
-            <div className="flex items-center justify-between mb-2">
-              <h1 className="text-3xl font-bold gradient-text mx-auto">{t('aboutTitle')}</h1>
-              <button onClick={() => setCurrentScreen('welcome')} className="glass-card px-3 py-1 rounded-xl text-gray-600 text-sm hover:bg-gray-100 transition-all">
-                {t('back')}
-              </button>
-            </div>
+          <div className="max-w-3xl mx-auto animate-slide-up text-center relative">
+            <button onClick={() => setCurrentScreen('welcome')} className="absolute top-0 left-0 glass-card px-3 py-1 rounded-xl text-gray-600 text-sm hover:bg-gray-100 transition-all">
+              {t('back')}
+            </button>
+            <h1 className="text-3xl font-bold gradient-text">{t('aboutTitle')}</h1>
             <p className="text-gray-500 mb-12">{t('aboutSub')}</p>
 
             <div className="glass-card rounded-3xl p-8 mb-10 card-hover shadow-custom-lg text-center">
