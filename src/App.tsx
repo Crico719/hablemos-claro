@@ -431,36 +431,13 @@ export default function App() {
     setCurrentScreen(screen)
   }
 
-  // Actualizar progreso y verificar insignias
+  // Actualizar progreso (las insignias SOLO se consiguen completando el test final)
   const updateProgress = (activitiesIncrement: number = 1) => {
     const currentProfile = profileType === 'student' ? studentProfile : familyProfile
     const newProgress = { ...currentProfile.progress }
     newProgress.completedActivities += activitiesIncrement
     newProgress.totalActivities = Math.max(newProgress.totalActivities, newProgress.completedActivities)
-    
-    const newBadges = [...newProgress.badges]
-    let newBadgeToShow: Badge | null = null
 
-    const isExplorer = newBadges.find(b => b.id === 'topics-explorer')!
-    if (!isExplorer.unlocked && newProgress.completedActivities >= 1) {
-      isExplorer.unlocked = true
-      newBadgeToShow = { ...isExplorer }
-    }
-
-    const isMaster = newBadges.find(b => b.id === 'game-master')!
-    if (!isMaster.unlocked && newProgress.completedActivities >= 5) {
-      isMaster.unlocked = true
-      newBadgeToShow = { ...isMaster }
-    }
-
-    const isChampion = newBadges.find(b => b.id === 'integrity-champion')!
-    if (!isChampion.unlocked && isExplorer.unlocked && isMaster.unlocked) {
-      isChampion.unlocked = true
-      newBadgeToShow = { ...isChampion }
-    }
-
-    newProgress.badges = newBadges
-    
     if (profileType === 'student') {
       setStudentProfile({ ...studentProfile, progress: newProgress })
       saveStudentProfile({ ...studentProfile, progress: newProgress })
@@ -468,11 +445,56 @@ export default function App() {
       setFamilyProfile({ ...familyProfile, progress: newProgress })
       saveFamilyProfile({ ...familyProfile, progress: newProgress })
     }
-    
-    if (newBadgeToShow) {
-      setEarnedBadge(newBadgeToShow)
-      setShowBadgeCelebration(true)
+  }
+
+  // Orden obligatorio de temas (paso por paso, sin saltos)
+  const topicOrder: LearningTopic[] = ['coima', 'recognition', 'impact', 'consequences', 'prevention', 'ethics', 'citizen', 'test']
+
+  // Completar un tema (solo cuenta la primera vez)
+  const completeTopic = (topic: LearningTopic) => {
+    const currentProfile = profileType === 'student' ? studentProfile : familyProfile
+    const alreadyDone = (currentProfile.progress.topicProgress[topic] ?? 0) >= 100
+    const newProgress = {
+      ...currentProfile.progress,
+      topicProgress: {
+        ...currentProfile.progress.topicProgress,
+        [topic]: 100,
+      },
     }
+    if (profileType === 'student') {
+      setStudentProfile({ ...studentProfile, progress: newProgress })
+      saveStudentProfile({ ...studentProfile, progress: newProgress })
+    } else {
+      setFamilyProfile({ ...familyProfile, progress: newProgress })
+      saveFamilyProfile({ ...familyProfile, progress: newProgress })
+    }
+    if (!alreadyDone) updateProgress(1)
+  }
+
+  // Completar el test final: única forma de conseguir las insignias
+  const completeTest = () => {
+    const currentProfile = profileType === 'student' ? studentProfile : familyProfile
+    const alreadyDone = (currentProfile.progress.topicProgress['test'] ?? 0) >= 100
+    const newBadges = currentProfile.progress.badges.map(b => ({ ...b, unlocked: true }))
+    const newProgress = {
+      ...currentProfile.progress,
+      topicProgress: {
+        ...currentProfile.progress.topicProgress,
+        test: 100,
+      },
+      badges: newBadges,
+    }
+    if (profileType === 'student') {
+      setStudentProfile({ ...studentProfile, progress: newProgress })
+      saveStudentProfile({ ...studentProfile, progress: newProgress })
+    } else {
+      setFamilyProfile({ ...familyProfile, progress: newProgress })
+      saveFamilyProfile({ ...familyProfile, progress: newProgress })
+    }
+    if (!alreadyDone) updateProgress(1)
+    const champion = newBadges.find(b => b.id === 'integrity-champion')!
+    setEarnedBadge({ ...champion })
+    setShowBadgeCelebration(true)
   }
 
   const completeConversation = () => {
@@ -1359,23 +1381,40 @@ case 'about':
 
             {/* Topic menu */}
             <div className="glass-card rounded-2xl p-8">
-              <h2 className="text-xl font-bold text-dark mb-2">Elige un tema</h2>
-              <p className="text-gray-500 mb-6">Toca una tarjeta para estudiar ese tema.</p>
+              <h2 className="text-xl font-bold text-dark mb-2">Ruta de aprendizaje</h2>
+              <p className="text-gray-500 mb-6">Avanza paso por paso, sin saltos. El test se desbloquea al terminar todos los temas.</p>
               <div className="grid grid-cols-2 gap-5">
-                {(Object.keys(topics) as LearningTopic[]).map((key) => (
-                  <button
-                    key={key}
-                    onClick={() => { setSelectedTopic(key); setShowCoimaONo(false); setShowFeedback(false); }}
-                    className={`rounded-2xl p-5 text-left transition-all border-2 ${
-                      (selectedTopic ?? 'coima') === key
-                        ? 'bg-primary text-white border-primary shadow-lg'
-                        : 'glass-card text-dark border-transparent hover:border-primary/40'
-                    }`}
-                  >
-                    <div className="text-3xl mb-2">{topics[key].icon}</div>
-                    <div className="font-bold leading-snug">{topics[key].title}</div>
-                  </button>
-                ))}
+                {topicOrder.map((key) => {
+                  const idx = topicOrder.indexOf(key)
+                  const prevKey = idx > 0 ? topicOrder[idx - 1] : null
+                  const prevDone = prevKey === null || (getProgress().topicProgress[prevKey] ?? 0) >= 100
+                  const done = (getProgress().topicProgress[key] ?? 0) >= 100
+                  const locked = !prevDone
+                  const isTest = key === 'test'
+                  return (
+                    <button
+                      key={key}
+                      disabled={locked}
+                      onClick={() => { setSelectedTopic(key); setShowCoimaONo(false); setShowFeedback(false); }}
+                      className={`rounded-2xl p-5 text-left transition-all border-2 ${
+                        locked
+                          ? 'bg-gray-100 text-gray-400 border-gray-200 opacity-70'
+                          : (selectedTopic ?? 'coima') === key
+                            ? 'bg-primary text-white border-primary shadow-lg'
+                            : 'glass-card text-dark border-transparent hover:border-primary/40'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="text-3xl mb-2">{locked ? '🔒' : topics[key].icon}</div>
+                        {done && !locked && <div className="text-xl">✅</div>}
+                      </div>
+                      <div className="font-bold leading-snug">
+                        {idx + 1}. {topics[key].title}
+                        {isTest && locked && ' (bloqueado)'}
+                      </div>
+                    </button>
+                  )
+                })}
               </div>
             </div>
 
@@ -1534,10 +1573,10 @@ case 'about':
                 </div>
 
                 <button
-                  onClick={() => navigateTo('result')}
+                  onClick={() => { completeTest(); navigateTo('result'); }}
                   className="btn-glow bg-success text-white font-bold py-4 px-6 rounded-xl text-lg w-full"
                 >
-                  Terminar prueba
+                  Terminar prueba y conseguir insignias 🏅
                 </button>
               </div>
             )}
@@ -1545,15 +1584,19 @@ case 'about':
             {selectedTopic !== 'test' && !showCoimaONo && (
               <button
                 onClick={() => {
-                  const topicKeys = Object.keys(topics) as LearningTopic[]
-                  const currentIndex = topicKeys.indexOf(selectedTopic ?? 'coima')
-                  setSelectedTopic(topicKeys[(currentIndex + 1) % topicKeys.length])
+                  const activeKey = selectedTopic ?? 'coima'
+                  const alreadyDone = (getProgress().topicProgress[activeKey] ?? 0) >= 100
+                  if (!alreadyDone) completeTopic(activeKey)
+                  const currentIndex = topicOrder.indexOf(activeKey)
+                  setSelectedTopic(topicOrder[(currentIndex + 1) % topicOrder.length])
                   setShowCoimaONo(false)
                   setShowFeedback(false)
                 }}
                 className="btn-glow bg-gradient-to-r from-primary to-secondary text-white font-bold py-4 px-6 rounded-xl text-lg w-full"
               >
-                Siguiente tema →
+                {((getProgress().topicProgress[selectedTopic ?? 'coima'] ?? 0) >= 100)
+                  ? 'Siguiente tema →'
+                  : 'Terminar tema y continuar →'}
               </button>
             )}
           </div>
