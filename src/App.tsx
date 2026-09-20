@@ -2383,33 +2383,6 @@ case 'about':
           <p className="text-gray-500 mb-6">{t('choosePhoto')}</p>
           
           <div className="space-y-3 mb-6">
-            <label className="cursor-pointer">
-              <input
-                type="file"
-                accept="image/*"
-                capture="environment"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0]
-                  if (file) {
-                    const reader = new FileReader()
-                    reader.onload = (event) => {
-                      const result = event.target?.result as string
-                      setTempPhoto(result)
-                      const updated = { ...studentProfile, photo: result }
-                      setStudentProfile(updated)
-                      saveStudentProfile(updated)
-                      setEditPhotoModal(false)
-                    }
-                    reader.readAsDataURL(file)
-                  }
-                }}
-              />
-              <button className="btn-glow bg-primary text-white font-bold py-3 px-6 rounded-xl w-full">
-                📷 {t('takePhoto')}
-              </button>
-            </label>
-            
             <button
               onClick={() => {
                 const updated = { ...studentProfile, photo: '' }
