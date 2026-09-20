@@ -2121,43 +2121,53 @@ case 'about':
 
             {/* HUB */}
             {learnView === 'hub' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-4xl mx-auto items-stretch">
                 <button
                   onClick={() => setLearnView('kids')}
-                  className="group bg-white rounded-3xl p-8 shadow-xl border border-gray-100 text-left transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl cursor-pointer"
+                  className="group bg-white rounded-3xl p-10 shadow-xl border border-gray-100 text-center flex flex-col items-center transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl cursor-pointer"
                 >
-                  <div className="w-20 h-20 rounded-3xl mb-5 flex items-center justify-center transition-transform duration-300 group-hover:scale-105" style={{ background: 'linear-gradient(135deg, #DBEAFE, #EDE9FE)' }}>
-                    <svg viewBox="0 0 24 24" className="w-10 h-10 text-primary" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <div className="w-24 h-24 rounded-3xl mb-6 flex items-center justify-center transition-transform duration-300 group-hover:scale-105" style={{ background: 'linear-gradient(135deg, #DBEAFE, #EDE9FE)' }}>
+                    <svg viewBox="0 0 24 24" className="w-12 h-12 text-primary" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                       <path d="M12 4 22 9l-10 5L2 9l10-5Z" />
                       <path d="M6 11.5V16c0 1.7 2.7 3 6 3s6-1.3 6-3v-4.5" />
                       <path d="M22 9v6" />
                     </svg>
                   </div>
-                  <h2 className="text-2xl font-black text-primary mb-2">PARA HIJOS</h2>
-                  <p className="text-gray-600 leading-relaxed mb-6">Aprende de forma sencilla, interactiva y con ejemplos de situaciones cotidianas.</p>
-                  <span className="inline-flex items-center gap-2 bg-primary text-white font-bold py-3 px-6 rounded-full transition-all duration-300 group-hover:gap-3">
+                  <h2 className="text-2xl font-black text-primary mb-3">PARA HIJOS</h2>
+                  <p className="text-gray-600 text-lg leading-relaxed mb-6 flex-1">Aprende de forma sencilla, interactiva y con ejemplos de situaciones cotidianas.</p>
+                  <span className="inline-flex items-center justify-center gap-2 w-full bg-primary text-white font-bold text-lg py-4 px-6 rounded-full shadow-lg transition-all duration-300 group-hover:gap-3 group-hover:shadow-xl">
                     Explorar temas →
                   </span>
-                  <p className="text-sm font-bold text-gray-400 mt-4">{kidsDone.length} de {KIDS_TOPICS.length} completados</p>
+                  <div className="w-full mt-5">
+                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="h-full rounded-full bg-primary" style={{ width: `${(kidsDone.length / KIDS_TOPICS.length) * 100}%` }}></div>
+                    </div>
+                    <p className="text-sm font-bold text-gray-500 mt-2">{kidsDone.length} de {KIDS_TOPICS.length} completados</p>
+                  </div>
                 </button>
                 <button
                   onClick={() => setLearnView('parents')}
-                  className="group bg-white rounded-3xl p-8 shadow-xl border border-gray-100 text-left transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl cursor-pointer"
+                  className="group bg-white rounded-3xl p-10 shadow-xl border border-gray-100 text-center flex flex-col items-center transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl cursor-pointer"
                 >
-                  <div className="w-20 h-20 rounded-3xl mb-5 flex items-center justify-center transition-transform duration-300 group-hover:scale-105" style={{ background: 'linear-gradient(135deg, #EDE9FE, #FEF3C7)' }}>
-                    <svg viewBox="0 0 24 24" className="w-10 h-10 text-secondary" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <div className="w-24 h-24 rounded-3xl mb-6 flex items-center justify-center transition-transform duration-300 group-hover:scale-105" style={{ background: 'linear-gradient(135deg, #EDE9FE, #FEF3C7)' }}>
+                    <svg viewBox="0 0 24 24" className="w-12 h-12 text-secondary" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                       <circle cx="9" cy="8" r="3.2" />
                       <path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5" />
                       <circle cx="16.8" cy="9" r="2.4" />
                       <path d="M16 14.3c2.6.4 4.3 2 4.7 4.2" />
                     </svg>
                   </div>
-                  <h2 className="text-2xl font-black text-secondary mb-2">PARA PADRES Y TUTORES</h2>
-                  <p className="text-gray-600 leading-relaxed mb-6">Encuentra herramientas para conversar y acompañar a tus hijos.</p>
-                  <span className="inline-flex items-center gap-2 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 group-hover:gap-3" style={{ background: '#7C3AED' }}>
+                  <h2 className="text-2xl font-black text-secondary mb-3">PARA PADRES Y TUTORES</h2>
+                  <p className="text-gray-600 text-lg leading-relaxed mb-6 flex-1">Encuentra herramientas para conversar y acompañar a tus hijos.</p>
+                  <span className="inline-flex items-center justify-center gap-2 w-full text-white font-bold text-lg py-4 px-6 rounded-full shadow-lg transition-all duration-300 group-hover:gap-3 group-hover:shadow-xl" style={{ background: '#7C3AED' }}>
                     Explorar temas →
                   </span>
-                  <p className="text-sm font-bold text-gray-400 mt-4">{guidesDone.length} de {PARENT_GUIDES.length} revisados</p>
+                  <div className="w-full mt-5">
+                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="h-full rounded-full" style={{ width: `${(guidesDone.length / PARENT_GUIDES.length) * 100}%`, background: '#7C3AED' }}></div>
+                    </div>
+                    <p className="text-sm font-bold text-gray-500 mt-2">{guidesDone.length} de {PARENT_GUIDES.length} revisados</p>
+                  </div>
                 </button>
               </div>
             )}
