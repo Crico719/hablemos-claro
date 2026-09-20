@@ -567,8 +567,10 @@ export default function App() {
       return (
         <div className="min-h-screen p-8" style={{ background: cust0.backgroundValue, backgroundSize: cust0.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           <div className="max-w-3xl mx-auto animate-slide-up text-center">
-            <h1 className="text-3xl font-bold gradient-text mb-2">{t('chooseProfile')}</h1>
-            <p className="text-gray-500 mb-8">{t('welcomeSub')}</p>
+            <div className="bg-white rounded-2xl p-6 mb-8 shadow-sm">
+              <h1 className="text-3xl font-bold gradient-text mb-2">{t('chooseProfile')}</h1>
+              <p className="text-gray-600">{t('welcomeSub')}</p>
+            </div>
             
             <div className="grid grid-cols-2 gap-6 mb-10">
               <button
@@ -613,8 +615,10 @@ case 'about':
             <button onClick={() => setCurrentScreen('welcome')} className="absolute top-0 right-0 glass-card px-3 py-1 rounded-xl text-gray-600 text-sm hover:bg-gray-100 transition-all">
               {t('back')}
             </button>
-            <h1 className="text-3xl font-bold gradient-text">{t('aboutTitle')}</h1>
-            <p className="text-gray-500 mb-12">{t('aboutSub')}</p>
+            <div className="bg-white rounded-2xl p-6 mb-12 shadow-sm">
+              <h1 className="text-3xl font-bold gradient-text">{t('aboutTitle')}</h1>
+              <p className="text-gray-600 mt-2">{t('aboutSub')}</p>
+            </div>
 
             <div className="glass-card rounded-3xl p-8 mb-10 card-hover shadow-custom-lg text-center">
               <div className="flex items-center justify-center gap-4 mb-5">
@@ -736,8 +740,10 @@ case 'about':
               </button>
               <span className="text-xs text-gray-400 font-medium">1 / 2</span>
             </div>
-            <h1 className="text-3xl font-bold gradient-text mb-2 mt-4">{t('deviceQuestion')}</h1>
-            <p className="text-gray-500 mb-8">{t('deviceSub')}</p>
+            <div className="bg-white rounded-2xl p-6 mb-8 shadow-sm">
+              <h1 className="text-3xl font-bold gradient-text mb-2">{t('deviceQuestion')}</h1>
+              <p className="text-gray-600">{t('deviceSub')}</p>
+            </div>
 
             <div className="grid grid-cols-3 gap-8 mb-12">
               <button
@@ -781,7 +787,9 @@ case 'about':
       return (
         <div className="min-h-screen p-8" style={{ background: cust4.backgroundValue, backgroundSize: cust4.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           <div className="max-w-4xl mx-auto animate-slide-up">
-            <h2 className="text-3xl font-bold gradient-text mb-10 text-center">{t('configTitle')}</h2>
+            <div className="bg-white rounded-2xl p-6 mb-10 shadow-sm text-center">
+              <h2 className="text-3xl font-bold gradient-text">{t('configTitle')}</h2>
+            </div>
             
             <div className="space-y-8">
               <div className="glass-card rounded-2xl p-8 mb-6">
@@ -827,7 +835,7 @@ case 'about':
                 </div>
               </div>
 
-              <p className="text-dark font-medium text-center text-lg">{t('roleQuestion')}</p>
+              <p className="text-dark font-medium text-center text-lg bg-white rounded-xl px-4 py-3 shadow-sm">{t('roleQuestion')}</p>
               <div className="grid grid-cols-2 gap-5 mt-3">
                 <button
                   onClick={() => setSelectedRole('parent')}
@@ -843,11 +851,11 @@ case 'about':
                 </button>
               </div>
 
-              <p className="text-dark font-medium text-center text-lg mt-10">{t('deviceQuestion')}</p>
+              <p className="text-dark font-medium text-center text-lg bg-white rounded-xl px-4 py-3 shadow-sm mt-10">{t('deviceQuestion')}</p>
               <div className="grid grid-cols-3 gap-5 mt-3">
                 <button
                   onClick={() => setDevice('pc')}
-                  className={device === 'pc' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all'}
+                  className={device === 'pc' ? 'bg-primary text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'glass-card font-bold py-5 px-6 rounded-xl text-dark hover:bg-primary/20 transition-all text-lg'}
                 >
                   🖥️ PC
                 </button>
@@ -865,7 +873,7 @@ case 'about':
                 </button>
               </div>
 
-              <p className="text-dark font-medium text-center text-lg mt-10">{t('darkModeTitle')}</p>
+              <p className="text-dark font-medium text-center text-lg bg-white rounded-xl px-4 py-3 shadow-sm mt-10">{t('darkModeTitle')}</p>
               <div className="grid grid-cols-2 gap-5 mt-3">
                 <button
                   onClick={() => changeDarkMode(false)}
@@ -881,7 +889,7 @@ case 'about':
                 </button>
               </div>
 
-              <p className="text-dark font-medium text-center text-lg mt-10">{t('languageTitle')}</p>
+              <p className="text-dark font-medium text-center text-lg bg-white rounded-xl px-4 py-3 shadow-sm mt-10">{t('languageTitle')}</p>
               <div className="grid grid-cols-2 gap-5 mt-3">
                 <button
                   onClick={() => changeLanguage('es')}
@@ -917,14 +925,14 @@ case 'about':
           <div className="max-w-6xl mx-auto animate-slide-up space-y-16">
             
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="bg-white rounded-2xl p-6 flex items-center justify-between shadow-sm">
               <div className="flex items-center gap-4">
                 <div className="glass-card px-5 py-3 rounded-xl text-primary font-bold text-xl shadow-lg">
                   🏅 {unlockedCount}/3
                 </div>
                 <div>
                   <h1 className="text-3xl font-bold gradient-text">{t('greeting')}</h1>
-                  <p className="text-base text-gray-500">{device === 'phone' ? '📱 Móvil' : device === 'laptop' ? '💻 Laptop' : '🖥️ PC'}</p>
+                  <p className="text-base text-gray-600">{device === 'phone' ? '📱 Móvil' : device === 'laptop' ? '💻 Laptop' : '🖥️ PC'}</p>
                 </div>
               </div>
               <button onClick={() => setCurrentScreen('config')} className="glass-card px-5 py-3 rounded-xl text-primary text-base font-medium hover:bg-primary/10 transition-all">
@@ -933,7 +941,7 @@ case 'about':
             </div>
 
             {/* Welcome line */}
-            <p className="text-xl text-gray-600 text-center">{t('welcomeLine')}</p>
+            <p className="text-xl text-gray-600 text-center bg-white rounded-2xl px-6 py-4 shadow-sm">{t('welcomeLine')}</p>
 
             {/* Badges Card */}
             <div className="glass-card rounded-2xl p-10 card-hover">
@@ -1028,10 +1036,10 @@ case 'about':
       return (
         <div className="min-h-screen p-8" style={{ background: cust6.backgroundValue, backgroundSize: cust6.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           <div className="max-w-5xl mx-auto animate-slide-up">
-            <div className="flex items-center justify-between mb-6">
+            <div className="bg-white rounded-2xl p-5 flex items-center justify-between mb-6 shadow-sm">
               <div>
                 <h1 className="text-3xl font-bold gradient-text">{t('reels')} 📱</h1>
-                <p className="text-sm text-gray-500">{t('reelsDesc')}</p>
+                <p className="text-sm text-gray-600">{t('reelsDesc')}</p>
               </div>
               <button onClick={() => navigateTo('home')} className="glass-card px-3 py-1 rounded-xl text-gray-600 text-sm hover:bg-gray-100 transition-all">
                 {t('back')}
@@ -1332,14 +1340,14 @@ case 'about':
           <div className="max-w-4xl mx-auto animate-slide-up space-y-10">
             
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="bg-white rounded-2xl p-6 flex items-center justify-between shadow-sm">
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-4xl">
                   {currentTopicData.icon}
                 </div>
                 <div>
                   <h1 className="text-3xl font-bold gradient-text">{currentTopicData.title}</h1>
-                  <p className="text-gray-500 mt-1">Tema {Object.keys(topics).indexOf(selectedTopic || 'coima') + 1} de {Object.keys(topics).length}</p>
+                  <p className="text-gray-600 mt-1">Tema {Object.keys(topics).indexOf(selectedTopic || 'coima') + 1} de {Object.keys(topics).length}</p>
                 </div>
               </div>
               <button onClick={() => navigateTo('home')} className="glass-card px-5 py-2 rounded-xl text-gray-500 hover:text-primary text-sm font-medium hover:bg-gray-100 transition-all">
@@ -1585,7 +1593,7 @@ case 'about':
       return (
         <div className="min-h-screen bg-gradient-to-br from-secondary/10 via-primary/5 to-success/10 p-8">
           <div className="max-w-5xl mx-auto animate-slide-up">
-            <div className="flex items-center justify-between mb-6">
+            <div className="bg-white rounded-2xl p-5 flex items-center justify-between mb-6 shadow-sm">
               <h1 className="text-3xl font-bold gradient-text">¿Qué harías?</h1>
               <button onClick={() => navigateTo('home')} className="glass-card px-3 py-1 rounded-xl text-gray-600 text-sm hover:bg-gray-100 transition-all">
                 ← Atrás
@@ -2023,22 +2031,24 @@ case 'about':
                       ✏️
                     </button>
                   </div>
-                  <h2 className="text-4xl font-bold gradient-text">{studentProfile.name || 'Estudiante'}</h2>
-                  <p className="text-gray-500 mt-2 text-lg">{t('profileSub')}</p>
-                  {(studentProfile.age || studentProfile.district) && (
-                    <div className="flex justify-center gap-3 mt-4 flex-wrap">
-                      {studentProfile.age && (
-                        <span className="px-5 py-2 rounded-full bg-primary/10 text-primary text-base font-medium">
-                          🎂 {studentProfile.age} {t('ageYears')}
-                        </span>
-                      )}
-                      {studentProfile.district && (
-                        <span className="px-5 py-2 rounded-full bg-secondary/10 text-secondary text-base font-medium">
-                          📍 {studentProfile.district}
-                        </span>
-                      )}
-                    </div>
-                  )}
+                  <div className="bg-white rounded-2xl px-6 py-5 shadow-sm">
+                    <h2 className="text-4xl font-bold gradient-text">{studentProfile.name || 'Estudiante'}</h2>
+                    <p className="text-gray-600 mt-2 text-lg">{t('profileSub')}</p>
+                    {(studentProfile.age || studentProfile.district) && (
+                      <div className="flex justify-center gap-3 mt-4 flex-wrap">
+                        {studentProfile.age && (
+                          <span className="px-5 py-2 rounded-full bg-primary/10 text-primary text-base font-medium">
+                            🎂 {studentProfile.age} {t('ageYears')}
+                          </span>
+                        )}
+                        {studentProfile.district && (
+                          <span className="px-5 py-2 rounded-full bg-secondary/10 text-secondary text-base font-medium">
+                            📍 {studentProfile.district}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Stats Cards */}
@@ -2230,8 +2240,9 @@ case 'about':
                   <div className="w-28 h-28 bg-gradient-to-br from-secondary to-warning rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-float text-5xl">
                     👨‍👩‍👧
                   </div>
-                  <h2 className="text-3xl font-bold gradient-text">{familyProfile.name || 'Familia'}</h2>
-                  <p className="text-gray-500 mt-1">Perfil familiar compartido</p>
+                  <div className="bg-white rounded-2xl px-6 py-5 shadow-sm">
+                    <h2 className="text-3xl font-bold gradient-text">{familyProfile.name || 'Familia'}</h2>
+                    <p className="text-gray-600 mt-1">Perfil familiar compartido</p>
                   {familyProfile.members.length > 0 && (
                     <div className="flex justify-center gap-2 mt-3 flex-wrap">
                       {familyProfile.members.map((member, i) => (
@@ -2241,6 +2252,7 @@ case 'about':
                       ))}
                     </div>
                   )}
+                  </div>
                 </div>
 
                 <div className="glass-card rounded-2xl p-6 shadow-custom-lg mb-6">
