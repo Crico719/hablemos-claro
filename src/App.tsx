@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './index.css'
 
 // Tipos para la aplicación
@@ -32,6 +32,7 @@ interface StudentProfile {
   age: string
   district: string
   photo: string
+  photoPos: PhotoPos
   progress: UserProgress
   customization: ProfileCustomization
 }
@@ -55,6 +56,14 @@ interface ConversationPrompt {
   question: string
   asked: boolean
 }
+
+interface PhotoPos {
+  x: number
+  y: number
+  zoom: number
+}
+
+const defaultPhotoPos: PhotoPos = { x: 50, y: 50, zoom: 1 }
 
 const allBadges: Badge[] = [
   { id: 'topics-explorer', name: 'Explorador de Temas', emoji: '📚', color: '#3B82F6', unlocked: false },
@@ -283,6 +292,7 @@ const getStoredStudentProfile = (): StudentProfile => {
       age: parsed.age ?? '',
       district: parsed.district ?? '',
       photo: parsed.photo ?? '',
+      photoPos: { ...defaultPhotoPos, ...(parsed.photoPos ?? {}) },
       progress: {
         ...defaultStudentProgress,
         ...parsed.progress,
@@ -304,6 +314,7 @@ const getStoredStudentProfile = (): StudentProfile => {
     age: '',
     district: '',
     photo: '',
+    photoPos: defaultPhotoPos,
     progress: defaultStudentProgress,
     customization: defaultCustomization,
   }
@@ -405,6 +416,8 @@ export default function App() {
   const [profileType, setProfileType] = useState<ProfileType>('student')
   const [editPhotoModal, setEditPhotoModal] = useState(false)
   const [photoUrl, setPhotoUrl] = useState('')
+  const [posDraft, setPosDraft] = useState<PhotoPos>(defaultPhotoPos)
+  const dragStart = useRef<{ sx: number; sy: number; x: number; y: number } | null>(null)
   const [_tempPhoto, setTempPhoto] = useState<string>('')
 
   // Sincronizar userName/userAge/userDistrict con studentProfile
@@ -2020,7 +2033,15 @@ case 'about':
                   <div className="relative inline-block">
                     <div className="w-32 h-32 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg animate-float text-7xl overflow-hidden border-4 border-white">
                       {studentProfile.photo ? (
-                        <img src={studentProfile.photo} alt="Perfil" className="w-full h-full object-cover rounded-full" />
+                        <img
+                          src={studentProfile.photo}
+                          alt="Perfil"
+                          className="w-full h-full object-cover rounded-full"
+                          style={{
+                            objectPosition: `${studentProfile.photoPos?.x ?? 50}% ${studentProfile.photoPos?.y ?? 50}%`,
+                            transform: `scale(${studentProfile.photoPos?.zoom ?? 1})`,
+                          }}
+                        />
                       ) : (
                         '👤'
                       )}
@@ -2030,6 +2051,7 @@ case 'about':
                       onClick={() => {
                         setTempPhoto(studentProfile.photo)
                         setPhotoUrl(studentProfile.photo.startsWith('http') ? studentProfile.photo : '')
+                        setPosDraft(studentProfile.photoPos ?? defaultPhotoPos)
                         setEditPhotoModal(true)
                       }}
                       className="absolute bottom-2 right-2 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:bg-primary/90 transition-all text-xl"
@@ -2422,7 +2444,6 @@ case 'about':
                   const updated = { ...studentProfile, photo: url }
                   setStudentProfile(updated)
                   saveStudentProfile(updated)
-                  setEditPhotoModal(false)
                 }}
                 disabled={photoUrl.trim() === ''}
                 className={`font-bold py-3 px-6 rounded-xl w-full mt-3 ${
@@ -2435,13 +2456,86 @@ case 'about':
               </button>
             </div>
             
-            <button
-              onClick={() => setEditPhotoModal(false)}
-              className="text-gray-500 hover:text-primary text-sm font-medium"
-            >
-              {t('back')}
-            </button>
-          </div>
+              <button
+                onClick={() => setEditPhotoModal(false)}
+                className="text-gray-500 hover:text-primary text-sm font-medium"
+              >
+                {t('back')}
+              </button>
+            </div>
+
+            {(photoUrl.trim() !== '' || studentProfile.photo !== '') && (
+              <div className="bg-white rounded-xl p-4 border border-gray-200 mt-3 text-left">
+                <p className="font-bold text-dark mb-1">🖼️ Encuadrar imagen</p>
+                <p className="text-sm text-gray-500 mb-3">Arrastra la foto para moverla y usa los controles para ajustar.</p>
+                <div
+                  className="w-full aspect-square rounded-xl overflow-hidden bg-gray-100 touch-none cursor-move select-none"
+                  onPointerDown={(e) => {
+                    (e.currentTarget as HTMLElement).setPointerCapture?.(e.pointerId)
+                    dragStart.current = { sx: e.clientX, sy: e.clientY, x: posDraft.x, y: posDraft.y }
+                  }}
+                  onPointerMove={(e) => {
+                    const d = dragStart.current
+                    if (!d) return
+                    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+                    const nx = Math.min(100, Math.max(0, d.x - ((e.clientX - d.sx) / rect.width) * 100))
+                    const ny = Math.min(100, Math.max(0, d.y - ((e.clientY - d.sy) / rect.height) * 100))
+                    setPosDraft(prev => ({ ...prev, x: nx, y: ny }))
+                  }}
+                  onPointerUp={() => { dragStart.current = null }}
+                  onPointerCancel={() => { dragStart.current = null }}
+                >
+                  <img
+                    src={photoUrl.trim() !== '' ? photoUrl.trim() : studentProfile.photo}
+                    alt="Ajuste"
+                    draggable={false}
+                    className="w-full h-full object-cover pointer-events-none"
+                    style={{
+                      objectPosition: `${posDraft.x}% ${posDraft.y}%`,
+                      transform: `scale(${posDraft.zoom})`,
+                    }}
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                  />
+                </div>
+                <div className="mt-4 space-y-3">
+                  <label className="block text-sm font-medium text-dark">
+                    ↔ Horizontal: {Math.round(posDraft.x)}%
+                    <input
+                      type="range" min={0} max={100} value={posDraft.x}
+                      onChange={e => setPosDraft(prev => ({ ...prev, x: Number(e.target.value) }))}
+                      className="w-full"
+                    />
+                  </label>
+                  <label className="block text-sm font-medium text-dark">
+                    ↕ Vertical: {Math.round(posDraft.y)}%
+                    <input
+                      type="range" min={0} max={100} value={posDraft.y}
+                      onChange={e => setPosDraft(prev => ({ ...prev, y: Number(e.target.value) }))}
+                      className="w-full"
+                    />
+                  </label>
+                  <label className="block text-sm font-medium text-dark">
+                    🔍 Zoom: {posDraft.zoom.toFixed(1)}x
+                    <input
+                      type="range" min={1} max={2.5} step={0.1} value={posDraft.zoom}
+                      onChange={e => setPosDraft(prev => ({ ...prev, zoom: Number(e.target.value) }))}
+                      className="w-full"
+                    />
+                  </label>
+                </div>
+                <button
+                  onClick={() => {
+                    const updated = { ...studentProfile, photoPos: posDraft }
+                    setStudentProfile(updated)
+                    saveStudentProfile(updated)
+                    setEditPhotoModal(false)
+                  }}
+                  className="btn-glow bg-primary text-white font-bold py-3 px-6 rounded-xl w-full mt-4"
+                >
+                  Guardar encuadre ✓
+                </button>
+              </div>
+            )}
         </div>
       </div>
     ) : null
