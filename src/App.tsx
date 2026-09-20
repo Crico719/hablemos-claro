@@ -90,15 +90,15 @@ const reelsMessages = [
 ]
 
 const backgrounds: Array<{ name: string; type: 'gradient' | 'pattern' | 'solid'; value: string }> = [
-  { name: 'Gradiente Azul', type: 'gradient', value: 'linear-gradient(135deg, #2563EB, #7C3AED)' },
-  { name: 'Gradiente Verde', type: 'gradient', value: 'linear-gradient(135deg, #10B981, #059669)' },
-  { name: 'Gradiente Morado', type: 'gradient', value: 'linear-gradient(135deg, #8B5CF6, #7C3AED)' },
-  { name: 'Gradiente Naranja', type: 'gradient', value: 'linear-gradient(135deg, #F59E0B, #EA580C)' },
-  { name: 'Ondas', type: 'pattern', value: 'radial-gradient(circle at 25% 25%, #2563EB20 0%, transparent 50%), radial-gradient(circle at 75% 75%, #7C3AED20 0%, transparent 50%)' },
-  { name: 'Puntos', type: 'pattern', value: 'radial-gradient(#2563EB30 1px, transparent 1px)' },
-  { name: 'Rayas', type: 'pattern', value: 'repeating-linear-gradient(45deg, #2563EB15, #2563EB15 10px, transparent 10px, transparent 20px)' },
-  { name: 'Sólido Claro', type: 'solid', value: '#F8FAFC' },
-  { name: 'Sólido Oscuro', type: 'solid', value: '#1E293B' },
+  { name: 'Enfoque Azul', type: 'gradient', value: 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #3b82f6 100%)' },
+  { name: 'Enfoque Verde', type: 'gradient', value: 'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #10b981 100%)' },
+  { name: 'Enfoque Neutro', type: 'gradient', value: 'linear-gradient(135deg, #374151 0%, #4b5563 50%, #6b7280 100%)' },
+  { name: 'Enfoque Suave', type: 'gradient', value: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%)' },
+  { name: 'Zen Claro', type: 'solid', value: '#f1f5f9' },
+  { name: 'Zen Oscuro', type: 'solid', value: '#1e293b' },
+  { name: 'Papel', type: 'solid', value: '#fefce8' },
+  { name: 'Menta', type: 'solid', value: '#f0fdf4' },
+  { name: 'Lavanda', type: 'solid', value: '#faf5ff' },
 ]
 
 const translations = {
