@@ -2436,24 +2436,6 @@ case 'about':
                   />
                 </div>
               )}
-              <button
-                onClick={() => {
-                  const url = photoUrl.trim()
-                  if (url === '') return
-                  setTempPhoto(url)
-                  const updated = { ...studentProfile, photo: url }
-                  setStudentProfile(updated)
-                  saveStudentProfile(updated)
-                }}
-                disabled={photoUrl.trim() === ''}
-                className={`font-bold py-3 px-6 rounded-xl w-full mt-3 ${
-                  photoUrl.trim() === ''
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'btn-glow bg-success text-white'
-                }`}
-              >
-                🔗 {t('useLink')}
-              </button>
             </div>
             
               <button
@@ -2525,14 +2507,20 @@ case 'about':
                 </div>
                 <button
                   onClick={() => {
-                    const updated = { ...studentProfile, photoPos: posDraft }
+                    const url = photoUrl.trim()
+                    setTempPhoto(url !== '' ? url : studentProfile.photo)
+                    const updated = {
+                      ...studentProfile,
+                      photo: url !== '' ? url : studentProfile.photo,
+                      photoPos: posDraft,
+                    }
                     setStudentProfile(updated)
                     saveStudentProfile(updated)
                     setEditPhotoModal(false)
                   }}
-                  className="btn-glow bg-primary text-white font-bold py-3 px-6 rounded-xl w-full mt-4"
+                  className="btn-glow bg-success text-white font-bold py-3 px-6 rounded-xl w-full mt-4"
                 >
-                  Guardar encuadre ✓
+                  💾 Guardar foto ✓
                 </button>
               </div>
             )}
