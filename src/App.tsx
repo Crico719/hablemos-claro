@@ -956,19 +956,6 @@ case 'about':
                   <p className="text-gray-500 leading-relaxed">{t('profileDesc')}</p>
                 </div>
               </button>
-              <button
-                onClick={() => setCurrentScreen('config')}
-                className="glass-card rounded-2xl p-8 text-left card-hover shadow-custom-lg col-span-2 flex items-center justify-between min-h-[140px]"
-              >
-                <div className="flex items-center gap-6">
-                  <div className="text-5xl">⚙️</div>
-                  <div>
-                    <h3 className="font-bold text-dark text-xl mb-2">{t('configTitle')}</h3>
-                    <p className="text-gray-500">{t('languageTitle')} · {t('darkModeTitle')} · {t('deviceQuestion')}</p>
-                  </div>
-                </div>
-                <span className="text-primary font-bold text-3xl">→</span>
-              </button>
             </div>
 
             <hr className="border-gray-200 my-20" />
