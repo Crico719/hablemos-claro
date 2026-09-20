@@ -915,50 +915,50 @@ case 'about':
             </div>
 
             {/* Accesos principales */}
-            <div className="grid grid-cols-2 gap-8 mb-12">
+            <div className="grid grid-cols-2 gap-16 mb-20">
               <button
                 onClick={() => setCurrentScreen('learn')}
-                className="glass-card rounded-2xl p-8 text-left card-hover shadow-custom-lg min-h-[160px] flex flex-col justify-between"
+                className="glass-card rounded-2xl p-12 text-left card-hover shadow-custom-lg min-h-[200px] flex flex-col justify-between"
               >
                 <div>
-                  <div className="text-5xl mb-4">📚</div>
-                  <h3 className="font-bold text-primary text-xl mb-2">{t('themes')}</h3>
-                  <p className="text-gray-500 leading-relaxed">{t('themesDesc')}</p>
+                  <div className="text-7xl mb-8">📚</div>
+                  <h3 className="font-bold text-primary text-2xl mb-4">{t('themes')}</h3>
+                  <p className="text-gray-500 leading-relaxed text-lg">{t('themesDesc')}</p>
                 </div>
               </button>
               <button
                 onClick={() => setCurrentScreen('games')}
-                className="glass-card rounded-2xl p-8 text-left card-hover shadow-custom-lg min-h-[160px] flex flex-col justify-between"
+                className="glass-card rounded-2xl p-12 text-left card-hover shadow-custom-lg min-h-[200px] flex flex-col justify-between"
               >
                 <div>
-                  <div className="text-5xl mb-4">🎮</div>
-                  <h3 className="font-bold text-secondary text-xl mb-2">{t('game')}</h3>
-                  <p className="text-gray-500 leading-relaxed">{t('gameDesc')}</p>
+                  <div className="text-7xl mb-8">🎮</div>
+                  <h3 className="font-bold text-secondary text-2xl mb-4">{t('game')}</h3>
+                  <p className="text-gray-500 leading-relaxed text-lg">{t('gameDesc')}</p>
                 </div>
               </button>
               <button
                 onClick={() => setCurrentScreen('reels')}
-                className="glass-card rounded-2xl p-8 text-left card-hover shadow-custom-lg min-h-[160px] flex flex-col justify-between"
+                className="glass-card rounded-2xl p-12 text-left card-hover shadow-custom-lg min-h-[200px] flex flex-col justify-between"
               >
                 <div>
-                  <div className="text-5xl mb-4">📱</div>
-                  <h3 className="font-bold text-warning text-xl mb-2">{t('reels')}</h3>
-                  <p className="text-gray-500 leading-relaxed">{t('reelsDesc')}</p>
+                  <div className="text-7xl mb-8">📱</div>
+                  <h3 className="font-bold text-warning text-2xl mb-4">{t('reels')}</h3>
+                  <p className="text-gray-500 leading-relaxed text-lg">{t('reelsDesc')}</p>
                 </div>
               </button>
               <button
                 onClick={() => setCurrentScreen('profile')}
-                className="glass-card rounded-2xl p-8 text-left card-hover shadow-custom-lg min-h-[160px] flex flex-col justify-between"
+                className="glass-card rounded-2xl p-12 text-left card-hover shadow-custom-lg min-h-[200px] flex flex-col justify-between"
               >
                 <div>
-                  <div className="text-5xl mb-4">👤</div>
-                  <h3 className="font-bold text-success text-xl mb-2">{t('profile')}</h3>
-                  <p className="text-gray-500 leading-relaxed">{t('profileDesc')}</p>
+                  <div className="text-7xl mb-8">👤</div>
+                  <h3 className="font-bold text-success text-2xl mb-4">{t('profile')}</h3>
+                  <p className="text-gray-500 leading-relaxed text-lg">{t('profileDesc')}</p>
                 </div>
               </button>
             </div>
 
-            <hr className="border-gray-200 my-20" />
+            <hr className="border-gray-200 my-28" />
 
             <div className="glass-card rounded-2xl p-8 card-hover">
               <h3 className="font-bold text-warning text-xl mb-4">{t('familyActivity')}</h3>
