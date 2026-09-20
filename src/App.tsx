@@ -934,7 +934,9 @@ case 'about':
             </div>
 
             {/* Welcome line */}
-            <p className="text-xl text-gray-600 text-center bg-white rounded-2xl px-6 py-4 shadow-sm">{t('welcomeLine')}</p>
+            <div className="rounded-2xl px-6 py-5 shadow-lg text-center" style={{ background: 'linear-gradient(135deg, #2563EB, #7C3AED, #EC4899)' }}>
+              <p className="text-xl text-white font-bold drop-shadow">✨ {t('welcomeLine')} 🌟</p>
+            </div>
 
             {/* Badges Card */}
             <div className="glass-card rounded-2xl p-10 card-hover">
