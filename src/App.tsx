@@ -126,9 +126,6 @@ const translations = {
     child: 'Hijo / Hija',
     deviceQuestion: '¿Qué dispositivo estás usando?',
     deviceSub: 'Elige cómo quieres ver la app',
-    darkModeTitle: '🌙 Modo de color',
-    light: '☀️ Claro',
-    dark: '🌙 Oscuro',
     languageTitle: '🗣️ Idioma',
     spanish: '🇪🇸 Español',
     quechua: '🦙 Quechua',
@@ -206,9 +203,6 @@ const translations = {
     child: 'Wawa',
     deviceQuestion: '¿Imaykanatam llamkachkanki?',
     deviceSub: 'Aqllay imaynatam kayta rikuchiy',
-    darkModeTitle: '🌙 Llimpikuna',
-    light: "☀️ K'anchaq",
-    dark: '🌙 Tutayay',
     languageTitle: '🗣️ Simi',
     spanish: '🇪🇸 Castellano',
     quechua: '🦙 Runa Simi',
@@ -371,7 +365,6 @@ export default function App() {
   const [device, setDevice] = useState<DeviceType>('pc')
   const [showBadgeCelebration, setShowBadgeCelebration] = useState(false)
   const [earnedBadge, setEarnedBadge] = useState<Badge | null>(null)
-  const [darkMode, setDarkMode] = useState<boolean>(() => localStorage.getItem('hablemos-claro-dark') === 'true')
   const [userName, setUserName] = useState<string>(() => localStorage.getItem('hablemos-claro-name') || '')
   const [userAge, setUserAge] = useState<string>(() => localStorage.getItem('hablemos-claro-age') || '')
   const [userDistrict, setUserDistrict] = useState<string>(() => localStorage.getItem('hablemos-claro-district') || '')
@@ -406,12 +399,6 @@ export default function App() {
     const updatedStudent = { ...studentProfile, name: userName, age: userAge, district: userDistrict }
     setStudentProfile(updatedStudent)
     saveStudentProfile(updatedStudent)
-  }
-
-  // Cambiar modo claro/oscuro
-  const changeDarkMode = (value: boolean) => {
-    setDarkMode(value)
-    localStorage.setItem('hablemos-claro-dark', String(value))
   }
 
   // Cambiar idioma
@@ -857,71 +844,55 @@ case 'about':
                 </div>
               </div>
 
-              <p className="text-dark font-medium text-center text-lg bg-white rounded-xl px-4 py-3 shadow-sm">{t('roleQuestion')}</p>
+              <p className="text-black font-bold text-center text-lg bg-white rounded-xl px-4 py-3 shadow-sm border border-gray-200">{t('roleQuestion')}</p>
               <div className="grid grid-cols-2 gap-5 mt-3">
                 <button
                   onClick={() => setSelectedRole('parent')}
-                  className={selectedRole === 'parent' ? 'bg-primary text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'glass-card font-bold py-5 px-6 rounded-xl text-dark hover:bg-primary/20 transition-all text-lg'}
+                  className={selectedRole === 'parent' ? 'bg-primary text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'bg-white font-bold py-5 px-6 rounded-xl text-black border-2 border-gray-200 shadow-sm hover:bg-primary/20 transition-all text-lg'}
                 >
                   {t('parent')}
                 </button>
                 <button
                   onClick={() => setSelectedRole('child')}
-                  className={selectedRole === 'child' ? 'bg-secondary text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'glass-card font-bold py-5 px-6 rounded-xl text-dark hover:bg-secondary/20 transition-all text-lg'}
+                  className={selectedRole === 'child' ? 'bg-secondary text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'bg-white font-bold py-5 px-6 rounded-xl text-black border-2 border-gray-200 shadow-sm hover:bg-secondary/20 transition-all text-lg'}
                 >
                   {t('child')}
                 </button>
               </div>
 
-              <p className="text-dark font-medium text-center text-lg bg-white rounded-xl px-4 py-3 shadow-sm mt-10">{t('deviceQuestion')}</p>
+              <p className="text-black font-bold text-center text-lg bg-white rounded-xl px-4 py-3 shadow-sm border border-gray-200 mt-10">{t('deviceQuestion')}</p>
               <div className="grid grid-cols-3 gap-5 mt-3">
                 <button
                   onClick={() => setDevice('pc')}
-                  className={device === 'pc' ? 'bg-primary text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'glass-card font-bold py-5 px-6 rounded-xl text-dark hover:bg-primary/20 transition-all text-lg'}
+                  className={device === 'pc' ? 'bg-primary text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'bg-white font-bold py-5 px-6 rounded-xl text-black border-2 border-gray-200 shadow-sm hover:bg-primary/20 transition-all text-lg'}
                 >
                   🖥️ PC
                 </button>
                 <button
                   onClick={() => setDevice('phone')}
-                  className={device === 'phone' ? 'bg-secondary text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'glass-card font-bold py-5 px-6 rounded-xl text-dark hover:bg-secondary/20 transition-all text-lg'}
+                  className={device === 'phone' ? 'bg-secondary text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'bg-white font-bold py-5 px-6 rounded-xl text-black border-2 border-gray-200 shadow-sm hover:bg-secondary/20 transition-all text-lg'}
                 >
                   📱 Móvil
                 </button>
                 <button
                   onClick={() => setDevice('laptop')}
-                  className={device === 'laptop' ? 'bg-warning text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'glass-card font-bold py-5 px-6 rounded-xl text-dark hover:bg-warning/20 transition-all text-lg'}
+                  className={device === 'laptop' ? 'bg-warning text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'bg-white font-bold py-5 px-6 rounded-xl text-black border-2 border-gray-200 shadow-sm hover:bg-warning/20 transition-all text-lg'}
                 >
                   💻 Laptop
                 </button>
               </div>
 
-              <p className="text-dark font-medium text-center text-lg bg-white rounded-xl px-4 py-3 shadow-sm mt-10">{t('darkModeTitle')}</p>
-              <div className="grid grid-cols-2 gap-5 mt-3">
-                <button
-                  onClick={() => changeDarkMode(false)}
-                  className={!darkMode ? 'bg-primary text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'glass-card font-bold py-5 px-6 rounded-xl text-dark hover:bg-primary/20 transition-all text-lg'}
-                >
-                  {t('light')}
-                </button>
-                <button
-                  onClick={() => changeDarkMode(true)}
-                  className={darkMode ? 'bg-secondary text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'glass-card font-bold py-5 px-6 rounded-xl text-dark hover:bg-secondary/20 transition-all text-lg'}
-                >
-                  {t('dark')}
-                </button>
-              </div>
-
-              <p className="text-dark font-medium text-center text-lg bg-white rounded-xl px-4 py-3 shadow-sm mt-10">{t('languageTitle')}</p>
+              <p className="text-black font-bold text-center text-lg bg-white rounded-xl px-4 py-3 shadow-sm border border-gray-200 mt-10">{t('languageTitle')}</p>
               <div className="grid grid-cols-2 gap-5 mt-3">
                 <button
                   onClick={() => changeLanguage('es')}
-                  className={language === 'es' ? 'bg-primary text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'glass-card font-bold py-5 px-6 rounded-xl text-dark hover:bg-primary/20 transition-all text-lg'}
+                  className={language === 'es' ? 'bg-primary text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'bg-white font-bold py-5 px-6 rounded-xl text-black border-2 border-gray-200 shadow-sm hover:bg-primary/20 transition-all text-lg'}
                 >
                   {t('spanish')}
                 </button>
                 <button
                   onClick={() => changeLanguage('qu')}
-                  className={language === 'qu' ? 'bg-secondary text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'glass-card font-bold py-5 px-6 rounded-xl text-dark hover:bg-secondary/20 transition-all text-lg'}
+                  className={language === 'qu' ? 'bg-secondary text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'bg-white font-bold py-5 px-6 rounded-xl text-black border-2 border-gray-200 shadow-sm hover:bg-secondary/20 transition-all text-lg'}
                 >
                   {t('quechua')}
                 </button>
@@ -2470,7 +2441,7 @@ case 'about':
     ) : null
 
   return (
-    <div className={`${darkMode ? 'dark' : ''} ${device === 'pc' ? 'pc-mode' : ''}`}>
+    <div className={`${device === 'pc' ? 'pc-mode' : ''}`}>
       {device === 'phone' ? (
         // Marco de móvil: la app se muestra como un celular centrado
         <div className="min-h-screen flex items-center justify-center p-3" style={{ background: 'linear-gradient(135deg, #0f172a, #1e293b, #0f172a)' }}>
