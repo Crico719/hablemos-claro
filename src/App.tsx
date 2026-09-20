@@ -662,9 +662,9 @@ export default function App() {
       const cust2 = getCustomization();
       return (
         <div className="min-h-screen p-8" style={{ background: cust2.backgroundValue, backgroundSize: cust2.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
-          <div className="max-w-3xl mx-auto animate-slide-up">
+          <div className="max-w-3xl mx-auto animate-slide-up text-center">
             <div className="flex items-center justify-between mb-2">
-              <h1 className="text-3xl font-bold gradient-text">{t('aboutTitle')}</h1>
+              <h1 className="text-3xl font-bold gradient-text mx-auto">{t('aboutTitle')}</h1>
               <button onClick={() => setCurrentScreen('welcome')} className="glass-card px-3 py-1 rounded-xl text-gray-600 text-sm hover:bg-gray-100 transition-all">
                 {t('back')}
               </button>
@@ -672,8 +672,8 @@ export default function App() {
             <p className="text-gray-500 mb-12">{t('aboutSub')}</p>
 
             {/* 1. ¿De qué trata la app? */}
-            <div className="glass-card rounded-3xl p-8 mb-10 card-hover shadow-custom-lg">
-              <div className="flex items-center gap-4 mb-5">
+            <div className="glass-card rounded-3xl p-8 mb-10 card-hover shadow-custom-lg text-center">
+              <div className="flex items-center justify-center gap-4 mb-5">
                 <div className="w-14 h-14 rounded-2xl bg-primary/15 flex items-center justify-center text-3xl">🔎</div>
                 <h2 className="text-2xl font-bold text-primary">¿De qué trata la app?</h2>
               </div>
@@ -681,22 +681,22 @@ export default function App() {
                 <strong>Hablemos Claro</strong> es una aplicación educativa para que las familias aprendan a conversar sobre las <strong>coimas (sobornos)</strong> y la corrupción.
               </p>
               <div className="grid grid-cols-2 gap-6 mt-8">
-                <div className="rounded-2xl bg-primary/5 p-5 border border-primary/10">
+                <div className="rounded-2xl bg-primary/5 p-5 border border-primary/10 text-center">
                   <div className="text-3xl mb-2">📚</div>
                   <p className="font-bold text-primary mb-1">Temas</p>
                   <p className="text-sm text-gray-600 leading-relaxed">Explica qué es una coima, cómo reconocerla, por qué hace daño y cómo prevenirla.</p>
                 </div>
-                <div className="rounded-2xl bg-secondary/5 p-5 border border-secondary/10">
+                <div className="rounded-2xl bg-secondary/5 p-5 border border-secondary/10 text-center">
                   <div className="text-3xl mb-2">🎮</div>
                   <p className="font-bold text-secondary mb-1">Juego</p>
                   <p className="text-sm text-gray-600 leading-relaxed">Actividades para aplicar lo aprendido.</p>
                 </div>
-                <div className="rounded-2xl bg-warning/5 p-5 border border-warning/10">
+                <div className="rounded-2xl bg-warning/5 p-5 border border-warning/10 text-center">
                   <div className="text-3xl mb-2">📱</div>
                   <p className="font-bold text-warning mb-1">Reels</p>
                   <p className="text-sm text-gray-600 leading-relaxed">Mensajes cortos que refuerzan la integridad.</p>
                 </div>
-                <div className="rounded-2xl bg-success/5 p-5 border border-success/10">
+                <div className="rounded-2xl bg-success/5 p-5 border border-success/10 text-center">
                   <div className="text-3xl mb-2">💬</div>
                   <p className="font-bold text-success mb-1">Conversaciones</p>
                   <p className="text-sm text-gray-600 leading-relaxed">Preguntas para dialogar en familia.</p>
@@ -705,15 +705,15 @@ export default function App() {
             </div>
 
             {/* 2. ¿A quién está dirigida? */}
-            <div className="glass-card rounded-3xl p-8 mb-10 card-hover shadow-custom-lg">
-              <div className="flex items-center gap-4 mb-5">
+            <div className="glass-card rounded-3xl p-8 mb-10 card-hover shadow-custom-lg text-center">
+              <div className="flex items-center justify-center gap-4 mb-5">
                 <div className="w-14 h-14 rounded-2xl bg-secondary/15 flex items-center justify-center text-3xl">👨‍👩‍👧‍👦</div>
                 <h2 className="text-2xl font-bold text-secondary">¿A quién está dirigida?</h2>
               </div>
               <p className="text-gray-700 leading-relaxed text-lg">
                 Está pensada para <strong>padres, madres, hijos e hijas</strong> de todas las edades, para que aprendan juntos en casa. También sirve a jóvenes y docentes interesados en entender la corrupción y promover valores como la honestidad y la transparencia.
               </p>
-              <div className="flex flex-wrap gap-3 mt-8">
+              <div className="flex flex-wrap justify-center gap-3 mt-8">
                 <span className="px-4 py-2 rounded-full bg-primary/10 text-primary font-bold">👨‍👩‍👧 Familias</span>
                 <span className="px-4 py-2 rounded-full bg-secondary/10 text-secondary font-bold">🧑‍🎓 Jóvenes</span>
                 <span className="px-4 py-2 rounded-full bg-warning/10 text-warning font-bold">📚 Docentes</span>
@@ -722,50 +722,50 @@ export default function App() {
             </div>
 
             {/* 3. ¿Cómo usar la app? */}
-            <div className="glass-card rounded-3xl p-8 mb-12 card-hover shadow-custom-lg">
-              <div className="flex items-center gap-4 mb-8">
+            <div className="glass-card rounded-3xl p-8 mb-12 card-hover shadow-custom-lg text-center">
+              <div className="flex items-center justify-center gap-4 mb-8">
                 <div className="w-14 h-14 rounded-2xl bg-warning/15 flex items-center justify-center text-3xl">🛠️</div>
                 <h2 className="text-2xl font-bold text-warning">¿Cómo usar la app?</h2>
               </div>
               <div className="space-y-6">
-                <div className="flex gap-5 items-start">
-                  <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold shrink-0">1</div>
-                  <div>
+                <div className="flex flex-col items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold shrink-0 text-xl">1</div>
+                  <div className="text-center">
                     <p className="font-bold text-dark text-lg leading-tight">Crea tu avatar</p>
                     <p className="text-gray-600 mt-1">Elige tu personaje favorito para personalizar tu perfil.</p>
                   </div>
                 </div>
-                <div className="flex gap-5 items-start">
-                  <div className="w-10 h-10 rounded-full bg-secondary text-white flex items-center justify-center font-bold shrink-0">2</div>
-                  <div>
+                <div className="flex flex-col items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-secondary text-white flex items-center justify-center font-bold shrink-0 text-xl">2</div>
+                  <div className="text-center">
                     <p className="font-bold text-dark text-lg leading-tight">Elige el modo</p>
                     <p className="text-gray-600 mt-1">Individual 👤 o con familia 👨‍👩‍👧‍👦.</p>
                   </div>
                 </div>
-                <div className="flex gap-5 items-start">
-                  <div className="w-10 h-10 rounded-full bg-warning text-white flex items-center justify-center font-bold shrink-0">3</div>
-                  <div>
+                <div className="flex flex-col items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-warning text-white flex items-center justify-center font-bold shrink-0 text-xl">3</div>
+                  <div className="text-center">
                     <p className="font-bold text-dark text-lg leading-tight">Configura la app</p>
                     <p className="text-gray-600 mt-1">Tu rol (padre/hijo), tu dispositivo (PC, móvil o laptop) y el tema del día.</p>
                   </div>
                 </div>
-                <div className="flex gap-5 items-start">
-                  <div className="w-10 h-10 rounded-full bg-success text-white flex items-center justify-center font-bold shrink-0">4</div>
-                  <div>
+                <div className="flex flex-col items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-success text-white flex items-center justify-center font-bold shrink-0 text-xl">4</div>
+                  <div className="text-center">
                     <p className="font-bold text-dark text-lg leading-tight">Explora los Temas</p>
                     <p className="text-gray-600 mt-1">Desde la pantalla de inicio.</p>
                   </div>
                 </div>
-                <div className="flex gap-5 items-start">
-                  <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold shrink-0">5</div>
-                  <div>
+                <div className="flex flex-col items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold shrink-0 text-xl">5</div>
+                  <div className="text-center">
                     <p className="font-bold text-dark text-lg leading-tight">Juega y desbloquea las 3 insignias</p>
                     <p className="text-gray-600 mt-1">🏅 Consíguelas todas desde tu perfil.</p>
                   </div>
                 </div>
-                <div className="flex gap-5 items-start">
-                  <div className="w-10 h-10 rounded-full bg-secondary text-white flex items-center justify-center font-bold shrink-0">6</div>
-                  <div>
+                <div className="flex flex-col items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-secondary text-white flex items-center justify-center font-bold shrink-0 text-xl">6</div>
+                  <div className="text-center">
                     <p className="font-bold text-dark text-lg leading-tight">Mira los Reels</p>
                     <p className="text-gray-600 mt-1">Para reforzar lo aprendido.</p>
                   </div>
