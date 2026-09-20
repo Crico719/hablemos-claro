@@ -39,8 +39,36 @@ interface StudentProfile {
 
 interface FamilyProfile {
   name: string
-  members: string[]
+  members: FamilyMember[]
   progress: UserProgress
+  familyBadges: FamilyBadge[]
+  activityLog: ActivityEntry[]
+}
+
+type FamilyRole = 'Padre' | 'Madre' | 'Hijo' | 'Hija' | 'Tutor'
+
+interface FamilyMember {
+  id: string
+  name: string
+  role: FamilyRole
+  avatar: string
+  activities: number
+}
+
+type FamilyBadgeId = 'first-conversation' | 'first-learning' | 'united-family' | 'great-conversationalists' | 'against-corruption' | 'committed-family'
+
+interface FamilyBadge {
+  id: FamilyBadgeId
+  name: string
+  emoji: string
+  desc: string
+  unlocked: boolean
+}
+
+interface ActivityEntry {
+  id: string
+  text: string
+  date: string
 }
 
 interface ProfileCustomization {
@@ -70,6 +98,32 @@ const allBadges: Badge[] = [
   { id: 'game-master', name: 'Maestro del Juego', emoji: '🎮', color: '#8B5CF6', unlocked: false },
   { id: 'integrity-champion', name: 'Campeón de la Integridad', emoji: '🏆', color: '#F59E0B', unlocked: false },
 ]
+
+const defaultFamilyBadges: FamilyBadge[] = [
+  { id: 'first-conversation', name: 'Primera conversación', emoji: '🏅', desc: 'Completa la primera conversación familiar', unlocked: false },
+  { id: 'first-learning', name: 'Primer aprendizaje', emoji: '📚', desc: 'Completa la primera actividad educativa', unlocked: false },
+  { id: 'united-family', name: 'Familia unida', emoji: '👨‍👩‍👧‍👦', desc: 'Todos los integrantes participan en una actividad', unlocked: false },
+  { id: 'great-conversationalists', name: 'Grandes conversadores', emoji: '💬', desc: 'Completa 5 conversaciones familiares', unlocked: false },
+  { id: 'against-corruption', name: 'Contra la corrupción', emoji: '🛡️', desc: 'Completa 3 actividades sobre coimas y corrupción', unlocked: false },
+  { id: 'committed-family', name: 'Familia comprometida', emoji: '⭐', desc: 'Completa todas las actividades principales', unlocked: false },
+]
+
+const corruptionTopics: LearningTopic[] = ['coima', 'recognition', 'impact', 'consequences', 'prevention']
+const mainTopics: LearningTopic[] = ['coima', 'recognition', 'impact', 'consequences', 'prevention', 'ethics', 'citizen']
+
+const topicTitles: Record<LearningTopic, string> = {
+  coima: '¿Qué es una coima?',
+  recognition: '¿Cómo reconocer una coima?',
+  impact: '¿Por qué las coimas hacen daño?',
+  consequences: 'Consecuencias legales y sociales',
+  prevention: 'Cómo prevenir la corrupción',
+  ethics: 'Ética e integridad personal',
+  citizen: 'Ciudadanía activa',
+  test: 'Examen final',
+}
+
+const memberAvatars = ['😊', '👨', '👩', '👦', '👧', '👴', '👵', '🧑']
+const familyRoles: FamilyRole[] = ['Padre', 'Madre', 'Hijo', 'Hija', 'Tutor']
 
 const reelsMessages = [
   { id: '1', author: 'Integridad Plus', message: '¿Sabías que la corrupción afecta a más del 50% de la población mundial? 🌍', time: 'Hace 2h' },
@@ -172,6 +226,28 @@ const translations = {
     timeSpent: 'Tiempo invertido',
     streak: 'Racha de días',
     topicProgress: 'Progreso por tema',
+    familyTagline: 'Aprendiendo juntos, construyendo una sociedad más honesta.',
+    editName: 'Editar nombre',
+    save: 'Guardar',
+    cancel: 'Cancelar',
+    quickActivities: 'Actividades',
+    quickConvos: 'Conversaciones',
+    quickBadges: 'Insignias',
+    quickMembers: 'Integrantes',
+    recentActivity: 'Actividad reciente',
+    noActivity: 'Todavía no hay actividad.',
+    membersTitle: 'Integrantes',
+    addMember: '+ Agregar integrante',
+    memberNamePh: 'Nombre del integrante',
+    memberRole: 'Rol',
+    memberAvatar: 'Avatar',
+    add: 'Agregar',
+    statMembers: 'Integrantes',
+    progressHint: 'Completa actividades y conversaciones para avanzar.',
+    registerActivity: '+1 actividad',
+    lockedBadge: 'Bloqueada',
+    unlockedBadge: 'Desbloqueada',
+    backHome: '← Volver al inicio',
   },
   qu: {
     greeting: '¡Napaykullayki! 👋',
@@ -320,13 +396,46 @@ const getStoredStudentProfile = (): StudentProfile => {
   }
 }
 
+const defaultFamilyMember = (): FamilyMember => ({
+  id: `m-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+  name: 'Familiar 1',
+  role: 'Tutor',
+  avatar: '😊',
+  activities: 0,
+})
+
+const normalizeMembers = (raw: unknown): FamilyMember[] => {
+  if (!Array.isArray(raw)) return [defaultFamilyMember()]
+  const mapped = (raw as Array<string | Partial<FamilyMember>>).map((m, i) => {
+    if (typeof m === 'string') {
+      return { id: `m-old-${i}`, name: m, role: 'Tutor' as FamilyRole, avatar: memberAvatars[i % memberAvatars.length], activities: 0 }
+    }
+    return {
+      id: typeof m.id === 'string' ? m.id : `m-old-${i}`,
+      name: typeof m.name === 'string' && m.name !== '' ? m.name : `Familiar ${i + 1}`,
+      role: (['Padre', 'Madre', 'Hijo', 'Hija', 'Tutor'] as FamilyRole[]).includes(m.role as FamilyRole) ? (m.role as FamilyRole) : 'Tutor',
+      avatar: typeof m.avatar === 'string' && m.avatar !== '' ? m.avatar : memberAvatars[i % memberAvatars.length],
+      activities: typeof m.activities === 'number' ? m.activities : 0,
+    }
+  })
+  return mapped.length > 0 ? mapped : [defaultFamilyMember()]
+}
+
+const normalizeFamilyBadges = (raw: unknown): FamilyBadge[] => {
+  const arr = Array.isArray(raw) ? (raw as Array<Partial<FamilyBadge>>) : []
+  return defaultFamilyBadges.map(def => {
+    const found = arr.find(b => b.id === def.id)
+    return found ? { ...def, unlocked: found.unlocked === true } : { ...def }
+  })
+}
+
 const getStoredFamilyProfile = (): FamilyProfile => {
   const stored = localStorage.getItem('hablemos-claro-family-profile')
   if (stored) {
     const parsed = JSON.parse(stored)
     return {
-      name: parsed.name ?? '',
-      members: parsed.members ?? [],
+      name: typeof parsed.name === 'string' && parsed.name !== '' ? parsed.name : 'Mi familia',
+      members: normalizeMembers(parsed.members),
       progress: {
         ...defaultStudentProgress,
         ...parsed.progress,
@@ -337,12 +446,16 @@ const getStoredFamilyProfile = (): FamilyProfile => {
         badges: parsed.progress?.badges ?? [...allBadges],
         quizScores: parsed.progress?.quizScores ?? [],
       },
+      familyBadges: normalizeFamilyBadges(parsed.familyBadges),
+      activityLog: Array.isArray(parsed.activityLog) ? parsed.activityLog.slice(0, 10) : [],
     }
   }
   return {
-    name: '',
-    members: [],
+    name: 'Mi familia',
+    members: [defaultFamilyMember()],
     progress: defaultStudentProgress,
+    familyBadges: defaultFamilyBadges.map(b => ({ ...b })),
+    activityLog: [],
   }
 }
 
@@ -418,6 +531,18 @@ export default function App() {
   const [photoUrl, setPhotoUrl] = useState('')
   const [posDraft, setPosDraft] = useState<PhotoPos>(defaultPhotoPos)
   const dragStart = useRef<{ sx: number; sy: number; x: number; y: number } | null>(null)
+  const [editingFamName, setEditingFamName] = useState(false)
+  const [famNameDraft, setFamNameDraft] = useState('')
+  const [newMemberName, setNewMemberName] = useState('')
+  const [newMemberRole, setNewMemberRole] = useState<FamilyRole>('Hijo')
+  const [newMemberAvatar, setNewMemberAvatar] = useState('😊')
+  const [editingMemberId, setEditingMemberId] = useState<string | null>(null)
+  const [memberNameDraft, setMemberNameDraft] = useState('')
+  const badgesRef = useRef<HTMLDivElement | null>(null)
+  const membersRef = useRef<HTMLDivElement | null>(null)
+  const scrollToRef = (ref: React.RefObject<HTMLDivElement | null>) => {
+    ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
   const [_tempPhoto, setTempPhoto] = useState<string>('')
 
   // Sincronizar userName/userAge/userDistrict con studentProfile
@@ -434,7 +559,7 @@ export default function App() {
   }, [studentProfile.name, studentProfile.age, studentProfile.district])
 
   // Traducción según idioma
-  const t = (key: keyof typeof translations['es']) => translations[language][key] ?? translations['es'][key]
+  const t = (key: keyof typeof translations['es']) => (translations[language] as Record<string, string>)[key] ?? translations['es'][key]
 
   // Helper to get current profile's progress
   const getProgress = () => profileType === 'student' ? studentProfile.progress : familyProfile.progress
@@ -502,8 +627,12 @@ export default function App() {
       setStudentProfile({ ...studentProfile, progress: newProgress })
       saveStudentProfile({ ...studentProfile, progress: newProgress })
     } else {
-      setFamilyProfile({ ...familyProfile, progress: newProgress })
-      saveFamilyProfile({ ...familyProfile, progress: newProgress })
+      let updated: FamilyProfile = { ...familyProfile, progress: newProgress }
+      updated = pushFamilyLog(updated, `📚 Tema completado: ${topicTitles[topic]}.`)
+      const checked = checkFamilyBadges(updated)
+      setFamilyProfile(checked.profile)
+      saveFamilyProfile(checked.profile)
+      celebrateFamilyBadges(checked.unlocked)
     }
   }
 
@@ -527,12 +656,126 @@ export default function App() {
       setStudentProfile({ ...studentProfile, progress: newProgress })
       saveStudentProfile({ ...studentProfile, progress: newProgress })
     } else {
-      setFamilyProfile({ ...familyProfile, progress: newProgress })
-      saveFamilyProfile({ ...familyProfile, progress: newProgress })
+      let updated: FamilyProfile = { ...familyProfile, progress: newProgress }
+      updated = pushFamilyLog(updated, '🏅 ¡Examen final completado!')
+      const checked = checkFamilyBadges(updated)
+      setFamilyProfile(checked.profile)
+      saveFamilyProfile(checked.profile)
+      celebrateFamilyBadges(checked.unlocked)
     }
     const champion = newBadges.find(b => b.id === 'integrity-champion')!
     setEarnedBadge({ ...champion })
     setShowBadgeCelebration(true)
+  }
+
+  // --- Acciones de integrantes y nombre de familia ---
+  const saveFamilyName = () => {
+    const name = famNameDraft.trim() === '' ? 'Mi familia' : famNameDraft.trim()
+    const updated = { ...familyProfile, name }
+    setFamilyProfile(updated)
+    saveFamilyProfile(updated)
+    setEditingFamName(false)
+  }
+
+  const addFamilyMember = () => {
+    const name = newMemberName.trim()
+    if (name === '') return
+    const member: FamilyMember = {
+      id: `m-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+      name,
+      role: newMemberRole,
+      avatar: newMemberAvatar,
+      activities: 0,
+    }
+    let updated: FamilyProfile = { ...familyProfile, members: [...familyProfile.members, member] }
+    updated = pushFamilyLog(updated, `👤 ${name} se unió a la familia.`)
+    const checked = checkFamilyBadges(updated)
+    setFamilyProfile(checked.profile)
+    saveFamilyProfile(checked.profile)
+    celebrateFamilyBadges(checked.unlocked)
+    setNewMemberName('')
+    setNewMemberRole('Hijo')
+    setNewMemberAvatar('😊')
+  }
+
+  const registerMemberActivity = (id: string) => {
+    const member = familyProfile.members.find(m => m.id === id)
+    if (!member) return
+    const members = familyProfile.members.map(m => (m.id === id ? { ...m, activities: m.activities + 1 } : m))
+    const completedActivities = familyProfile.progress.completedActivities + 1
+    const newProgress = {
+      ...familyProfile.progress,
+      completedActivities,
+      totalActivities: Math.max(familyProfile.progress.totalActivities, completedActivities),
+    }
+    let updated: FamilyProfile = { ...familyProfile, members, progress: newProgress }
+    updated = pushFamilyLog(updated, `✅ ${member.name} completó una actividad.`)
+    const checked = checkFamilyBadges(updated)
+    setFamilyProfile(checked.profile)
+    saveFamilyProfile(checked.profile)
+    celebrateFamilyBadges(checked.unlocked)
+  }
+
+  const saveMemberName = (id: string) => {
+    const name = memberNameDraft.trim()
+    if (name === '') {
+      setEditingMemberId(null)
+      return
+    }
+    const members = familyProfile.members.map(m => (m.id === id ? { ...m, name } : m))
+    const updated = { ...familyProfile, members }
+    setFamilyProfile(updated)
+    saveFamilyProfile(updated)
+    setEditingMemberId(null)
+  }
+
+  // --- Perfil familiar: actividad reciente e insignias reales ---
+  const pushFamilyLog = (profile: FamilyProfile, text: string): FamilyProfile => {
+    const entry: ActivityEntry = { id: `log-${Date.now()}-${Math.floor(Math.random() * 10000)}`, text, date: new Date().toLocaleString() }
+    return { ...profile, activityLog: [entry, ...profile.activityLog].slice(0, 10) }
+  }
+
+  const checkFamilyBadges = (profile: FamilyProfile): { profile: FamilyProfile; unlocked: FamilyBadge[] } => {
+    const tp = profile.progress.topicProgress
+    const conv = profile.progress.conversations
+    const acts = profile.progress.completedActivities
+    const shouldUnlock = (id: FamilyBadgeId): boolean => {
+      switch (id) {
+        case 'first-conversation': return conv >= 1
+        case 'first-learning': return acts >= 1
+        case 'united-family': return profile.members.length > 0 && profile.members.every(m => m.activities >= 1)
+        case 'great-conversationalists': return conv >= 5
+        case 'against-corruption': return corruptionTopics.filter(t => (tp[t] ?? 0) >= 100).length >= 3
+        case 'committed-family': return mainTopics.every(t => (tp[t] ?? 0) >= 100)
+      }
+    }
+    let updated = profile
+    const unlocked: FamilyBadge[] = []
+    defaultFamilyBadges.forEach(def => {
+      const current = updated.familyBadges.find(b => b.id === def.id)!
+      if (!current.unlocked && shouldUnlock(def.id)) {
+        const nb = { ...current, unlocked: true }
+        updated = { ...updated, familyBadges: updated.familyBadges.map(b => (b.id === def.id ? nb : b)) }
+        unlocked.push(nb)
+        updated = pushFamilyLog(updated, `🏅 Se desbloqueó la insignia ${nb.name}.`)
+      }
+    })
+    return { profile: updated, unlocked }
+  }
+
+  const celebrateFamilyBadges = (unlocked: FamilyBadge[]) => {
+    if (unlocked.length === 0) return
+    const last = unlocked[unlocked.length - 1]
+    setEarnedBadge({ id: 'integrity-champion', name: last.name, emoji: last.emoji, color: '#F59E0B', unlocked: true })
+    setShowBadgeCelebration(true)
+  }
+
+  const familyProgressPercent = (p: FamilyProfile): number => {
+    const topicsDone = mainTopics.filter(t => (p.progress.topicProgress[t] ?? 0) >= 100).length
+    const topicsPart = (topicsDone / mainTopics.length) * 60
+    const convPart = Math.min(p.progress.conversations / 5, 1) * 20
+    const badgePart = p.familyBadges.length > 0 ? (p.familyBadges.filter(b => b.unlocked).length / p.familyBadges.length) * 20 : 0
+    return Math.round(topicsPart + convPart + badgePart)
   }
 
   const completeConversation = () => {
@@ -542,8 +785,12 @@ export default function App() {
       setStudentProfile({ ...studentProfile, progress: newProgress })
       saveStudentProfile({ ...studentProfile, progress: newProgress })
     } else {
-      setFamilyProfile({ ...familyProfile, progress: newProgress })
-      saveFamilyProfile({ ...familyProfile, progress: newProgress })
+      let updated: FamilyProfile = { ...familyProfile, progress: newProgress }
+      updated = pushFamilyLog(updated, '💬 La familia inició una conversación.')
+      const checked = checkFamilyBadges(updated)
+      setFamilyProfile(checked.profile)
+      saveFamilyProfile(checked.profile)
+      celebrateFamilyBadges(checked.unlocked)
     }
   }
 
@@ -964,6 +1211,9 @@ case 'about':
       const currentProgress = getProgress()
       const unlockedCount = currentProgress.badges.filter(b => b.unlocked).length
       const cust5 = getCustomization();
+      const isFamHome = profileType === 'family'
+      const homeBadgeCount = isFamHome ? familyProfile.familyBadges.filter(b => b.unlocked).length : unlockedCount
+      const homeBadgeTotal = isFamHome ? familyProfile.familyBadges.length : 3
       return (
         <div className="min-h-screen p-8" style={{ background: cust5.backgroundValue, backgroundSize: cust5.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           <div className="max-w-6xl mx-auto animate-slide-up space-y-16">
@@ -972,7 +1222,7 @@ case 'about':
             <div className="bg-white rounded-2xl p-6 flex items-center justify-between shadow-sm">
               <div className="flex items-center gap-4">
                 <div className="glass-card px-5 py-3 rounded-xl text-primary font-bold text-xl shadow-lg">
-                  🏅 {unlockedCount}/3
+                  🏅 {homeBadgeCount}/{homeBadgeTotal}
                 </div>
                 <div>
                   <h1 className="text-3xl font-black text-black">{t('greeting')}</h1>
@@ -993,10 +1243,10 @@ case 'about':
             <div className="glass-card rounded-2xl p-10 card-hover">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="font-bold text-secondary text-xl">{t('badges')}</h3>
-                <span className="text-lg font-bold text-primary">{unlockedCount}/3</span>
+                <span className="text-lg font-bold text-primary">{homeBadgeCount}/{homeBadgeTotal}</span>
               </div>
               <div className="flex gap-6 mb-8">
-                {currentProgress.badges.map(badge => (
+                {(isFamHome ? familyProfile.familyBadges : currentProgress.badges).map(badge => (
                   <div key={badge.id} className={`flex-1 text-center p-5 rounded-xl ${badge.unlocked ? 'animate-float' : 'opacity-30 grayscale'}`}>
                     <div className="text-4xl">{badge.emoji}</div>
                     <div className="text-xs font-bold mt-2 truncate">{badge.name}</div>
@@ -1006,7 +1256,7 @@ case 'about':
               <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
                 <div
                   className="progress-bar h-full"
-                  style={{ width: `${Math.min((unlockedCount / 3) * 100, 100)}%` }}
+                  style={{ width: `${Math.min((homeBadgeCount / Math.max(homeBadgeTotal, 1)) * 100, 100)}%` }}
                 ></div>
               </div>
             </div>
@@ -1772,7 +2022,7 @@ case 'about':
             </div>
 
             <div className="mt-8 p-4 bg-primary/5 rounded">
-              <p className="font-medium">Insignias: {getBadges().filter(b => b.unlocked).length}/3 ⭐</p>
+              <p className="font-medium">Insignias: {profileType === 'family' ? `${familyProfile.familyBadges.filter(b => b.unlocked).length}/${familyProfile.familyBadges.length}` : `${getBadges().filter(b => b.unlocked).length}/3`} ⭐</p>
               <p className="text-xs">Desbloquea todas para ser Campeón</p>
             </div>
 
@@ -2001,6 +2251,10 @@ case 'about':
       const currentBadges = getBadges()
       const currentUnlockedCount = currentBadges.filter(b => b.unlocked).length
       const cust13 = getCustomization();
+      const famBadges = familyProfile.familyBadges
+      const famUnlocked = famBadges.filter(b => b.unlocked).length
+      const famPct = familyProgressPercent(familyProfile)
+      const ringC = 2 * Math.PI * 54
       
       return (
         <div className="min-h-screen p-8" style={{ background: cust13.backgroundValue, backgroundSize: cust13.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
@@ -2267,73 +2521,235 @@ case 'about':
               <>
                 <div className="text-center mb-8">
                   <div className="w-28 h-28 bg-gradient-to-br from-secondary to-warning rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-float text-5xl">
-                    👨‍👩‍👧
+                    👨‍👩‍👧‍👦
                   </div>
                   <div className="bg-white rounded-2xl px-6 py-5 shadow-sm">
-                    <h2 className="text-3xl font-bold gradient-text">{familyProfile.name || 'Familia'}</h2>
-                    <p className="text-gray-600 mt-1">Perfil familiar compartido</p>
-                  {familyProfile.members.length > 0 && (
-                    <div className="flex justify-center gap-2 mt-3 flex-wrap">
-                      {familyProfile.members.map((member, i) => (
-                        <span key={i} className="px-4 py-1 rounded-full bg-secondary/10 text-secondary text-sm font-medium">
-                          {member}
-                        </span>
-                      ))}
-                    </div>
-                  )}
+                    {editingFamName ? (
+                      <div className="flex gap-2 justify-center">
+                        <input
+                          type="text"
+                          value={famNameDraft}
+                          onChange={e => setFamNameDraft(e.target.value)}
+                          placeholder="Nombre de la familia"
+                          className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-dark focus:outline-none focus:ring-2 focus:ring-primary font-bold text-xl text-center max-w-xs"
+                        />
+                        <button onClick={saveFamilyName} className="bg-success text-white font-bold px-4 py-2 rounded-xl">✓</button>
+                        <button onClick={() => setEditingFamName(false)} className="bg-gray-200 text-gray-600 font-bold px-4 py-2 rounded-xl">✕</button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center gap-2">
+                        <h2 className="text-3xl font-bold gradient-text">{familyProfile.name}</h2>
+                        <button
+                          onClick={() => { setFamNameDraft(familyProfile.name); setEditingFamName(true) }}
+                          className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all"
+                          aria-label={t('editName')}
+                        >
+                          ✏️
+                        </button>
+                      </div>
+                    )}
+                    <p className="text-gray-600 mt-2">{t('familyTagline')}</p>
                   </div>
                 </div>
 
-                <div className="glass-card rounded-2xl p-6 shadow-custom-lg mb-6">
-                  <div className="grid grid-cols-4 gap-4">
-                    <div className="text-center p-3">
-                      <div className="text-3xl font-bold gradient-text">{currentUnlockedCount}/3</div>
-                      <div className="text-sm text-gray-500 mt-1">{t('myBadges')}</div>
-                    </div>
-                    <div className="text-center p-3">
-                      <div className="text-3xl font-bold text-secondary">{getProgress().completedActivities}</div>
-                      <div className="text-sm text-gray-500 mt-1">{t('activities')}</div>
-                    </div>
-                    <div className="text-center p-3">
-                      <div className="text-3xl font-bold text-warning">{getProgress().conversations}</div>
-                      <div className="text-sm text-gray-500 mt-1">{t('conversations')}</div>
-                    </div>
-                    <div className="text-center p-3">
-                      <div className="text-lg font-bold text-primary">{familyProfile.members.length}</div>
-                      <div className="text-sm text-gray-500 mt-1">Integrantes</div>
-                    </div>
-                  </div>
+                {/* Accesos rápidos */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                  <button onClick={() => setCurrentScreen('learn')} className="glass-card rounded-2xl p-4 font-bold text-primary card-hover">
+                    📚 {t('quickActivities')}
+                  </button>
+                  <button onClick={() => setCurrentScreen('converse')} className="glass-card rounded-2xl p-4 font-bold text-warning card-hover">
+                    💬 {t('quickConvos')}
+                  </button>
+                  <button onClick={() => scrollToRef(badgesRef)} className="glass-card rounded-2xl p-4 font-bold text-secondary card-hover">
+                    🏅 {t('quickBadges')}
+                  </button>
+                  <button onClick={() => scrollToRef(membersRef)} className="glass-card rounded-2xl p-4 font-bold text-success card-hover">
+                    👨‍👩‍👧 {t('quickMembers')}
+                  </button>
                 </div>
 
-                <div className="glass-card rounded-2xl p-6 mb-6">
-                  <h3 className="font-bold text-dark mb-3">{t('generalProgress')}</h3>
-                  <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
-                    <div 
-                      className="progress-bar h-full"
-                      style={{ width: `${getProgress().totalActivities > 0 ? (getProgress().completedActivities / getProgress().totalActivities) * 100 : 0}%` }}
-                    ></div>
-                  </div>
-                  <div className="flex justify-between mt-2">
-                    <span className="text-sm text-gray-500">{getProgress().completedActivities} de {getProgress().totalActivities}</span>
-                    <span className="text-sm font-bold text-primary">{getProgress().totalActivities > 0 ? Math.round((getProgress().completedActivities / getProgress().totalActivities) * 100) : 0}%</span>
-                  </div>
+                {/* Estadísticas */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                  <button onClick={() => scrollToRef(badgesRef)} className="bg-white rounded-2xl p-5 shadow-sm text-center card-hover">
+                    <div className="text-3xl mb-1">🏅</div>
+                    <div className="text-3xl font-black text-dark">{famUnlocked}/6</div>
+                    <div className="text-sm text-gray-500 mt-1">{t('myBadges')}</div>
+                  </button>
+                  <button onClick={() => setCurrentScreen('learn')} className="bg-white rounded-2xl p-5 shadow-sm text-center card-hover">
+                    <div className="text-3xl mb-1">📚</div>
+                    <div className="text-3xl font-black text-secondary">{familyProfile.progress.completedActivities}</div>
+                    <div className="text-sm text-gray-500 mt-1">{t('activities')}</div>
+                  </button>
+                  <button onClick={() => setCurrentScreen('converse')} className="bg-white rounded-2xl p-5 shadow-sm text-center card-hover">
+                    <div className="text-3xl mb-1">💬</div>
+                    <div className="text-3xl font-black text-warning">{familyProfile.progress.conversations}</div>
+                    <div className="text-sm text-gray-500 mt-1">{t('conversations')}</div>
+                  </button>
+                  <button onClick={() => scrollToRef(membersRef)} className="bg-white rounded-2xl p-5 shadow-sm text-center card-hover">
+                    <div className="text-3xl mb-1">👨‍👩‍👧</div>
+                    <div className="text-3xl font-black text-success">{familyProfile.members.length}</div>
+                    <div className="text-sm text-gray-500 mt-1">{t('statMembers')}</div>
+                  </button>
                 </div>
 
-                <div className="glass-card rounded-2xl p-6 mb-6">
-                  <h3 className="font-bold text-dark mb-4">{t('myBadges')}</h3>
-                  <div className="flex gap-4 justify-center">
-                    {currentBadges.map(badge => (
-                      <div key={badge.id} className={`text-center p-4 rounded-xl ${badge.unlocked ? '' : 'opacity-40 grayscale'}`} style={{ border: badge.unlocked ? `3px solid ${badge.color}` : '2px dashed gray' }}>
-                        <div className="text-3xl">{badge.emoji}</div>
-                        <div className="text-xs font-bold mt-2" style={{ color: badge.color }}>{badge.name}</div>
+                {/* Progreso general */}
+                <div className="glass-card rounded-2xl p-8 mb-8 text-center">
+                  <h3 className="font-bold text-dark text-xl mb-4">{t('generalProgress')}</h3>
+                  <div className="flex justify-center">
+                    <svg width="150" height="150" viewBox="0 0 140 140">
+                      <circle cx="70" cy="70" r="54" fill="none" stroke="#E5E7EB" strokeWidth="14" />
+                      <circle
+                        cx="70" cy="70" r="54" fill="none" stroke="#8B5CF6" strokeWidth="14" strokeLinecap="round"
+                        strokeDasharray={ringC}
+                        strokeDashoffset={ringC - (ringC * famPct) / 100}
+                        transform="rotate(-90 70 70)"
+                        style={{ transition: 'stroke-dashoffset 0.6s ease' }}
+                      />
+                      <text x="70" y="80" textAnchor="middle" fontSize="28" fontWeight="900" fill="#1F2937">{famPct}%</text>
+                    </svg>
+                  </div>
+                  <p className="text-gray-500 mt-4">{t('progressHint')}</p>
+                </div>
+
+                {/* Mis insignias */}
+                <div ref={badgesRef} className="glass-card rounded-2xl p-8 mb-8 scroll-mt-4">
+                  <h3 className="font-bold text-dark text-xl mb-1">🏅 {t('myBadges')}</h3>
+                  <p className="text-gray-500 mb-6">{famUnlocked} de 6 desbloqueadas</p>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
+                    {famBadges.map(b => (
+                      <div
+                        key={b.id}
+                        className={`rounded-2xl p-5 text-center border-2 ${
+                          b.unlocked
+                            ? 'bg-white border-warning shadow-lg'
+                            : 'bg-gray-50 border-dashed border-gray-300'
+                        }`}
+                      >
+                        <div className="relative inline-block">
+                          <div className={`text-5xl mb-2 ${b.unlocked ? 'animate-float' : 'grayscale opacity-50'}`}>{b.emoji}</div>
+                          {!b.unlocked && <div className="absolute -top-1 -right-1 text-lg">🔒</div>}
+                        </div>
+                        <div className="font-bold text-dark">{b.name}</div>
+                        <div className="text-xs text-gray-500 mt-1 leading-snug">{b.desc}</div>
+                        <div className={`text-xs font-bold mt-2 ${b.unlocked ? 'text-success' : 'text-gray-400'}`}>
+                          {b.unlocked ? `✓ ${t('unlockedBadge')}` : t('lockedBadge')}
+                        </div>
                       </div>
                     ))}
                   </div>
                 </div>
 
+                {/* Actividad reciente */}
+                <div className="glass-card rounded-2xl p-8 mb-8">
+                  <h3 className="font-bold text-dark text-xl mb-4">🕘 {t('recentActivity')}</h3>
+                  {familyProfile.activityLog.length === 0 ? (
+                    <p className="text-gray-500">{t('noActivity')}</p>
+                  ) : (
+                    <ul className="space-y-3">
+                      {familyProfile.activityLog.slice(0, 6).map(e => (
+                        <li key={e.id} className="bg-white rounded-xl px-4 py-3 shadow-sm">
+                          <p className="text-dark font-medium">{e.text}</p>
+                          <p className="text-xs text-gray-400">{e.date}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+
+                {/* Integrantes */}
+                <div ref={membersRef} className="glass-card rounded-2xl p-8 mb-8 scroll-mt-4">
+                  <h3 className="font-bold text-dark text-xl mb-6">👨‍👩‍👧 {t('membersTitle')} ({familyProfile.members.length})</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-5 mb-8">
+                    {familyProfile.members.map(m => (
+                      <div key={m.id} className="bg-white rounded-2xl p-5 shadow-sm text-center border border-gray-100">
+                        <div className="text-5xl mb-2">{m.avatar}</div>
+                        {editingMemberId === m.id ? (
+                          <div className="flex gap-1 justify-center mb-2">
+                            <input
+                              type="text"
+                              value={memberNameDraft}
+                              onChange={e => setMemberNameDraft(e.target.value)}
+                              className="w-full px-2 py-1 rounded-lg border border-gray-200 text-dark font-bold text-center"
+                            />
+                            <button onClick={() => saveMemberName(m.id)} className="bg-success text-white font-bold px-3 py-1 rounded-lg">✓</button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-center gap-1">
+                            <p className="font-bold text-dark">{m.name}</p>
+                            <button
+                              onClick={() => { setEditingMemberId(m.id); setMemberNameDraft(m.name) }}
+                              className="text-xs text-gray-400 hover:text-primary"
+                              aria-label={t('editName')}
+                            >
+                              ✏️
+                            </button>
+                          </div>
+                        )}
+                        <span className="inline-block px-3 py-1 rounded-full bg-secondary/10 text-secondary text-xs font-bold mt-2">{m.role}</span>
+                        <p className="text-sm text-gray-500 mt-2">{m.activities} actividades</p>
+                        <button
+                          onClick={() => registerMemberActivity(m.id)}
+                          className="mt-3 w-full bg-success text-white font-bold py-2 px-4 rounded-xl text-sm"
+                        >
+                          {t('registerActivity')}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="bg-white rounded-2xl p-5 border-2 border-dashed border-gray-300">
+                    <h4 className="font-bold text-dark mb-4">{t('addMember')}</h4>
+                    <input
+                      type="text"
+                      value={newMemberName}
+                      onChange={e => setNewMemberName(e.target.value)}
+                      placeholder={t('memberNamePh')}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-dark focus:outline-none focus:ring-2 focus:ring-primary font-medium mb-3"
+                    />
+                    <div className="grid grid-cols-2 gap-3 mb-3">
+                      <div>
+                        <p className="text-sm font-medium text-dark mb-2">{t('memberRole')}</p>
+                        <select
+                          value={newMemberRole}
+                          onChange={e => setNewMemberRole(e.target.value as FamilyRole)}
+                          className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-dark font-medium"
+                        >
+                          {familyRoles.map(r => (
+                            <option key={r} value={r}>{r}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-dark mb-2">{t('memberAvatar')}</p>
+                        <div className="flex gap-1 flex-wrap">
+                          {memberAvatars.map(a => (
+                            <button
+                              key={a}
+                              onClick={() => setNewMemberAvatar(a)}
+                              className={`text-2xl p-1 rounded-lg ${newMemberAvatar === a ? 'bg-primary/15 ring-2 ring-primary' : 'hover:bg-gray-100'}`}
+                            >
+                              {a}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={addFamilyMember}
+                      disabled={newMemberName.trim() === ''}
+                      className={`font-bold py-3 px-6 rounded-xl w-full ${
+                        newMemberName.trim() === ''
+                          ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                          : 'btn-glow bg-primary text-white'
+                      }`}
+                    >
+                      {t('add')}
+                    </button>
+                  </div>
+                </div>
+
                 <div className="mt-6">
                   <button onClick={() => setCurrentScreen('home')} className="btn-glow bg-primary text-white font-bold py-4 px-6 rounded-xl text-lg w-full">
-                    ← Volver al inicio
+                    {t('backHome')}
                   </button>
                 </div>
               </>
