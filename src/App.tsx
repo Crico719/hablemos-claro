@@ -1332,7 +1332,7 @@ case 'about':
 
       return (
         <div className="min-h-screen p-8" style={{ background: cust7.backgroundValue, backgroundSize: cust7.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
-          <div className="max-w-4xl mx-auto animate-slide-up space-y-10">
+          <div className="max-w-4xl mx-auto animate-slide-up space-y-14">
             
             {/* Header */}
             <div className="bg-white rounded-2xl p-6 flex items-center justify-between shadow-sm">
@@ -1353,10 +1353,10 @@ case 'about':
             {/* Main Content */}
 
             {/* Topic menu */}
-            <div className="glass-card rounded-2xl p-8">
-              <h2 className="text-xl font-bold text-dark mb-2">Ruta de aprendizaje</h2>
-              <p className="text-gray-500 mb-6">Avanza paso por paso, sin saltos. El test se desbloquea al terminar todos los temas.</p>
-              <div className="grid grid-cols-2 gap-5">
+            <div className="glass-card rounded-2xl p-10">
+              <h2 className="text-xl font-bold text-dark mb-3">Ruta de aprendizaje</h2>
+              <p className="text-gray-500 mb-8">Avanza paso por paso, sin saltos. El test se desbloquea al terminar todos los temas.</p>
+              <div className="grid grid-cols-2 gap-6">
                 {topicOrder.map((key) => {
                   const idx = topicOrder.indexOf(key)
                   const prevKey = idx > 0 ? topicOrder[idx - 1] : null
@@ -1392,19 +1392,19 @@ case 'about':
             </div>
 
             {selectedTopic !== 'test' && !showCoimaONo && (
-              <div className="rounded-2xl p-8 border-2 border-black" style={{ background: '#FFE45E' }}>
-                <div className="flex items-center gap-3 mb-5">
+              <div className="rounded-2xl p-10 border-2 border-black" style={{ background: '#FFE45E' }}>
+                <div className="flex items-center gap-3 mb-6">
                   <div className="w-11 h-11 rounded-xl bg-black flex items-center justify-center text-2xl">📖</div>
                   <h2 className="text-2xl font-bold text-black">Explicación</h2>
                 </div>
-                <p className="text-black text-lg leading-relaxed">{currentTopicData.explanation}</p>
+                <p className="text-black text-lg leading-loose">{currentTopicData.explanation}</p>
 
                 {currentTopicData.keyPoints.length > 0 && (
-                  <div className="mt-8">
-                    <h3 className="font-bold text-black mb-4">Puntos clave</h3>
-                    <ul className="space-y-4">
+                  <div className="mt-10">
+                    <h3 className="font-bold text-black mb-5">Puntos clave</h3>
+                    <ul className="space-y-6">
                       {currentTopicData.keyPoints.map((point, i) => (
-                        <li key={i} className="flex items-start gap-4 p-4 bg-white rounded-xl border border-black/10">
+                        <li key={i} className="flex items-start gap-4 p-5 bg-white rounded-xl border border-black/10">
                           <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-bold flex-shrink-0">
                             {i + 1}
                           </div>
@@ -1415,19 +1415,19 @@ case 'about':
                   </div>
                 )}
 
-                <div className="mt-8 p-5 bg-white border-l-4 border-black rounded-xl">
-                  <p className="font-bold text-black mb-2">💡 Ejemplo</p>
-                  <p className="text-black leading-relaxed italic">“{currentTopicData.example}”</p>
+                <div className="mt-10 p-6 bg-white border-l-4 border-black rounded-xl">
+                  <p className="font-bold text-black mb-3">💡 Ejemplo</p>
+                  <p className="text-black leading-loose italic">“{currentTopicData.example}”</p>
                 </div>
 
-                <div className="mt-6 p-5 bg-white border-2 border-black rounded-xl">
-                  <p className="font-bold text-black mb-2">⚖️ Principio</p>
-                  <p className="text-black leading-relaxed font-medium">“{currentTopicData.theorem}”</p>
+                <div className="mt-8 p-6 bg-white border-2 border-black rounded-xl">
+                  <p className="font-bold text-black mb-3">⚖️ Principio</p>
+                  <p className="text-black leading-loose font-medium">“{currentTopicData.theorem}”</p>
                 </div>
 
-                <div className="mt-8">
-                  <h3 className="font-bold text-black mb-4">Comprensión rápida</h3>
-                  <div className="grid grid-cols-2 gap-5">
+                <div className="mt-10">
+                  <h3 className="font-bold text-black mb-5">Comprensión rápida</h3>
+                  <div className="grid grid-cols-2 gap-6">
                     <button
                       onClick={() => handleAnswer(0)}
                       className="btn-glow bg-success text-white font-bold py-4 px-5 rounded-xl text-lg border-2 border-white"
@@ -1466,7 +1466,7 @@ case 'about':
                 </p>
 
                 {/* Pregunta 1 */}
-                <div className="glass-card rounded-xl p-6 mb-6 border border-primary/15">
+                <div className="glass-card rounded-xl p-8 mb-8 border border-primary/15">
                   <p className="font-bold text-primary mb-2">Pregunta 1</p>
                   <p className="text-gray-800 text-lg mb-5">¿Qué es una coima?</p>
                   <div className="space-y-4">
@@ -1486,7 +1486,7 @@ case 'about':
                 </div>
 
                 {/* Pregunta 2 */}
-                <div className="glass-card rounded-xl p-6 mb-6 border border-secondary/15">
+                <div className="glass-card rounded-xl p-8 mb-8 border border-secondary/15">
                   <p className="font-bold text-secondary mb-2">Pregunta 2</p>
                   <p className="text-gray-800 text-lg mb-5">¿Puedo ofrecerle dinero a un amigo para que gane un concurso?</p>
                   <div className="space-y-4">
@@ -1506,7 +1506,7 @@ case 'about':
                 </div>
 
                 {/* Pregunta 3 */}
-                <div className="glass-card rounded-xl p-6 mb-6 border border-warning/20">
+                <div className="glass-card rounded-xl p-8 mb-8 border border-warning/20">
                   <p className="font-bold text-warning mb-2">Pregunta 3</p>
                   <p className="text-gray-800 text-lg mb-5">Un funcionario pide un “extra” para acelerar un trámite. ¿Es coima?</p>
                   <div className="space-y-4">
