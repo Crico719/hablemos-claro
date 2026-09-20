@@ -1372,51 +1372,51 @@ case 'about':
             </div>
 
             {selectedTopic !== 'test' && !showCoimaONo && (
-              <div className="glass-card rounded-2xl p-8">
+              <div className="rounded-2xl p-8 border-2 border-black" style={{ background: '#FFE45E' }}>
                 <div className="flex items-center gap-3 mb-5">
-                  <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center text-2xl">📖</div>
-                  <h2 className="text-2xl font-bold text-primary">Explicación</h2>
+                  <div className="w-11 h-11 rounded-xl bg-black flex items-center justify-center text-2xl">📖</div>
+                  <h2 className="text-2xl font-bold text-black">Explicación</h2>
                 </div>
-                <p className="text-gray-700 text-lg leading-relaxed">{currentTopicData.explanation}</p>
+                <p className="text-black text-lg leading-relaxed">{currentTopicData.explanation}</p>
 
                 {currentTopicData.keyPoints.length > 0 && (
                   <div className="mt-8">
-                    <h3 className="font-bold text-dark mb-4">Puntos clave</h3>
+                    <h3 className="font-bold text-black mb-4">Puntos clave</h3>
                     <ul className="space-y-4">
                       {currentTopicData.keyPoints.map((point, i) => (
-                        <li key={i} className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
-                          <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold flex-shrink-0">
+                        <li key={i} className="flex items-start gap-4 p-4 bg-white rounded-xl border border-black/10">
+                          <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-bold flex-shrink-0">
                             {i + 1}
                           </div>
-                          <p className="text-gray-700 leading-relaxed">{point}</p>
+                          <p className="text-black leading-relaxed">{point}</p>
                         </li>
                       ))}
                     </ul>
                   </div>
                 )}
 
-                <div className="mt-8 p-5 bg-warning/5 border-l-4 border-warning rounded-xl">
-                  <p className="font-bold text-warning mb-2">💡 Ejemplo</p>
-                  <p className="text-gray-700 leading-relaxed italic">“{currentTopicData.example}”</p>
+                <div className="mt-8 p-5 bg-white border-l-4 border-black rounded-xl">
+                  <p className="font-bold text-black mb-2">💡 Ejemplo</p>
+                  <p className="text-black leading-relaxed italic">“{currentTopicData.example}”</p>
                 </div>
 
-                <div className="mt-6 p-5 bg-primary/5 border border-primary/15 rounded-xl">
-                  <p className="font-bold text-primary mb-2">⚖️ Principio</p>
-                  <p className="text-gray-800 leading-relaxed font-medium">“{currentTopicData.theorem}”</p>
+                <div className="mt-6 p-5 bg-white border-2 border-black rounded-xl">
+                  <p className="font-bold text-black mb-2">⚖️ Principio</p>
+                  <p className="text-black leading-relaxed font-medium">“{currentTopicData.theorem}”</p>
                 </div>
 
                 <div className="mt-8">
-                  <h3 className="font-bold text-dark mb-4">Comprensión rápida</h3>
+                  <h3 className="font-bold text-black mb-4">Comprensión rápida</h3>
                   <div className="grid grid-cols-2 gap-5">
                     <button
                       onClick={() => handleAnswer(0)}
-                      className="btn-glow bg-success text-white font-bold py-4 px-5 rounded-xl text-lg"
+                      className="btn-glow bg-success text-white font-bold py-4 px-5 rounded-xl text-lg border-2 border-white"
                     >
                       ✅ {currentTopicData.correct}
                     </button>
                     <button
                       onClick={() => handleAnswer(1)}
-                      className="btn-glow bg-white border-2 border-gray-200 text-dark font-bold py-4 px-5 rounded-xl hover:border-primary/50"
+                      className="btn-glow bg-white border-2 border-white text-black font-bold py-4 px-5 rounded-xl hover:border-primary/50"
                     >
                       ❌ {currentTopicData.incorrect}
                     </button>
