@@ -874,39 +874,42 @@ case 'about':
       const cust5 = getCustomization();
       return (
         <div className="min-h-screen p-8" style={{ background: cust5.backgroundValue, backgroundSize: cust5.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
-          <div className="max-w-6xl mx-auto animate-slide-up">
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-3">
-                <div className="glass-card px-4 py-2 rounded-xl text-primary font-bold text-lg shadow-lg">
+          <div className="max-w-6xl mx-auto animate-slide-up space-y-16">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="glass-card px-5 py-3 rounded-xl text-primary font-bold text-xl shadow-lg">
                   🏅 {unlockedCount}/3
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold gradient-text">{t('greeting')}</h1>
-                  <p className="text-sm text-gray-500">{device === 'phone' ? '📱 Móvil' : device === 'laptop' ? '💻 Laptop' : '🖥️ PC'}</p>
+                  <h1 className="text-3xl font-bold gradient-text">{t('greeting')}</h1>
+                  <p className="text-base text-gray-500">{device === 'phone' ? '📱 Móvil' : device === 'laptop' ? '💻 Laptop' : '🖥️ PC'}</p>
                 </div>
               </div>
-              <button onClick={() => setCurrentScreen('config')} className="glass-card px-4 py-2 rounded-xl text-primary text-sm font-medium hover:bg-primary/10 transition-all">
+              <button onClick={() => setCurrentScreen('config')} className="glass-card px-5 py-3 rounded-xl text-primary text-base font-medium hover:bg-primary/10 transition-all">
                 ⚙️ {t('configTitle')}
               </button>
             </div>
 
-            <p className="text-lg text-gray-600 mb-8">{t('welcomeLine')}</p>
+            {/* Welcome line */}
+            <p className="text-xl text-gray-600 text-center">{t('welcomeLine')}</p>
 
-            {/* Progreso + insignias */}
-            <div className="glass-card rounded-2xl p-8 mb-8 card-hover">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-secondary text-lg">{t('badges')}</h3>
-                <span className="text-sm font-bold text-primary">{unlockedCount}/3</span>
+            {/* Badges Card */}
+            <div className="glass-card rounded-2xl p-10 card-hover">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="font-bold text-secondary text-xl">{t('badges')}</h3>
+                <span className="text-lg font-bold text-primary">{unlockedCount}/3</span>
               </div>
-              <div className="flex gap-4 mb-6">
+              <div className="flex gap-6 mb-8">
                 {currentProgress.badges.map(badge => (
-                  <div key={badge.id} className={`flex-1 text-center p-3 rounded-xl ${badge.unlocked ? 'animate-float' : 'opacity-30 grayscale'}`}>
-                    <div className="text-3xl">{badge.emoji}</div>
-                    <div className="text-[10px] font-bold mt-1 truncate">{badge.name}</div>
+                  <div key={badge.id} className={`flex-1 text-center p-5 rounded-xl ${badge.unlocked ? 'animate-float' : 'opacity-30 grayscale'}`}>
+                    <div className="text-4xl">{badge.emoji}</div>
+                    <div className="text-xs font-bold mt-2 truncate">{badge.name}</div>
                   </div>
                 ))}
               </div>
-              <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+              <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
                 <div
                   className="progress-bar h-full"
                   style={{ width: `${Math.min((unlockedCount / 3) * 100, 100)}%` }}
@@ -914,64 +917,68 @@ case 'about':
               </div>
             </div>
 
-            {/* Accesos principales */}
-            <div className="grid grid-cols-2 gap-16 mb-28">
+            {/* Main Grid - 2x2 */}
+            <div className="grid grid-cols-2 gap-12">
               <button
                 onClick={() => setCurrentScreen('learn')}
-                className="glass-card rounded-2xl p-12 text-left card-hover shadow-custom-lg min-h-[200px] flex flex-col justify-between"
+                className="glass-card rounded-2xl p-10 card-hover shadow-custom-lg min-h-[180px] flex flex-col justify-between group"
               >
                 <div>
-                  <div className="text-7xl mb-8">📚</div>
-                  <h3 className="font-bold text-primary text-2xl mb-4">{t('themes')}</h3>
-                  <p className="text-gray-500 leading-relaxed text-lg">{t('themesDesc')}</p>
+                  <div className="text-6xl mb-6 group-hover:scale-110 transition-transform duration-300">📚</div>
+                  <h3 className="font-bold text-primary text-2xl mb-3">{t('themes')}</h3>
+                  <p className="text-gray-500 leading-relaxed">{t('themesDesc')}</p>
                 </div>
               </button>
               <button
                 onClick={() => setCurrentScreen('games')}
-                className="glass-card rounded-2xl p-12 text-left card-hover shadow-custom-lg min-h-[200px] flex flex-col justify-between"
+                className="glass-card rounded-2xl p-10 card-hover shadow-custom-lg min-h-[180px] flex flex-col justify-between group"
               >
                 <div>
-                  <div className="text-7xl mb-8">🎮</div>
-                  <h3 className="font-bold text-secondary text-2xl mb-4">{t('game')}</h3>
-                  <p className="text-gray-500 leading-relaxed text-lg">{t('gameDesc')}</p>
+                  <div className="text-6xl mb-6 group-hover:scale-110 transition-transform duration-300">🎮</div>
+                  <h3 className="font-bold text-secondary text-2xl mb-3">{t('game')}</h3>
+                  <p className="text-gray-500 leading-relaxed">{t('gameDesc')}</p>
                 </div>
               </button>
               <button
                 onClick={() => setCurrentScreen('reels')}
-                className="glass-card rounded-2xl p-12 text-left card-hover shadow-custom-lg min-h-[200px] flex flex-col justify-between"
+                className="glass-card rounded-2xl p-10 card-hover shadow-custom-lg min-h-[180px] flex flex-col justify-between group"
               >
                 <div>
-                  <div className="text-7xl mb-8">📱</div>
-                  <h3 className="font-bold text-warning text-2xl mb-4">{t('reels')}</h3>
-                  <p className="text-gray-500 leading-relaxed text-lg">{t('reelsDesc')}</p>
+                  <div className="text-6xl mb-6 group-hover:scale-110 transition-transform duration-300">📱</div>
+                  <h3 className="font-bold text-warning text-2xl mb-3">{t('reels')}</h3>
+                  <p className="text-gray-500 leading-relaxed">{t('reelsDesc')}</p>
                 </div>
               </button>
               <button
                 onClick={() => setCurrentScreen('profile')}
-                className="glass-card rounded-2xl p-12 text-left card-hover shadow-custom-lg min-h-[200px] flex flex-col justify-between"
+                className="glass-card rounded-2xl p-10 card-hover shadow-custom-lg min-h-[180px] flex flex-col justify-between group"
               >
                 <div>
-                  <div className="text-7xl mb-8">👤</div>
-                  <h3 className="font-bold text-success text-2xl mb-4">{t('profile')}</h3>
-                  <p className="text-gray-500 leading-relaxed text-lg">{t('profileDesc')}</p>
+                  <div className="text-6xl mb-6 group-hover:scale-110 transition-transform duration-300">👤</div>
+                  <h3 className="font-bold text-success text-2xl mb-3">{t('profile')}</h3>
+                  <p className="text-gray-500 leading-relaxed">{t('profileDesc')}</p>
                 </div>
               </button>
             </div>
 
-            <hr className="border-gray-200 my-32" />
+            {/* Divider */}
+            <hr className="border-gray-200 my-16" />
 
-            <div className="glass-card rounded-2xl p-10 card-hover">
+            {/* Family Activity */}
+            <div className="glass-card rounded-2xl p-10 card-hover text-center">
+              <div className="text-4xl mb-4">💬</div>
               <h3 className="font-bold text-warning text-xl mb-4">{t('familyActivity')}</h3>
-              <p className="text-gray-600 mb-6 leading-relaxed">
+              <p className="text-gray-600 mb-6 leading-relaxed max-w-xl mx-auto">
                 {t('familyDesc')}
               </p>
               <button
                 onClick={() => setCurrentScreen('converse')}
-                className="btn-glow bg-warning text-white font-bold py-3 px-6 rounded-xl text-sm w-full"
+                className="btn-glow bg-warning text-white font-bold py-4 px-8 rounded-xl text-base w-full max-w-xs"
               >
                 {t('converse')}
               </button>
             </div>
+            
           </div>
         </div>
       )
