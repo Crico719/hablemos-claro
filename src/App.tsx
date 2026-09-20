@@ -89,37 +89,16 @@ const reelsMessages = [
   { id: '6', author: 'Transparencia Total', message: 'La información es un derecho, no un privilegio. La luz es la mejor herramienta contra la corrupción. 💡', time: 'Hace 2d' },
 ]
 
-const themeColors = [
-  { name: 'Azul', value: '#2563EB', gradient: 'linear-gradient(135deg, #2563EB, #7C3AED)' },
-  { name: 'Verde', value: '#10B981', gradient: 'linear-gradient(135deg, #10B981, #059669)' },
-  { name: 'Morado', value: '#8B5CF6', gradient: 'linear-gradient(135deg, #8B5CF6, #7C3AED)' },
-  { name: 'Naranja', value: '#F59E0B', gradient: 'linear-gradient(135deg, #F59E0B, #EA580C)' },
-  { name: 'Rosa', value: '#EC4899', gradient: 'linear-gradient(135deg, #EC4899, #DB2777)' },
-  { name: 'Rojo', value: '#EF4444', gradient: 'linear-gradient(135deg, #EF4444, #DC2626)' },
-  { name: 'Cian', value: '#06B6D4', gradient: 'linear-gradient(135deg, #06B6D4, #0891B2)' },
-  { name: 'Índigo', value: '#6366F1', gradient: 'linear-gradient(135deg, #6366F1, #4F46E5)' },
-]
-
 const backgrounds: Array<{ name: string; type: 'gradient' | 'pattern' | 'solid'; value: string }> = [
-  { name: 'Gradiente', type: 'gradient', value: 'linear-gradient(135deg, #2563EB, #7C3AED)' },
+  { name: 'Gradiente Azul', type: 'gradient', value: 'linear-gradient(135deg, #2563EB, #7C3AED)' },
+  { name: 'Gradiente Verde', type: 'gradient', value: 'linear-gradient(135deg, #10B981, #059669)' },
+  { name: 'Gradiente Morado', type: 'gradient', value: 'linear-gradient(135deg, #8B5CF6, #7C3AED)' },
+  { name: 'Gradiente Naranja', type: 'gradient', value: 'linear-gradient(135deg, #F59E0B, #EA580C)' },
   { name: 'Ondas', type: 'pattern', value: 'radial-gradient(circle at 25% 25%, #2563EB20 0%, transparent 50%), radial-gradient(circle at 75% 75%, #7C3AED20 0%, transparent 50%)' },
   { name: 'Puntos', type: 'pattern', value: 'radial-gradient(#2563EB30 1px, transparent 1px)' },
   { name: 'Rayas', type: 'pattern', value: 'repeating-linear-gradient(45deg, #2563EB15, #2563EB15 10px, transparent 10px, transparent 20px)' },
   { name: 'Sólido Claro', type: 'solid', value: '#F8FAFC' },
   { name: 'Sólido Oscuro', type: 'solid', value: '#1E293B' },
-]
-
-const cardStyles: Array<{ name: string; value: 'glass' | 'solid' | 'outlined' }> = [
-  { name: 'Cristal', value: 'glass' },
-  { name: 'Sólido', value: 'solid' },
-  { name: 'Bordes', value: 'outlined' },
-]
-
-const decorations: Array<{ name: string; value: 'stars' | 'hearts' | 'sparkles' | 'none' }> = [
-  { name: 'Estrellas', value: 'stars' },
-  { name: 'Corazones', value: 'hearts' },
-  { name: 'Brillos', value: 'sparkles' },
-  { name: 'Ninguna', value: 'none' },
 ]
 
 const translations = {
@@ -403,6 +382,7 @@ export default function App() {
   // Helper to get current profile's progress
   const getProgress = () => profileType === 'student' ? studentProfile.progress : familyProfile.progress
   const getBadges = () => profileType === 'student' ? studentProfile.progress.badges : familyProfile.progress.badges
+  const getCustomization = () => profileType === 'student' ? studentProfile.customization : defaultCustomization
 
   // Guardar datos personales
   const saveUserData = () => {
@@ -566,8 +546,9 @@ export default function App() {
       )
 
     case 'profile-type':
+      const cust0 = getCustomization()
       return (
-        <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-success/10 p-8">
+        <div className="min-h-screen p-8" style={{ background: cust0.backgroundValue, backgroundSize: cust0.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           <div className="max-w-3xl mx-auto animate-slide-up text-center">
             <h1 className="text-3xl font-bold gradient-text mb-2">{t('chooseProfile')}</h1>
             <p className="text-gray-500 mb-8">{t('welcomeSub')}</p>
@@ -608,8 +589,9 @@ export default function App() {
       )
 
     case 'avatar':
+      const cust1 = getCustomization();
       return (
-        <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-success/10 p-8">
+        <div className="min-h-screen p-8" style={{ background: cust1.backgroundValue, backgroundSize: cust1.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           <div className="max-w-5xl mx-auto animate-slide-up">
             <h1 className="text-3xl font-bold gradient-text text-center mb-2">{profileType === 'student' ? 'Crea tu Avatar' : 'Avatar Familiar'}</h1>
             <p className="text-center text-gray-500 mb-6">{profileType === 'student' ? 'Elige tu personaje para la aventura' : 'Elige un avatar para la familia'}</p>
@@ -628,18 +610,18 @@ export default function App() {
               ))}
             </div>
 
-            <div className="glass-card rounded-2xl p-6 mb-6">
-              <h3 className="font-bold text-lg mb-4 text-center">🎮 Modo de juego</h3>
-              <div className="grid grid-cols-2 gap-8">
+            <div className="glass-card rounded-2xl p-8 mb-8">
+              <h3 className="font-bold text-lg mb-6 text-center">🎮 Modo de juego</h3>
+              <div className="grid grid-cols-2 gap-6">
                 <button
                   onClick={() => setPlayMode('individual')}
-                  className={`py-4 px-6 rounded-xl font-bold transition-all ${playMode === 'individual' ? 'bg-primary text-white shadow-lg' : 'glass-card text-dark hover:bg-primary/10'}`}
+                  className={`py-6 px-8 rounded-xl font-bold text-lg transition-all ${playMode === 'individual' ? 'bg-primary text-white shadow-lg' : 'glass-card text-dark hover:bg-primary/10'}`}
                 >
                   👤 Individual
                 </button>
                 <button
                   onClick={() => setPlayMode('family')}
-                  className={`py-4 px-6 rounded-xl font-bold transition-all ${playMode === 'family' ? 'bg-secondary text-white shadow-lg' : 'glass-card text-dark hover:bg-secondary/10'}`}
+                  className={`py-6 px-8 rounded-xl font-bold text-lg transition-all ${playMode === 'family' ? 'bg-secondary text-white shadow-lg' : 'glass-card text-dark hover:bg-secondary/10'}`}
                 >
                   👨‍👩‍👧‍👦 Con familia
                 </button>
@@ -647,8 +629,8 @@ export default function App() {
             </div>
 
             {selectedAvatar && (
-              <div className="glass-card rounded-2xl p-6 mb-6 animate-fade-in">
-                <div className="flex items-center justify-center gap-4 mb-4">
+              <div className="glass-card rounded-2xl p-8 mb-8 animate-fade-in">
+                <div className="flex items-center justify-center gap-6 mb-4">
                   <div className="text-6xl animate-float">{selectedAvatar.emoji}</div>
                   <div>
                     <div className="text-2xl font-bold" style={{ color: selectedAvatar.color }}>{selectedAvatar.name}</div>
@@ -677,8 +659,9 @@ export default function App() {
       )
 
     case 'about':
+      const cust2 = getCustomization();
       return (
-        <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-success/10 p-8">
+        <div className="min-h-screen p-8" style={{ background: cust2.backgroundValue, backgroundSize: cust2.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           <div className="max-w-3xl mx-auto animate-slide-up">
             <div className="flex items-center justify-between mb-2">
               <h1 className="text-3xl font-bold gradient-text">{t('aboutTitle')}</h1>
@@ -801,8 +784,9 @@ export default function App() {
       )
 
     case 'device':
+      const cust3 = getCustomization();
       return (
-        <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-success/10 p-8">
+        <div className="min-h-screen p-8" style={{ background: cust3.backgroundValue, backgroundSize: cust3.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           <div className="max-w-3xl mx-auto animate-slide-up text-center">
             <div className="flex items-center justify-between mb-2">
               <button onClick={() => setCurrentScreen('welcome')} className="glass-card px-3 py-1 rounded-xl text-gray-600 text-sm hover:bg-gray-100 transition-all">
@@ -813,36 +797,36 @@ export default function App() {
             <h1 className="text-3xl font-bold gradient-text mb-2 mt-4">{t('deviceQuestion')}</h1>
             <p className="text-gray-500 mb-8">{t('deviceSub')}</p>
 
-            <div className="grid grid-cols-3 gap-8">
+            <div className="grid grid-cols-3 gap-8 mb-12">
               <button
                 onClick={() => setDevice('pc')}
-                className={`glass-card rounded-2xl p-6 card-hover shadow-custom-lg ${device === 'pc' ? 'ring-4 ring-primary' : ''}`}
+                className={`glass-card rounded-2xl p-8 card-hover shadow-custom-lg ${device === 'pc' ? 'ring-4 ring-primary' : ''}`}
               >
-                <div className="text-5xl mb-3 animate-float">🖥️</div>
-                <div className="font-bold text-dark">PC</div>
-                <p className="text-xs text-gray-500 mt-1">Pantalla completa</p>
+                <div className="text-6xl mb-4 animate-float">🖥️</div>
+                <div className="font-bold text-dark text-xl mb-2">PC</div>
+                <p className="text-sm text-gray-500">Pantalla completa</p>
               </button>
               <button
                 onClick={() => setDevice('phone')}
-                className={`glass-card rounded-2xl p-6 card-hover shadow-custom-lg ${device === 'phone' ? 'ring-4 ring-secondary' : ''}`}
+                className={`glass-card rounded-2xl p-8 card-hover shadow-custom-lg ${device === 'phone' ? 'ring-4 ring-secondary' : ''}`}
               >
-                <div className="text-5xl mb-3 animate-float">📱</div>
-                <div className="font-bold text-dark">Móvil</div>
-                <p className="text-xs text-gray-500 mt-1">Formato celular</p>
+                <div className="text-6xl mb-4 animate-float">📱</div>
+                <div className="font-bold text-dark text-xl mb-2">Móvil</div>
+                <p className="text-sm text-gray-500">Formato celular</p>
               </button>
               <button
                 onClick={() => setDevice('laptop')}
-                className={`glass-card rounded-2xl p-6 card-hover shadow-custom-lg ${device === 'laptop' ? 'ring-4 ring-warning' : ''}`}
+                className={`glass-card rounded-2xl p-8 card-hover shadow-custom-lg ${device === 'laptop' ? 'ring-4 ring-warning' : ''}`}
               >
-                <div className="text-5xl mb-3 animate-float">💻</div>
-                <div className="font-bold text-dark">Laptop</div>
-                <p className="text-xs text-gray-500 mt-1">Formato portátil</p>
+                <div className="text-6xl mb-4 animate-float">💻</div>
+                <div className="font-bold text-dark text-xl mb-2">Laptop</div>
+                <p className="text-sm text-gray-500">Formato portátil</p>
               </button>
             </div>
 
             <button
               onClick={goHome}
-              className="btn-glow bg-primary text-white font-bold py-4 px-6 rounded-xl text-lg w-full mt-8"
+              className="btn-glow bg-primary text-white font-bold py-5 px-8 rounded-xl text-xl w-full mt-10"
             >
               {t('continue')} →
             </button>
@@ -851,29 +835,30 @@ export default function App() {
       )
 
     case 'config':
+      const cust4 = getCustomization();
       return (
-        <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-success/10 p-8">
+        <div className="min-h-screen p-8" style={{ background: cust4.backgroundValue, backgroundSize: cust4.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           <div className="max-w-4xl mx-auto animate-slide-up">
-            <h2 className="text-3xl font-bold gradient-text mb-6 text-center">{t('configTitle')}</h2>
+            <h2 className="text-3xl font-bold gradient-text mb-10 text-center">{t('configTitle')}</h2>
             
-            <div className="space-y-4">
-              <div className="glass-card rounded-2xl p-6 mb-4">
-                <h3 className="font-bold text-lg mb-4 text-center">{t('yourData')}</h3>
-                <div className="space-y-3">
+            <div className="space-y-8">
+              <div className="glass-card rounded-2xl p-8 mb-6">
+                <h3 className="font-bold text-xl mb-6 text-center">{t('yourData')}</h3>
+                <div className="space-y-5">
                   <div>
-                    <label className="text-sm font-medium text-dark">{t('name')}</label>
+                    <label className="text-sm font-medium text-dark mb-2 block">{t('name')}</label>
                     <input
                       type="text"
                       value={userName}
                       onChange={e => setUserName(e.target.value)}
                       onBlur={saveUserData}
                       placeholder={t('name')}
-                      className="mt-1 w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-dark focus:outline-none focus:ring-2 focus:ring-primary font-medium"
+                      className="mt-1 w-full px-5 py-4 rounded-xl border border-gray-200 bg-white text-dark focus:outline-none focus:ring-2 focus:ring-primary font-medium text-lg"
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-5">
                     <div>
-                      <label className="text-sm font-medium text-dark">{t('age')}</label>
+                      <label className="text-sm font-medium text-dark mb-2 block">{t('age')}</label>
                       <input
                         type="number"
                         min="0"
@@ -882,42 +867,42 @@ export default function App() {
                         onChange={e => setUserAge(e.target.value)}
                         onBlur={saveUserData}
                         placeholder={t('age')}
-                        className="mt-1 w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-dark focus:outline-none focus:ring-2 focus:ring-primary font-medium"
+                        className="mt-1 w-full px-5 py-4 rounded-xl border border-gray-200 bg-white text-dark focus:outline-none focus:ring-2 focus:ring-primary font-medium text-lg"
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-dark">{t('district')}</label>
+                      <label className="text-sm font-medium text-dark mb-2 block">{t('district')}</label>
                       <input
                         type="text"
                         value={userDistrict}
                         onChange={e => setUserDistrict(e.target.value)}
                         onBlur={saveUserData}
                         placeholder={t('district')}
-                        className="mt-1 w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-dark focus:outline-none focus:ring-2 focus:ring-primary font-medium"
+                        className="mt-1 w-full px-5 py-4 rounded-xl border border-gray-200 bg-white text-dark focus:outline-none focus:ring-2 focus:ring-primary font-medium text-lg"
                       />
                     </div>
                   </div>
                 </div>
               </div>
 
-              <p className="text-dark font-medium text-center">{t('roleQuestion')}</p>
-              <div className="grid grid-cols-2 gap-3">
+              <p className="text-dark font-medium text-center text-lg">{t('roleQuestion')}</p>
+              <div className="grid grid-cols-2 gap-5 mt-3">
                 <button
                   onClick={() => setSelectedRole('parent')}
-                  className={selectedRole === 'parent' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all'}
+                  className={selectedRole === 'parent' ? 'bg-primary text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'glass-card font-bold py-5 px-6 rounded-xl text-dark hover:bg-primary/20 transition-all text-lg'}
                 >
                   {t('parent')}
                 </button>
                 <button
                   onClick={() => setSelectedRole('child')}
-                  className={selectedRole === 'child' ? 'bg-secondary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-secondary/20 transition-all'}
+                  className={selectedRole === 'child' ? 'bg-secondary text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'glass-card font-bold py-5 px-6 rounded-xl text-dark hover:bg-secondary/20 transition-all text-lg'}
                 >
                   {t('child')}
                 </button>
               </div>
 
-              <p className="text-dark font-medium text-center mt-6">{t('deviceQuestion')}</p>
-              <div className="grid grid-cols-3 gap-3">
+              <p className="text-dark font-medium text-center text-lg mt-10">{t('deviceQuestion')}</p>
+              <div className="grid grid-cols-3 gap-5 mt-3">
                 <button
                   onClick={() => setDevice('pc')}
                   className={device === 'pc' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all'}
@@ -926,45 +911,45 @@ export default function App() {
                 </button>
                 <button
                   onClick={() => setDevice('phone')}
-                  className={device === 'phone' ? 'bg-secondary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-secondary/20 transition-all'}
+                  className={device === 'phone' ? 'bg-secondary text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'glass-card font-bold py-5 px-6 rounded-xl text-dark hover:bg-secondary/20 transition-all text-lg'}
                 >
                   📱 Móvil
                 </button>
                 <button
                   onClick={() => setDevice('laptop')}
-                  className={device === 'laptop' ? 'bg-warning text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-warning/20 transition-all'}
+                  className={device === 'laptop' ? 'bg-warning text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'glass-card font-bold py-5 px-6 rounded-xl text-dark hover:bg-warning/20 transition-all text-lg'}
                 >
                   💻 Laptop
                 </button>
               </div>
 
-              <p className="text-dark font-medium text-center mt-6">{t('darkModeTitle')}</p>
-              <div className="grid grid-cols-2 gap-3">
+              <p className="text-dark font-medium text-center text-lg mt-10">{t('darkModeTitle')}</p>
+              <div className="grid grid-cols-2 gap-5 mt-3">
                 <button
                   onClick={() => changeDarkMode(false)}
-                  className={!darkMode ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all'}
+                  className={!darkMode ? 'bg-primary text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'glass-card font-bold py-5 px-6 rounded-xl text-dark hover:bg-primary/20 transition-all text-lg'}
                 >
                   {t('light')}
                 </button>
                 <button
                   onClick={() => changeDarkMode(true)}
-                  className={darkMode ? 'bg-secondary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-secondary/20 transition-all'}
+                  className={darkMode ? 'bg-secondary text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'glass-card font-bold py-5 px-6 rounded-xl text-dark hover:bg-secondary/20 transition-all text-lg'}
                 >
                   {t('dark')}
                 </button>
               </div>
 
-              <p className="text-dark font-medium text-center mt-6">{t('languageTitle')}</p>
-              <div className="grid grid-cols-2 gap-3">
+              <p className="text-dark font-medium text-center text-lg mt-10">{t('languageTitle')}</p>
+              <div className="grid grid-cols-2 gap-5 mt-3">
                 <button
                   onClick={() => changeLanguage('es')}
-                  className={language === 'es' ? 'bg-primary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-primary/20 transition-all'}
+                  className={language === 'es' ? 'bg-primary text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'glass-card font-bold py-5 px-6 rounded-xl text-dark hover:bg-primary/20 transition-all text-lg'}
                 >
                   {t('spanish')}
                 </button>
                 <button
                   onClick={() => changeLanguage('qu')}
-                  className={language === 'qu' ? 'bg-secondary text-white font-bold py-3 px-4 rounded-xl shadow-lg' : 'glass-card font-bold py-3 px-4 rounded-xl text-dark hover:bg-secondary/20 transition-all'}
+                  className={language === 'qu' ? 'bg-secondary text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'glass-card font-bold py-5 px-6 rounded-xl text-dark hover:bg-secondary/20 transition-all text-lg'}
                 >
                   {t('quechua')}
                 </button>
@@ -973,7 +958,7 @@ export default function App() {
 
               <button
                 onClick={goHome}
-                className="btn-glow bg-primary text-white font-bold py-4 px-6 rounded-xl text-lg w-full mt-6"
+                className="btn-glow bg-primary text-white font-bold py-5 px-8 rounded-xl text-xl w-full mt-10"
               >
                 🏠 {t('goHome')}
               </button>
@@ -984,8 +969,9 @@ export default function App() {
     case 'home':
       const currentProgress = getProgress()
       const unlockedCount = currentProgress.badges.filter(b => b.unlocked).length
+      const cust5 = getCustomization();
       return (
-        <div className="min-h-screen bg-gradient-to-br from-primary/5 via-white to-secondary/5 p-8">
+        <div className="min-h-screen p-8" style={{ background: cust5.backgroundValue, backgroundSize: cust5.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           <div className="max-w-6xl mx-auto animate-slide-up">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-3">
@@ -1027,59 +1013,67 @@ export default function App() {
             </div>
 
             {/* Accesos principales */}
-            <div className="grid grid-cols-2 gap-6 mb-8">
+            <div className="grid grid-cols-2 gap-8 mb-12">
               <button
                 onClick={() => setCurrentScreen('learn')}
-                className="glass-card rounded-2xl p-6 text-left card-hover shadow-custom-lg"
+                className="glass-card rounded-2xl p-8 text-left card-hover shadow-custom-lg min-h-[160px] flex flex-col justify-between"
               >
-                <div className="text-4xl mb-2">📚</div>
-                <h3 className="font-bold text-primary">{t('themes')}</h3>
-                <p className="text-sm text-gray-500">{t('themesDesc')}</p>
+                <div>
+                  <div className="text-5xl mb-4">📚</div>
+                  <h3 className="font-bold text-primary text-xl mb-2">{t('themes')}</h3>
+                  <p className="text-gray-500 leading-relaxed">{t('themesDesc')}</p>
+                </div>
               </button>
               <button
                 onClick={() => setCurrentScreen('games')}
-                className="glass-card rounded-2xl p-6 text-left card-hover shadow-custom-lg"
+                className="glass-card rounded-2xl p-8 text-left card-hover shadow-custom-lg min-h-[160px] flex flex-col justify-between"
               >
-                <div className="text-4xl mb-2">🎮</div>
-                <h3 className="font-bold text-secondary">{t('game')}</h3>
-                <p className="text-sm text-gray-500">{t('gameDesc')}</p>
+                <div>
+                  <div className="text-5xl mb-4">🎮</div>
+                  <h3 className="font-bold text-secondary text-xl mb-2">{t('game')}</h3>
+                  <p className="text-gray-500 leading-relaxed">{t('gameDesc')}</p>
+                </div>
               </button>
               <button
                 onClick={() => setCurrentScreen('reels')}
-                className="glass-card rounded-2xl p-6 text-left card-hover shadow-custom-lg"
+                className="glass-card rounded-2xl p-8 text-left card-hover shadow-custom-lg min-h-[160px] flex flex-col justify-between"
               >
-                <div className="text-4xl mb-2">📱</div>
-                <h3 className="font-bold text-warning">{t('reels')}</h3>
-                <p className="text-sm text-gray-500">{t('reelsDesc')}</p>
+                <div>
+                  <div className="text-5xl mb-4">📱</div>
+                  <h3 className="font-bold text-warning text-xl mb-2">{t('reels')}</h3>
+                  <p className="text-gray-500 leading-relaxed">{t('reelsDesc')}</p>
+                </div>
               </button>
               <button
                 onClick={() => setCurrentScreen('profile')}
-                className="glass-card rounded-2xl p-6 text-left card-hover shadow-custom-lg"
+                className="glass-card rounded-2xl p-8 text-left card-hover shadow-custom-lg min-h-[160px] flex flex-col justify-between"
               >
-                <div className="text-4xl mb-2">👤</div>
-                <h3 className="font-bold text-success">{t('profile')}</h3>
-                <p className="text-sm text-gray-500">{t('profileDesc')}</p>
+                <div>
+                  <div className="text-5xl mb-4">👤</div>
+                  <h3 className="font-bold text-success text-xl mb-2">{t('profile')}</h3>
+                  <p className="text-gray-500 leading-relaxed">{t('profileDesc')}</p>
+                </div>
               </button>
               <button
                 onClick={() => setCurrentScreen('config')}
-                className="glass-card rounded-2xl p-6 text-left card-hover shadow-custom-lg col-span-2 flex items-center justify-between"
+                className="glass-card rounded-2xl p-8 text-left card-hover shadow-custom-lg col-span-2 flex items-center justify-between min-h-[140px]"
               >
-                <div className="flex items-center gap-8">
-                  <div className="text-4xl">⚙️</div>
+                <div className="flex items-center gap-6">
+                  <div className="text-5xl">⚙️</div>
                   <div>
-                    <h3 className="font-bold text-dark">{t('configTitle')}</h3>
-                    <p className="text-sm text-gray-500">{t('languageTitle')} · {t('darkModeTitle')} · {t('deviceQuestion')}</p>
+                    <h3 className="font-bold text-dark text-xl mb-2">{t('configTitle')}</h3>
+                    <p className="text-gray-500">{t('languageTitle')} · {t('darkModeTitle')} · {t('deviceQuestion')}</p>
                   </div>
                 </div>
-                <span className="text-primary font-bold text-2xl">→</span>
+                <span className="text-primary font-bold text-3xl">→</span>
               </button>
             </div>
 
-            <hr className="border-gray-200 my-16" />
+            <hr className="border-gray-200 my-20" />
 
-            <div className="glass-card rounded-2xl p-6 card-hover">
-              <h3 className="font-bold text-warning text-lg mb-2">{t('familyActivity')}</h3>
-              <p className="text-gray-600 text-sm mb-4">
+            <div className="glass-card rounded-2xl p-8 card-hover">
+              <h3 className="font-bold text-warning text-xl mb-4">{t('familyActivity')}</h3>
+              <p className="text-gray-600 mb-6 leading-relaxed">
                 {t('familyDesc')}
               </p>
               <button
@@ -1094,8 +1088,9 @@ export default function App() {
       )
 
     case 'reels':
+      const cust6 = getCustomization();
       return (
-        <div className="min-h-screen bg-gradient-to-br from-warning/10 via-white to-primary/5 p-8">
+        <div className="min-h-screen p-8" style={{ background: cust6.backgroundValue, backgroundSize: cust6.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           <div className="max-w-5xl mx-auto animate-slide-up">
             <div className="flex items-center justify-between mb-6">
               <div>
@@ -1498,9 +1493,10 @@ export default function App() {
       )
 
     case 'result':
-      const resultProgress = getProgress()
+      const cust8 = getCustomization();
+      const resultProgress = getProgress();
       return (
-        <div className="min-h-screen bg-light text-dark p-8">
+        <div className="min-h-screen p-8" style={{ background: cust8.backgroundValue, backgroundSize: cust8.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           <div className="max-w-5xl mx-auto text-center">
             <h2 className="text-4xl font-bold text-primary mb-4">¡Actividad completada! 🎉</h2>
             <p className="text-3xl font-bold">{resultProgress.completedActivities}/{resultProgress.totalActivities}</p>
@@ -1529,8 +1525,9 @@ export default function App() {
       )
 
     case 'games':
+      const cust9 = getCustomization();
       return (
-        <div className="min-h-screen bg-light text-dark p-8">
+        <div className="min-h-screen p-8" style={{ background: cust9.backgroundValue, backgroundSize: cust9.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           <div className="max-w-5xl mx-auto">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-2xl font-bold text-primary">Pon a prueba lo que sabes 🎮</h1>
@@ -1650,8 +1647,9 @@ export default function App() {
       )
 
     case 'converse':
+      const cust10 = getCustomization();
       return (
-        <div className="min-h-screen bg-light text-dark p-8">
+        <div className="min-h-screen p-8" style={{ background: cust10.backgroundValue, backgroundSize: cust10.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           <div className="max-w-5xl mx-auto">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-2xl font-bold text-primary">Conversemos en familia 💬</h1>
@@ -1703,8 +1701,9 @@ export default function App() {
       )
 
     case 'activity':
+      const cust11 = getCustomization();
       return (
-        <div className="min-h-screen bg-light text-dark p-8">
+        <div className="min-h-screen p-8" style={{ background: cust11.backgroundValue, backgroundSize: cust11.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           <div className="max-w-5xl mx-auto">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-2xl font-bold text-family">Detectemos juntos</h1>
@@ -1861,15 +1860,16 @@ export default function App() {
     case 'profile':
       const currentBadges = getBadges()
       const currentUnlockedCount = currentBadges.filter(b => b.unlocked).length
+      const cust13 = getCustomization();
       
       return (
-        <div className="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/5 to-warning/10 p-8">
+        <div className="min-h-screen p-8" style={{ background: cust13.backgroundValue, backgroundSize: cust13.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           <div className="max-w-6xl mx-auto animate-slide-up">
             {/* Profile Type Tabs */}
-            <div className="glass-card rounded-2xl p-2 mb-6 flex gap-2">
+            <div className="glass-card rounded-2xl p-3 mb-8 flex gap-3">
               <button
                 onClick={() => setProfileType('student')}
-                className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm transition-all ${
+                className={`flex-1 py-4 px-6 rounded-xl font-bold text-base transition-all ${
                   profileType === 'student' ? 'bg-primary text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
@@ -1877,7 +1877,7 @@ export default function App() {
               </button>
               <button
                 onClick={() => setProfileType('family')}
-                className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm transition-all ${
+                className={`flex-1 py-4 px-6 rounded-xl font-bold text-base transition-all ${
                   profileType === 'family' ? 'bg-secondary text-white shadow-lg' : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
@@ -1889,9 +1889,9 @@ export default function App() {
               // STUDENT PROFILE
               <>
                 {/* Header with editable photo */}
-                <div className="text-center mb-8 relative">
+                <div className="text-center mb-10 relative">
                   <div className="relative inline-block">
-                    <div className="w-28 h-28 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-float text-6xl overflow-hidden border-4 border-white">
+                    <div className="w-32 h-32 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg animate-float text-7xl overflow-hidden border-4 border-white">
                       {studentProfile.photo ? (
                         <img src={studentProfile.photo} alt="Perfil" className="w-full h-full object-cover rounded-full" />
                       ) : (
@@ -1906,23 +1906,23 @@ export default function App() {
                         setTempPhoto(studentProfile.photo)
                         setEditPhotoModal(true)
                       }}
-                      className="absolute bottom-1 right-1 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:bg-primary/90 transition-all"
+                      className="absolute bottom-2 right-2 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:bg-primary/90 transition-all text-xl"
                       aria-label={t('editPhoto')}
                     >
                       ✏️
                     </button>
                   </div>
-                  <h2 className="text-3xl font-bold gradient-text">{studentProfile.name || 'Estudiante'}</h2>
-                  <p className="text-gray-500 mt-1">{t('profileSub')}</p>
+                  <h2 className="text-4xl font-bold gradient-text">{studentProfile.name || 'Estudiante'}</h2>
+                  <p className="text-gray-500 mt-2 text-lg">{t('profileSub')}</p>
                   {(studentProfile.age || studentProfile.district) && (
-                    <div className="flex justify-center gap-2 mt-3 flex-wrap">
+                    <div className="flex justify-center gap-3 mt-4 flex-wrap">
                       {studentProfile.age && (
-                        <span className="px-4 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium">
+                        <span className="px-5 py-2 rounded-full bg-primary/10 text-primary text-base font-medium">
                           🎂 {studentProfile.age} {t('ageYears')}
                         </span>
                       )}
                       {studentProfile.district && (
-                        <span className="px-4 py-1 rounded-full bg-secondary/10 text-secondary text-sm font-medium">
+                        <span className="px-5 py-2 rounded-full bg-secondary/10 text-secondary text-base font-medium">
                           📍 {studentProfile.district}
                         </span>
                       )}
@@ -1931,29 +1931,29 @@ export default function App() {
                 </div>
 
                 {/* Stats Cards */}
-                <div className="glass-card rounded-2xl p-6 shadow-custom-lg mb-6">
-                  <div className="grid grid-cols-4 gap-4">
-                    <div className="text-center p-3">
-                      <div className="text-3xl font-bold gradient-text">{currentUnlockedCount}/3</div>
-                      <div className="text-sm text-gray-500 mt-1">{t('myBadges')}</div>
+                <div className="glass-card rounded-2xl p-8 shadow-custom-lg mb-8">
+                  <div className="grid grid-cols-4 gap-6">
+                    <div className="text-center p-5 bg-primary/5 rounded-xl">
+                      <div className="text-4xl font-bold gradient-text">{currentUnlockedCount}/3</div>
+                      <div className="text-base text-gray-500 mt-2">{t('myBadges')}</div>
                     </div>
-                    <div className="text-center p-3">
-                      <div className="text-3xl font-bold text-secondary">{getProgress().completedActivities}</div>
-                      <div className="text-sm text-gray-500 mt-1">{t('activities')}</div>
+                    <div className="text-center p-5 bg-secondary/5 rounded-xl">
+                      <div className="text-4xl font-bold text-secondary">{getProgress().completedActivities}</div>
+                      <div className="text-base text-gray-500 mt-2">{t('activities')}</div>
                     </div>
-                    <div className="text-center p-3">
-                      <div className="text-3xl font-bold text-warning">{getProgress().conversations}</div>
-                      <div className="text-sm text-gray-500 mt-1">{t('conversations')}</div>
+                    <div className="text-center p-5 bg-warning/5 rounded-xl">
+                      <div className="text-4xl font-bold text-warning">{getProgress().conversations}</div>
+                      <div className="text-base text-gray-500 mt-2">{t('conversations')}</div>
                     </div>
-                    <div className="text-center p-3">
-                      <div className="text-lg font-bold text-primary">{getProgress().streakDays}</div>
-                      <div className="text-sm text-gray-500 mt-1">{t('streak')}</div>
+                    <div className="text-center p-5 bg-success/5 rounded-xl">
+                      <div className="text-2xl font-bold text-primary">{getProgress().streakDays}</div>
+                      <div className="text-base text-gray-500 mt-2">{t('streak')}</div>
                     </div>
                   </div>
                 </div>
 
                 {/* Badges or Stats when no badges */}
-                <div className="glass-card rounded-2xl p-6 mb-6">
+                <div className="glass-card rounded-2xl p-8 mb-8">
                   {currentUnlockedCount > 0 ? (
                     <>
                       <h3 className="font-bold text-dark mb-4">{t('myBadges')}</h3>
@@ -2053,43 +2053,14 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Customization Panel */}
-                <div className="glass-card rounded-2xl p-6 mb-6">
-                  <h3 className="font-bold text-dark mb-4 flex items-center gap-2">{t('customization')}</h3>
+                {/* Customization Panel - Solo Fondos */}
+                <div className="glass-card rounded-2xl p-8 mb-8">
+                  <h3 className="font-bold text-dark mb-6 flex items-center gap-2">{t('customization')}</h3>
                   
-                  {/* Theme Colors */}
-                  <div className="mb-6">
-                    <h4 className="font-medium text-gray-700 mb-3">{t('themeColors')}</h4>
-                    <div className="grid grid-cols-4 gap-3">
-                      {themeColors.map(theme => (
-                        <button
-                          key={theme.name}
-                          onClick={() => {
-                            const updated = { 
-                              ...studentProfile, 
-                              customization: { 
-                                ...studentProfile.customization, 
-                                themeColor: theme.value,
-                                backgroundValue: theme.gradient 
-                              } 
-                            }
-                            setStudentProfile(updated)
-                            saveStudentProfile(updated)
-                          }}
-                          className={`w-12 h-12 rounded-xl border-3 transition-all ${
-                            studentProfile.customization.themeColor === theme.value ? 'ring-4 ring-primary scale-110' : 'border-transparent hover:border-gray-300'
-                          }`}
-                          style={{ background: theme.gradient }}
-                          title={theme.name}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
                   {/* Backgrounds */}
-                  <div className="mb-6">
-                    <h4 className="font-medium text-gray-700 mb-3">{t('backgrounds')}</h4>
-                    <div className="grid grid-cols-3 gap-3">
+                  <div className="mb-8">
+                    <h4 className="font-medium text-gray-700 mb-4">{t('backgrounds')}</h4>
+                    <div className="grid grid-cols-3 gap-5">
                       {backgrounds.map(bg => (
                         <button
                           key={bg.name}
@@ -2105,7 +2076,7 @@ export default function App() {
                             setStudentProfile(updated)
                             saveStudentProfile(updated)
                           }}
-                          className={`p-3 rounded-xl border-3 transition-all text-center ${
+                          className={`p-5 rounded-xl border-3 transition-all text-center ${
                             studentProfile.customization.backgroundType === bg.type && studentProfile.customization.backgroundValue === bg.value 
                               ? 'ring-4 ring-secondary' 
                               : 'border-transparent hover:border-gray-300'
@@ -2115,64 +2086,7 @@ export default function App() {
                             backgroundSize: bg.type === 'pattern' ? '50px 50px' : 'cover'
                           }}
                         >
-                          <span className="block text-xs font-medium text-gray-700 mt-2">{bg.name}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Card Styles */}
-                  <div className="mb-6">
-                    <h4 className="font-medium text-gray-700 mb-3">{t('cardStyles')}</h4>
-                    <div className="flex gap-4">
-                      {cardStyles.map(style => (
-                        <button
-                          key={style.name}
-                          onClick={() => {
-                            const updated = { 
-                              ...studentProfile, 
-                              customization: { ...studentProfile.customization, cardStyle: style.value } 
-                            }
-                            setStudentProfile(updated)
-                            saveStudentProfile(updated)
-                          }}
-                          className={`px-6 py-3 rounded-xl font-bold transition-all ${
-                            studentProfile.customization.cardStyle === style.value 
-                              ? 'bg-primary text-white' 
-                              : 'glass-card text-dark hover:bg-primary/10'
-                          }`}
-                        >
-                          {style.name}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Decorations */}
-                  <div className="mb-6">
-                    <h4 className="font-medium text-gray-700 mb-3">{t('decorations')}</h4>
-                    <div className="flex gap-4 flex-wrap">
-                      {decorations.map(dec => (
-                        <button
-                          key={dec.name}
-                          onClick={() => {
-                            const decs = studentProfile.customization.decorations.includes(dec.value)
-                              ? studentProfile.customization.decorations.filter(d => d !== dec.value)
-                              : [...studentProfile.customization.decorations, dec.value]
-                            const updated = { 
-                              ...studentProfile, 
-                              customization: { ...studentProfile.customization, decorations: decs } 
-                            }
-                            setStudentProfile(updated)
-                            saveStudentProfile(updated)
-                          }}
-                          className={`px-4 py-2 rounded-xl font-medium transition-all ${
-                            studentProfile.customization.decorations.includes(dec.value)
-                              ? 'bg-warning text-white'
-                              : 'glass-card text-dark hover:bg-warning/10'
-                          }`}
-                        >
-                          {dec.name === 'Ninguna' ? '✨' : dec.value === 'stars' ? '⭐' : dec.value === 'hearts' ? '❤️' : '✨'} {dec.name}
+                          <span className="block text-sm font-medium text-gray-700 mt-3">{bg.name}</span>
                         </button>
                       ))}
                     </div>
@@ -2185,7 +2099,7 @@ export default function App() {
                       setStudentProfile(updated)
                       saveStudentProfile(updated)
                     }}
-                    className="w-full py-2 px-4 rounded-xl text-sm text-gray-500 hover:text-primary hover:bg-gray-100 transition-all"
+                    className="w-full py-3 px-5 rounded-xl text-base text-gray-500 hover:text-primary hover:bg-gray-100 transition-all"
                   >
                     {t('resetCustomization')}
                   </button>
