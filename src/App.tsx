@@ -828,7 +828,7 @@ export default function App() {
   // Helper to get current profile's progress
   const getProgress = () => profileType === 'student' ? studentProfile.progress : familyProfile.progress
   const getBadges = () => profileType === 'student' ? studentProfile.progress.badges : familyProfile.progress.badges
-  const getCustomization = () => profileType === 'student' ? studentProfile.customization : defaultCustomization
+  const getCustomization = () => studentProfile.customization
 
   // Guardar datos personales
   const saveUserData = () => {
