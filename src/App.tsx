@@ -145,6 +145,9 @@ const translations = {
     editPhoto: 'Editar foto',
     choosePhoto: 'Elegir foto',
     takePhoto: 'Tomar foto',
+    photoLinkTitle: '🔗 O pega el enlace de una imagen',
+    photoLinkPlaceholder: 'https://ejemplo.com/mi-foto.jpg',
+    useLink: 'Usar enlace',
     customization: '🎨 Personalizar mi app',
     themeColors: 'Colores del tema',
     backgrounds: 'Fondos',
@@ -222,6 +225,9 @@ const translations = {
     editPhoto: 'Riqchiy rikin',
     choosePhoto: 'Aqllay rikin',
     takePhoto: 'Riqsiy rikin',
+    photoLinkTitle: '🔗 Utaq willay rikinpa linknin',
+    photoLinkPlaceholder: 'https://ejemplo.com/riki.jpg',
+    useLink: "Linkta llaqtay",
     customization: '🎨 Kaynin ñiqqiy',
     themeColors: 'Llimpi kullkikuna',
     backgrounds: 'Ukukuna',
@@ -398,6 +404,7 @@ export default function App() {
   const [language, setLanguage] = useState<'es' | 'qu'>(() => (localStorage.getItem('hablemos-claro-lang') as 'es' | 'qu') || 'es')
   const [profileType, setProfileType] = useState<ProfileType>('student')
   const [editPhotoModal, setEditPhotoModal] = useState(false)
+  const [photoUrl, setPhotoUrl] = useState('')
   const [_tempPhoto, setTempPhoto] = useState<string>('')
 
   // Sincronizar userName/userAge/userDistrict con studentProfile
@@ -2022,6 +2029,7 @@ case 'about':
                     <button
                       onClick={() => {
                         setTempPhoto(studentProfile.photo)
+                        setPhotoUrl(studentProfile.photo.startsWith('http') ? studentProfile.photo : '')
                         setEditPhotoModal(true)
                       }}
                       className="absolute bottom-2 right-2 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:bg-primary/90 transition-all text-xl"
@@ -2413,6 +2421,46 @@ case 'about':
             >
               Eliminar foto
             </button>
+
+            <div className="bg-white rounded-xl p-4 border border-gray-200">
+              <p className="font-bold text-dark mb-3">{t('photoLinkTitle')}</p>
+              <input
+                type="url"
+                value={photoUrl}
+                onChange={e => setPhotoUrl(e.target.value)}
+                placeholder={t('photoLinkPlaceholder')}
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-dark focus:outline-none focus:ring-2 focus:ring-primary font-medium"
+              />
+              {photoUrl.trim() !== '' && (
+                <div className="mt-3 flex justify-center">
+                  <img
+                    src={photoUrl.trim()}
+                    alt="Vista previa"
+                    className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-lg"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                  />
+                </div>
+              )}
+              <button
+                onClick={() => {
+                  const url = photoUrl.trim()
+                  if (url === '') return
+                  setTempPhoto(url)
+                  const updated = { ...studentProfile, photo: url }
+                  setStudentProfile(updated)
+                  saveStudentProfile(updated)
+                  setEditPhotoModal(false)
+                }}
+                disabled={photoUrl.trim() === ''}
+                className={`font-bold py-3 px-6 rounded-xl w-full mt-3 ${
+                  photoUrl.trim() === ''
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'btn-glow bg-success text-white'
+                }`}
+              >
+                🔗 {t('useLink')}
+              </button>
+            </div>
             
             <button
               onClick={() => setEditPhotoModal(false)}
