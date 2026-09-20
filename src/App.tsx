@@ -924,7 +924,7 @@ case 'about':
                   🏅 {unlockedCount}/3
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold gradient-text">{t('greeting')}</h1>
+                  <h1 className="text-3xl font-black text-black">{t('greeting')}</h1>
                   <p className="text-base text-gray-600">{device === 'phone' ? '📱 Móvil' : device === 'laptop' ? '💻 Laptop' : '🖥️ PC'}</p>
                 </div>
               </div>
