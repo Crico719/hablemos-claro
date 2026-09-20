@@ -267,6 +267,16 @@ const translations = {
     lockedBadge: 'Bloqueada',
     unlockedBadge: 'Desbloqueada',
     backHome: '← Volver al inicio',
+    selectEyebrow: 'ELIGE TU ESPACIO',
+    selectTitle: '¿Cómo quieres continuar?',
+    selectTagline: 'Aprende, conversa y toma buenas decisiones.',
+    studentCardTitle: 'PERFIL ESTUDIANTE',
+    studentCardDesc: 'Tu espacio personal para aprender, avanzar y conseguir insignias.',
+    familyCardTitle: 'PERFIL FAMILIA',
+    familyCardDesc: 'Un espacio para aprender, conversar y participar juntos.',
+    enterBtn: 'Continuar →',
+    learnTogether: 'Aprendemos juntos para tomar mejores decisiones.',
+    bottomQuote: 'Una conversación puede ser el primer paso para generar un cambio.',
   },
   qu: {
     greeting: '¡Napaykullayki! 👋',
@@ -892,46 +902,146 @@ export default function App() {
       )
 
     case 'profile-type':
-      const cust0 = getCustomization()
       return (
-        <div className="min-h-screen p-8" style={{ background: cust0.backgroundValue, backgroundSize: cust0.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
-          <div className="max-w-3xl mx-auto animate-slide-up text-center">
-            <div className="bg-white rounded-2xl p-6 mb-8 shadow-sm">
-              <h1 className="text-3xl font-bold gradient-text mb-2">{t('chooseProfile')}</h1>
-              <p className="text-gray-600">{t('welcomeSub')}</p>
+        <div className="min-h-screen p-6 md:p-10 flex items-center justify-center relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #EEF2FF 0%, #FFFFFF 50%, #F5F0FF 100%)' }}>
+          {/* Fondo decorativo sutil */}
+          <div aria-hidden className="pointer-events-none absolute inset-0">
+            <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-primary/10 blur-3xl" />
+            <div className="absolute -bottom-28 -right-20 w-[28rem] h-[28rem] rounded-full bg-secondary/10 blur-3xl" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[36rem] h-[36rem] rounded-full bg-warning/5 blur-3xl" />
+            <svg className="absolute top-12 left-[7%] w-16 h-16 text-primary/15 hidden md:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 5.5h16a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H9l-5 4v-4H4a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1Z" />
+              <circle cx="9" cy="10.5" r="0.6" fill="currentColor" />
+              <circle cx="12.5" cy="10.5" r="0.6" fill="currentColor" />
+              <circle cx="16" cy="10.5" r="0.6" fill="currentColor" />
+            </svg>
+            <svg className="absolute bottom-14 right-[8%] w-16 h-16 text-secondary/15 hidden md:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 6c-2-1.5-5-2-8-2v13c3 0 6 .5 8 2 2-1.5 5-2 8-2V4c-3 0-6 .5-8 2Z" />
+              <path d="M12 6v13" />
+            </svg>
+            <svg className="absolute top-1/3 right-[4%] w-8 h-8 text-warning/25 hidden lg:block" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2l2.2 6.6L21 11l-6.8 2.4L12 20l-2.2-6.6L3 11l6.8-2.4L12 2Z" />
+            </svg>
+            <svg className="absolute bottom-1/4 left-[5%] w-6 h-6 text-success/25 hidden lg:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </div>
+
+          <button
+            onClick={() => setCurrentScreen('welcome')}
+            className="absolute top-5 left-5 bg-white/80 backdrop-blur px-4 py-2 rounded-full text-gray-600 text-sm font-bold shadow-sm hover:bg-white hover:text-primary transition-all"
+          >
+            {t('back')}
+          </button>
+
+          <div className="relative w-full max-w-5xl mx-auto animate-slide-up text-center py-6">
+            {/* Encabezado */}
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <div className="w-12 h-12 rounded-2xl shadow-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #2563EB, #7C3AED)' }}>
+                <svg viewBox="0 0 24 24" className="w-7 h-7" aria-hidden>
+                  <path d="M4 5.5h16a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H9l-5 4v-4H4a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1Z" fill="#FFFFFF" />
+                  <circle cx="9" cy="10.5" r="1.3" fill="#2563EB" />
+                  <circle cx="12.5" cy="10.5" r="1.3" fill="#2563EB" />
+                  <circle cx="16" cy="10.5" r="1.3" fill="#2563EB" />
+                </svg>
+              </div>
+              <span className="text-2xl font-black text-dark">Hablemos Claro</span>
             </div>
-            
-            <div className="grid grid-cols-2 gap-6 mb-10">
+            <p className="text-gray-500 font-medium mb-8">{t('selectTagline')}</p>
+
+            <p className="text-xs font-black tracking-[0.25em] text-secondary mb-2">{t('selectEyebrow')}</p>
+            <h1 className="text-3xl md:text-4xl font-black text-dark mb-2">{t('selectTitle')}</h1>
+            <p className="text-gray-500 mb-8 max-w-xl mx-auto">{t('welcomeSub')}</p>
+
+            {/* Tarjetas */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mb-8 text-left">
               <button
                 onClick={() => {
                   setProfileType('student')
                   setCurrentScreen('home')
                 }}
-                className="glass-card rounded-2xl p-8 card-hover shadow-custom-lg border-2 border-primary/20"
+                className="group bg-white rounded-3xl p-7 md:p-8 shadow-xl border border-gray-100 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-2xl cursor-pointer"
               >
-                <div className="text-6xl mb-4">👤</div>
-                <h3 className="text-xl font-bold text-primary mb-2">{t('studentProfile')}</h3>
-                <p className="text-gray-600 text-sm">Tu perfil personal con insignias, progreso y personalización</p>
+                <div className="rounded-2xl p-4 mb-5 flex justify-center" style={{ background: 'linear-gradient(135deg, #DBEAFE, #EDE9FE)' }}>
+                  <svg role="img" aria-label="Ilustración de estudiante aprendiendo" viewBox="0 0 220 170" className="w-full max-w-[230px] h-auto transition-transform duration-300 group-hover:scale-105">
+                    <ellipse cx="110" cy="88" rx="92" ry="68" fill="#DBEAFE" />
+                    <path d="M150 34l42 14-42 14-42-14 42-14Z" fill="#1F2937" />
+                    <path d="M178 52v22" stroke="#F59E0B" strokeWidth="3" strokeLinecap="round" />
+                    <circle cx="178" cy="78" r="4" fill="#F59E0B" />
+                    <path d="M40 44l2.5 6 6 2.5-6 2.5-2.5 6-2.5-6-6-2.5 6-2.5 2.5-6Z" fill="#7C3AED" />
+                    <circle cx="196" cy="120" r="5" fill="#93C5FD" />
+                    <rect x="82" y="106" width="56" height="48" rx="16" fill="#2563EB" />
+                    <circle cx="110" cy="74" r="24" fill="#FCD9B8" />
+                    <path d="M88 68C88 52 98 46 110 46c12 0 22 6 22 22-6-8-14-10-22-10s-16 2-22 10Z" fill="#1F2937" />
+                    <circle cx="102" cy="76" r="2.5" fill="#1F2937" />
+                    <circle cx="118" cy="76" r="2.5" fill="#1F2937" />
+                    <path d="M104 84q6 5 12 0" stroke="#1F2937" strokeWidth="2" fill="none" strokeLinecap="round" />
+                    <path d="M60 128q25-10 50 0v24q-25-10-50 0Z" fill="#FFFFFF" stroke="#BFDBFE" strokeWidth="2" />
+                    <path d="M160 128q-25-10-50 0v24q25-10 50 0Z" fill="#FFFFFF" stroke="#BFDBFE" strokeWidth="2" />
+                    <path d="M110 128v24" stroke="#BFDBFE" strokeWidth="2" />
+                  </svg>
+                </div>
+                <div className="flex items-center gap-2 mb-2">
+                  <svg viewBox="0 0 24 24" className="w-6 h-6 text-primary" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <path d="M12 4 22 9l-10 5L2 9l10-5Z" />
+                    <path d="M6 11.5V16c0 1.7 2.7 3 6 3s6-1.3 6-3v-4.5" />
+                    <path d="M22 9v6" />
+                  </svg>
+                  <h2 className="text-lg font-black tracking-wide text-primary">{t('studentCardTitle')}</h2>
+                </div>
+                <p className="text-gray-600 leading-relaxed mb-6">{t('studentCardDesc')}</p>
+                <span className="inline-flex items-center gap-2 bg-primary text-white font-bold py-3 px-6 rounded-full transition-all duration-300 group-hover:gap-3 group-hover:shadow-lg">
+                  {t('enterBtn')}
+                </span>
               </button>
+
               <button
                 onClick={() => {
                   setProfileType('family')
                   setCurrentScreen('home')
                 }}
-                className="glass-card rounded-2xl p-8 card-hover shadow-custom-lg border-2 border-secondary/20"
+                className="group bg-white rounded-3xl p-7 md:p-8 shadow-xl border border-gray-100 transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-2xl cursor-pointer"
               >
-                <div className="text-6xl mb-4">👨‍👩‍👧</div>
-                <h3 className="text-xl font-bold text-secondary mb-2">{t('familyProfile')}</h3>
-                <p className="text-gray-600 text-sm">Perfil familiar compartido con actividades en conjunto</p>
+                <div className="rounded-2xl p-4 mb-5 flex justify-center" style={{ background: 'linear-gradient(135deg, #EDE9FE, #FEF3C7)' }}>
+                  <svg role="img" aria-label="Ilustración de familia unida" viewBox="0 0 220 170" className="w-full max-w-[230px] h-auto transition-transform duration-300 group-hover:scale-105">
+                    <ellipse cx="110" cy="92" rx="95" ry="66" fill="#EDE9FE" />
+                    <ellipse cx="110" cy="154" rx="78" ry="9" fill="#DDD6FE" />
+                    <path d="M110 32c-6-12-22-12-22 0 0 8 10 14 22 22 12-8 22-14 22-22 0-12-16-12-22 0Z" fill="#EC4899" />
+                    <rect x="20" y="26" width="42" height="28" rx="9" fill="#FFFFFF" stroke="#BFDBFE" strokeWidth="2" />
+                    <path d="M30 54l5 8 6-8" fill="#FFFFFF" stroke="#BFDBFE" strokeWidth="2" strokeLinejoin="round" />
+                    <circle cx="32" cy="40" r="2.5" fill="#7C3AED" />
+                    <circle cx="41" cy="40" r="2.5" fill="#7C3AED" />
+                    <circle cx="50" cy="40" r="2.5" fill="#7C3AED" />
+                    <rect x="46" y="86" width="40" height="60" rx="15" fill="#7C3AED" />
+                    <circle cx="66" cy="66" r="19" fill="#FCD9B8" />
+                    <path d="M47 66a19 19 0 0 1 38 0Z" fill="#1F2937" />
+                    <rect x="96" y="82" width="40" height="64" rx="15" fill="#10B981" />
+                    <circle cx="116" cy="62" r="19" fill="#F1C27D" />
+                    <path d="M97 62a19 19 0 0 1 38 0Z" fill="#7C4A2D" />
+                    <rect x="148" y="108" width="28" height="38" rx="12" fill="#F59E0B" />
+                    <circle cx="162" cy="94" r="14" fill="#FCD9B8" />
+                    <path d="M148 94a14 14 0 0 1 28 0Z" fill="#1F2937" />
+                    <path d="M186 96l2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5Z" fill="#F59E0B" />
+                  </svg>
+                </div>
+                <div className="flex items-center gap-2 mb-2">
+                  <svg viewBox="0 0 24 24" className="w-6 h-6 text-secondary" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <circle cx="9" cy="8" r="3.2" />
+                    <path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5" />
+                    <circle cx="16.8" cy="9" r="2.4" />
+                    <path d="M16 14.3c2.6.4 4.3 2 4.7 4.2" />
+                  </svg>
+                  <h2 className="text-lg font-black tracking-wide text-secondary">{t('familyCardTitle')}</h2>
+                </div>
+                <p className="text-gray-600 leading-relaxed mb-6">{t('familyCardDesc')}</p>
+                <span className="inline-flex items-center gap-2 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 group-hover:gap-3 group-hover:shadow-lg" style={{ background: '#7C3AED' }}>
+                  {t('enterBtn')}
+                </span>
               </button>
             </div>
-            
-            <button
-              onClick={() => setCurrentScreen('welcome')}
-              className="glass-card px-4 py-2 rounded-xl text-gray-600 text-sm hover:bg-gray-100 transition-all"
-            >
-              {t('back')}
-            </button>
+
+            <p className="text-sm font-bold text-gray-500 mb-6">{t('learnTogether')}</p>
+            <p className="text-xs text-gray-400 italic">“{t('bottomQuote')}”</p>
           </div>
         </div>
       )
