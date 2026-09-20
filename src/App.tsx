@@ -25,6 +25,8 @@ interface UserProgress {
   quizScores: number[]
   lastActiveDate: string
   streakDays: number
+  kidsDone: string[]
+  guidesDone: string[]
 }
 
 interface StudentProfile {
@@ -386,6 +388,8 @@ const defaultStudentProgress: UserProgress = {
   quizScores: [],
   lastActiveDate: '',
   streakDays: 0,
+  kidsDone: [],
+  guidesDone: [],
 }
 
 const getStoredStudentProfile = (): StudentProfile => {
@@ -524,6 +528,230 @@ const examQuestions: ExamQuestion[] = [
   { topic: 'Ciudadanía', icon: '🗳️', question: 'Un comité vecinal detecta sobreprecio en una obra. ¿Qué puede hacer?', options: ['Pedir su parte', 'No meterse', 'Exigir el expediente y denunciar'], correct: 2 },
 ]
 
+const topicFilters = ['Todos', 'Corrupción', 'Coimas', 'Decisiones', 'Ciudadanía', 'Familia', 'Actividades']
+
+// Biblioteca de temas para hijos y adolescentes
+interface KidTopic {
+  id: string
+  title: string
+  desc: string
+  icon: string
+  category: string
+  core: LearningTopic
+  body: string[]
+  example: string
+  scenarioQ: string
+  scenarioOpts: string[]
+  scenarioCorrect: number
+  scenarioWhy: string
+  familyPrompt: string
+  familyQuestion: string
+  relatedGuide: string
+  joint?: boolean
+}
+
+const KIDS_TOPICS: KidTopic[] = [
+  {
+    id: 'k1', title: '¿Qué es la corrupción?', desc: 'Descubre qué significa con ejemplos de todos los días.', icon: '🏛️', category: 'Corrupción', core: 'coima',
+    body: ['La corrupción es cuando alguien usa su poder o su puesto para conseguir algo injusto, en vez de hacer lo correcto.', 'No es solo cosa de políticos: puede aparecer en la escuela, en el barrio o en cualquier lugar donde alguien haga trampa para ganar.'],
+    example: 'Pagar para evitar una multa que sí cometiste es corrupción: rompe las reglas que son para todos.',
+    scenarioQ: 'Un compañero te ofrece dinero para que lo dejes copiar tu examen. ¿Qué es eso?',
+    scenarioOpts: ['Una ayuda entre amigos', 'Un acto de corrupción', 'Un juego sin importancia'], scenarioCorrect: 1,
+    scenarioWhy: 'Es corrupción: se ofrece algo de valor para obtener un beneficio injusto.',
+    familyPrompt: 'Hoy aprendí qué es la corrupción.',
+    familyQuestion: '¿En qué lugares crees que puede aparecer la corrupción?',
+    relatedGuide: 'p1',
+  },
+  {
+    id: 'k2', title: '¿Qué es una coima?', desc: 'Aprende qué es y por qué afecta a otras personas.', icon: '💰', category: 'Coimas', core: 'coima',
+    body: ['Una coima es dinero, regalos o favores que se ofrecen para conseguir algo que no corresponde.', 'El problema es que ese beneficio injusto le quita algo a otra persona: un cupo, un servicio, una oportunidad.'],
+    example: 'Ofrecer dinero para que te atiendan primero, saltándose a todos los que esperaban.',
+    scenarioQ: '¿Cuál de estos es una coima?',
+    scenarioOpts: ['Pagar el precio justo en el mercado', 'Dar dinero para obtener un beneficio que no corresponde', 'Devolver algo prestado'], scenarioCorrect: 1,
+    scenarioWhy: 'La coima siempre busca un beneficio indebido a cambio de algo de valor.',
+    familyPrompt: 'Hoy aprendí qué es una coima.',
+    familyQuestion: '¿Por qué crees que una coima puede afectar a otras personas?',
+    relatedGuide: 'p2',
+  },
+  {
+    id: 'k3', title: '¿Por qué alguien ofrece una coima?', desc: 'Entiende las razones sin justificar la conducta.', icon: '🤔', category: 'Coimas', core: 'recognition',
+    body: ['Algunas personas ofrecen coimas por impaciencia, por querer ganar sin esfuerzo o porque creen que “todos lo hacen”.', 'Ninguna razón lo justifica: entender por qué ocurre nos ayuda a no caer en lo mismo.'],
+    example: 'Alguien ofrece dinero para no hacer la fila del trámite porque no quiere esperar.',
+    scenarioQ: 'Un amigo dice: “todos pagan para pasar, hay que hacerlo”. ¿Qué piensas?',
+    scenarioOpts: ['Tiene razón, hay que adaptarse', 'Que algo sea común no lo hace correcto', 'Depende del monto'], scenarioCorrect: 1,
+    scenarioWhy: 'Que muchos lo hagan no lo vuelve correcto ni legal.',
+    familyPrompt: 'Hoy pensé por qué la gente ofrece coimas.',
+    familyQuestion: '¿Qué responderías si alguien te dice que “todos lo hacen”?',
+    relatedGuide: 'p7',
+  },
+  {
+    id: 'k4', title: '¿Qué harías tú?', desc: 'Decide cómo actuar en distintos escenarios.', icon: '🧭', category: 'Decisiones', core: 'impact',
+    body: ['En la vida te vas a cruzar con situaciones injustas. Lo importante es detenerte, pensar en las consecuencias y elegir bien.', 'Puedes practicar aquí con casos de mentira para estar listo cuando pase de verdad.'],
+    example: 'Te ofrecen un premio por quedarte callado ante algo injusto.',
+    scenarioQ: 'Ves que favorecen injustamente a alguien por dinero. ¿Qué haces?',
+    scenarioOpts: ['Me quedo callado, no es mi problema', 'Lo comento con un adulto de confianza', 'Pido que también me favorezcan'], scenarioCorrect: 1,
+    scenarioWhy: 'Hablar con alguien de confianza es el primer paso para frenar lo injusto.',
+    familyPrompt: 'Hoy practiqué cómo actuar ante situaciones injustas.',
+    familyQuestion: 'Si vieras algo injusto, ¿a quién se lo contarías primero?',
+    relatedGuide: 'p6',
+  },
+  {
+    id: 'k5', title: 'Presión de grupo', desc: 'Aprende a decir que no cuando te presionan.', icon: '🫂', category: 'Decisiones', core: 'prevention',
+    body: ['A veces otras personas intentan convencerte de hacer algo incorrecto para “encajar”. Eso se llama presión de grupo.', 'Decir que no es difícil, pero es una muestra de fuerza: puedes proponer otra cosa, alejarte o pedir ayuda.'],
+    example: 'Tus amigos te presionan para copiar en un examen y te dicen que si no lo haces eres un traidor.',
+    scenarioQ: '¿Qué haces si te presionan para hacer algo incorrecto?',
+    scenarioOpts: ['Acepto para no quedar mal', 'Digo que no y me alejo o pido ayuda', 'Lo hago solo una vez'], scenarioCorrect: 1,
+    scenarioWhy: 'Decir que no y buscar apoyo es la respuesta valiente y correcta.',
+    familyPrompt: 'Hoy aprendí a enfrentar la presión de grupo.',
+    familyQuestion: '¿Qué podrías decir si alguien te presiona a hacer algo malo?',
+    relatedGuide: 'p7',
+  },
+  {
+    id: 'k6', title: 'Decisiones y consecuencias', desc: 'Tus decisiones pueden afectar a otras personas.', icon: '⚖️', category: 'Decisiones', core: 'consequences',
+    body: ['Cada decisión deja una huella: puede ayudar o puede dañar a quienes te rodean.', 'Antes de decidir, pregúntate: ¿a quién afecta esto? ¿me sentiría orgulloso si todos lo supieran?'],
+    example: 'Aceptar un beneficio injusto puede dejar sin oportunidad a alguien que sí se lo merecía.',
+    scenarioQ: '¿Qué pregunta te ayuda a decidir bien?',
+    scenarioOpts: ['¿Me conviene solo a mí?', '¿A quién afecta y sería justo para todos?', '¿Nadie se dará cuenta?'], scenarioCorrect: 1,
+    scenarioWhy: 'Pensar en los demás y en lo justo lleva a mejores decisiones.',
+    familyPrompt: 'Hoy aprendí que mis decisiones afectan a otros.',
+    familyQuestion: '¿Recuerdas una decisión tuya que haya afectado a alguien?',
+    relatedGuide: 'p5',
+  },
+  {
+    id: 'k7', title: 'Corrupción en la vida cotidiana', desc: 'Ejemplos cercanos y fáciles de identificar.', icon: '🏪', category: 'Ciudadanía', core: 'impact',
+    body: ['La corrupción no solo sale en las noticias: está en favorecer a alguien injustamente o usar una posición para obtener ventajas.', 'Aprender a verla en lo cotidiano te protege: la reconoces antes de que te atrape.'],
+    example: 'Un comerciante cobra de más a quien no conoce y le hace “precio especial” solo a sus amigos en un servicio público.',
+    scenarioQ: '¿Cuál de estos es un ejemplo cotidiano de corrupción?',
+    scenarioOpts: ['Hacer fila y esperar tu turno', 'Usar un cargo para favorecer injustamente a alguien', 'Pedir ayuda con la tarea'], scenarioCorrect: 1,
+    scenarioWhy: 'Usar una posición para dar ventajas injustas es corrupción cotidiana.',
+    familyPrompt: 'Hoy descubrí la corrupción en la vida diaria.',
+    familyQuestion: '¿Has visto alguna situación injusta en tu escuela o barrio?',
+    relatedGuide: 'p4',
+  },
+  {
+    id: 'k8', title: '¿Cómo puedo actuar correctamente?', desc: 'Acciones concretas de honestidad y ciudadanía.', icon: '🌟', category: 'Ciudadanía', core: 'ethics',
+    body: ['Actuar bien es un hábito: respetar turnos, decir la verdad, devolver lo perdido y tratar a todos con justicia.', 'Cada pequeña acción honesta construye tu reputación y mejora tu comunidad.'],
+    example: 'Devuelves el vuelto de más aunque nadie se haya dado cuenta.',
+    scenarioQ: '¿Cuál es una acción correcta?',
+    scenarioOpts: ['Quedarme con el vuelto de más', 'Devolver lo que no es mío y ser justo', 'Aprovechar si nadie mira'], scenarioCorrect: 1,
+    scenarioWhy: 'La honestidad se demuestra cuando nadie está mirando.',
+    familyPrompt: 'Hoy aprendí acciones para actuar correctamente.',
+    familyQuestion: '¿Qué acción honesta hiciste esta semana?',
+    relatedGuide: 'p5',
+  },
+  {
+    id: 'k9', title: 'Mitos sobre las coimas', desc: 'Descubre si estas afirmaciones son verdaderas o falsas.', icon: '❓', category: 'Actividades', core: 'prevention',
+    body: ['Mito 1: “una coima pequeña no hace daño” → Falso: toda coima rompe reglas y quita recursos a todos.', 'Mito 2: “si nadie se entera no pasa nada” → Falso: el daño existe aunque nadie lo vea.', 'Mito 3: “así funcionan las cosas” → Falso: las cosas funcionan mejor con honestidad.'],
+    example: 'Decir “es solo un poquito” no lo vuelve correcto.',
+    scenarioQ: '“Pagar una coima pequeña no hace daño a nadie.” ¿Verdadero o falso?',
+    scenarioOpts: ['Verdadero', 'Falso'], scenarioCorrect: 1,
+    scenarioWhy: 'Falso: toda coima hace daño y rompe la confianza.',
+    familyPrompt: 'Hoy descubrí los mitos de las coimas.',
+    familyQuestion: '¿Qué frase has escuchado que normalice las coimas?',
+    relatedGuide: 'p8',
+  },
+  {
+    id: 'k10', title: 'Reto familiar', desc: 'Actividad para hacer junto a tu familia.', icon: '👨‍👩‍👧', category: 'Familia', core: 'citizen', joint: true,
+    body: ['Este reto se hace en equipo: elige a tu padre, madre o tutor y conversen juntos.', 'Lean la situación, den su opinión cada uno y escriban su compromiso familiar contra las coimas.'],
+    example: 'Compromiso: “En nuestra familia hablamos con la verdad y no aceptamos atajos injustos”.',
+    scenarioQ: '¿Ya conversaron y escribieron su compromiso familiar?',
+    scenarioOpts: ['Todavía no', '¡Sí, lo hicimos juntos!'], scenarioCorrect: 1,
+    scenarioWhy: '¡Felicidades! Conversar en familia ya es un gran paso.',
+    familyPrompt: 'Hoy hicimos el reto familiar juntos.',
+    familyQuestion: '¿Cuál es el compromiso de nuestra familia?',
+    relatedGuide: 'p10',
+  },
+]
+
+// Biblioteca de guías para padres y tutores
+interface ParentGuide {
+  id: string
+  title: string
+  desc: string
+  icon: string
+  category: string
+  body: string[]
+  questions: string[]
+  tip: string
+  relatedKid: string
+  joint?: boolean
+}
+
+const PARENT_GUIDES: ParentGuide[] = [
+  {
+    id: 'p1', title: 'Comprender la corrupción', desc: 'Conceptos básicos para conversar con adolescentes.', icon: '🏛️', category: 'Corrupción',
+    body: ['La corrupción es el uso indebido del poder para obtener beneficios injustos.', 'Para conversarlo con tu hijo, usa ejemplos cercanos: la escuela, el barrio, los servicios que usan a diario.', 'Evita definiciones frías: lo que queda son las historias y los ejemplos.'],
+    questions: ['¿Qué entiendes tú por corrupción?', '¿Dónde crees que puede aparecer?', '¿Por qué nos afecta a todos?'],
+    tip: 'Empieza con una pregunta, no con un sermón: la curiosidad abre la conversación.',
+    relatedKid: 'k1',
+  },
+  {
+    id: 'p2', title: 'Cómo explicar qué es una coima', desc: 'Guía sencilla sin generar confusión.', icon: '💰', category: 'Coimas',
+    body: ['Una coima es ofrecer o aceptar algo de valor para conseguir un beneficio indebido.', 'Explícalo con un ejemplo concreto: saltarse una fila pagando, o ganar algo sin merecerlo.', 'Aclara que no importa el monto: pequeña o grande, sigue siendo coima.'],
+    questions: ['¿Por qué crees que una coima afecta a otras personas?', '¿Qué diferencia hay entre un regalo y una coima?', '¿Qué harías si te la ofrecen?'],
+    tip: 'Usa el ejemplo de la fila: todos entienden lo injusto de saltársela pagando.',
+    relatedKid: 'k2',
+  },
+  {
+    id: 'p3', title: 'Cómo conversar sobre corrupción', desc: 'Preguntas y estrategias para iniciar el diálogo.', icon: '💬', category: 'Familia',
+    body: ['Elige un momento tranquilo, sin pantallas de por medio.', 'Haz preguntas abiertas: las que empiezan con “qué”, “cómo” o “por qué”.', 'Valida sus opiniones antes de corregir: “qué interesante, cuéntame más”.'],
+    questions: ['¿Qué harías tú en esa situación?', '¿Cómo te sentirías si fueras la persona afectada?', '¿Qué valores están en juego aquí?'],
+    tip: 'Escucha el 80% del tiempo y habla el 20%: tu hijo debe ser el protagonista.',
+    relatedKid: 'k4',
+  },
+  {
+    id: 'p4', title: 'Enseñar con situaciones cotidianas', desc: 'Usa la vida diaria para generar reflexión.', icon: '🏪', category: 'Ciudadanía',
+    body: ['Las noticias, la escuela y el barrio están llenos de ejemplos para conversar.', 'Cuando vean algo injusto juntos, pregúntale qué ve y qué haría.', 'Conecta cada ejemplo con un valor: justicia, respeto, honestidad.'],
+    questions: ['¿Qué viste y por qué te pareció injusto?', '¿Quién sale afectado?', '¿Cómo se podría haber hecho bien?'],
+    tip: 'Lleva un “diario de situaciones”: anoten juntos un ejemplo por semana.',
+    relatedKid: 'k7',
+  },
+  {
+    id: 'p5', title: 'Valores y toma de decisiones', desc: 'Responsabilidad, honestidad, respeto y justicia.', icon: '🌟', category: 'Decisiones',
+    body: ['Los valores se enseñan con el ejemplo más que con palabras.', 'Narra tus propias decisiones honestas del día en voz alta.', 'Celebra cuando tu hijo elija bien, sobre todo si le costó.'],
+    questions: ['¿Qué valor usaste hoy?', '¿Qué fue lo más difícil de decidir bien?', '¿De qué decisión te sientes orgulloso?'],
+    tip: 'Refuerza el esfuerzo, no solo el resultado: “me gusta cómo lo pensaste”.',
+    relatedKid: 'k6',
+  },
+  {
+    id: 'p6', title: '¿Qué harías en esta situación?', desc: 'Casos familiares para analizar juntos.', icon: '🧭', category: 'Decisiones',
+    body: ['Presenta un caso corto y pidan su opinión antes de dar la tuya.', 'Analicen juntos: qué pasa, dónde está el problema y qué decisión sería responsable.', 'Cierren con un compromiso concreto para situaciones parecidas.'],
+    questions: ['¿Qué está pasando aquí?', '¿Dónde está el problema?', '¿Qué decisión tomaríamos como familia?'],
+    tip: 'No hay una sola respuesta: lo valioso es el razonamiento que construyen juntos.',
+    relatedKid: 'k4',
+  },
+  {
+    id: 'p7', title: 'Cómo responder preguntas difíciles', desc: 'Orientación ante dudas sobre corrupción.', icon: '❓', category: 'Coimas',
+    body: ['Si no sabes la respuesta, dilo: “averigüémoslo juntos” también enseña.', 'Responde con otra pregunta para conocer qué piensa primero.', 'Si el tema es delicado, valida su emoción antes de explicar.'],
+    questions: ['¿Qué te preocupa de eso que preguntas?', '¿Qué crees tú que deberíamos hacer?', '¿A quién más le podríamos preguntar?'],
+    tip: 'Nunca te burles de una pregunta: cada duda es una puerta para conversar.',
+    relatedKid: 'k3',
+  },
+  {
+    id: 'p8', title: 'Evitar normalizar las coimas', desc: 'Por qué “así funcionan las cosas” hace daño.', icon: '🚫', category: 'Corrupción',
+    body: ['Frases como “así funcionan las cosas” enseñan a rendirse ante lo injusto.', 'Cuando escuches esa frase, pregúntale si le gustaría vivir en un lugar donde todo funcione así.', 'Muéstrale ejemplos donde la honestidad sí funcionó.'],
+    questions: ['¿Qué pasa si todos pensamos “así son las cosas”?', '¿Conoces a alguien que haya actuado bien aunque costara?', '¿Cómo sería nuestro barrio si nadie hiciera trampa?'],
+    tip: 'Cambia el “así son las cosas” por “¿y si lo hacemos bien?”.',
+    relatedKid: 'k9',
+  },
+  {
+    id: 'p9', title: 'Acompañamiento familiar', desc: 'Convierte el aprendizaje en conversación.', icon: '🤝', category: 'Familia',
+    body: ['Acompañar es estar presente: pregunta qué aprendió y pide que te enseñe.', 'Convierte cada tema en un ritual corto: 10 minutos de conversación después de aprender.', 'Registra los avances juntos revisando las insignias.'],
+    questions: ['¿Qué fue lo que más te sorprendió?', '¿Me enseñas lo que aprendiste?', '¿Qué conversamos la próxima vez?'],
+    tip: 'Que tu hijo te enseñe a ti: enseñar es la mejor forma de aprender.',
+    relatedKid: 'k10',
+    joint: true,
+  },
+  {
+    id: 'p10', title: 'Actividades para realizar en familia', desc: 'Dinámicas cortas para padres e hijos.', icon: '🎲', category: 'Actividades',
+    body: ['Elijan una situación injusta y represéntenla: cada uno defiende un rol distinto.', 'Escriban su compromiso familiar y péguenlo en un lugar visible.', 'Cierren con algo positivo: ¿qué hicieron bien hoy como familia?'],
+    questions: ['¿Qué rol te tocó y cómo te sentiste?', '¿Cuál es nuestro compromiso familiar?', '¿Qué repetimos la próxima semana?'],
+    tip: '15 minutos bastan: la constancia vale más que la duración.',
+    relatedKid: 'k10',
+    joint: true,
+  },
+]
+
 // Datos de preguntas para la sección Conversemos
 const conversationPrompts: ConversationPrompt[] = [
   { id: '1', question: '¿Qué entiendes por coima?', asked: false },
@@ -542,17 +770,11 @@ export default function App() {
   const [familyProfile, setFamilyProfile] = useState<FamilyProfile>(initialFamilyProfile)
   const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'device' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents' | 'profile-type'>('welcome')
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null)
-  const [learnRole, setLearnRole] = useState<'kids' | 'parents' | null>(() => {
-    const saved = localStorage.getItem('hablemos-claro-learn-role')
-    if (saved === 'parents' || saved === 'kids') return saved
-    return null
-  })
-  const effectiveLearnRole: 'kids' | 'parents' = learnRole ?? (selectedRole === 'parent' ? 'parents' : 'kids')
-  const changeLearnRole = (value: 'kids' | 'parents') => {
-    setLearnRole(value)
-    localStorage.setItem('hablemos-claro-learn-role', value)
-  }
-  const [selectedTopic, setSelectedTopic] = useState<LearningTopic | null>(null)
+  const [learnView, setLearnView] = useState<'hub' | 'kids' | 'parents' | 'kid' | 'guide' | 'exam'>('hub')
+  const [activeKidId, setActiveKidId] = useState<string | null>(null)
+  const [activeGuideId, setActiveGuideId] = useState<string | null>(null)
+  const [kidsFilter, setKidsFilter] = useState('Todos')
+  const [parentsFilter, setParentsFilter] = useState('Todos')
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [userAnswers, setUserAnswers] = useState<number[]>([])
   const [showFeedback, setShowFeedback] = useState(false)
@@ -648,18 +870,19 @@ export default function App() {
     }
   }
 
-  // Orden obligatorio de temas (paso por paso, sin saltos)
-  const topicOrder: LearningTopic[] = ['coima', 'recognition', 'impact', 'consequences', 'prevention', 'ethics', 'citizen', 'test']
-
   // Completar un tema (solo cuenta la primera vez) - un solo guardado para no sobrescribir el desbloqueo
-  const completeTopic = (topic: LearningTopic) => {
+  const completeTopic = (topic: LearningTopic, extraPatch?: Partial<UserProgress>, opts?: { forceCount?: boolean; convInc?: number; extraLog?: string }) => {
     const currentProfile = profileType === 'student' ? studentProfile : familyProfile
     const alreadyDone = (currentProfile.progress.topicProgress[topic] ?? 0) >= 100
-    const completedActivities = currentProfile.progress.completedActivities + (alreadyDone ? 0 : 1)
+    const convInc = opts?.convInc ?? 0
+    const countNow = (alreadyDone && !(opts?.forceCount ?? false) && convInc === 0) ? 0 : 1
+    const completedActivities = currentProfile.progress.completedActivities + countNow
     const newProgress = {
       ...currentProfile.progress,
+      ...(extraPatch ?? {}),
       completedActivities,
       totalActivities: Math.max(currentProfile.progress.totalActivities, completedActivities),
+      conversations: currentProfile.progress.conversations + convInc,
       topicProgress: {
         ...currentProfile.progress.topicProgress,
         [topic]: 100,
@@ -671,6 +894,46 @@ export default function App() {
     } else {
       let updated: FamilyProfile = { ...familyProfile, progress: newProgress }
       updated = pushFamilyLog(updated, `📚 Tema completado: ${topicTitles[topic]}.`)
+      if (opts?.extraLog) updated = pushFamilyLog(updated, opts.extraLog)
+      const checked = checkFamilyBadges(updated)
+      setFamilyProfile(checked.profile)
+      saveFamilyProfile(checked.profile)
+      celebrateFamilyBadges(checked.unlocked)
+    }
+  }
+
+  // Completar un tema de la biblioteca de hijos (suma actividad + conversación si es reto familiar)
+  const completeKidTopic = (id: string) => {
+    const kt = KIDS_TOPICS.find(k => k.id === id)
+    if (!kt) return
+    const cur = profileType === 'student' ? studentProfile : familyProfile
+    const prevKids = cur.progress.kidsDone ?? []
+    if (prevKids.includes(id)) return
+    const kidsDone = [...prevKids, id]
+    completeTopic(kt.core, { kidsDone }, kt.joint ? { forceCount: true, convInc: 1, extraLog: '💬 Actividad familiar completada juntos.' } : { forceCount: true })
+  }
+
+  // Marcar una guía de padres como revisada
+  const reviewGuide = (id: string) => {
+    const g = PARENT_GUIDES.find(x => x.id === id)
+    if (!g) return
+    const cur = profileType === 'student' ? studentProfile : familyProfile
+    const prev = cur.progress.guidesDone ?? []
+    if (prev.includes(id)) return
+    const guidesDone = [...prev, id]
+    const completedActivities = cur.progress.completedActivities + 1
+    const newProgress = {
+      ...cur.progress,
+      guidesDone,
+      completedActivities,
+      totalActivities: Math.max(cur.progress.totalActivities, completedActivities),
+    }
+    if (profileType === 'student') {
+      setStudentProfile({ ...studentProfile, progress: newProgress })
+      saveStudentProfile({ ...studentProfile, progress: newProgress })
+    } else {
+      let updated: FamilyProfile = { ...familyProfile, progress: newProgress }
+      updated = pushFamilyLog(updated, `📖 Guía revisada: ${g.title}.`)
       const checked = checkFamilyBadges(updated)
       setFamilyProfile(checked.profile)
       saveFamilyProfile(checked.profile)
@@ -1406,7 +1669,7 @@ case 'about':
             {/* Main Grid - 2x2 */}
             <div className="grid grid-cols-2 gap-12">
               <button
-                onClick={() => setCurrentScreen('learn')}
+                onClick={() => { setLearnView('hub'); setCurrentScreen('learn') }}
                 className="glass-card rounded-2xl p-10 card-hover shadow-custom-lg min-h-[180px] flex flex-col justify-between group"
               >
                 <div>
@@ -1703,7 +1966,12 @@ case 'about':
         },
       ]
 
-      const currentTopicData = selectedTopic ? topics[selectedTopic] : topics.coima
+      const kidsDone = getProgress().kidsDone ?? []
+      const guidesDone = getProgress().guidesDone ?? []
+      const activeKid = KIDS_TOPICS.find(k => k.id === activeKidId) ?? null
+      const activeGuide = PARENT_GUIDES.find(g => g.id === activeGuideId) ?? null
+      const activeKidCore = activeKid ? topics[activeKid.core] : null
+      const examUnlocked = kidsDone.length >= KIDS_TOPICS.length
       const cust7 = getCustomization();
 
       // Pantalla "¿Coima o no?"
@@ -1804,169 +2072,370 @@ case 'about':
             {/* Header */}
             <div className="bg-white rounded-2xl p-6 flex items-center justify-between shadow-sm">
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-4xl">
-                  {currentTopicData.icon}
-                </div>
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-4xl">📚</div>
                 <div>
-                  <h1 className="text-3xl font-bold gradient-text">{currentTopicData.title}</h1>
-                  <p className="text-gray-600 mt-1">Tema {Object.keys(topics).indexOf(selectedTopic || 'coima') + 1} de {Object.keys(topics).length}</p>
+                  <h1 className="text-3xl font-bold gradient-text">Explora los temas</h1>
+                  <p className="text-gray-600 mt-1">Elige contenidos según tu rol dentro de la familia.</p>
                 </div>
               </div>
-              <button onClick={() => navigateTo('home')} className="glass-card px-5 py-2 rounded-xl text-gray-500 hover:text-primary text-sm font-medium hover:bg-gray-100 transition-all">
-                ← Inicio
+              <button
+                onClick={() => {
+                  if (learnView === 'hub') navigateTo('home')
+                  else if (learnView === 'kid') setLearnView('kids')
+                  else if (learnView === 'guide') setLearnView('parents')
+                  else if (learnView === 'exam') setLearnView('kids')
+                  else setLearnView('hub')
+                }}
+                className="glass-card px-5 py-2 rounded-xl text-gray-500 hover:text-primary text-sm font-medium hover:bg-gray-100 transition-all"
+              >
+                {learnView === 'hub' ? '← Inicio' : '← Atrás'}
               </button>
             </div>
 
-            {selectedTopic !== 'test' && (
-              <div className="bg-white rounded-2xl p-4 shadow-sm">
-                <p className="text-sm font-bold text-dark text-center mb-3">¿Quién está aprendiendo?</p>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => changeLearnRole('kids')}
-                    className={`font-bold py-3 px-4 rounded-xl transition-all ${
-                      effectiveLearnRole === 'kids'
-                        ? 'bg-secondary text-white shadow-lg'
-                        : 'bg-gray-100 text-dark hover:bg-gray-200'
-                    }`}
-                  >
-                    🧒 Hijos
-                  </button>
-                  <button
-                    onClick={() => changeLearnRole('parents')}
-                    className={`font-bold py-3 px-4 rounded-xl transition-all ${
-                      effectiveLearnRole === 'parents'
-                        ? 'bg-primary text-white shadow-lg'
-                        : 'bg-gray-100 text-dark hover:bg-gray-200'
-                    }`}
-                  >
-                    👨‍👩‍👧 Padres y tutores
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Main Content */}
-
-            {/* Topic menu */}
-            <div className="glass-card rounded-2xl p-10">
-              <h2 className="text-xl font-bold text-dark mb-3">Ruta de aprendizaje</h2>
-              <p className="text-gray-500 mb-8">Avanza paso por paso, sin saltos. El test se desbloquea al terminar todos los temas.</p>
-              <div className="grid grid-cols-2 gap-6">
-                {topicOrder.map((key) => {
-                  const idx = topicOrder.indexOf(key)
-                  const prevKey = idx > 0 ? topicOrder[idx - 1] : null
-                  const prevDone = prevKey === null || (getProgress().topicProgress[prevKey] ?? 0) >= 100
-                  const done = (getProgress().topicProgress[key] ?? 0) >= 100
-                  const locked = !prevDone
-                  const isTest = key === 'test'
-                  return (
-                    <button
-                      key={key}
-                      disabled={locked}
-                      onClick={() => { setSelectedTopic(key); setShowCoimaONo(false); setShowFeedback(false); }}
-                      className={`rounded-2xl p-5 text-left transition-all border-2 ${
-                        locked
-                          ? 'bg-gray-100 text-gray-400 border-gray-200 opacity-70'
-                          : (selectedTopic ?? 'coima') === key
-                            ? 'bg-primary text-white border-primary shadow-lg'
-                            : 'glass-card text-dark border-transparent hover:border-primary/40'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="text-3xl mb-2">{locked ? '🔒' : topics[key].icon}</div>
-                        {done && !locked && <div className="text-xl">✅</div>}
-                      </div>
-                      <div className="font-bold leading-snug">
-                        {idx + 1}. {topics[key].title}
-                        {isTest && locked && ' (bloqueado)'}
-                      </div>
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-
-            {selectedTopic !== 'test' && !showCoimaONo && (
-              <div className="rounded-2xl p-10 border-2 border-black" style={{ background: '#FFE45E' }}>
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-11 h-11 rounded-xl bg-black flex items-center justify-center text-2xl">📖</div>
-                  <h2 className="text-2xl font-bold text-black">Explicación</h2>
-                  <span className="ml-auto px-3 py-1 rounded-full bg-black text-white text-xs font-bold">
-                    {effectiveLearnRole === 'kids' ? '🧒 Hijos' : '👨‍👩‍👧 Padres y tutores'}
-                  </span>
-                </div>
-                <p className="text-black text-lg leading-loose">{effectiveLearnRole === 'kids' ? currentTopicData.kidsExplanation : currentTopicData.explanation}</p>
-
-                {currentTopicData.keyPoints.length > 0 && (
-                  <div className="mt-10">
-                    <h3 className="font-bold text-black mb-5">Puntos clave</h3>
-                    <ul className="space-y-6">
-                      {currentTopicData.keyPoints.map((point, i) => (
-                        <li key={i} className="flex items-start gap-4 p-5 bg-white rounded-xl border border-black/10">
-                          <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-bold flex-shrink-0">
-                            {i + 1}
-                          </div>
-                          <p className="text-black leading-relaxed">{point}</p>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                <div className="mt-10 p-6 bg-white border-l-4 border-black rounded-xl">
-                  <p className="font-bold text-black mb-3">💡 Ejemplo</p>
-                  <p className="text-black leading-loose italic">“{effectiveLearnRole === 'kids' ? currentTopicData.kidsExample : currentTopicData.example}”</p>
-                </div>
-
-                {effectiveLearnRole === 'parents' && (
-                  <div className="mt-8 p-6 bg-white border-2 border-black rounded-xl">
-                    <p className="font-bold text-black mb-3">⚖️ Principio</p>
-                    <p className="text-black leading-loose font-medium">“{currentTopicData.theorem}”</p>
-                  </div>
-                )}
-
-                {effectiveLearnRole === 'parents' && currentTopicData.parentTip !== '' && (
-                  <div className="mt-8 p-6 bg-black rounded-xl">
-                    <p className="font-bold text-white mb-3">💬 Para conversar en casa</p>
-                    <p className="text-white leading-loose">{currentTopicData.parentTip}</p>
-                  </div>
-                )}
-
-                <div className="mt-10">
-                  <h3 className="font-bold text-black mb-5">Comprensión rápida</h3>
-                  <div className="grid grid-cols-2 gap-6">
-                    <button
-                      onClick={() => handleAnswer(0)}
-                      className="btn-glow bg-success text-white font-bold py-4 px-5 rounded-xl text-lg border-2 border-white"
-                    >
-                      ✅ {currentTopicData.correct}
-                    </button>
-                    <button
-                      onClick={() => handleAnswer(1)}
-                      className="btn-glow bg-white border-2 border-white text-black font-bold py-4 px-5 rounded-xl hover:border-primary/50"
-                    >
-                      ❌ {currentTopicData.incorrect}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {selectedTopic !== 'test' && !showCoimaONo && (
-              <div className="glass-card rounded-2xl p-8">
-                <h2 className="text-2xl font-bold text-primary mb-3">¿Coima o no?</h2>
-                <p className="text-gray-600 leading-relaxed mb-6">Pon a prueba tu criterio con situaciones de la vida real.</p>
+            {/* HUB */}
+            {learnView === 'hub' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                 <button
-                  onClick={() => setShowCoimaONo(true)}
-                  className="btn-glow bg-primary text-white font-bold py-4 px-6 rounded-xl text-lg w-full"
+                  onClick={() => setLearnView('kids')}
+                  className="group bg-white rounded-3xl p-8 shadow-xl border border-gray-100 text-left transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl cursor-pointer"
                 >
-                  Empezar test →
+                  <div className="w-20 h-20 rounded-3xl mb-5 flex items-center justify-center transition-transform duration-300 group-hover:scale-105" style={{ background: 'linear-gradient(135deg, #DBEAFE, #EDE9FE)' }}>
+                    <svg viewBox="0 0 24 24" className="w-10 h-10 text-primary" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <path d="M12 4 22 9l-10 5L2 9l10-5Z" />
+                      <path d="M6 11.5V16c0 1.7 2.7 3 6 3s6-1.3 6-3v-4.5" />
+                      <path d="M22 9v6" />
+                    </svg>
+                  </div>
+                  <h2 className="text-2xl font-black text-primary mb-2">PARA HIJOS</h2>
+                  <p className="text-gray-600 leading-relaxed mb-6">Aprende de forma sencilla, interactiva y con ejemplos de situaciones cotidianas.</p>
+                  <span className="inline-flex items-center gap-2 bg-primary text-white font-bold py-3 px-6 rounded-full transition-all duration-300 group-hover:gap-3">
+                    Explorar temas →
+                  </span>
+                  <p className="text-sm font-bold text-gray-400 mt-4">{kidsDone.length} de {KIDS_TOPICS.length} completados</p>
+                </button>
+                <button
+                  onClick={() => setLearnView('parents')}
+                  className="group bg-white rounded-3xl p-8 shadow-xl border border-gray-100 text-left transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl cursor-pointer"
+                >
+                  <div className="w-20 h-20 rounded-3xl mb-5 flex items-center justify-center transition-transform duration-300 group-hover:scale-105" style={{ background: 'linear-gradient(135deg, #EDE9FE, #FEF3C7)' }}>
+                    <svg viewBox="0 0 24 24" className="w-10 h-10 text-secondary" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                      <circle cx="9" cy="8" r="3.2" />
+                      <path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5" />
+                      <circle cx="16.8" cy="9" r="2.4" />
+                      <path d="M16 14.3c2.6.4 4.3 2 4.7 4.2" />
+                    </svg>
+                  </div>
+                  <h2 className="text-2xl font-black text-secondary mb-2">PARA PADRES Y TUTORES</h2>
+                  <p className="text-gray-600 leading-relaxed mb-6">Encuentra herramientas para conversar y acompañar a tus hijos.</p>
+                  <span className="inline-flex items-center gap-2 text-white font-bold py-3 px-6 rounded-full transition-all duration-300 group-hover:gap-3" style={{ background: '#7C3AED' }}>
+                    Explorar temas →
+                  </span>
+                  <p className="text-sm font-bold text-gray-400 mt-4">{guidesDone.length} de {PARENT_GUIDES.length} revisados</p>
                 </button>
               </div>
             )}
 
-            {selectedTopic === 'test' && (
+            {/* BIBLIOTECA HIJOS */}
+            {learnView === 'kids' && (
+              <>
+                <div className="bg-white rounded-2xl p-6 shadow-sm">
+                  <div className="flex items-center justify-between mb-2">
+                    <h2 className="text-2xl font-black text-primary">🧒 Temas para ti</h2>
+                    <span className="font-bold text-primary">{kidsDone.length}/{KIDS_TOPICS.length}</span>
+                  </div>
+                  <div className="h-3 bg-gray-200 rounded-full overflow-hidden mb-5">
+                    <div className="progress-bar h-full" style={{ width: `${(kidsDone.length / KIDS_TOPICS.length) * 100}%` }}></div>
+                  </div>
+                  <div className="flex gap-2 flex-wrap">
+                    {topicFilters.map(f => (
+                      <button
+                        key={f}
+                        onClick={() => setKidsFilter(f)}
+                        className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                          kidsFilter === f ? 'bg-primary text-white shadow' : 'bg-gray-100 text-dark hover:bg-gray-200'
+                        }`}
+                      >
+                        {f}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {KIDS_TOPICS.filter(k => kidsFilter === 'Todos' || k.category === kidsFilter).map((k, i) => {
+                    const done = kidsDone.includes(k.id)
+                    return (
+                      <button
+                        key={k.id}
+                        onClick={() => { setActiveKidId(k.id); setLearnView('kid'); setShowFeedback(false); }}
+                        className="bg-white rounded-2xl p-6 shadow-sm text-left border border-gray-100 transition-all hover:-translate-y-1 hover:shadow-lg cursor-pointer"
+                      >
+                        <div className="flex items-start gap-4">
+                          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/15 to-secondary/15 flex items-center justify-center text-4xl shrink-0">
+                            {k.icon}
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-xs font-bold text-gray-400">{String(i + 1).padStart(2, '0')} · {k.category}{k.joint ? ' · 👨‍👩‍👧 Juntos' : ''}</p>
+                            <h3 className="font-bold text-dark text-lg leading-snug mt-1">{k.title}</h3>
+                            <p className="text-sm text-gray-500 leading-relaxed mt-1">{k.desc}</p>
+                            <span className={`inline-block mt-3 font-bold text-sm px-4 py-2 rounded-full ${done ? 'bg-success/15 text-success' : 'bg-primary text-white'}`}>
+                              {done ? '✓ Completado' : 'Comenzar →'}
+                            </span>
+                          </div>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+                <button
+                  onClick={() => { if (examUnlocked) { setActiveKidId(null); setLearnView('exam'); setExamAnswers({}); } }}
+                  disabled={!examUnlocked}
+                  className={`rounded-2xl p-6 w-full text-left transition-all ${
+                    examUnlocked
+                      ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-lg hover:shadow-xl cursor-pointer'
+                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="text-5xl">{examUnlocked ? '📝' : '🔒'}</div>
+                    <div>
+                      <h3 className="font-black text-xl">Examen final</h3>
+                      <p className={`text-sm ${examUnlocked ? 'text-white/85' : ''}`}>
+                        {examUnlocked ? '14 preguntas de todos los temas. ¡Consigue tus insignias! →' : `Completa los ${KIDS_TOPICS.length} temas para desbloquearlo`}
+                      </p>
+                    </div>
+                  </div>
+                </button>
+              </>
+            )}
+
+            {/* BIBLIOTECA PADRES */}
+            {learnView === 'parents' && (
+              <>
+                <div className="bg-white rounded-2xl p-6 shadow-sm">
+                  <div className="flex items-center justify-between mb-2">
+                    <h2 className="text-2xl font-black text-secondary">👨‍👩‍👧 Guías para acompañar</h2>
+                    <span className="font-bold text-secondary">{guidesDone.length}/{PARENT_GUIDES.length}</span>
+                  </div>
+                  <div className="h-3 bg-gray-200 rounded-full overflow-hidden mb-5">
+                    <div className="h-full rounded-full" style={{ width: `${(guidesDone.length / PARENT_GUIDES.length) * 100}%`, background: 'linear-gradient(90deg, #7C3AED, #EC4899)' }}></div>
+                  </div>
+                  <div className="flex gap-2 flex-wrap">
+                    {topicFilters.map(f => (
+                      <button
+                        key={f}
+                        onClick={() => setParentsFilter(f)}
+                        className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                          parentsFilter === f ? 'bg-secondary text-white shadow' : 'bg-gray-100 text-dark hover:bg-gray-200'
+                        }`}
+                      >
+                        {f}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  {PARENT_GUIDES.filter(g => parentsFilter === 'Todos' || g.category === parentsFilter).map((g, i) => {
+                    const done = guidesDone.includes(g.id)
+                    return (
+                      <button
+                        key={g.id}
+                        onClick={() => { setActiveGuideId(g.id); setLearnView('guide'); }}
+                        className="bg-white rounded-2xl p-6 shadow-sm text-left border border-gray-100 transition-all hover:-translate-y-1 hover:shadow-lg cursor-pointer"
+                      >
+                        <div className="flex items-start gap-4">
+                          <div className="w-14 h-14 rounded-2xl bg-secondary/10 flex items-center justify-center text-3xl shrink-0">
+                            {g.icon}
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-xs font-bold text-gray-400">{String(i + 1).padStart(2, '0')} · {g.category}{g.joint ? ' · 👨‍👩‍👧 Juntos' : ''}</p>
+                            <h3 className="font-bold text-dark text-lg leading-snug mt-1">{g.title}</h3>
+                            <p className="text-sm text-gray-500 leading-relaxed mt-1">{g.desc}</p>
+                            <span className={`inline-block mt-3 font-bold text-sm px-4 py-2 rounded-full ${done ? 'bg-success/15 text-success' : 'bg-secondary text-white'}`}>
+                              {done ? '✓ Revisada' : 'Ver guía →'}
+                            </span>
+                          </div>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </>
+            )}
+
+            {/* DETALLE TEMA HIJO */}
+            {learnView === 'kid' && activeKid && (
+              <>
+                <div className="rounded-2xl p-8 md:p-10 border-2 border-black" style={{ background: '#FFE45E' }}>
+                  <div className="flex items-start justify-between gap-3 mb-5">
+                    <div className="flex items-center gap-3">
+                      <div className="w-14 h-14 rounded-2xl bg-black flex items-center justify-center text-3xl shrink-0">{activeKid.icon}</div>
+                      <div>
+                        <p className="text-xs font-black text-black/60">{activeKid.category}{activeKid.joint ? ' · 👨‍👩‍👧 JUNTOS' : ''}</p>
+                        <h2 className="text-2xl font-black text-black leading-tight">{activeKid.title}</h2>
+                      </div>
+                    </div>
+                    {kidsDone.includes(activeKid.id) && <span className="px-3 py-1 rounded-full bg-black text-white text-xs font-bold shrink-0">✓ Listo</span>}
+                  </div>
+                  <div className="space-y-4 mb-8">
+                    {activeKid.body.map((p, i) => (
+                      <p key={i} className="text-black text-lg leading-loose">{p}</p>
+                    ))}
+                  </div>
+                  <div className="p-5 bg-white border-l-4 border-black rounded-xl mb-8">
+                    <p className="font-bold text-black mb-2">💡 Ejemplo</p>
+                    <p className="text-black leading-loose italic">“{activeKid.example}”</p>
+                  </div>
+                  {activeKidCore && activeKidCore.keyPoints.length > 0 && (
+                    <div className="mb-8">
+                      <h3 className="font-bold text-black mb-4">Puntos clave</h3>
+                      <ul className="space-y-4">
+                        {activeKidCore.keyPoints.map((point, i) => (
+                          <li key={i} className="flex items-start gap-4 p-4 bg-white rounded-xl border border-black/10">
+                            <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-bold flex-shrink-0">
+                              {i + 1}
+                            </div>
+                            <p className="text-black leading-relaxed">{point}</p>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {activeKidCore && activeKidCore.theorem !== '' && (
+                    <div className="p-5 bg-white border-2 border-black rounded-xl mb-8">
+                      <p className="font-bold text-black mb-2">⚖️ Principio</p>
+                      <p className="text-black leading-loose font-medium">“{activeKidCore.theorem}”</p>
+                    </div>
+                  )}
+                  <div className="bg-white rounded-xl p-6 border border-black/10">
+                    <p className="font-bold text-black text-lg mb-4">{activeKid.scenarioQ}</p>
+                    <div className="space-y-4">
+                      {activeKid.scenarioOpts.map((opt, oi) => (
+                        <button
+                          key={oi}
+                          onClick={() => {
+                            const ok = oi === activeKid.scenarioCorrect
+                            setFeedbackMessage((ok ? '¡Muy bien! ' : 'Casi… ') + activeKid.scenarioWhy)
+                            setShowFeedback(true)
+                          }}
+                          className="btn-glow w-full py-4 px-5 rounded-xl text-left bg-white border-2 border-gray-200 hover:border-primary/60 font-medium text-dark"
+                        >
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                    {showFeedback && (
+                      <div className="mt-4 p-4 rounded-xl bg-primary/5 border border-primary/20 animate-fade-in">
+                        <p className="font-bold text-primary">{feedbackMessage}</p>
+                      </div>
+                    )}
+                  </div>
+                  {activeKid.id === 'k4' && (
+                    <button
+                      onClick={() => { setShowCoimaONo(true); setCurrentCoimaCase(0); setShowFeedback(false); }}
+                      className="btn-glow bg-black text-white font-bold py-4 px-6 rounded-xl text-lg w-full mt-8"
+                    >
+                      🎯 Jugar ¿Coima o no?
+                    </button>
+                  )}
+                  <button
+                    onClick={() => completeKidTopic(activeKid.id)}
+                    disabled={kidsDone.includes(activeKid.id)}
+                    className={`font-bold py-4 px-6 rounded-xl text-lg w-full mt-6 ${
+                      kidsDone.includes(activeKid.id)
+                        ? 'bg-black text-white cursor-default'
+                        : 'btn-glow bg-success text-white'
+                    }`}
+                  >
+                    {kidsDone.includes(activeKid.id) ? '✓ Tema completado' : 'Marcar como terminado ✓'}
+                  </button>
+                </div>
+                <div className="glass-card rounded-2xl p-8">
+                  <h3 className="font-bold text-warning text-xl mb-2">💬 Conversarlo en familia</h3>
+                  <p className="text-gray-700 italic leading-relaxed">“{activeKid.familyPrompt}”</p>
+                  <p className="text-dark font-bold mt-3">Pregunta para conversar: {activeKid.familyQuestion}</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                    <button
+                      onClick={() => setCurrentScreen('converse')}
+                      className="btn-glow bg-warning text-white font-bold py-4 px-6 rounded-xl"
+                    >
+                      Iniciar conversación familiar →
+                    </button>
+                    <button
+                      onClick={() => { setActiveGuideId(activeKid.relatedGuide); setLearnView('guide'); setShowFeedback(false); }}
+                      className="btn-glow bg-white border-2 border-secondary text-secondary font-bold py-4 px-6 rounded-xl"
+                    >
+                      Ver guía para padres →
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* DETALLE GUÍA PADRES */}
+            {learnView === 'guide' && activeGuide && (
+              <>
+                <div className="bg-white rounded-3xl p-8 md:p-10 shadow-xl border border-gray-100">
+                  <div className="flex items-start gap-4 mb-5">
+                    <div className="w-14 h-14 rounded-2xl bg-secondary/10 flex items-center justify-center text-3xl shrink-0">{activeGuide.icon}</div>
+                    <div>
+                      <p className="text-xs font-black text-gray-400">{activeGuide.category}{activeGuide.joint ? ' · 👨‍👩‍👧 JUNTOS' : ''}</p>
+                      <h2 className="text-2xl font-black text-dark leading-tight">{activeGuide.title}</h2>
+                      <p className="text-gray-500 mt-1">{activeGuide.desc}</p>
+                    </div>
+                  </div>
+                  <div className="space-y-4 mb-8">
+                    {activeGuide.body.map((p, i) => (
+                      <p key={i} className="text-gray-700 text-lg leading-relaxed">{p}</p>
+                    ))}
+                  </div>
+                  <div className="bg-secondary/5 rounded-2xl p-6 border border-secondary/15 mb-6">
+                    <h3 className="font-bold text-secondary text-lg mb-4">Preguntas para conversar</h3>
+                    <ul className="space-y-4">
+                      {activeGuide.questions.map((q, i) => (
+                        <li key={i} className="flex items-start gap-3">
+                          <div className="w-8 h-8 rounded-full bg-secondary text-white flex items-center justify-center font-bold flex-shrink-0 text-sm">
+                            {i + 1}
+                          </div>
+                          <p className="text-dark leading-relaxed font-medium">{q}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="p-5 bg-dark rounded-2xl mb-8" style={{ background: '#1F2937' }}>
+                    <p className="font-bold text-white mb-2">💡 Consejo</p>
+                    <p className="text-white/90 leading-relaxed">{activeGuide.tip}</p>
+                  </div>
+                  <button
+                    onClick={() => reviewGuide(activeGuide.id)}
+                    disabled={guidesDone.includes(activeGuide.id)}
+                    className={`font-bold py-4 px-6 rounded-xl text-lg w-full ${
+                      guidesDone.includes(activeGuide.id)
+                        ? 'bg-gray-200 text-gray-500 cursor-default'
+                        : 'btn-glow bg-secondary text-white'
+                    }`}
+                  >
+                    {guidesDone.includes(activeGuide.id) ? '✓ Guía revisada' : 'Marcar como revisada ✓'}
+                  </button>
+                </div>
+                <div className="glass-card rounded-2xl p-8">
+                  <h3 className="font-bold text-primary text-xl mb-2">👦 Actividad relacionada</h3>
+                  <p className="text-gray-600 mb-6">Tu hijo puede trabajar este tema desde su biblioteca.</p>
+                  <button
+                    onClick={() => { setActiveKidId(activeGuide.relatedKid); setLearnView('kid'); setShowFeedback(false); }}
+                    className="btn-glow bg-primary text-white font-bold py-4 px-6 rounded-xl w-full"
+                  >
+                    Ver tema relacionado →
+                  </button>
+                </div>
+              </>
+            )}
+
+            {/* EXAMEN FINAL */}
+            {learnView === 'exam' && examUnlocked && (
               <div className="glass-card rounded-2xl p-8">
+                <button onClick={() => setLearnView('kids')} className="text-gray-500 hover:text-primary text-sm font-medium mb-4">
+                  ← Biblioteca
+                </button>
                 <h2 className="text-2xl font-bold text-primary mb-3">📝 Examen final</h2>
                 <p className="text-gray-600 leading-relaxed mb-2">
                   {examQuestions.length} preguntas de todos los temas. Responde todo para conseguir tus insignias 🏅
@@ -2011,25 +2480,6 @@ case 'about':
                     : 'Terminar examen y conseguir insignias 🏅'}
                 </button>
               </div>
-            )}
-
-            {selectedTopic !== 'test' && !showCoimaONo && (
-              <button
-                onClick={() => {
-                  const activeKey = selectedTopic ?? 'coima'
-                  const alreadyDone = (getProgress().topicProgress[activeKey] ?? 0) >= 100
-                  if (!alreadyDone) completeTopic(activeKey)
-                  const currentIndex = topicOrder.indexOf(activeKey)
-                  setSelectedTopic(topicOrder[(currentIndex + 1) % topicOrder.length])
-                  setShowCoimaONo(false)
-                  setShowFeedback(false)
-                }}
-                className="btn-glow bg-gradient-to-r from-primary to-secondary text-white font-bold py-4 px-6 rounded-xl text-lg w-full"
-              >
-                {((getProgress().topicProgress[selectedTopic ?? 'coima'] ?? 0) >= 100)
-                  ? 'Siguiente tema →'
-                  : 'Terminar tema y continuar →'}
-              </button>
             )}
           </div>
         </div>
