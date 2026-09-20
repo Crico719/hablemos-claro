@@ -337,6 +337,32 @@ const saveFamilyProfile = (profile: FamilyProfile) => {
   localStorage.setItem('hablemos-claro-family-profile', JSON.stringify(profile))
 }
 
+// Banco del examen final: cubre todos los temas
+interface ExamQuestion {
+  topic: string
+  icon: string
+  question: string
+  options: string[]
+  correct: number
+}
+
+const examQuestions: ExamQuestion[] = [
+  { topic: '¿Qué es una coima?', icon: '💰', question: '¿Qué es una coima?', options: ['Respetar las reglas sin ofrecer nada', 'Ofrecer dinero o regalos para obtener un beneficio indebido', 'Pedir ayuda para una tarea'], correct: 1 },
+  { topic: '¿Qué es una coima?', icon: '💰', question: '¿Cuál de estos es un ejemplo de coima?', options: ['Un funcionario pide dinero para acelerar un trámite', 'Pagar el precio justo en el mercado', 'Devolver una billetera perdida'], correct: 0 },
+  { topic: 'Reconocerla', icon: '🔍', question: '¿Cuál es una señal de alerta de corrupción?', options: ['Te dan comprobante por todo', 'Te explican el procedimiento con calma', 'Te presionan a decidir rápido y en secreto'], correct: 2 },
+  { topic: 'Reconocerla', icon: '🔍', question: 'Un inspector dice: “dame un regalito y cierro los ojos”. ¿Qué es?', options: ['Un trámite normal', 'Una multa legal', 'Una coima'], correct: 2 },
+  { topic: 'El daño', icon: '💔', question: '¿A quién dañan las coimas?', options: ['A toda la sociedad, sobre todo a los más vulnerables', 'Solo a quien la ofrece', 'A nadie realmente'], correct: 0 },
+  { topic: 'El daño', icon: '💔', question: 'El dinero de una coima en una obra podría haberse usado en…', options: ['Fiestas privadas', 'Escuelas y hospitales', 'Nada importante'], correct: 1 },
+  { topic: 'Consecuencias', icon: '⚖️', question: '¿Qué le puede pasar a quien ofrece o acepta una coima?', options: ['Solo una llamada de atención', 'Nada si nadie se entera', 'Prisión, multas e inhabilitación'], correct: 2 },
+  { topic: 'Consecuencias', icon: '⚖️', question: 'Además de lo legal, la corrupción destruye…', options: ['La confianza entre ciudadanos', 'Los semáforos', 'Los feriados'], correct: 0 },
+  { topic: 'Prevención', icon: '🛡️', question: '¿Cómo se previene la corrupción?', options: ['Exigiendo transparencia y denunciando', 'Ignorando lo que pasa', 'Pagando más rápido'], correct: 0 },
+  { topic: 'Prevención', icon: '🛡️', question: 'Si ves algo incorrecto en tu municipalidad, puedes…', options: ['Quedarte callado', 'Denunciar por canales seguros', 'Participar del reparto'], correct: 1 },
+  { topic: 'Ética', icon: '🧭', question: 'La integridad significa…', options: ['Seguir a la mayoría', 'Hacer lo que conviene', 'Hacer lo correcto aunque nadie mire'], correct: 2 },
+  { topic: 'Ética', icon: '🧭', question: 'Encuentras una billetera con dinero. ¿Qué muestra integridad?', options: ['Devolverla con todo su contenido', 'Quedarse con el dinero', 'Gastarlo y devolver el resto'], correct: 0 },
+  { topic: 'Ciudadanía', icon: '🗳️', question: 'Ser un ciudadano activo es…', options: ['Vigilar, participar y exigir cuentas', 'Votar y olvidar el tema', 'Dejar todo a los políticos'], correct: 0 },
+  { topic: 'Ciudadanía', icon: '🗳️', question: 'Un comité vecinal detecta sobreprecio en una obra. ¿Qué puede hacer?', options: ['Pedir su parte', 'No meterse', 'Exigir el expediente y denunciar'], correct: 2 },
+]
+
 // Datos de preguntas para la sección Conversemos
 const conversationPrompts: ConversationPrompt[] = [
   { id: '1', question: '¿Qué entiendes por coima?', asked: false },
@@ -362,6 +388,7 @@ export default function App() {
   const [feedbackMessage, setFeedbackMessage] = useState<string>('')
   const [showCoimaONo, setShowCoimaONo] = useState(false)
   const [currentCoimaCase, setCurrentCoimaCase] = useState(0)
+  const [examAnswers, setExamAnswers] = useState<Record<number, number>>({})
   const [device, setDevice] = useState<DeviceType>('pc')
   const [showBadgeCelebration, setShowBadgeCelebration] = useState(false)
   const [earnedBadge, setEarnedBadge] = useState<Badge | null>(null)
@@ -1464,96 +1491,48 @@ case 'about':
 
             {selectedTopic === 'test' && (
               <div className="glass-card rounded-2xl p-8">
-                <h2 className="text-2xl font-bold text-primary mb-3">Pon a prueba tus conocimientos</h2>
-                <p className="text-gray-600 leading-relaxed mb-8">
-                  Responde cada pregunta con calma. Cada tarjeta es una pregunta separada.
+                <h2 className="text-2xl font-bold text-primary mb-3">📝 Examen final</h2>
+                <p className="text-gray-600 leading-relaxed mb-2">
+                  {examQuestions.length} preguntas de todos los temas. Responde todo para conseguir tus insignias 🏅
+                </p>
+                <p className="text-sm font-bold text-primary mb-8">
+                  Respondidas: {Object.keys(examAnswers).length} de {examQuestions.length}
                 </p>
 
-                {/* Pregunta 1 */}
-                <div className="glass-card rounded-xl p-8 mb-8 border border-primary/15">
-                  <p className="font-bold text-primary mb-2">Pregunta 1</p>
-                  <p className="text-gray-800 text-lg mb-5">¿Qué es una coima?</p>
-                  <div className="space-y-4">
-                    <button
-                      onClick={() => handleAnswer(0)}
-                      className="btn-glow w-full py-4 px-5 rounded-xl text-left bg-white border-2 border-gray-200 hover:border-primary/50 font-medium"
-                    >
-                      Ofrecer dinero para saltarse una regla
-                    </button>
-                    <button
-                      onClick={() => handleAnswer(1)}
-                      className="btn-glow w-full py-4 px-5 rounded-xl text-left bg-white border-2 border-gray-200 hover:border-primary/50 font-medium"
-                    >
-                      Respetar las reglas sin ofrecer nada
-                    </button>
+                {examQuestions.map((q, qi) => (
+                  <div key={qi} className="glass-card rounded-xl p-6 mb-6 border border-primary/15">
+                    <p className="text-sm font-bold text-gray-500 mb-2">{q.icon} {q.topic} · Pregunta {qi + 1}</p>
+                    <p className="text-gray-800 text-lg mb-5">{q.question}</p>
+                    <div className="space-y-4">
+                      {q.options.map((opt, oi) => (
+                        <button
+                          key={oi}
+                          onClick={() => setExamAnswers(prev => ({ ...prev, [qi]: oi }))}
+                          className={`btn-glow w-full py-4 px-5 rounded-xl text-left font-medium border-2 ${
+                            examAnswers[qi] === oi
+                              ? 'bg-primary text-white border-primary shadow-lg'
+                              : 'bg-white border-gray-200 text-dark hover:border-primary/50'
+                          }`}
+                        >
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                </div>
-
-                {/* Pregunta 2 */}
-                <div className="glass-card rounded-xl p-8 mb-8 border border-secondary/15">
-                  <p className="font-bold text-secondary mb-2">Pregunta 2</p>
-                  <p className="text-gray-800 text-lg mb-5">¿Puedo ofrecerle dinero a un amigo para que gane un concurso?</p>
-                  <div className="space-y-4">
-                    <button
-                      onClick={() => handleAnswer(0)}
-                      className="btn-glow w-full py-4 px-5 rounded-xl text-left bg-white border-2 border-gray-200 hover:border-secondary/50 font-medium"
-                    >
-                      Sí, es un regalo amable
-                    </button>
-                    <button
-                      onClick={() => handleAnswer(1)}
-                      className="btn-glow w-full py-4 px-5 rounded-xl text-left bg-white border-2 border-gray-200 hover:border-secondary/50 font-medium"
-                    >
-                      No, eso no es correcto
-                    </button>
-                  </div>
-                </div>
-
-                {/* Pregunta 3 */}
-                <div className="glass-card rounded-xl p-8 mb-8 border border-warning/20">
-                  <p className="font-bold text-warning mb-2">Pregunta 3</p>
-                  <p className="text-gray-800 text-lg mb-5">Un funcionario pide un “extra” para acelerar un trámite. ¿Es coima?</p>
-                  <div className="space-y-4">
-                    <button
-                      onClick={() => handleAnswer(0)}
-                      className="btn-glow w-full py-4 px-5 rounded-xl text-left bg-white border-2 border-gray-200 hover:border-warning/50 font-medium"
-                    >
-                      Sí, es una coima
-                    </button>
-                    <button
-                      onClick={() => handleAnswer(1)}
-                      className="btn-glow w-full py-4 px-5 rounded-xl text-left bg-white border-2 border-gray-200 hover:border-warning/50 font-medium"
-                    >
-                      No, es un trámite normal
-                    </button>
-                  </div>
-                </div>
-
-                {/* Pregunta 4 */}
-                <div className="glass-card rounded-xl p-6 mb-8 border border-success/20">
-                  <p className="font-bold text-success mb-2">Pregunta 4</p>
-                  <p className="text-gray-800 text-lg mb-5">¿Cuál es una forma de prevenir la corrupción?</p>
-                  <div className="space-y-4">
-                    <button
-                      onClick={() => handleAnswer(0)}
-                      className="btn-glow w-full py-4 px-5 rounded-xl text-left bg-white border-2 border-gray-200 hover:border-success/50 font-medium"
-                    >
-                      Ignorar lo que pasa
-                    </button>
-                    <button
-                      onClick={() => handleAnswer(1)}
-                      className="btn-glow w-full py-4 px-5 rounded-xl text-left bg-white border-2 border-gray-200 hover:border-success/50 font-medium"
-                    >
-                      Exigir transparencia y denunciar
-                    </button>
-                  </div>
-                </div>
+                ))}
 
                 <button
                   onClick={() => { completeTest(); navigateTo('result'); }}
-                  className="btn-glow bg-success text-white font-bold py-4 px-6 rounded-xl text-lg w-full"
+                  disabled={Object.keys(examAnswers).length < examQuestions.length}
+                  className={`font-bold py-4 px-6 rounded-xl text-lg w-full ${
+                    Object.keys(examAnswers).length < examQuestions.length
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'btn-glow bg-success text-white'
+                  }`}
                 >
-                  Terminar prueba y conseguir insignias 🏅
+                  {Object.keys(examAnswers).length < examQuestions.length
+                    ? `Responde todo (${Object.keys(examAnswers).length}/${examQuestions.length})`
+                    : 'Terminar examen y conseguir insignias 🏅'}
                 </button>
               </div>
             )}
