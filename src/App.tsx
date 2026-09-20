@@ -663,7 +663,7 @@ case 'about':
       return (
         <div className="min-h-screen p-8" style={{ background: cust2.backgroundValue, backgroundSize: cust2.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           <div className="max-w-3xl mx-auto animate-slide-up text-center relative">
-            <button onClick={() => setCurrentScreen('welcome')} className="absolute top-0 left-0 glass-card px-3 py-1 rounded-xl text-gray-600 text-sm hover:bg-gray-100 transition-all">
+            <button onClick={() => setCurrentScreen('welcome')} className="absolute top-0 right-0 glass-card px-3 py-1 rounded-xl text-gray-600 text-sm hover:bg-gray-100 transition-all">
               {t('back')}
             </button>
             <h1 className="text-3xl font-bold gradient-text">{t('aboutTitle')}</h1>
