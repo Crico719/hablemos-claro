@@ -547,6 +547,9 @@ interface KidTopic {
   compareNote?: string
   body: string[]
   example: string
+  observe: string
+  reflectQ: string
+  finalTask: string
   scenarioQ: string
   scenarioOpts: string[]
   scenarioCorrect: number
@@ -565,6 +568,9 @@ const KIDS_TOPICS: KidTopic[] = [
     art: 'scale',
     summary: 'La corrupción es usar un poder o una posición para conseguir algo injusto.',
     problems: ['Rompe reglas que son para todos', 'Da ventajas injustas a algunos', 'Debilita la confianza en las instituciones'],
+    observe: 'En el recreo, un grupo paga a otro para usar primero la cancha, aunque no era su turno.',
+    reflectQ: '¿A quiénes afecta que unos pocos se salten las reglas?',
+    finalTask: 'Cuéntale a alguien de tu familia un ejemplo de corrupción que hayas visto o imaginado.',
     scenarioQ: 'Un compañero te ofrece dinero para que ignores una regla del juego. ¿Qué haces?',
     scenarioOpts: ['Acepto el dinero', 'Digo que no y sigo las reglas', 'Acepto pero no digo nada'], scenarioCorrect: 1,
     scenarioFeedback: [
@@ -586,6 +592,9 @@ const KIDS_TOPICS: KidTopic[] = [
     compareA: 'Corrupción: uso indebido del poder o de una posición para obtener un beneficio personal.',
     compareB: 'Coima: dinero, regalo o favor que se ofrece o entrega para conseguir una ventaja indebida.',
     compareNote: 'La coima es una forma de corrupción, pero no toda corrupción ocurre mediante una coima.',
+    observe: 'Una persona ofrece dinero para evitar una multa que sí debe pagar.',
+    reflectQ: 'Si aceptas algo injusto una vez, ¿será más fácil aceptar la próxima?',
+    finalTask: 'Escribe con tus palabras qué es una coima y por qué hace daño.',
     scenarioQ: 'Tu amigo te dice que puede pagar para evitar una multa. ¿Qué opción elegirías?',
     scenarioOpts: ['Aceptar porque todos lo hacen', 'Decir que no y respetar las reglas', 'No decir nada', 'Preguntar a un adulto de confianza'], scenarioCorrect: 1,
     scenarioFeedback: [
@@ -605,6 +614,9 @@ const KIDS_TOPICS: KidTopic[] = [
     art: 'paths',
     summary: 'Algunas personas ofrecen coimas por impaciencia o por querer ganar sin esfuerzo. Ninguna razón lo justifica.',
     problems: ['Normaliza la trampa como un “atajo”', 'Presiona a otros a hacer lo mismo', 'Esconde lo que cada uno realmente puede lograr'],
+    observe: '“Aquí todos pagan para pasar rápido”, dice un señor en la fila del trámite.',
+    reflectQ: '¿Por qué crees que algunas personas prefieren pagar en vez de esperar?',
+    finalTask: 'Piensa una respuesta firme para decir que no y compártela en familia.',
     scenarioQ: 'Un amigo dice: “todos pagan para pasar, hay que hacerlo”. ¿Qué haces?',
     scenarioOpts: ['Acepto para no quedar mal', 'Le digo que eso no está bien', 'Me alejo y lo comento con un adulto'], scenarioCorrect: 1,
     scenarioFeedback: [
@@ -623,6 +635,9 @@ const KIDS_TOPICS: KidTopic[] = [
     art: 'paths',
     summary: 'Cuando veas algo injusto, detente, piensa en las consecuencias y elige lo correcto.',
     problems: ['Quedarte callado deja que lo injusto continúe', 'Seguir a otros te hace parte del problema', 'Actuar bien protege a los demás y a ti'],
+    observe: 'Ves que a un compañero lo favorecen por dinero en un concurso escolar.',
+    reflectQ: '¿Qué sentirías si fueras quien merecía ganar?',
+    finalTask: 'Dibuja o escribe cómo actuarías tú en esa situación.',
     scenarioQ: 'Ves que favorecen injustamente a alguien por dinero. ¿Qué haces?',
     scenarioOpts: ['Me quedo callado, no es mi problema', 'Lo comento con un adulto de confianza', 'Pido que también me favorezcan'], scenarioCorrect: 1,
     scenarioFeedback: [
@@ -641,6 +656,9 @@ const KIDS_TOPICS: KidTopic[] = [
     art: 'shield',
     summary: 'Decir que no cuando te presionan es una muestra de fuerza, no de debilidad.',
     problems: ['Ceder una vez facilita ceder la próxima', 'Puedes meterte en problemas serios', 'Pierdes la confianza de quienes te quieren'],
+    observe: 'Tus amigos insisten en copiar y te dicen traidor si no aceptas.',
+    reflectQ: '¿Qué pesa más: quedar bien un momento o tu tranquilidad?',
+    finalTask: 'Practica en voz alta una frase para decir que no.',
     scenarioQ: '¿Qué haces si te presionan para hacer algo incorrecto?',
     scenarioOpts: ['Acepto para no quedar mal', 'Digo que no y me alejo o pido ayuda', 'Lo hago solo una vez'], scenarioCorrect: 1,
     scenarioFeedback: [
@@ -659,6 +677,9 @@ const KIDS_TOPICS: KidTopic[] = [
     art: 'scale',
     summary: 'Cada decisión deja huella: piensa a quién afecta antes de elegir.',
     problems: ['Una mala decisión puede quitarle algo a otro', 'Los efectos duran más de lo que crees', 'Tus decisiones hablan de quién eres'],
+    observe: 'Alguien acepta un beneficio injusto y otro se queda sin su oportunidad.',
+    reflectQ: '¿Qué consecuencias puede tener una decisión así para los demás?',
+    finalTask: 'Recuerda una decisión tuya y escribe a quién afectó.',
     scenarioQ: '¿Qué pregunta te ayuda a decidir bien?',
     scenarioOpts: ['¿Me conviene solo a mí?', '¿A quién afecta y sería justo para todos?', '¿Nadie se dará cuenta?'], scenarioCorrect: 1,
     scenarioFeedback: [
@@ -677,6 +698,9 @@ const KIDS_TOPICS: KidTopic[] = [
     art: 'hands',
     summary: 'La corrupción también aparece en lo cotidiano: reconocerla te protege.',
     problems: ['Se esconde en favores y “precios especiales”', 'Afecta servicios que usas a diario', 'Si la ignoras, crece'],
+    observe: 'En el mercado, a unos les cobran de más por no conocer los precios.',
+    reflectQ: '¿Qué situaciones injustas has visto en tu escuela o barrio?',
+    finalTask: 'Anota una situación injusta que veas esta semana.',
     scenarioQ: '¿Cuál de estos es un ejemplo cotidiano de corrupción?',
     scenarioOpts: ['Hacer fila y esperar tu turno', 'Usar un cargo para favorecer injustamente a alguien', 'Pedir ayuda con la tarea'], scenarioCorrect: 1,
     scenarioFeedback: [
@@ -695,6 +719,9 @@ const KIDS_TOPICS: KidTopic[] = [
     art: 'shield',
     summary: 'Actuar bien es un hábito: pequeños actos honestos todos los días.',
     problems: ['La honestidad se nota aunque nadie mire', 'Tu ejemplo inspira a otros', 'Lo correcto casi siempre es lo más simple'],
+    observe: 'Alguien devuelve el vuelto de más sin que nadie se dé cuenta.',
+    reflectQ: '¿Por qué cuesta hacer lo correcto cuando nadie mira?',
+    finalTask: 'Haz una acción honesta hoy y cuéntala en familia.',
     scenarioQ: '¿Cuál es una acción correcta?',
     scenarioOpts: ['Quedarme con el vuelto de más', 'Devolver lo que no es mío y ser justo', 'Aprovechar si nadie mira'], scenarioCorrect: 1,
     scenarioFeedback: [
@@ -713,6 +740,9 @@ const KIDS_TOPICS: KidTopic[] = [
     art: 'chat',
     summary: 'Muchas frases sobre coimas son mitos: aquí descubres la verdad.',
     problems: ['“Es solo un poquito” no lo vuelve correcto', '“Nadie se entera” no evita el daño', '“Así son las cosas” se puede cambiar'],
+    observe: 'Escuchas decir: “es solo un poquito, no hace daño”.',
+    reflectQ: '¿Un daño pequeño deja de ser daño?',
+    finalTask: 'Explica a alguien por qué “un poquito” también cuenta.',
     scenarioQ: '“Pagar una coima pequeña no hace daño a nadie.” ¿Verdadero o falso?',
     scenarioOpts: ['Verdadero', 'Falso'], scenarioCorrect: 1,
     scenarioFeedback: [
@@ -730,6 +760,9 @@ const KIDS_TOPICS: KidTopic[] = [
     art: 'chat',
     summary: 'Un reto para hacer en equipo con tu familia y conversar de verdad.',
     problems: ['Conversar une a la familia', 'Un compromiso escrito se cumple mejor', 'Aprender juntos es más divertido'],
+    observe: 'Tu familia conversa sobre un problema del barrio.',
+    reflectQ: '¿Qué compromiso puede asumir tu familia?',
+    finalTask: 'Escriban juntos su compromiso familiar y péguenlo en un lugar visible.',
     scenarioQ: '¿Ya conversaron y escribieron su compromiso familiar?',
     scenarioOpts: ['Todavía no', '¡Sí, lo hicimos juntos!'], scenarioCorrect: 1,
     scenarioFeedback: [
@@ -922,6 +955,8 @@ export default function App() {
   const [activeGuideId, setActiveGuideId] = useState<string | null>(null)
   const [kidsFilter, setKidsFilter] = useState('Todos')
   const [parentsFilter, setParentsFilter] = useState('Todos')
+  const [topicStep, setTopicStep] = useState(0)
+  const [answeredOpt, setAnsweredOpt] = useState<number | null>(null)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [userAnswers, setUserAnswers] = useState<number[]>([])
   const [showFeedback, setShowFeedback] = useState(false)
@@ -2173,7 +2208,7 @@ case 'about':
                     return (
                       <button
                         key={k.id}
-                        onClick={() => { setActiveKidId(k.id); setLearnView('kid'); setShowFeedback(false); }}
+                        onClick={() => { setActiveKidId(k.id); setLearnView('kid'); setShowFeedback(false); setTopicStep(0); setAnsweredOpt(null); }}
                         className="bg-white rounded-2xl p-6 shadow-sm text-left border border-gray-100 transition-all hover:-translate-y-1 hover:shadow-lg cursor-pointer"
                       >
                         <div className="flex items-start gap-4">
@@ -2299,25 +2334,34 @@ case 'about':
                 </div>
                 <div className="flex gap-2 flex-wrap justify-center">
                   {['Aprende', 'Observa', 'Reflexiona', 'Elige', 'Conversa', 'Completa'].map((s, i) => (
-                    <span key={s} className="px-3 py-1 rounded-full bg-white text-xs font-bold text-gray-500 shadow-sm">{i + 1} · {s}</span>
+                    <button
+                      key={s}
+                      onClick={() => { setTopicStep(i); setShowFeedback(false); }}
+                      className={`px-3 py-1 rounded-full text-xs font-bold shadow-sm transition-all ${
+                        topicStep === i
+                          ? 'bg-[#166534] text-white'
+                          : topicStep > i
+                            ? 'bg-success/15 text-success'
+                            : 'bg-white text-gray-500 hover:bg-gray-100'
+                      }`}
+                    >
+                      {topicStep > i ? '✓ ' : `${i + 1} · `}{s}
+                    </button>
                   ))}
                 </div>
+                <p className="text-center text-sm font-bold text-gray-400">Paso {topicStep + 1} de 6</p>
 
                 {/* Ilustración */}
                 <div className="bg-white rounded-3xl p-6 shadow-sm flex justify-center">
                   {KID_ART[activeKid.art]}
                 </div>
 
-                {/* 1. En pocas palabras */}
+                {/* 1. APRENDE */}
+                {topicStep === 0 && (
+                  <>
                 <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm">
                   <p className="text-xs font-black tracking-widest text-[#166534] mb-3">1 · EN POCAS PALABRAS</p>
                   <p className="text-gray-800 text-lg leading-loose">{activeKid.summary}</p>
-                </div>
-
-                {/* 2. Ejemplo */}
-                <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border-l-8" style={{ borderLeftColor: '#F59E0B' }}>
-                  <p className="text-xs font-black tracking-widest text-[#166534] mb-3">2 · EJEMPLO COTIDIANO</p>
-                  <p className="text-gray-800 text-lg leading-loose italic">“{activeKid.example}”</p>
                 </div>
 
                 {/* 3. Por qué es un problema */}
@@ -2348,7 +2392,32 @@ case 'about':
                     <p className="text-center font-bold text-dark mt-5">{activeKid.compareNote}</p>
                   </div>
                 )}
-                {/* 4. Interactivo */}
+                  </>
+                )}
+                {/* 2. OBSERVA */}
+                {topicStep === 1 && (
+                  <>
+                    <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border-l-8" style={{ borderLeftColor: '#F59E0B' }}>
+                      <p className="text-xs font-black tracking-widest text-[#166534] mb-3">2 · OBSERVA</p>
+                      <p className="text-gray-800 text-lg leading-loose italic">“{activeKid.observe}”</p>
+                    </div>
+                    <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm">
+                      <p className="font-bold text-black mb-2">💡 Ejemplo cotidiano</p>
+                      <p className="text-gray-800 text-lg leading-loose italic">“{activeKid.example}”</p>
+                    </div>
+                  </>
+                )}
+                {/* 3. REFLEXIONA */}
+                {topicStep === 2 && (
+                  <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm text-center">
+                    <p className="text-xs font-black tracking-widest text-[#166534] mb-3">3 · REFLEXIONA</p>
+                    <div className="text-5xl mb-4">🤔</div>
+                    <p className="text-gray-800 text-xl leading-relaxed font-medium">{activeKid.reflectQ}</p>
+                    <p className="text-gray-500 mt-4">Tómate un momento para pensarlo antes de continuar.</p>
+                  </div>
+                )}
+                {/* 4. ELIGE */}
+                {topicStep === 3 && (
                 <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border-2 border-primary/20">
                   <p className="text-xs font-black tracking-widest text-[#166534] mb-3">4 · ¿QUÉ HARÍAS TÚ?</p>
                   <p className="text-gray-800 text-lg mb-5">{activeKid.scenarioQ}</p>
@@ -2357,10 +2426,17 @@ case 'about':
                       <button
                         key={oi}
                         onClick={() => {
+                          setAnsweredOpt(oi)
                           setFeedbackMessage(activeKid.scenarioFeedback[oi] ?? '')
                           setShowFeedback(true)
                         }}
-                        className="btn-glow w-full py-4 px-5 rounded-xl text-left bg-white border-2 border-gray-200 hover:border-primary/60 font-medium text-dark text-lg"
+                        className={`btn-glow w-full py-4 px-5 rounded-xl text-left font-medium text-lg border-2 transition-all ${
+                          answeredOpt === oi
+                            ? oi === activeKid.scenarioCorrect
+                              ? 'bg-success text-white border-success shadow-lg'
+                              : 'bg-white border-warning text-dark'
+                            : 'bg-white border-gray-200 hover:border-primary/60 text-dark'
+                        }`}
                       >
                         {opt}
                       </button>
@@ -2381,39 +2457,9 @@ case 'about':
                     </button>
                   )}
                 </div>
-                {/* 6. Completa */}
-                <button
-                  onClick={() => completeKidTopic(activeKid.id)}
-                  disabled={kidsDone.includes(activeKid.id)}
-                  className={`font-bold py-4 px-6 rounded-xl text-lg w-full ${
-                    kidsDone.includes(activeKid.id)
-                      ? 'bg-success/15 text-success cursor-default'
-                      : 'btn-glow text-white'
-                  }`}
-                  style={kidsDone.includes(activeKid.id) ? undefined : { background: '#166534' }}
-                >
-                  {kidsDone.includes(activeKid.id) ? '✓ Tema completado' : '6 · Marcar como terminado ✓'}
-                </button>
-                {kidsDone.includes(activeKid.id) && (() => {
-                  const next = KIDS_TOPICS.find(k => !kidsDone.includes(k.id))
-                  return (
-                    <button
-                      onClick={() => {
-                        if (next) {
-                          setActiveKidId(next.id)
-                          setShowFeedback(false)
-                        } else {
-                          setLearnView('kids')
-                        }
-                      }}
-                      className="btn-glow text-white font-bold py-4 px-6 rounded-xl text-lg w-full"
-                      style={{ background: '#166534' }}
-                    >
-                      {next ? `Continuar con: ${next.title} →` : 'Volver a la biblioteca →'}
-                    </button>
-                  )
-                })()}
-                {/* 5. Conversa en familia */}
+                )}
+                {/* 5. CONVERSA */}
+                {topicStep === 4 && (
                 <div className="glass-card rounded-2xl p-8">
                   <p className="text-xs font-black tracking-widest text-warning mb-2">5 · CONVERSA EN FAMILIA</p>
                   <h3 className="font-bold text-warning text-xl mb-2">💬 Conversarlo en familia</h3>
@@ -2433,6 +2479,82 @@ case 'about':
                       Ver guía para padres →
                     </button>
                   </div>
+                </div>
+                )}
+                {/* 6. COMPLETA */}
+                {topicStep === 5 && (
+                <>
+                <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm text-center">
+                  <p className="text-xs font-black tracking-widest text-[#166534] mb-3">6 · COMPLETA</p>
+                  <div className="text-5xl mb-3">🎯</div>
+                  <p className="text-gray-800 text-lg leading-relaxed mb-2">{activeKid.finalTask}</p>
+                </div>
+                <button
+                  onClick={() => completeKidTopic(activeKid.id)}
+                  disabled={kidsDone.includes(activeKid.id) || answeredOpt === null}
+                  className={`font-bold py-4 px-6 rounded-xl text-lg w-full ${
+                    kidsDone.includes(activeKid.id)
+                      ? 'bg-success/15 text-success cursor-default'
+                      : answeredOpt === null
+                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        : 'btn-glow text-white'
+                  }`}
+                  style={kidsDone.includes(activeKid.id) || answeredOpt === null ? undefined : { background: '#166534' }}
+                >
+                  {kidsDone.includes(activeKid.id)
+                    ? '✓ Tema completado'
+                    : answeredOpt === null
+                      ? 'Responde el paso 4 para completar'
+                      : 'Marcar como terminado ✓'}
+                </button>
+                {kidsDone.includes(activeKid.id) && (() => {
+                  const next = KIDS_TOPICS.find(k => !kidsDone.includes(k.id))
+                  return (
+                    <button
+                      onClick={() => {
+                        if (next) {
+                          setActiveKidId(next.id)
+                          setShowFeedback(false)
+                          setTopicStep(0)
+                          setAnsweredOpt(null)
+                        } else {
+                          setLearnView('kids')
+                        }
+                      }}
+                      className="btn-glow text-white font-bold py-4 px-6 rounded-xl text-lg w-full"
+                      style={{ background: '#166534' }}
+                    >
+                      {next ? `Continuar con: ${next.title} →` : 'Volver a la biblioteca →'}
+                    </button>
+                  )
+                })()}
+                </>
+                )}
+                {/* Navegación entre pasos */}
+                <div className="grid grid-cols-3 gap-4">
+                  <button
+                    onClick={() => { setTopicStep(Math.max(0, topicStep - 1)); setShowFeedback(false); }}
+                    disabled={topicStep === 0}
+                    className={`font-bold py-3 px-4 rounded-xl transition-all ${
+                      topicStep === 0 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-dark shadow-sm hover:bg-gray-50'
+                    }`}
+                  >
+                    ← Anterior
+                  </button>
+                  <button
+                    onClick={() => setLearnView('kids')}
+                    className="bg-white text-dark font-bold py-3 px-4 rounded-xl shadow-sm hover:bg-gray-50 transition-all"
+                  >
+                    Ver temas
+                  </button>
+                  <button
+                    onClick={() => { setTopicStep(Math.min(5, topicStep + 1)); setShowFeedback(false); }}
+                    disabled={topicStep === 5}
+                    className="font-bold py-3 px-4 rounded-xl transition-all text-white"
+                    style={topicStep === 5 ? undefined : { background: '#166534' }}
+                  >
+                    Siguiente →
+                  </button>
                 </div>
               </div>
             )}
@@ -2508,7 +2630,7 @@ case 'about':
                   <h3 className="font-bold text-primary text-xl mb-2">👦 Actividad relacionada</h3>
                   <p className="text-gray-600 mb-6">Tu hijo puede trabajar este tema desde su biblioteca.</p>
                   <button
-                    onClick={() => { setActiveKidId(activeGuide.relatedKid); setLearnView('kid'); setShowFeedback(false); }}
+                    onClick={() => { setActiveKidId(activeGuide.relatedKid); setLearnView('kid'); setShowFeedback(false); setTopicStep(0); setAnsweredOpt(null); }}
                     className="btn-glow bg-primary text-white font-bold py-4 px-6 rounded-xl w-full"
                   >
                     Ver tema relacionado →
