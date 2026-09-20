@@ -565,12 +565,12 @@ const KIDS_TOPICS: KidTopic[] = [
     art: 'scale',
     summary: 'La corrupción es usar un poder o una posición para conseguir algo injusto.',
     problems: ['Rompe reglas que son para todos', 'Da ventajas injustas a algunos', 'Debilita la confianza en las instituciones'],
-    scenarioQ: 'Un compañero te ofrece dinero para que lo dejes copiar tu examen. ¿Qué es eso?',
-    scenarioOpts: ['Una ayuda entre amigos', 'Un acto de corrupción', 'Un juego sin importancia'], scenarioCorrect: 1,
+    scenarioQ: 'Un compañero te ofrece dinero para que ignores una regla del juego. ¿Qué haces?',
+    scenarioOpts: ['Acepto el dinero', 'Digo que no y sigo las reglas', 'Acepto pero no digo nada'], scenarioCorrect: 1,
     scenarioFeedback: [
-      'Ayudar es explicar, no regalar respuestas a cambio de algo.',
-      'Exacto: se ofrece algo de valor para obtener un beneficio injusto.',
-      'Aunque parezca un juego, copiar así es una forma de trampa.'
+      'Aceptar te hace parte de la trampa y otros salen perdiendo.',
+      'Bien: decir que no mantiene el juego justo para todos.',
+      'Quedarte callado deja que la trampa siga.'
     ],
     familyPrompt: 'Hoy aprendí qué es la corrupción.',
     familyQuestion: '¿En qué lugares crees que puede aparecer la corrupción?',
@@ -2271,7 +2271,7 @@ case 'about':
 
             {/* DETALLE TEMA HIJO */}
             {learnView === 'kid' && activeKid && (
-              <div className="w-full max-w-[760px] mx-auto space-y-8">
+              <div className="w-full max-w-[760px] mx-auto space-y-8 rounded-3xl p-4 md:p-8" style={{ background: 'linear-gradient(180deg, #F0FDF4 0%, #FFFFFF 100%)' }}>
                 {/* Cabecera */}
                 <div className="bg-white rounded-2xl p-5 shadow-sm">
                   <div className="flex items-center justify-between">
@@ -2394,6 +2394,25 @@ case 'about':
                 >
                   {kidsDone.includes(activeKid.id) ? '✓ Tema completado' : '6 · Marcar como terminado ✓'}
                 </button>
+                {kidsDone.includes(activeKid.id) && (() => {
+                  const next = KIDS_TOPICS.find(k => !kidsDone.includes(k.id))
+                  return (
+                    <button
+                      onClick={() => {
+                        if (next) {
+                          setActiveKidId(next.id)
+                          setShowFeedback(false)
+                        } else {
+                          setLearnView('kids')
+                        }
+                      }}
+                      className="btn-glow text-white font-bold py-4 px-6 rounded-xl text-lg w-full"
+                      style={{ background: '#166534' }}
+                    >
+                      {next ? `Continuar con: ${next.title} →` : 'Volver a la biblioteca →'}
+                    </button>
+                  )
+                })()}
                 {/* 5. Conversa en familia */}
                 <div className="glass-card rounded-2xl p-8">
                   <p className="text-xs font-black tracking-widest text-warning mb-2">5 · CONVERSA EN FAMILIA</p>
