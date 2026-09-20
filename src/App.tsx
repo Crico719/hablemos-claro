@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import type { ReactNode } from 'react'
 import './index.css'
 
 // Tipos para la aplicación
@@ -536,14 +537,20 @@ interface KidTopic {
   title: string
   desc: string
   icon: string
+  art: 'scale' | 'paths' | 'hands' | 'shield' | 'chat'
   category: string
   core: LearningTopic
+  summary: string
+  problems: string[]
+  compareA?: string
+  compareB?: string
+  compareNote?: string
   body: string[]
   example: string
   scenarioQ: string
   scenarioOpts: string[]
   scenarioCorrect: number
-  scenarioWhy: string
+  scenarioFeedback: string[]
   familyPrompt: string
   familyQuestion: string
   relatedGuide: string
@@ -555,9 +562,16 @@ const KIDS_TOPICS: KidTopic[] = [
     id: 'k1', title: '¿Qué es la corrupción?', desc: 'Descubre qué significa con ejemplos de todos los días.', icon: '🏛️', category: 'Corrupción', core: 'coima',
     body: ['La corrupción es cuando alguien usa su poder o su puesto para conseguir algo injusto, en vez de hacer lo correcto.', 'No es solo cosa de políticos: puede aparecer en la escuela, en el barrio o en cualquier lugar donde alguien haga trampa para ganar.'],
     example: 'Pagar para evitar una multa que sí cometiste es corrupción: rompe las reglas que son para todos.',
+    art: 'scale',
+    summary: 'La corrupción es usar un poder o una posición para conseguir algo injusto.',
+    problems: ['Rompe reglas que son para todos', 'Da ventajas injustas a algunos', 'Debilita la confianza en las instituciones'],
     scenarioQ: 'Un compañero te ofrece dinero para que lo dejes copiar tu examen. ¿Qué es eso?',
     scenarioOpts: ['Una ayuda entre amigos', 'Un acto de corrupción', 'Un juego sin importancia'], scenarioCorrect: 1,
-    scenarioWhy: 'Es corrupción: se ofrece algo de valor para obtener un beneficio injusto.',
+    scenarioFeedback: [
+      'Ayudar es explicar, no regalar respuestas a cambio de algo.',
+      'Exacto: se ofrece algo de valor para obtener un beneficio injusto.',
+      'Aunque parezca un juego, copiar así es una forma de trampa.'
+    ],
     familyPrompt: 'Hoy aprendí qué es la corrupción.',
     familyQuestion: '¿En qué lugares crees que puede aparecer la corrupción?',
     relatedGuide: 'p1',
@@ -566,9 +580,20 @@ const KIDS_TOPICS: KidTopic[] = [
     id: 'k2', title: '¿Qué es una coima?', desc: 'Aprende qué es y por qué afecta a otras personas.', icon: '💰', category: 'Coimas', core: 'coima',
     body: ['Una coima es dinero, regalos o favores que se ofrecen para conseguir algo que no corresponde.', 'El problema es que ese beneficio injusto le quita algo a otra persona: un cupo, un servicio, una oportunidad.'],
     example: 'Ofrecer dinero para que te atiendan primero, saltándose a todos los que esperaban.',
-    scenarioQ: '¿Cuál de estos es una coima?',
-    scenarioOpts: ['Pagar el precio justo en el mercado', 'Dar dinero para obtener un beneficio que no corresponde', 'Devolver algo prestado'], scenarioCorrect: 1,
-    scenarioWhy: 'La coima siempre busca un beneficio indebido a cambio de algo de valor.',
+    art: 'hands',
+    summary: 'Una coima es ofrecer o entregar dinero, un regalo o un favor para obtener una ventaja que no corresponde. Aunque parezca una solución rápida, puede ser injusta y afectar a otras personas.',
+    problems: ['Rompe las reglas', 'Da una ventaja injusta', 'Puede perjudicar a otras personas', 'Debilita la confianza'],
+    compareA: 'Corrupción: uso indebido del poder o de una posición para obtener un beneficio personal.',
+    compareB: 'Coima: dinero, regalo o favor que se ofrece o entrega para conseguir una ventaja indebida.',
+    compareNote: 'La coima es una forma de corrupción, pero no toda corrupción ocurre mediante una coima.',
+    scenarioQ: 'Tu amigo te dice que puede pagar para evitar una multa. ¿Qué opción elegirías?',
+    scenarioOpts: ['Aceptar porque todos lo hacen', 'Decir que no y respetar las reglas', 'No decir nada', 'Preguntar a un adulto de confianza'], scenarioCorrect: 1,
+    scenarioFeedback: [
+      'Si todos lo hacen, el daño se reparte entre todos: menos recursos y menos confianza.',
+      'Buena decisión. Respetar las reglas ayuda a que todas las personas reciban un trato justo.',
+      'Guardar silencio deja que lo injusto siga pasando y puede volverse costumbre.',
+      'Muy bien: pedir ayuda a un adulto de confianza es una forma valiente y segura de actuar.'
+    ],
     familyPrompt: 'Hoy aprendí qué es una coima.',
     familyQuestion: '¿Por qué crees que una coima puede afectar a otras personas?',
     relatedGuide: 'p2',
@@ -577,9 +602,16 @@ const KIDS_TOPICS: KidTopic[] = [
     id: 'k3', title: '¿Por qué alguien ofrece una coima?', desc: 'Entiende las razones sin justificar la conducta.', icon: '🤔', category: 'Coimas', core: 'recognition',
     body: ['Algunas personas ofrecen coimas por impaciencia, por querer ganar sin esfuerzo o porque creen que “todos lo hacen”.', 'Ninguna razón lo justifica: entender por qué ocurre nos ayuda a no caer en lo mismo.'],
     example: 'Alguien ofrece dinero para no hacer la fila del trámite porque no quiere esperar.',
-    scenarioQ: 'Un amigo dice: “todos pagan para pasar, hay que hacerlo”. ¿Qué piensas?',
-    scenarioOpts: ['Tiene razón, hay que adaptarse', 'Que algo sea común no lo hace correcto', 'Depende del monto'], scenarioCorrect: 1,
-    scenarioWhy: 'Que muchos lo hagan no lo vuelve correcto ni legal.',
+    art: 'paths',
+    summary: 'Algunas personas ofrecen coimas por impaciencia o por querer ganar sin esfuerzo. Ninguna razón lo justifica.',
+    problems: ['Normaliza la trampa como un “atajo”', 'Presiona a otros a hacer lo mismo', 'Esconde lo que cada uno realmente puede lograr'],
+    scenarioQ: 'Un amigo dice: “todos pagan para pasar, hay que hacerlo”. ¿Qué haces?',
+    scenarioOpts: ['Acepto para no quedar mal', 'Le digo que eso no está bien', 'Me alejo y lo comento con un adulto'], scenarioCorrect: 1,
+    scenarioFeedback: [
+      'Quedar bien un momento puede costar tu tranquilidad después.',
+      'Exacto: que algo sea común no lo vuelve correcto.',
+      'Bien: alejarte y pedir ayuda también es una gran respuesta.'
+    ],
     familyPrompt: 'Hoy pensé por qué la gente ofrece coimas.',
     familyQuestion: '¿Qué responderías si alguien te dice que “todos lo hacen”?',
     relatedGuide: 'p7',
@@ -588,9 +620,16 @@ const KIDS_TOPICS: KidTopic[] = [
     id: 'k4', title: '¿Qué harías tú?', desc: 'Decide cómo actuar en distintos escenarios.', icon: '🧭', category: 'Decisiones', core: 'impact',
     body: ['En la vida te vas a cruzar con situaciones injustas. Lo importante es detenerte, pensar en las consecuencias y elegir bien.', 'Puedes practicar aquí con casos de mentira para estar listo cuando pase de verdad.'],
     example: 'Te ofrecen un premio por quedarte callado ante algo injusto.',
+    art: 'paths',
+    summary: 'Cuando veas algo injusto, detente, piensa en las consecuencias y elige lo correcto.',
+    problems: ['Quedarte callado deja que lo injusto continúe', 'Seguir a otros te hace parte del problema', 'Actuar bien protege a los demás y a ti'],
     scenarioQ: 'Ves que favorecen injustamente a alguien por dinero. ¿Qué haces?',
     scenarioOpts: ['Me quedo callado, no es mi problema', 'Lo comento con un adulto de confianza', 'Pido que también me favorezcan'], scenarioCorrect: 1,
-    scenarioWhy: 'Hablar con alguien de confianza es el primer paso para frenar lo injusto.',
+    scenarioFeedback: [
+      'El silencio ayuda a que lo injusto se repita.',
+      'Muy bien: contarle a un adulto de confianza es el primer paso para frenar lo injusto.',
+      'Pedir lo mismo te convierte en parte del problema.'
+    ],
     familyPrompt: 'Hoy practiqué cómo actuar ante situaciones injustas.',
     familyQuestion: 'Si vieras algo injusto, ¿a quién se lo contarías primero?',
     relatedGuide: 'p6',
@@ -599,9 +638,16 @@ const KIDS_TOPICS: KidTopic[] = [
     id: 'k5', title: 'Presión de grupo', desc: 'Aprende a decir que no cuando te presionan.', icon: '🫂', category: 'Decisiones', core: 'prevention',
     body: ['A veces otras personas intentan convencerte de hacer algo incorrecto para “encajar”. Eso se llama presión de grupo.', 'Decir que no es difícil, pero es una muestra de fuerza: puedes proponer otra cosa, alejarte o pedir ayuda.'],
     example: 'Tus amigos te presionan para copiar en un examen y te dicen que si no lo haces eres un traidor.',
+    art: 'shield',
+    summary: 'Decir que no cuando te presionan es una muestra de fuerza, no de debilidad.',
+    problems: ['Ceder una vez facilita ceder la próxima', 'Puedes meterte en problemas serios', 'Pierdes la confianza de quienes te quieren'],
     scenarioQ: '¿Qué haces si te presionan para hacer algo incorrecto?',
     scenarioOpts: ['Acepto para no quedar mal', 'Digo que no y me alejo o pido ayuda', 'Lo hago solo una vez'], scenarioCorrect: 1,
-    scenarioWhy: 'Decir que no y buscar apoyo es la respuesta valiente y correcta.',
+    scenarioFeedback: [
+      'Quedar bien con el grupo no vale un problema mayor.',
+      'Exacto: decir que no y buscar apoyo es la respuesta valiente.',
+      '“Solo una vez” suele ser el inicio de muchas veces.'
+    ],
     familyPrompt: 'Hoy aprendí a enfrentar la presión de grupo.',
     familyQuestion: '¿Qué podrías decir si alguien te presiona a hacer algo malo?',
     relatedGuide: 'p7',
@@ -610,9 +656,16 @@ const KIDS_TOPICS: KidTopic[] = [
     id: 'k6', title: 'Decisiones y consecuencias', desc: 'Tus decisiones pueden afectar a otras personas.', icon: '⚖️', category: 'Decisiones', core: 'consequences',
     body: ['Cada decisión deja una huella: puede ayudar o puede dañar a quienes te rodean.', 'Antes de decidir, pregúntate: ¿a quién afecta esto? ¿me sentiría orgulloso si todos lo supieran?'],
     example: 'Aceptar un beneficio injusto puede dejar sin oportunidad a alguien que sí se lo merecía.',
+    art: 'scale',
+    summary: 'Cada decisión deja huella: piensa a quién afecta antes de elegir.',
+    problems: ['Una mala decisión puede quitarle algo a otro', 'Los efectos duran más de lo que crees', 'Tus decisiones hablan de quién eres'],
     scenarioQ: '¿Qué pregunta te ayuda a decidir bien?',
     scenarioOpts: ['¿Me conviene solo a mí?', '¿A quién afecta y sería justo para todos?', '¿Nadie se dará cuenta?'], scenarioCorrect: 1,
-    scenarioWhy: 'Pensar en los demás y en lo justo lleva a mejores decisiones.',
+    scenarioFeedback: [
+      'Pensar solo en ti deja fuera a los demás.',
+      'Exacto: pensar en los demás y en lo justo lleva a mejores decisiones.',
+      'Que nadie lo vea no lo vuelve correcto.'
+    ],
     familyPrompt: 'Hoy aprendí que mis decisiones afectan a otros.',
     familyQuestion: '¿Recuerdas una decisión tuya que haya afectado a alguien?',
     relatedGuide: 'p5',
@@ -621,9 +674,16 @@ const KIDS_TOPICS: KidTopic[] = [
     id: 'k7', title: 'Corrupción en la vida cotidiana', desc: 'Ejemplos cercanos y fáciles de identificar.', icon: '🏪', category: 'Ciudadanía', core: 'impact',
     body: ['La corrupción no solo sale en las noticias: está en favorecer a alguien injustamente o usar una posición para obtener ventajas.', 'Aprender a verla en lo cotidiano te protege: la reconoces antes de que te atrape.'],
     example: 'Un comerciante cobra de más a quien no conoce y le hace “precio especial” solo a sus amigos en un servicio público.',
+    art: 'hands',
+    summary: 'La corrupción también aparece en lo cotidiano: reconocerla te protege.',
+    problems: ['Se esconde en favores y “precios especiales”', 'Afecta servicios que usas a diario', 'Si la ignoras, crece'],
     scenarioQ: '¿Cuál de estos es un ejemplo cotidiano de corrupción?',
     scenarioOpts: ['Hacer fila y esperar tu turno', 'Usar un cargo para favorecer injustamente a alguien', 'Pedir ayuda con la tarea'], scenarioCorrect: 1,
-    scenarioWhy: 'Usar una posición para dar ventajas injustas es corrupción cotidiana.',
+    scenarioFeedback: [
+      'Bien: respetar tu turno es actuar con justicia.',
+      'Exacto: usar una posición para dar ventajas injustas es corrupción cotidiana.',
+      'Pedir ayuda para aprender no es trampa.'
+    ],
     familyPrompt: 'Hoy descubrí la corrupción en la vida diaria.',
     familyQuestion: '¿Has visto alguna situación injusta en tu escuela o barrio?',
     relatedGuide: 'p4',
@@ -632,9 +692,16 @@ const KIDS_TOPICS: KidTopic[] = [
     id: 'k8', title: '¿Cómo puedo actuar correctamente?', desc: 'Acciones concretas de honestidad y ciudadanía.', icon: '🌟', category: 'Ciudadanía', core: 'ethics',
     body: ['Actuar bien es un hábito: respetar turnos, decir la verdad, devolver lo perdido y tratar a todos con justicia.', 'Cada pequeña acción honesta construye tu reputación y mejora tu comunidad.'],
     example: 'Devuelves el vuelto de más aunque nadie se haya dado cuenta.',
+    art: 'shield',
+    summary: 'Actuar bien es un hábito: pequeños actos honestos todos los días.',
+    problems: ['La honestidad se nota aunque nadie mire', 'Tu ejemplo inspira a otros', 'Lo correcto casi siempre es lo más simple'],
     scenarioQ: '¿Cuál es una acción correcta?',
     scenarioOpts: ['Quedarme con el vuelto de más', 'Devolver lo que no es mío y ser justo', 'Aprovechar si nadie mira'], scenarioCorrect: 1,
-    scenarioWhy: 'La honestidad se demuestra cuando nadie está mirando.',
+    scenarioFeedback: [
+      'Quedarte con lo ajeno rompe la confianza, aunque nadie lo note.',
+      'Exacto: la honestidad se demuestra cuando nadie está mirando.',
+      'Que nadie mire no lo vuelve correcto.'
+    ],
     familyPrompt: 'Hoy aprendí acciones para actuar correctamente.',
     familyQuestion: '¿Qué acción honesta hiciste esta semana?',
     relatedGuide: 'p5',
@@ -643,9 +710,15 @@ const KIDS_TOPICS: KidTopic[] = [
     id: 'k9', title: 'Mitos sobre las coimas', desc: 'Descubre si estas afirmaciones son verdaderas o falsas.', icon: '❓', category: 'Actividades', core: 'prevention',
     body: ['Mito 1: “una coima pequeña no hace daño” → Falso: toda coima rompe reglas y quita recursos a todos.', 'Mito 2: “si nadie se entera no pasa nada” → Falso: el daño existe aunque nadie lo vea.', 'Mito 3: “así funcionan las cosas” → Falso: las cosas funcionan mejor con honestidad.'],
     example: 'Decir “es solo un poquito” no lo vuelve correcto.',
+    art: 'chat',
+    summary: 'Muchas frases sobre coimas son mitos: aquí descubres la verdad.',
+    problems: ['“Es solo un poquito” no lo vuelve correcto', '“Nadie se entera” no evita el daño', '“Así son las cosas” se puede cambiar'],
     scenarioQ: '“Pagar una coima pequeña no hace daño a nadie.” ¿Verdadero o falso?',
     scenarioOpts: ['Verdadero', 'Falso'], scenarioCorrect: 1,
-    scenarioWhy: 'Falso: toda coima hace daño y rompe la confianza.',
+    scenarioFeedback: [
+      'Aunque sea pequeña, rompe reglas y quita recursos a todos.',
+      'Exacto: toda coima hace daño y rompe la confianza.'
+    ],
     familyPrompt: 'Hoy descubrí los mitos de las coimas.',
     familyQuestion: '¿Qué frase has escuchado que normalice las coimas?',
     relatedGuide: 'p8',
@@ -654,9 +727,15 @@ const KIDS_TOPICS: KidTopic[] = [
     id: 'k10', title: 'Reto familiar', desc: 'Actividad para hacer junto a tu familia.', icon: '👨‍👩‍👧', category: 'Familia', core: 'citizen', joint: true,
     body: ['Este reto se hace en equipo: elige a tu padre, madre o tutor y conversen juntos.', 'Lean la situación, den su opinión cada uno y escriban su compromiso familiar contra las coimas.'],
     example: 'Compromiso: “En nuestra familia hablamos con la verdad y no aceptamos atajos injustos”.',
+    art: 'chat',
+    summary: 'Un reto para hacer en equipo con tu familia y conversar de verdad.',
+    problems: ['Conversar une a la familia', 'Un compromiso escrito se cumple mejor', 'Aprender juntos es más divertido'],
     scenarioQ: '¿Ya conversaron y escribieron su compromiso familiar?',
     scenarioOpts: ['Todavía no', '¡Sí, lo hicimos juntos!'], scenarioCorrect: 1,
-    scenarioWhy: '¡Felicidades! Conversar en familia ya es un gran paso.',
+    scenarioFeedback: [
+      'Cuando estén listos, conversen y escríbanlo juntos.',
+      '¡Felicidades! Conversar en familia ya es un gran paso.'
+    ],
     familyPrompt: 'Hoy hicimos el reto familiar juntos.',
     familyQuestion: '¿Cuál es el compromiso de nuestra familia?',
     relatedGuide: 'p10',
@@ -751,6 +830,74 @@ const PARENT_GUIDES: ParentGuide[] = [
     joint: true,
   },
 ]
+
+// Ilustraciones vectoriales para los temas (mismo estilo plano en toda la app)
+const KID_ART: Record<string, ReactNode> = {
+  scale: (
+    <svg role="img" aria-label="Ilustración de una balanza de justicia" viewBox="0 0 200 150" className="w-full max-w-[260px] h-auto">
+      <ellipse cx="100" cy="132" rx="62" ry="10" fill="#DBEAFE" />
+      <rect x="96" y="30" width="8" height="96" rx="4" fill="#166534" />
+      <rect x="88" y="122" width="24" height="8" rx="4" fill="#166534" />
+      <rect x="30" y="44" width="140" height="8" rx="4" fill="#166534" />
+      <path d="M100 22l8-12 8 12-8 5-8-5Z" fill="#166534" />
+      <line x1="45" y1="52" x2="32" y2="88" stroke="#166534" strokeWidth="3" />
+      <line x1="45" y1="52" x2="58" y2="88" stroke="#166534" strokeWidth="3" />
+      <path d="M22 88a18 12 0 0 0 36 0Z" fill="#F59E0B" />
+      <line x1="155" y1="52" x2="142" y2="88" stroke="#166534" strokeWidth="3" />
+      <line x1="155" y1="52" x2="168" y2="88" stroke="#166534" strokeWidth="3" />
+      <path d="M132 88a18 12 0 0 0 36 0Z" fill="#F59E0B" />
+      <circle cx="168" cy="30" r="4" fill="#10B981" />
+      <circle cx="30" cy="110" r="4" fill="#7C3AED" />
+    </svg>
+  ),
+  paths: (
+    <svg role="img" aria-label="Ilustración de una persona frente a dos caminos" viewBox="0 0 200 150" className="w-full max-w-[260px] h-auto">
+      <ellipse cx="100" cy="132" rx="70" ry="10" fill="#DBEAFE" />
+      <path d="M100 128C80 110 50 104 30 108" stroke="#93C5FD" strokeWidth="10" fill="none" strokeLinecap="round" />
+      <path d="M100 128c20-18 50-24 70-20" stroke="#166534" strokeWidth="10" fill="none" strokeLinecap="round" />
+      <circle cx="100" cy="72" r="16" fill="#FCD9B8" />
+      <path d="M84 70a16 16 0 0 1 32 0Z" fill="#1F2937" />
+      <rect x="86" y="90" width="28" height="34" rx="10" fill="#2563EB" />
+      <path d="M168 46l2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5Z" fill="#F59E0B" />
+      <circle cx="38" cy="52" r="4" fill="#7C3AED" />
+    </svg>
+  ),
+  hands: (
+    <svg role="img" aria-label="Ilustración de una mano rechazando un sobre de dinero" viewBox="0 0 200 150" className="w-full max-w-[260px] h-auto">
+      <ellipse cx="100" cy="130" rx="66" ry="10" fill="#DBEAFE" />
+      <rect x="62" y="52" width="76" height="52" rx="8" fill="#FFFFFF" stroke="#166534" strokeWidth="4" />
+      <path d="M62 60l38 24 38-24" fill="none" stroke="#166534" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+      <rect x="86" y="70" width="28" height="16" rx="3" fill="#F59E0B" />
+      <circle cx="100" cy="78" r="34" fill="none" stroke="#EF4444" strokeWidth="7" />
+      <path d="M76 54l48 48" stroke="#EF4444" strokeWidth="7" strokeLinecap="round" />
+      <path d="M162 40l2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5Z" fill="#10B981" />
+    </svg>
+  ),
+  shield: (
+    <svg role="img" aria-label="Ilustración de un escudo de protección" viewBox="0 0 200 150" className="w-full max-w-[260px] h-auto">
+      <ellipse cx="100" cy="130" rx="60" ry="10" fill="#DBEAFE" />
+      <path d="M100 22l44 16v34c0 30-19 50-44 60-25-10-44-30-44-60V38l44-16Z" fill="#10B981" />
+      <path d="M100 34l33 12v26c0 22-14 37-33 45-19-8-33-23-33-45V46l33-12Z" fill="#FFFFFF" />
+      <path d="M88 76l9 9 17-18" fill="none" stroke="#166534" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="160" cy="44" r="4" fill="#F59E0B" />
+      <circle cx="40" cy="60" r="4" fill="#7C3AED" />
+    </svg>
+  ),
+  chat: (
+    <svg role="img" aria-label="Ilustración de dos personas conversando" viewBox="0 0 200 150" className="w-full max-w-[260px] h-auto">
+      <ellipse cx="100" cy="132" rx="70" ry="10" fill="#DBEAFE" />
+      <circle cx="72" cy="70" r="18" fill="#FCD9B8" />
+      <rect x="52" y="90" width="40" height="38" rx="13" fill="#2563EB" />
+      <circle cx="130" cy="66" r="18" fill="#F1C27D" />
+      <rect x="110" y="86" width="40" height="42" rx="13" fill="#7C3AED" />
+      <rect x="86" y="18" width="52" height="30" rx="10" fill="#FFFFFF" stroke="#BFDBFE" strokeWidth="3" />
+      <circle cx="104" cy="33" r="3" fill="#2563EB" />
+      <circle cx="114" cy="33" r="3" fill="#7C3AED" />
+      <circle cx="124" cy="33" r="3" fill="#10B981" />
+      <path d="M162 30l2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5Z" fill="#F59E0B" />
+    </svg>
+  ),
+}
 
 // Datos de preguntas para la sección Conversemos
 const conversationPrompts: ConversationPrompt[] = [
@@ -1779,83 +1926,6 @@ case 'about':
 
     case 'learn':
       // Temas educativos
-      // Contenido base reutilizado por la biblioteca (puntos clave y principios)
-      const topics: Record<LearningTopic, { keyPoints: string[]; theorem: string }> = {
-        coima: {
-          keyPoints: [
-            'Puede ser dinero, regalos, favores o promesas futuras',
-            'Siempre busca un beneficio que no le corresponde',
-            'Corrompe la imparcialidad de quien decide',
-            'Es delito en casi todos los países'
-          ],
-          theorem: 'Principio de Transparencia: Toda decisión pública debe estar abierta a la supervisión. La información es un derecho, no un privilegio.',
-        },
-        recognition: {
-          keyPoints: [
-            'Ofertas "demasiado buenas para ser verdad"',
-            'Presión para decidir rápido sin revisar',
-            'Reuniones secretas sin testigos ni registro',
-            'Pedidos de "favores" a cambio de agilizar trámites',
-            'Regalos costosos antes de una decisión importante'
-          ],
-          theorem: 'Principio de Responsabilidad: Quien decide debe rendir cuentas. El poder sin control es abuso.',
-        },
-        impact: {
-          keyPoints: [
-            'Menos dinero para escuelas, hospitales y seguridad',
-            'Servicios públicos de peor calidad',
-            'Aumenta la desigualdad: paga el más vulnerable',
-            'Destruye la confianza en las instituciones',
-            'Frena el desarrollo del país'
-          ],
-          theorem: 'Principio de Equidad: Todos merecemos igual trato. La corrupción rompe la igualdad y agrava la pobreza.',
-        },
-        consequences: {
-          keyPoints: [
-            'Prisión: 3 a 8 años (Perú) o más según el caso',
-            'Multas económicas elevadas',
-            'Inhabilitación para cargo público (hasta de por vida)',
-            'Antecedentes penales que limitan empleo y viajes',
-            'Estigma social y familiar permanente'
-          ],
-          theorem: 'Principio de Proporcionalidad: La pena debe ser proporcional. La prevención siempre supera al castigo.',
-        },
-        prevention: {
-          keyPoints: [
-            'Conoce tus derechos y los procedimientos correctos',
-            'Exige transparencia: pide comprobantes y actas',
-            'Denuncia: usa canales seguros y anónimos',
-            'Educa a tu familia: habla de integridad en casa',
-            'Participa: vigila obras y gastos públicos'
-          ],
-          theorem: 'Principio de Participación: La democracia se fortalece cuando todos vigilamos. El silencio es cómplice.',
-        },
-        ethics: {
-          keyPoints: [
-            'Honestidad: decir la verdad aunque cueste',
-            'Coherencia: actuar según tus valores',
-            'Valentía: decir no a lo incorrecto',
-            'Empatía: pensar en cómo afectas a otros',
-            'Ejemplo: tu conducta inspira a otros'
-          ],
-          theorem: 'Principio de Integridad: Hacer lo correcto cuando nadie mira define tu carácter real.',
-        },
-        citizen: {
-          keyPoints: [
-            'Vigila: revisa obras y gastos de tu municipalidad',
-            'Participa: asiste a audiencias y cabildos',
-            'Denuncia: usa la Defensoría, Contraloría o Fiscalía',
-            'Organiza: junta vecinos para fiscalizar juntos',
-            'Vota informado: investiga antecedentes de candidatos'
-          ],
-          theorem: 'Principio de Soberanía: El poder emana del pueblo. Ejercerlo es defender tus derechos.',
-        },
-        test: {
-          keyPoints: [],
-          theorem: 'Recuerda: La integridad no es solo no hacer lo malo, sino actuar correctamente aunque nadie te vea.',
-        },
-      }
-
       const coimaCases = [
         {
           id: 1,
@@ -1893,7 +1963,6 @@ case 'about':
       const guidesDone = getProgress().guidesDone ?? []
       const activeKid = KIDS_TOPICS.find(k => k.id === activeKidId) ?? null
       const activeGuide = PARENT_GUIDES.find(g => g.id === activeGuideId) ?? null
-      const activeKidCore = activeKid ? topics[activeKid.core] : null
       const examUnlocked = kidsDone.length >= KIDS_TOPICS.length
       const cust7 = getCustomization();
 
@@ -2202,92 +2271,132 @@ case 'about':
 
             {/* DETALLE TEMA HIJO */}
             {learnView === 'kid' && activeKid && (
-              <>
-                <div className="rounded-2xl p-8 md:p-10 border-2 border-black" style={{ background: '#FFE45E' }}>
-                  <div className="flex items-start justify-between gap-3 mb-5">
-                    <div className="flex items-center gap-3">
-                      <div className="w-14 h-14 rounded-2xl bg-black flex items-center justify-center text-3xl shrink-0">{activeKid.icon}</div>
-                      <div>
-                        <p className="text-xs font-black text-black/60">{activeKid.category}{activeKid.joint ? ' · 👨‍👩‍👧 JUNTOS' : ''}</p>
-                        <h2 className="text-2xl font-black text-black leading-tight">{activeKid.title}</h2>
+              <div className="w-full max-w-[760px] mx-auto space-y-8">
+                {/* Cabecera */}
+                <div className="bg-white rounded-2xl p-5 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="font-black text-dark">Hablemos Claro</span>
+                    <button onClick={() => setCurrentScreen('profile')} className="glass-card px-4 py-2 rounded-xl text-primary text-sm font-bold hover:bg-primary/10 transition-all">
+                      Mi progreso
+                    </button>
+                  </div>
+                  <div className="flex items-center justify-between mt-3 text-sm font-bold">
+                    <span className="text-gray-500">Tema {KIDS_TOPICS.findIndex(k => k.id === activeKid.id) + 1} de {KIDS_TOPICS.length} · {activeKid.category}</span>
+                    <span className="text-primary">{Math.round((kidsDone.length / KIDS_TOPICS.length) * 100)}% completado</span>
+                  </div>
+                  <div className="h-2.5 bg-gray-200 rounded-full mt-2 overflow-hidden">
+                    <div className="h-full rounded-full" style={{ width: `${(kidsDone.length / KIDS_TOPICS.length) * 100}%`, background: 'linear-gradient(90deg, #10B981, #2563EB)' }}></div>
+                  </div>
+                  <button onClick={() => setLearnView('kids')} className="text-gray-500 hover:text-primary text-sm font-bold mt-3">
+                    ← Volver a temas
+                  </button>
+                </div>
+
+                {/* Título + pasos */}
+                <div className="text-center">
+                  <h2 className="text-3xl md:text-4xl font-black text-[#166534] leading-tight">{activeKid.title}</h2>
+                  <p className="text-gray-600 text-lg mt-2">{activeKid.desc}</p>
+                </div>
+                <div className="flex gap-2 flex-wrap justify-center">
+                  {['Aprende', 'Observa', 'Reflexiona', 'Elige', 'Conversa', 'Completa'].map((s, i) => (
+                    <span key={s} className="px-3 py-1 rounded-full bg-white text-xs font-bold text-gray-500 shadow-sm">{i + 1} · {s}</span>
+                  ))}
+                </div>
+
+                {/* Ilustración */}
+                <div className="bg-white rounded-3xl p-6 shadow-sm flex justify-center">
+                  {KID_ART[activeKid.art]}
+                </div>
+
+                {/* 1. En pocas palabras */}
+                <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm">
+                  <p className="text-xs font-black tracking-widest text-[#166534] mb-3">1 · EN POCAS PALABRAS</p>
+                  <p className="text-gray-800 text-lg leading-loose">{activeKid.summary}</p>
+                </div>
+
+                {/* 2. Ejemplo */}
+                <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border-l-8" style={{ borderLeftColor: '#F59E0B' }}>
+                  <p className="text-xs font-black tracking-widest text-[#166534] mb-3">2 · EJEMPLO COTIDIANO</p>
+                  <p className="text-gray-800 text-lg leading-loose italic">“{activeKid.example}”</p>
+                </div>
+
+                {/* 3. Por qué es un problema */}
+                <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm">
+                  <p className="text-xs font-black tracking-widest text-[#166534] mb-4">3 · ¿POR QUÉ ES UN PROBLEMA?</p>
+                  <ul className="space-y-4">
+                    {activeKid.problems.map((pb, i) => (
+                      <li key={i} className="flex items-start gap-3">
+                        <span className="w-7 h-7 rounded-full bg-[#166534] text-white flex items-center justify-center font-bold text-sm shrink-0">✓</span>
+                        <p className="text-gray-800 text-lg leading-relaxed">{pb}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Corrupción vs coima */}
+                {activeKid.compareA && (
+                  <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm">
+                    <p className="text-xs font-black tracking-widest text-[#166534] mb-4">⚖️ CORRUPCIÓN Y COIMA NO SON LO MISMO</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="rounded-xl p-5 bg-primary/5 border border-primary/15">
+                        <p className="text-gray-800 leading-relaxed">{activeKid.compareA}</p>
+                      </div>
+                      <div className="rounded-xl p-5 bg-warning/10 border border-warning/25">
+                        <p className="text-gray-800 leading-relaxed">{activeKid.compareB}</p>
                       </div>
                     </div>
-                    {kidsDone.includes(activeKid.id) && <span className="px-3 py-1 rounded-full bg-black text-white text-xs font-bold shrink-0">✓ Listo</span>}
+                    <p className="text-center font-bold text-dark mt-5">{activeKid.compareNote}</p>
                   </div>
-                  <div className="space-y-4 mb-8">
-                    {activeKid.body.map((p, i) => (
-                      <p key={i} className="text-black text-lg leading-loose">{p}</p>
+                )}
+                {/* 4. Interactivo */}
+                <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border-2 border-primary/20">
+                  <p className="text-xs font-black tracking-widest text-[#166534] mb-3">4 · ¿QUÉ HARÍAS TÚ?</p>
+                  <p className="text-gray-800 text-lg mb-5">{activeKid.scenarioQ}</p>
+                  <div className="space-y-4">
+                    {activeKid.scenarioOpts.map((opt, oi) => (
+                      <button
+                        key={oi}
+                        onClick={() => {
+                          setFeedbackMessage(activeKid.scenarioFeedback[oi] ?? '')
+                          setShowFeedback(true)
+                        }}
+                        className="btn-glow w-full py-4 px-5 rounded-xl text-left bg-white border-2 border-gray-200 hover:border-primary/60 font-medium text-dark text-lg"
+                      >
+                        {opt}
+                      </button>
                     ))}
                   </div>
-                  <div className="p-5 bg-white border-l-4 border-black rounded-xl mb-8">
-                    <p className="font-bold text-black mb-2">💡 Ejemplo</p>
-                    <p className="text-black leading-loose italic">“{activeKid.example}”</p>
-                  </div>
-                  {activeKidCore && activeKidCore.keyPoints.length > 0 && (
-                    <div className="mb-8">
-                      <h3 className="font-bold text-black mb-4">Puntos clave</h3>
-                      <ul className="space-y-4">
-                        {activeKidCore.keyPoints.map((point, i) => (
-                          <li key={i} className="flex items-start gap-4 p-4 bg-white rounded-xl border border-black/10">
-                            <div className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center font-bold flex-shrink-0">
-                              {i + 1}
-                            </div>
-                            <p className="text-black leading-relaxed">{point}</p>
-                          </li>
-                        ))}
-                      </ul>
+                  {showFeedback && (
+                    <div className="mt-5 p-5 rounded-xl bg-primary/5 border border-primary/20 animate-fade-in">
+                      <p className="text-xs font-black tracking-widest text-primary mb-2">💡 PARA PENSAR</p>
+                      <p className="text-gray-800 text-lg leading-relaxed">{feedbackMessage}</p>
                     </div>
                   )}
-                  {activeKidCore && activeKidCore.theorem !== '' && (
-                    <div className="p-5 bg-white border-2 border-black rounded-xl mb-8">
-                      <p className="font-bold text-black mb-2">⚖️ Principio</p>
-                      <p className="text-black leading-loose font-medium">“{activeKidCore.theorem}”</p>
-                    </div>
-                  )}
-                  <div className="bg-white rounded-xl p-6 border border-black/10">
-                    <p className="font-bold text-black text-lg mb-4">{activeKid.scenarioQ}</p>
-                    <div className="space-y-4">
-                      {activeKid.scenarioOpts.map((opt, oi) => (
-                        <button
-                          key={oi}
-                          onClick={() => {
-                            const ok = oi === activeKid.scenarioCorrect
-                            setFeedbackMessage((ok ? '¡Muy bien! ' : 'Casi… ') + activeKid.scenarioWhy)
-                            setShowFeedback(true)
-                          }}
-                          className="btn-glow w-full py-4 px-5 rounded-xl text-left bg-white border-2 border-gray-200 hover:border-primary/60 font-medium text-dark"
-                        >
-                          {opt}
-                        </button>
-                      ))}
-                    </div>
-                    {showFeedback && (
-                      <div className="mt-4 p-4 rounded-xl bg-primary/5 border border-primary/20 animate-fade-in">
-                        <p className="font-bold text-primary">{feedbackMessage}</p>
-                      </div>
-                    )}
-                  </div>
                   {activeKid.id === 'k4' && (
                     <button
                       onClick={() => { setShowCoimaONo(true); setCurrentCoimaCase(0); setShowFeedback(false); }}
-                      className="btn-glow bg-black text-white font-bold py-4 px-6 rounded-xl text-lg w-full mt-8"
+                      className="btn-glow bg-[#166534] text-white font-bold py-4 px-6 rounded-xl text-lg w-full mt-6"
                     >
                       🎯 Jugar ¿Coima o no?
                     </button>
                   )}
-                  <button
-                    onClick={() => completeKidTopic(activeKid.id)}
-                    disabled={kidsDone.includes(activeKid.id)}
-                    className={`font-bold py-4 px-6 rounded-xl text-lg w-full mt-6 ${
-                      kidsDone.includes(activeKid.id)
-                        ? 'bg-black text-white cursor-default'
-                        : 'btn-glow bg-success text-white'
-                    }`}
-                  >
-                    {kidsDone.includes(activeKid.id) ? '✓ Tema completado' : 'Marcar como terminado ✓'}
-                  </button>
                 </div>
+                {/* 6. Completa */}
+                <button
+                  onClick={() => completeKidTopic(activeKid.id)}
+                  disabled={kidsDone.includes(activeKid.id)}
+                  className={`font-bold py-4 px-6 rounded-xl text-lg w-full ${
+                    kidsDone.includes(activeKid.id)
+                      ? 'bg-success/15 text-success cursor-default'
+                      : 'btn-glow text-white'
+                  }`}
+                  style={kidsDone.includes(activeKid.id) ? undefined : { background: '#166534' }}
+                >
+                  {kidsDone.includes(activeKid.id) ? '✓ Tema completado' : '6 · Marcar como terminado ✓'}
+                </button>
+                {/* 5. Conversa en familia */}
                 <div className="glass-card rounded-2xl p-8">
+                  <p className="text-xs font-black tracking-widest text-warning mb-2">5 · CONVERSA EN FAMILIA</p>
                   <h3 className="font-bold text-warning text-xl mb-2">💬 Conversarlo en familia</h3>
                   <p className="text-gray-700 italic leading-relaxed">“{activeKid.familyPrompt}”</p>
                   <p className="text-dark font-bold mt-3">Pregunta para conversar: {activeKid.familyQuestion}</p>
@@ -2306,7 +2415,7 @@ case 'about':
                     </button>
                   </div>
                 </div>
-              </>
+              </div>
             )}
 
             {/* DETALLE GUÍA PADRES */}
