@@ -822,6 +822,16 @@ export default function App() {
     localStorage.setItem('hablemos-claro-district', studentProfile.district)
   }, [studentProfile.name, studentProfile.age, studentProfile.district])
 
+  // Al cambiar de perfil: volver al inicio de Temas y limpiar respuestas (no mezclar datos)
+  useEffect(() => {
+    setLearnView('hub')
+    setActiveKidId(null)
+    setActiveGuideId(null)
+    setExamAnswers({})
+    setShowFeedback(false)
+    setShowCoimaONo(false)
+  }, [profileType])
+
   // Traducción según idioma
   const t = (key: keyof typeof translations['es']) => (translations[language] as Record<string, string>)[key] ?? translations['es'][key]
 
@@ -1769,32 +1779,18 @@ case 'about':
 
     case 'learn':
       // Temas educativos
-      const topics = {
+      // Contenido base reutilizado por la biblioteca (puntos clave y principios)
+      const topics: Record<LearningTopic, { keyPoints: string[]; theorem: string }> = {
         coima: {
-          title: '¿Qué es una coima?',
-          icon: '💰',
-          color: 'primary',
-          explanation: 'Una coima (también llamada soborno) ocurre cuando alguien ofrece, entrega, pide o acepta dinero, regalos o favores para obtener un beneficio indebido o influir incorrectamente en una decisión.',
           keyPoints: [
             'Puede ser dinero, regalos, favores o promesas futuras',
             'Siempre busca un beneficio que no le corresponde',
             'Corrompe la imparcialidad de quien decide',
             'Es delito en casi todos los países'
           ],
-          example: 'Un contratista ofrece dinero a un funcionario para ganar una licitación sin cumplir requisitos.',
-          kidsExplanation: 'Una coima es cuando alguien ofrece dinero o regalos para conseguir algo que no le corresponde, como saltarse la fila o ganar sin merecerlo. Es una trampa que nos hace daño a todos.',
-          kidsExample: 'Un niño ofrece sus juguetes a cambio de que le pasen las respuestas del examen.',
-          parentTip: 'Pregúntale a tu hijo qué haría si alguien le ofrece algo a cambio de hacer trampa. Escucha sin juzgar y felicita las respuestas honestas.',
-          correct: 'Es un delito',
-          incorrect: 'Es una práctica normal',
-          video: 'https://www.youtube.com/embed/5LbVY6qH3kM',
           theorem: 'Principio de Transparencia: Toda decisión pública debe estar abierta a la supervisión. La información es un derecho, no un privilegio.',
         },
         recognition: {
-          title: '¿Cómo reconocer una coima?',
-          icon: '🔍',
-          color: 'secondary',
-          explanation: 'Las coimas suelen disfrazarse. Aprende a detectar las señales de alerta antes de caer en una trampa.',
           keyPoints: [
             'Ofertas "demasiado buenas para ser verdad"',
             'Presión para decidir rápido sin revisar',
@@ -1802,20 +1798,9 @@ case 'about':
             'Pedidos de "favores" a cambio de agilizar trámites',
             'Regalos costosos antes de una decisión importante'
           ],
-          example: 'Un inspector dice: "Si me das un regalito, cierro los ojos ante esta infracción".',
-          kidsExplanation: 'Puedes darte cuenta cuando algo no está bien: si te piden guardar un secreto, si te apuran para decidir rápido o si te ofrecen un premio por hacer algo injusto.',
-          kidsExample: 'Una persona te dice: “no le cuentes a nadie y te doy esto”.',
-          parentTip: 'Enseña la regla de oro: “si hay que esconderlo, probablemente está mal”. Practiquen con ejemplos de la vida diaria.',
-          correct: 'Situación de corrupción',
-          incorrect: 'Trato normal',
-          video: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
           theorem: 'Principio de Responsabilidad: Quien decide debe rendir cuentas. El poder sin control es abuso.',
         },
         impact: {
-          title: '¿Por qué las coimas hacen daño?',
-          icon: '💔',
-          color: 'warning',
-          explanation: 'Cada coima roba recursos que pertenecen a todos. El daño no es abstracto: afecta directamente tu calidad de vida y la de tu familia.',
           keyPoints: [
             'Menos dinero para escuelas, hospitales y seguridad',
             'Servicios públicos de peor calidad',
@@ -1823,20 +1808,9 @@ case 'about':
             'Destruye la confianza en las instituciones',
             'Frena el desarrollo del país'
           ],
-          example: 'El dinero de una coima en una obra pública podría haber equipado 3 aulas escolares.',
-          kidsExplanation: 'Cuando alguien hace trampa con dinero, hay menos dinero para cosas importantes como escuelas, hospitales y parques. Todos salimos perdiendo.',
-          kidsExample: 'Si el dinero para arreglar tu escuela se pierde en una coima, tu aula sigue rota.',
-          parentTip: 'Conéctalo con su realidad: pregúntale qué le gustaría mejorar en su escuela o barrio y de dónde sale ese dinero.',
-          correct: 'Daño real a la sociedad',
-          incorrect: 'Solo afecta a los involucrados',
-          video: 'https://www.youtube.com/embed/9bZkp7q19f0',
           theorem: 'Principio de Equidad: Todos merecemos igual trato. La corrupción rompe la igualdad y agrava la pobreza.',
         },
         consequences: {
-          title: 'Consecuencias legales y sociales',
-          icon: '⚖️',
-          color: 'error',
-          explanation: 'Ofrecer o aceptar una coima es delito grave. Las consecuencias van más allá de lo legal: destruyen tu reputación y futuro.',
           keyPoints: [
             'Prisión: 3 a 8 años (Perú) o más según el caso',
             'Multas económicas elevadas',
@@ -1844,20 +1818,9 @@ case 'about':
             'Antecedentes penales que limitan empleo y viajes',
             'Estigma social y familiar permanente'
           ],
-          example: 'Un alcalde condenado por cohecho pierde su cargo, va a prisión y su familia carga el estigma.',
-          kidsExplanation: 'Hacer trampa con dinero es un delito. Quien lo hace puede ir a la cárcel, pagar multas y perder la confianza de todos para siempre.',
-          kidsExample: 'Un alcalde que aceptó dinero perdió su trabajo y fue a la cárcel.',
-          parentTip: 'Habla de consecuencias sin asustar: enfócate en que las decisiones tienen efectos y en que siempre se puede elegir bien.',
-          correct: 'Consecuencias graves e irreversibles',
-          incorrect: 'Solo una multa leve',
-          video: 'https://www.youtube.com/embed/DqP2rR0fB4s',
           theorem: 'Principio de Proporcionalidad: La pena debe ser proporcional. La prevención siempre supera al castigo.',
         },
         prevention: {
-          title: 'Cómo prevenir la corrupción',
-          icon: '🛡️',
-          color: 'success',
-          explanation: 'La mejor defensa es la prevención activa. Cada persona puede ser un agente de cambio desde su entorno.',
           keyPoints: [
             'Conoce tus derechos y los procedimientos correctos',
             'Exige transparencia: pide comprobantes y actas',
@@ -1865,20 +1828,9 @@ case 'about':
             'Educa a tu familia: habla de integridad en casa',
             'Participa: vigila obras y gastos públicos'
           ],
-          example: 'Vecinos organizados exigen ver el expediente de una obra y evitan sobreprecio.',
-          kidsExplanation: 'Tú puedes ayudar a que no haya trampas: conociendo tus derechos, contando lo que está mal y siendo honesto siempre.',
-          kidsExample: 'Si ves algo injusto en tu escuela, cuéntaselo a un profesor o a tus padres.',
-          parentTip: 'Crea un ambiente donde tu hijo se sienta seguro contándote cosas difíciles. Felicítalo cuando te cuente algo aunque sea incómodo.',
-          correct: 'Sí, la prevención funciona',
-          incorrect: 'No se puede hacer nada',
-          video: 'https://www.youtube.com/embed/kffacxfA7G4',
           theorem: 'Principio de Participación: La democracia se fortalece cuando todos vigilamos. El silencio es cómplice.',
         },
         ethics: {
-          title: 'Ética e integridad personal',
-          icon: '🧭',
-          color: 'info',
-          explanation: 'La integridad no es solo no robar: es hacer lo correcto cuando nadie mira. Es tu brújula interna.',
           keyPoints: [
             'Honestidad: decir la verdad aunque cueste',
             'Coherencia: actuar según tus valores',
@@ -1886,20 +1838,9 @@ case 'about':
             'Empatía: pensar en cómo afectas a otros',
             'Ejemplo: tu conducta inspira a otros'
           ],
-          example: 'Un estudiante devuelve una billetera perdida con todo su contenido sin esperar recompensa.',
-          kidsExplanation: 'Ser íntegro es hacer lo correcto aunque nadie te esté mirando, como devolver algo que no es tuyo.',
-          kidsExample: 'Encuentras dinero en el patio y lo entregas sin que nadie te lo pida.',
-          parentTip: 'Los hijos aprenden mirando: cuenta en voz alta tus propias decisiones honestas del día.',
-          correct: 'Es mi responsabilidad',
-          incorrect: 'Cada quien se arregla solo',
-          video: 'https://www.youtube.com/embed/ethics101',
           theorem: 'Principio de Integridad: Hacer lo correcto cuando nadie mira define tu carácter real.',
         },
         citizen: {
-          title: 'Ciudadanía activa',
-          icon: '🗳️',
-          color: 'purple',
-          explanation: 'Ser ciudadano no es solo votar cada 5 años. Es participar, vigilar y exigir cuentas todos los días.',
           keyPoints: [
             'Vigila: revisa obras y gastos de tu municipalidad',
             'Participa: asiste a audiencias y cabildos',
@@ -1907,28 +1848,10 @@ case 'about':
             'Organiza: junta vecinos para fiscalizar juntos',
             'Vota informado: investiga antecedentes de candidatos'
           ],
-          example: 'Un comité vecinal detecta sobreprecio en una pista y logra anular el contrato.',
-          kidsExplanation: 'Ser un buen ciudadano es cuidar lo que es de todos: participar, respetar las reglas y avisar cuando algo está mal.',
-          kidsExample: 'Cuidas el parque de tu barrio y avisas si alguien lo daña.',
-          parentTip: 'Llévalo a una actividad comunitaria o revisen juntos una obra del barrio: la participación se aprende participando.',
-          correct: 'Es mi poder y deber',
-          incorrect: 'Los políticos sabrán qué hacer',
-          video: 'https://www.youtube.com/embed/citizen101',
           theorem: 'Principio de Soberanía: El poder emana del pueblo. Ejercerlo es defender tus derechos.',
         },
         test: {
-          title: 'Pon a prueba tus conocimientos',
-          icon: '📝',
-          color: 'primary',
-          explanation: 'Responde estas preguntas para verificar lo que aprendiste. No hay respuestas "malas", solo oportunidades de aprender.',
           keyPoints: [],
-          kidsExplanation: '',
-          kidsExample: '',
-          parentTip: '',
-          example: '',
-          correct: '',
-          incorrect: '',
-          video: '',
           theorem: 'Recuerda: La integridad no es solo no hacer lo malo, sino actuar correctamente aunque nadie te vea.',
         },
       }
@@ -2160,6 +2083,21 @@ case 'about':
                     ))}
                   </div>
                 </div>
+                {(() => {
+                  const next = KIDS_TOPICS.find(k => !kidsDone.includes(k.id))
+                  if (!next) return null
+                  return (
+                    <button
+                      onClick={() => { setActiveKidId(next.id); setLearnView('kid'); setShowFeedback(false); }}
+                      className="rounded-2xl p-6 w-full text-left text-white shadow-lg transition-all hover:shadow-xl cursor-pointer"
+                      style={{ background: 'linear-gradient(135deg, #F59E0B, #EA580C)' }}
+                    >
+                      <p className="text-xs font-black tracking-widest text-white/80">🎯 RETO ACTUAL</p>
+                      <p className="text-xl font-black mt-1">{next.icon} {next.title}</p>
+                      <p className="text-sm text-white/85 mt-1">Continúa donde te quedaste →</p>
+                    </button>
+                  )
+                })()}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   {KIDS_TOPICS.filter(k => kidsFilter === 'Todos' || k.category === kidsFilter).map((k, i) => {
                     const done = kidsDone.includes(k.id)
@@ -2415,6 +2353,27 @@ case 'about':
                     }`}
                   >
                     {guidesDone.includes(activeGuide.id) ? '✓ Guía revisada' : 'Marcar como revisada ✓'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      const kid = KIDS_TOPICS.find(k => k.id === activeGuide.relatedKid)
+                      if (profileType === 'family') {
+                        let updated: FamilyProfile = { ...familyProfile }
+                        updated = pushFamilyLog(updated, `📌 Actividad familiar asignada: ${kid ? kid.title : activeGuide.title}.`)
+                        const checked = checkFamilyBadges(updated)
+                        setFamilyProfile(checked.profile)
+                        saveFamilyProfile(checked.profile)
+                        celebrateFamilyBadges(checked.unlocked)
+                      }
+                      if (kid) {
+                        setActiveKidId(kid.id)
+                        setLearnView('kid')
+                        setShowFeedback(false)
+                      }
+                    }}
+                    className="btn-glow bg-white border-2 border-warning text-warning font-bold py-4 px-6 rounded-xl text-lg w-full mt-4"
+                  >
+                    📌 Asignar actividad familiar
                   </button>
                 </div>
                 <div className="glass-card rounded-2xl p-8">
