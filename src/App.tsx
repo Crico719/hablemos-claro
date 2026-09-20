@@ -2417,6 +2417,24 @@ case 'about':
               Eliminar foto
             </button>
 
+            <button
+              onClick={() => {
+                const url = photoUrl.trim()
+                setTempPhoto(url !== '' ? url : studentProfile.photo)
+                const updated = {
+                  ...studentProfile,
+                  photo: url !== '' ? url : studentProfile.photo,
+                  photoPos: posDraft,
+                }
+                setStudentProfile(updated)
+                saveStudentProfile(updated)
+                setEditPhotoModal(false)
+              }}
+              className="btn-glow bg-success text-white font-bold py-3 px-6 rounded-xl w-full"
+            >
+              💾 Guardar foto ✓
+            </button>
+
             <div className="bg-white rounded-xl p-4 border border-gray-200">
               <p className="font-bold text-dark mb-3">{t('photoLinkTitle')}</p>
               <input
@@ -2505,23 +2523,6 @@ case 'about':
                     />
                   </label>
                 </div>
-                <button
-                  onClick={() => {
-                    const url = photoUrl.trim()
-                    setTempPhoto(url !== '' ? url : studentProfile.photo)
-                    const updated = {
-                      ...studentProfile,
-                      photo: url !== '' ? url : studentProfile.photo,
-                      photoPos: posDraft,
-                    }
-                    setStudentProfile(updated)
-                    saveStudentProfile(updated)
-                    setEditPhotoModal(false)
-                  }}
-                  className="btn-glow bg-success text-white font-bold py-3 px-6 rounded-xl w-full mt-4"
-                >
-                  💾 Guardar foto ✓
-                </button>
               </div>
             )}
         </div>
