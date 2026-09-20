@@ -4,17 +4,9 @@ import './index.css'
 // Tipos para la aplicación
 type UserRole = 'parent' | 'child'
 type LearningTopic = 'coima' | 'recognition' | 'impact' | 'consequences' | 'prevention' | 'test'
-type PlayMode = 'individual' | 'family'
 type BadgeType = 'topics-explorer' | 'game-master' | 'integrity-champion'
 type DeviceType = 'pc' | 'phone' | 'laptop'
 type ProfileType = 'student' | 'family'
-
-interface Avatar {
-  id: number
-  name: string
-  color: string
-  emoji: string
-}
 
 interface Badge {
   id: BadgeType
@@ -40,7 +32,6 @@ interface StudentProfile {
   age: string
   district: string
   photo: string
-  avatarId: number | null
   progress: UserProgress
   customization: ProfileCustomization
 }
@@ -64,15 +55,6 @@ interface ConversationPrompt {
   question: string
   asked: boolean
 }
-
-const avatars: Avatar[] = [
-  { id: 1, name: 'Valiente', color: '#EF4444', emoji: '🦸' },
-  { id: 2, name: 'Sabio', color: '#3B82F6', emoji: '🧠' },
-  { id: 3, name: 'Amigable', color: '#10B981', emoji: '🤝' },
-  { id: 4, name: 'Creativo', color: '#8B5CF6', emoji: '🎨' },
-  { id: 5, name: 'Fuerte', color: '#F59E0B', emoji: '💪' },
-  { id: 6, name: 'Brillante', color: '#EC4899', emoji: '✨' },
-]
 
 const allBadges: Badge[] = [
   { id: 'topics-explorer', name: 'Explorador de Temas', emoji: '📚', color: '#3B82F6', unlocked: false },
@@ -166,7 +148,6 @@ const translations = {
     editPhoto: 'Editar foto',
     choosePhoto: 'Elegir foto',
     takePhoto: 'Tomar foto',
-    useAvatar: 'Usar avatar',
     customization: '🎨 Personalizar mi app',
     themeColors: 'Colores del tema',
     backgrounds: 'Fondos',
@@ -247,7 +228,6 @@ const translations = {
     editPhoto: 'Riqchiy rikin',
     choosePhoto: 'Aqllay rikin',
     takePhoto: 'Riqsiy rikin',
-    useAvatar: 'Avatarta llaqtay',
     customization: '🎨 Kaynin ñiqqiy',
     themeColors: 'Llimpi kullkikuna',
     backgrounds: 'Ukukuna',
@@ -300,7 +280,6 @@ const getStoredStudentProfile = (): StudentProfile => {
     age: '',
     district: '',
     photo: '',
-    avatarId: null,
     progress: defaultStudentProgress,
     customization: defaultCustomization,
   }
@@ -349,8 +328,6 @@ export default function App() {
   const [feedbackMessage, setFeedbackMessage] = useState<string>('')
   const [showCoimaONo, setShowCoimaONo] = useState(false)
   const [currentCoimaCase, setCurrentCoimaCase] = useState(0)
-  const [selectedAvatar, setSelectedAvatar] = useState<Avatar | null>(null)
-  const [playMode, setPlayMode] = useState<PlayMode>('individual')
   const [device, setDevice] = useState<DeviceType>('pc')
   const [showBadgeCelebration, setShowBadgeCelebration] = useState(false)
   const [earnedBadge, setEarnedBadge] = useState<Badge | null>(null)
@@ -583,76 +560,6 @@ export default function App() {
               className="glass-card px-4 py-2 rounded-xl text-gray-600 text-sm hover:bg-gray-100 transition-all"
             >
               {t('back')}
-            </button>
-          </div>
-        </div>
-      )
-
-    case 'avatar':
-      const cust1 = getCustomization();
-      return (
-        <div className="min-h-screen p-8" style={{ background: cust1.backgroundValue, backgroundSize: cust1.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
-          <div className="max-w-5xl mx-auto animate-slide-up">
-            <h1 className="text-3xl font-bold gradient-text text-center mb-2">{profileType === 'student' ? 'Crea tu Avatar' : 'Avatar Familiar'}</h1>
-            <p className="text-center text-gray-500 mb-6">{profileType === 'student' ? 'Elige tu personaje para la aventura' : 'Elige un avatar para la familia'}</p>
-
-            <div className="grid grid-cols-3 gap-6 mb-10">
-              {avatars.map((avatar) => (
-                <button
-                  key={avatar.id}
-                  onClick={() => setSelectedAvatar(avatar)}
-                  className={`glass-card rounded-2xl p-4 text-center card-hover ${selectedAvatar?.id === avatar.id ? 'ring-4 ring-primary border-primary' : ''}`}
-                  style={{ borderColor: selectedAvatar?.id === avatar.id ? avatar.color : 'transparent' }}
-                >
-                  <div className="text-5xl mb-2 animate-float">{avatar.emoji}</div>
-                  <div className="font-bold text-dark text-sm">{avatar.name}</div>
-                </button>
-              ))}
-            </div>
-
-            <div className="glass-card rounded-2xl p-8 mb-8">
-              <h3 className="font-bold text-lg mb-6 text-center">🎮 Modo de juego</h3>
-              <div className="grid grid-cols-2 gap-6">
-                <button
-                  onClick={() => setPlayMode('individual')}
-                  className={`py-6 px-8 rounded-xl font-bold text-lg transition-all ${playMode === 'individual' ? 'bg-primary text-white shadow-lg' : 'glass-card text-dark hover:bg-primary/10'}`}
-                >
-                  👤 Individual
-                </button>
-                <button
-                  onClick={() => setPlayMode('family')}
-                  className={`py-6 px-8 rounded-xl font-bold text-lg transition-all ${playMode === 'family' ? 'bg-secondary text-white shadow-lg' : 'glass-card text-dark hover:bg-secondary/10'}`}
-                >
-                  👨‍👩‍👧‍👦 Con familia
-                </button>
-              </div>
-            </div>
-
-            {selectedAvatar && (
-              <div className="glass-card rounded-2xl p-8 mb-8 animate-fade-in">
-                <div className="flex items-center justify-center gap-6 mb-4">
-                  <div className="text-6xl animate-float">{selectedAvatar.emoji}</div>
-                  <div>
-                    <div className="text-2xl font-bold" style={{ color: selectedAvatar.color }}>{selectedAvatar.name}</div>
-                    <div className="text-gray-500">{playMode === 'individual' ? 'Jugando solo' : 'Jugando con familia'}</div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <button
-              onClick={() => { if (selectedAvatar) { 
-                if (profileType === 'student') {
-                  const updated = { ...studentProfile, avatarId: selectedAvatar.id }
-                  setStudentProfile(updated)
-                  saveStudentProfile(updated)
-                }
-                setCurrentScreen('home'); 
-              }}}
-              disabled={!selectedAvatar}
-              className={`w-full py-4 rounded-xl font-bold text-lg ${selectedAvatar ? 'btn-glow bg-primary text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
-            >
-              {t('continue')} →
             </button>
           </div>
         </div>
@@ -1531,35 +1438,6 @@ case 'about':
               </button>
             </div>
 
-            {/* Avatar Selection for Games */}
-            <div className="glass-card rounded-2xl p-6 mb-8 card-hover">
-              <h2 className="text-xl font-bold text-primary mb-4 flex items-center gap-2">🎭 {profileType === 'student' ? 'Tu personaje de juego' : 'Avatar familiar'}</h2>
-              <div className="grid grid-cols-3 gap-4">
-                {avatars.map((avatar) => (
-                  <button
-                    key={avatar.id}
-                    onClick={() => {
-                      if (profileType === 'student') {
-                        const updated = { ...studentProfile, avatarId: avatar.id }
-                        setStudentProfile(updated)
-                        saveStudentProfile(updated)
-                      }
-                    }}
-                    className={`glass-card rounded-xl p-4 text-center card-hover transition-all ${
-                      (profileType === 'student' && studentProfile.avatarId === avatar.id) 
-                        ? 'ring-3 ring-primary scale-105' 
-                        : 'hover:border-primary/50'
-                    }`}
-                    style={{ borderColor: (profileType === 'student' && studentProfile.avatarId === avatar.id) ? avatar.color : 'transparent' }}
-                  >
-                    <div className="text-4xl mb-2 animate-float">{avatar.emoji}</div>
-                    <div className="font-bold text-dark text-sm">{avatar.name}</div>
-                    <div className="text-xs text-gray-500 mt-1">{avatar.color}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
             <div className="bg-white rounded-lg p-6 shadow-sm mb-8">
               <h2 className="text-xl font-bold text-primary mb-6">Minijuegos</h2>
               
@@ -1890,9 +1768,7 @@ case 'about':
                       {studentProfile.photo ? (
                         <img src={studentProfile.photo} alt="Perfil" className="w-full h-full object-cover rounded-full" />
                       ) : (
-                        studentProfile.avatarId ? (
-                          avatars.find(a => a.id === studentProfile.avatarId)?.emoji || '👤'
-                        ) : '👤'
+                        '👤'
                       )}
                     </div>
                     {/* Edit photo button - pencil icon */}
@@ -2284,7 +2160,7 @@ case 'about':
               }}
               className="btn-glow bg-secondary text-white font-bold py-3 px-6 rounded-xl w-full"
             >
-              {t('useAvatar')} {(() => { const a = avatars.find(a => a.id === studentProfile.avatarId); return a ? `(${a.emoji} ${a.name})` : ''; })()}
+              Eliminar foto
             </button>
             
             <button
