@@ -542,6 +542,16 @@ export default function App() {
   const [familyProfile, setFamilyProfile] = useState<FamilyProfile>(initialFamilyProfile)
   const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'device' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents' | 'profile-type'>('welcome')
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null)
+  const [learnRole, setLearnRole] = useState<'kids' | 'parents' | null>(() => {
+    const saved = localStorage.getItem('hablemos-claro-learn-role')
+    if (saved === 'parents' || saved === 'kids') return saved
+    return null
+  })
+  const effectiveLearnRole: 'kids' | 'parents' = learnRole ?? (selectedRole === 'parent' ? 'parents' : 'kids')
+  const changeLearnRole = (value: 'kids' | 'parents') => {
+    setLearnRole(value)
+    localStorage.setItem('hablemos-claro-learn-role', value)
+  }
   const [selectedTopic, setSelectedTopic] = useState<LearningTopic | null>(null)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [userAnswers, setUserAnswers] = useState<number[]>([])
@@ -1509,6 +1519,9 @@ case 'about':
             'Es delito en casi todos los países'
           ],
           example: 'Un contratista ofrece dinero a un funcionario para ganar una licitación sin cumplir requisitos.',
+          kidsExplanation: 'Una coima es cuando alguien ofrece dinero o regalos para conseguir algo que no le corresponde, como saltarse la fila o ganar sin merecerlo. Es una trampa que nos hace daño a todos.',
+          kidsExample: 'Un niño ofrece sus juguetes a cambio de que le pasen las respuestas del examen.',
+          parentTip: 'Pregúntale a tu hijo qué haría si alguien le ofrece algo a cambio de hacer trampa. Escucha sin juzgar y felicita las respuestas honestas.',
           correct: 'Es un delito',
           incorrect: 'Es una práctica normal',
           video: 'https://www.youtube.com/embed/5LbVY6qH3kM',
@@ -1527,6 +1540,9 @@ case 'about':
             'Regalos costosos antes de una decisión importante'
           ],
           example: 'Un inspector dice: "Si me das un regalito, cierro los ojos ante esta infracción".',
+          kidsExplanation: 'Puedes darte cuenta cuando algo no está bien: si te piden guardar un secreto, si te apuran para decidir rápido o si te ofrecen un premio por hacer algo injusto.',
+          kidsExample: 'Una persona te dice: “no le cuentes a nadie y te doy esto”.',
+          parentTip: 'Enseña la regla de oro: “si hay que esconderlo, probablemente está mal”. Practiquen con ejemplos de la vida diaria.',
           correct: 'Situación de corrupción',
           incorrect: 'Trato normal',
           video: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
@@ -1545,6 +1561,9 @@ case 'about':
             'Frena el desarrollo del país'
           ],
           example: 'El dinero de una coima en una obra pública podría haber equipado 3 aulas escolares.',
+          kidsExplanation: 'Cuando alguien hace trampa con dinero, hay menos dinero para cosas importantes como escuelas, hospitales y parques. Todos salimos perdiendo.',
+          kidsExample: 'Si el dinero para arreglar tu escuela se pierde en una coima, tu aula sigue rota.',
+          parentTip: 'Conéctalo con su realidad: pregúntale qué le gustaría mejorar en su escuela o barrio y de dónde sale ese dinero.',
           correct: 'Daño real a la sociedad',
           incorrect: 'Solo afecta a los involucrados',
           video: 'https://www.youtube.com/embed/9bZkp7q19f0',
@@ -1563,6 +1582,9 @@ case 'about':
             'Estigma social y familiar permanente'
           ],
           example: 'Un alcalde condenado por cohecho pierde su cargo, va a prisión y su familia carga el estigma.',
+          kidsExplanation: 'Hacer trampa con dinero es un delito. Quien lo hace puede ir a la cárcel, pagar multas y perder la confianza de todos para siempre.',
+          kidsExample: 'Un alcalde que aceptó dinero perdió su trabajo y fue a la cárcel.',
+          parentTip: 'Habla de consecuencias sin asustar: enfócate en que las decisiones tienen efectos y en que siempre se puede elegir bien.',
           correct: 'Consecuencias graves e irreversibles',
           incorrect: 'Solo una multa leve',
           video: 'https://www.youtube.com/embed/DqP2rR0fB4s',
@@ -1581,6 +1603,9 @@ case 'about':
             'Participa: vigila obras y gastos públicos'
           ],
           example: 'Vecinos organizados exigen ver el expediente de una obra y evitan sobreprecio.',
+          kidsExplanation: 'Tú puedes ayudar a que no haya trampas: conociendo tus derechos, contando lo que está mal y siendo honesto siempre.',
+          kidsExample: 'Si ves algo injusto en tu escuela, cuéntaselo a un profesor o a tus padres.',
+          parentTip: 'Crea un ambiente donde tu hijo se sienta seguro contándote cosas difíciles. Felicítalo cuando te cuente algo aunque sea incómodo.',
           correct: 'Sí, la prevención funciona',
           incorrect: 'No se puede hacer nada',
           video: 'https://www.youtube.com/embed/kffacxfA7G4',
@@ -1599,6 +1624,9 @@ case 'about':
             'Ejemplo: tu conducta inspira a otros'
           ],
           example: 'Un estudiante devuelve una billetera perdida con todo su contenido sin esperar recompensa.',
+          kidsExplanation: 'Ser íntegro es hacer lo correcto aunque nadie te esté mirando, como devolver algo que no es tuyo.',
+          kidsExample: 'Encuentras dinero en el patio y lo entregas sin que nadie te lo pida.',
+          parentTip: 'Los hijos aprenden mirando: cuenta en voz alta tus propias decisiones honestas del día.',
           correct: 'Es mi responsabilidad',
           incorrect: 'Cada quien se arregla solo',
           video: 'https://www.youtube.com/embed/ethics101',
@@ -1617,6 +1645,9 @@ case 'about':
             'Vota informado: investiga antecedentes de candidatos'
           ],
           example: 'Un comité vecinal detecta sobreprecio en una pista y logra anular el contrato.',
+          kidsExplanation: 'Ser un buen ciudadano es cuidar lo que es de todos: participar, respetar las reglas y avisar cuando algo está mal.',
+          kidsExample: 'Cuidas el parque de tu barrio y avisas si alguien lo daña.',
+          parentTip: 'Llévalo a una actividad comunitaria o revisen juntos una obra del barrio: la participación se aprende participando.',
           correct: 'Es mi poder y deber',
           incorrect: 'Los políticos sabrán qué hacer',
           video: 'https://www.youtube.com/embed/citizen101',
@@ -1628,6 +1659,9 @@ case 'about':
           color: 'primary',
           explanation: 'Responde estas preguntas para verificar lo que aprendiste. No hay respuestas "malas", solo oportunidades de aprender.',
           keyPoints: [],
+          kidsExplanation: '',
+          kidsExample: '',
+          parentTip: '',
           example: '',
           correct: '',
           incorrect: '',
@@ -1783,6 +1817,34 @@ case 'about':
               </button>
             </div>
 
+            {selectedTopic !== 'test' && (
+              <div className="bg-white rounded-2xl p-4 shadow-sm">
+                <p className="text-sm font-bold text-dark text-center mb-3">¿Quién está aprendiendo?</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => changeLearnRole('kids')}
+                    className={`font-bold py-3 px-4 rounded-xl transition-all ${
+                      effectiveLearnRole === 'kids'
+                        ? 'bg-secondary text-white shadow-lg'
+                        : 'bg-gray-100 text-dark hover:bg-gray-200'
+                    }`}
+                  >
+                    🧒 Hijos
+                  </button>
+                  <button
+                    onClick={() => changeLearnRole('parents')}
+                    className={`font-bold py-3 px-4 rounded-xl transition-all ${
+                      effectiveLearnRole === 'parents'
+                        ? 'bg-primary text-white shadow-lg'
+                        : 'bg-gray-100 text-dark hover:bg-gray-200'
+                    }`}
+                  >
+                    👨‍👩‍👧 Padres y tutores
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Main Content */}
 
             {/* Topic menu */}
@@ -1829,8 +1891,11 @@ case 'about':
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-11 h-11 rounded-xl bg-black flex items-center justify-center text-2xl">📖</div>
                   <h2 className="text-2xl font-bold text-black">Explicación</h2>
+                  <span className="ml-auto px-3 py-1 rounded-full bg-black text-white text-xs font-bold">
+                    {effectiveLearnRole === 'kids' ? '🧒 Hijos' : '👨‍👩‍👧 Padres y tutores'}
+                  </span>
                 </div>
-                <p className="text-black text-lg leading-loose">{currentTopicData.explanation}</p>
+                <p className="text-black text-lg leading-loose">{effectiveLearnRole === 'kids' ? currentTopicData.kidsExplanation : currentTopicData.explanation}</p>
 
                 {currentTopicData.keyPoints.length > 0 && (
                   <div className="mt-10">
@@ -1850,13 +1915,22 @@ case 'about':
 
                 <div className="mt-10 p-6 bg-white border-l-4 border-black rounded-xl">
                   <p className="font-bold text-black mb-3">💡 Ejemplo</p>
-                  <p className="text-black leading-loose italic">“{currentTopicData.example}”</p>
+                  <p className="text-black leading-loose italic">“{effectiveLearnRole === 'kids' ? currentTopicData.kidsExample : currentTopicData.example}”</p>
                 </div>
 
-                <div className="mt-8 p-6 bg-white border-2 border-black rounded-xl">
-                  <p className="font-bold text-black mb-3">⚖️ Principio</p>
-                  <p className="text-black leading-loose font-medium">“{currentTopicData.theorem}”</p>
-                </div>
+                {effectiveLearnRole === 'parents' && (
+                  <div className="mt-8 p-6 bg-white border-2 border-black rounded-xl">
+                    <p className="font-bold text-black mb-3">⚖️ Principio</p>
+                    <p className="text-black leading-loose font-medium">“{currentTopicData.theorem}”</p>
+                  </div>
+                )}
+
+                {effectiveLearnRole === 'parents' && currentTopicData.parentTip !== '' && (
+                  <div className="mt-8 p-6 bg-black rounded-xl">
+                    <p className="font-bold text-white mb-3">💬 Para conversar en casa</p>
+                    <p className="text-white leading-loose">{currentTopicData.parentTip}</p>
+                  </div>
+                )}
 
                 <div className="mt-10">
                   <h3 className="font-bold text-black mb-5">Comprensión rápida</h3>
