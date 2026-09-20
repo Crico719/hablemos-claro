@@ -3,7 +3,7 @@ import './index.css'
 
 // Tipos para la aplicación
 type UserRole = 'parent' | 'child'
-type LearningTopic = 'coima' | 'recognition' | 'impact' | 'consequences' | 'prevention' | 'test'
+type LearningTopic = 'coima' | 'recognition' | 'impact' | 'consequences' | 'prevention' | 'ethics' | 'citizen' | 'test'
 type BadgeType = 'topics-explorer' | 'game-master' | 'integrity-champion'
 type DeviceType = 'pc' | 'phone' | 'laptop'
 type ProfileType = 'student' | 'family'
@@ -265,6 +265,8 @@ const defaultStudentProgress: UserProgress = {
     impact: 0,
     consequences: 0,
     prevention: 0,
+    ethics: 0,
+    citizen: 0,
     test: 0,
   },
   quizScores: [],
@@ -274,7 +276,29 @@ const defaultStudentProgress: UserProgress = {
 
 const getStoredStudentProfile = (): StudentProfile => {
   const stored = localStorage.getItem('hablemos-claro-student-profile')
-  if (stored) return JSON.parse(stored)
+  if (stored) {
+    const parsed = JSON.parse(stored)
+    return {
+      name: parsed.name ?? '',
+      age: parsed.age ?? '',
+      district: parsed.district ?? '',
+      photo: parsed.photo ?? '',
+      progress: {
+        ...defaultStudentProgress,
+        ...parsed.progress,
+        topicProgress: {
+          ...defaultStudentProgress.topicProgress,
+          ...(parsed.progress?.topicProgress ?? {}),
+        },
+        badges: parsed.progress?.badges ?? [...allBadges],
+        quizScores: parsed.progress?.quizScores ?? [],
+      },
+      customization: {
+        ...defaultCustomization,
+        ...(parsed.customization ?? {}),
+      },
+    }
+  }
   return {
     name: '',
     age: '',
@@ -287,7 +311,23 @@ const getStoredStudentProfile = (): StudentProfile => {
 
 const getStoredFamilyProfile = (): FamilyProfile => {
   const stored = localStorage.getItem('hablemos-claro-family-profile')
-  if (stored) return JSON.parse(stored)
+  if (stored) {
+    const parsed = JSON.parse(stored)
+    return {
+      name: parsed.name ?? '',
+      members: parsed.members ?? [],
+      progress: {
+        ...defaultStudentProgress,
+        ...parsed.progress,
+        topicProgress: {
+          ...defaultStudentProgress.topicProgress,
+          ...(parsed.progress?.topicProgress ?? {}),
+        },
+        badges: parsed.progress?.badges ?? [...allBadges],
+        quizScores: parsed.progress?.quizScores ?? [],
+      },
+    }
+  }
   return {
     name: '',
     members: [],
@@ -321,7 +361,7 @@ export default function App() {
   const [familyProfile, setFamilyProfile] = useState<FamilyProfile>(initialFamilyProfile)
   const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'device' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents' | 'profile-type'>('welcome')
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null)
-  const [selectedTopic] = useState<LearningTopic | null>(null)
+  const [selectedTopic, setSelectedTopic] = useState<LearningTopic | null>(null)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [userAnswers, setUserAnswers] = useState<number[]>([])
   const [showFeedback, setShowFeedback] = useState(false)
@@ -1023,57 +1063,140 @@ case 'about':
       const topics = {
         coima: {
           title: '¿Qué es una coima?',
-          explanation: 'Una coima es cuando una persona ofrece, entrega, pide o acepta algo de valor para conseguir un beneficio indebido o para influir de manera incorrecta en una decisión.',
-          example: 'Una persona ofrece dinero para que alguien ignore una regla que debería cumplir.',
-          correct: 'No es correcto',
-          incorrect: 'Lo correcto es respetar las reglas.',
+          icon: '💰',
+          color: 'primary',
+          explanation: 'Una coima (también llamada soborno) ocurre cuando alguien ofrece, entrega, pide o acepta dinero, regalos o favores para obtener un beneficio indebido o influir incorrectamente en una decisión.',
+          keyPoints: [
+            'Puede ser dinero, regalos, favores o promesas futuras',
+            'Siempre busca un beneficio que no le corresponde',
+            'Corrompe la imparcialidad de quien decide',
+            'Es delito en casi todos los países'
+          ],
+          example: 'Un contratista ofrece dinero a un funcionario para ganar una licitación sin cumplir requisitos.',
+          correct: 'Es un delito',
+          incorrect: 'Es una práctica normal',
           video: 'https://www.youtube.com/embed/5LbVY6qH3kM',
-          theorem: 'Principio de Transparencia: Toda decisión pública debe estar abierta a la supervisión de los ciudadanos. La información es un derecho, no un privilegio.',
+          theorem: 'Principio de Transparencia: Toda decisión pública debe estar abierta a la supervisión. La información es un derecho, no un privilegio.',
         },
         recognition: {
-          title: '¿Cómo reconocer una situación de corrupción?',
-          explanation: 'Aprende a identificar cuándo alguien está pidiendo un beneficio a cambio de algo injusto. Señales: ofertas secretas, tratos exclusivos, presión por decidir rápido.',
-          example: 'Un funcionario pide dinero para acelerar un trámite.',
+          title: '¿Cómo reconocer una coima?',
+          icon: '🔍',
+          color: 'secondary',
+          explanation: 'Las coimas suelen disfrazarse. Aprende a detectar las señales de alerta antes de caer en una trampa.',
+          keyPoints: [
+            'Ofertas "demasiado buenas para ser verdad"',
+            'Presión para decidir rápido sin revisar',
+            'Reuniones secretas sin testigos ni registro',
+            'Pedidos de "favores" a cambio de agilizar trámites',
+            'Regalos costosos antes de una decisión importante'
+          ],
+          example: 'Un inspector dice: "Si me das un regalito, cierro los ojos ante esta infracción".',
           correct: 'Situación de corrupción',
-          incorrect: 'Situación normal',
+          incorrect: 'Trato normal',
           video: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-          theorem: 'Principio de Responsabilidad: Quien toma una decisión debe rendir cuentas sobre sus actos. El poder sin control es abuso.',
+          theorem: 'Principio de Responsabilidad: Quien decide debe rendir cuentas. El poder sin control es abuso.',
         },
         impact: {
           title: '¿Por qué las coimas hacen daño?',
-          explanation: 'Las coimas afectan a toda la sociedad al desviar recursos de lo que realmente importa: salud, educación, seguridad. El daño es desigual, siempre paga el más vulnerable.',
-          example: 'El dinero de una coima podría haber sido usado para escuelas o hospitales.',
-          correct: 'Daño a la sociedad',
-          incorrect: 'Sin consecuencias',
+          icon: '💔',
+          color: 'warning',
+          explanation: 'Cada coima roba recursos que pertenecen a todos. El daño no es abstracto: afecta directamente tu calidad de vida y la de tu familia.',
+          keyPoints: [
+            'Menos dinero para escuelas, hospitales y seguridad',
+            'Servicios públicos de peor calidad',
+            'Aumenta la desigualdad: paga el más vulnerable',
+            'Destruye la confianza en las instituciones',
+            'Frena el desarrollo del país'
+          ],
+          example: 'El dinero de una coima en una obra pública podría haber equipado 3 aulas escolares.',
+          correct: 'Daño real a la sociedad',
+          incorrect: 'Solo afecta a los involucrados',
           video: 'https://www.youtube.com/embed/9bZkp7q19f0',
-          theorem: 'Principio de Equidad: Todos merecemos el mismo trato justo. La corrupción rompe la igualdad ante la ley y agrava la pobreza.',
+          theorem: 'Principio de Equidad: Todos merecemos igual trato. La corrupción rompe la igualdad y agrava la pobreza.',
         },
         consequences: {
           title: 'Consecuencias legales y sociales',
-          explanation: 'Quien ofrece o acepta una coima comete un delito. Las consecuencias incluyen multas, cárcel, pérdida de empleo y daño permanente a la reputación. También destruye la confianza entre ciudadanos.',
-          example: 'Un alcalde que recibe sobornos puede ir a la cárcel y su comunidad pierde servicios públicos.',
-          correct: 'Consecuencias graves',
-          incorrect: 'No pasa nada',
+          icon: '⚖️',
+          color: 'error',
+          explanation: 'Ofrecer o aceptar una coima es delito grave. Las consecuencias van más allá de lo legal: destruyen tu reputación y futuro.',
+          keyPoints: [
+            'Prisión: 3 a 8 años (Perú) o más según el caso',
+            'Multas económicas elevadas',
+            'Inhabilitación para cargo público (hasta de por vida)',
+            'Antecedentes penales que limitan empleo y viajes',
+            'Estigma social y familiar permanente'
+          ],
+          example: 'Un alcalde condenado por cohecho pierde su cargo, va a prisión y su familia carga el estigma.',
+          correct: 'Consecuencias graves e irreversibles',
+          incorrect: 'Solo una multa leve',
           video: 'https://www.youtube.com/embed/DqP2rR0fB4s',
-          theorem: 'Principio de Proporcionalidad: La pena debe ser proporcional al delito. Pero la prevención siempre es mejor que el castigo.',
+          theorem: 'Principio de Proporcionalidad: La pena debe ser proporcional. La prevención siempre supera al castigo.',
         },
         prevention: {
           title: 'Cómo prevenir la corrupción',
-          explanation: 'La prevención empieza con la educación. Conocer tus derechos, denunciar cuando algo está mal, y fomentar la cultura de la honestidad son herramientas poderosas. Cada persona puede marcar la diferencia.',
-          example: 'Un grupo de vecinos que exige rendición de cuentas a su comité comunitario previene el uso indebido de fondos.',
+          icon: '🛡️',
+          color: 'success',
+          explanation: 'La mejor defensa es la prevención activa. Cada persona puede ser un agente de cambio desde su entorno.',
+          keyPoints: [
+            'Conoce tus derechos y los procedimientos correctos',
+            'Exige transparencia: pide comprobantes y actas',
+            'Denuncia: usa canales seguros y anónimos',
+            'Educa a tu familia: habla de integridad en casa',
+            'Participa: vigila obras y gastos públicos'
+          ],
+          example: 'Vecinos organizados exigen ver el expediente de una obra y evitan sobreprecio.',
           correct: 'Sí, la prevención funciona',
           incorrect: 'No se puede hacer nada',
           video: 'https://www.youtube.com/embed/kffacxfA7G4',
-          theorem: 'Principio de Participación Ciudadana: La democracia se fortalece cuando todos vigilamos y participamos. El silencio cómplice es la mayor herramienta de la corrupción.',
+          theorem: 'Principio de Participación: La democracia se fortalece cuando todos vigilamos. El silencio es cómplice.',
+        },
+        ethics: {
+          title: 'Ética e integridad personal',
+          icon: '🧭',
+          color: 'info',
+          explanation: 'La integridad no es solo no robar: es hacer lo correcto cuando nadie mira. Es tu brújula interna.',
+          keyPoints: [
+            'Honestidad: decir la verdad aunque cueste',
+            'Coherencia: actuar según tus valores',
+            'Valentía: decir no a lo incorrecto',
+            'Empatía: pensar en cómo afectas a otros',
+            'Ejemplo: tu conducta inspira a otros'
+          ],
+          example: 'Un estudiante devuelve una billetera perdida con todo su contenido sin esperar recompensa.',
+          correct: 'Es mi responsabilidad',
+          incorrect: 'Cada quien se arregla solo',
+          video: 'https://www.youtube.com/embed/ethics101',
+          theorem: 'Principio de Integridad: Hacer lo correcto cuando nadie mira define tu carácter real.',
+        },
+        citizen: {
+          title: 'Ciudadanía activa',
+          icon: '🗳️',
+          color: 'purple',
+          explanation: 'Ser ciudadano no es solo votar cada 5 años. Es participar, vigilar y exigir cuentas todos los días.',
+          keyPoints: [
+            'Vigila: revisa obras y gastos de tu municipalidad',
+            'Participa: asiste a audiencias y cabildos',
+            'Denuncia: usa la Defensoría, Contraloría o Fiscalía',
+            'Organiza: junta vecinos para fiscalizar juntos',
+            'Vota informado: investiga antecedentes de candidatos'
+          ],
+          example: 'Un comité vecinal detecta sobreprecio en una pista y logra anular el contrato.',
+          correct: 'Es mi poder y deber',
+          incorrect: 'Los políticos sabrán qué hacer',
+          video: 'https://www.youtube.com/embed/citizen101',
+          theorem: 'Principio de Soberanía: El poder emana del pueblo. Ejercerlo es defender tus derechos.',
         },
         test: {
           title: 'Pon a prueba tus conocimientos',
-          explanation: 'Responde estas preguntas para verificar lo que aprendiste sobre todos los temas.',
+          icon: '📝',
+          color: 'primary',
+          explanation: 'Responde estas preguntas para verificar lo que aprendiste. No hay respuestas "malas", solo oportunidades de aprender.',
+          keyPoints: [],
           example: '',
           correct: '',
           incorrect: '',
           video: '',
-          theorem: 'Recuerda: La integridad no es solo no hacer lo malo, sino actuar correctamente incluso cuando nadie te ve.',
+          theorem: 'Recuerda: La integridad no es solo no hacer lo malo, sino actuar correctamente aunque nadie te vea.',
         },
       }
 
@@ -1111,19 +1234,25 @@ case 'about':
       ]
 
       const currentTopicData = selectedTopic ? topics[selectedTopic] : topics.coima
+      const cust7 = getCustomization();
 
       // Pantalla "¿Coima o no?"
       if (showCoimaONo) {
         const currentCase = coimaCases[currentCoimaCase]
+        const cust8 = getCustomization();
         return (
-          <div className="min-h-screen bg-light text-dark p-8">
-            <div className="max-w-5xl mx-auto">
-              <div className="flex items-center justify-between mb-4">
-                <h1 className="text-2xl font-bold text-primary">¿Coima o no?</h1>
-                <button onClick={() => { setShowCoimaONo(false); setCurrentCoimaCase(0); }} className="text-gray-500 hover:text-primary">
+          <div className="min-h-screen p-8" style={{ background: cust8.backgroundValue, backgroundSize: cust8.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
+            <div className="max-w-3xl mx-auto animate-slide-up space-y-8 text-center">
+              <div className="flex items-center justify-between">
+                <h1 className="text-3xl font-bold gradient-text">¿Coima o no?</h1>
+                <button onClick={() => { setShowCoimaONo(false); setCurrentCoimaCase(0); }} className="glass-card px-4 py-2 rounded-xl text-gray-500 hover:text-primary text-sm font-medium">
                   ← Atrás
                 </button>
               </div>
+              <div className="h-2 bg-gray-200 rounded-full overflow-hidden max-w-xs mx-auto">
+                <div className="h-full bg-primary rounded-full transition-all duration-300" style={{ width: `${((currentCoimaCase + 1) / coimaCases.length) * 100}%` }}></div>
+              </div>
+              <p className="text-sm text-gray-500">Caso {currentCoimaCase + 1} de {coimaCases.length}</p>
 
               <div className="bg-white rounded-lg p-6 mb-8 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
@@ -1135,7 +1264,7 @@ case 'about':
 
                 <p className="text-lg text-gray-700 mb-6">{currentCase.situation}</p>
 
-                <div className="grid grid-cols-2 gap-8">
+                <div className="grid grid-cols-2 gap-6">
                   <button
                     onClick={() => {
                       const isCorrect = currentCase.isCoima === true
@@ -1143,9 +1272,9 @@ case 'about':
                       setShowFeedback(true)
                       updateProgress()
                     }}
-                    className="btn-primary py-4 px-6 rounded-lg text-lg font-medium"
+                    className="btn-glow bg-primary text-white font-bold py-5 px-6 rounded-xl text-lg font-medium w-full shadow-lg"
                   >
-                    Sí, es una coima
+                    ✅ Sí, es una coima
                   </button>
                   <button
                     onClick={() => {
@@ -1154,39 +1283,44 @@ case 'about':
                       setShowFeedback(true)
                       updateProgress()
                     }}
-                    className="btn-outline py-4 px-6 rounded-lg text-lg font-medium border-2 border-primary text-primary"
+                    className="btn-glow bg-white border-2 border-primary text-primary font-bold py-5 px-6 rounded-xl text-lg font-medium hover:bg-primary/5"
                   >
-                    No, no es una coima
+                    ❌ No, no es una coima
                   </button>
                 </div>
               </div>
 
               {showFeedback && (
-                <div className="mt-6 p-4 rounded-lg bg-white shadow-sm">
-                  <p className="font-medium {feedbackMessage.includes('Correcto') ? 'text-primary' : 'text-alert'}">
-                    {feedbackMessage}
-                  </p>
+                <div className="glass-card rounded-2xl p-6 animate-fade-in">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-xl"
+                         style={{ background: feedbackMessage.includes('Correcto') ? '#10B98120' : '#EF444420' }}>
+                      {feedbackMessage.includes('Correcto') ? '✅' : '❌'}
+                    </div>
+                    <p className="font-bold text-lg" style={{ color: feedbackMessage.includes('Correcto') ? '#10B981' : '#EF4444' }}>
+                      {feedbackMessage.includes('Correcto') ? '¡Correcto!' : 'Intenta de nuevo'}
+                    </p>
+                  </div>
+                  <p className="text-gray-700 leading-relaxed">{feedbackMessage}</p>
                 </div>
               )}
 
               {showFeedback && (
-                <div className="mt-6">
-                  <button
-                    onClick={() => {
-                      setShowFeedback(false)
-                      if (currentCoimaCase < coimaCases.length - 1) {
-                        setCurrentCoimaCase(prev => prev + 1)
-                      } else {
-                        setShowCoimaONo(false)
-                        setCurrentCoimaCase(0)
-                        navigateTo('home')
-                      }
-                    }}
-                    className="btn-primary w-full py-3 px-6 rounded-lg text-lg"
-                  >
-                    {currentCoimaCase < coimaCases.length - 1 ? 'Siguiente caso' : 'Volver al inicio'}
-                  </button>
-                </div>
+                <button
+                  onClick={() => {
+                    setShowFeedback(false)
+                    if (currentCoimaCase < coimaCases.length - 1) {
+                      setCurrentCoimaCase(prev => prev + 1)
+                    } else {
+                      setShowCoimaONo(false)
+                      setCurrentCoimaCase(0)
+                      navigateTo('home')
+                    }
+                  }}
+                  className="btn-glow bg-primary text-white font-bold py-4 px-8 rounded-xl text-lg w-full"
+                >
+                  {currentCoimaCase < coimaCases.length - 1 ? 'Siguiente caso →' : 'Volver al inicio'}
+                </button>
               )}
             </div>
           </div>
@@ -1194,113 +1328,225 @@ case 'about':
       }
 
       return (
-        <div className="min-h-screen bg-light text-dark p-8">
-          <div className="max-w-5xl mx-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="text-2xl font-bold text-primary">
-                {currentTopicData.title}
-              </h1>
-              <button onClick={() => navigateTo('home')} className="text-gray-500 hover:text-primary">
-                ← Atrás
+        <div className="min-h-screen p-8" style={{ background: cust7.backgroundValue, backgroundSize: cust7.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
+          <div className="max-w-4xl mx-auto animate-slide-up space-y-10">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-4xl">
+                  {currentTopicData.icon}
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold gradient-text">{currentTopicData.title}</h1>
+                  <p className="text-gray-500 mt-1">Tema {Object.keys(topics).indexOf(selectedTopic || 'coima') + 1} de {Object.keys(topics).length}</p>
+                </div>
+              </div>
+              <button onClick={() => navigateTo('home')} className="glass-card px-5 py-2 rounded-xl text-gray-500 hover:text-primary text-sm font-medium hover:bg-gray-100 transition-all">
+                ← Inicio
               </button>
             </div>
 
+            {/* Main Content */}
+
+            {/* Topic menu */}
+            <div className="glass-card rounded-2xl p-8">
+              <h2 className="text-xl font-bold text-dark mb-2">Elige un tema</h2>
+              <p className="text-gray-500 mb-6">Toca una tarjeta para estudiar ese tema.</p>
+              <div className="grid grid-cols-2 gap-5">
+                {(Object.keys(topics) as LearningTopic[]).map((key) => (
+                  <button
+                    key={key}
+                    onClick={() => { setSelectedTopic(key); setShowCoimaONo(false); setShowFeedback(false); }}
+                    className={`rounded-2xl p-5 text-left transition-all border-2 ${
+                      (selectedTopic ?? 'coima') === key
+                        ? 'bg-primary text-white border-primary shadow-lg'
+                        : 'glass-card text-dark border-transparent hover:border-primary/40'
+                    }`}
+                  >
+                    <div className="text-3xl mb-2">{topics[key].icon}</div>
+                    <div className="font-bold leading-snug">{topics[key].title}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {selectedTopic !== 'test' && !showCoimaONo && (
-              <div className="bg-white rounded-lg p-6 mb-8 shadow-sm">
-                <h2 className="text-xl font-bold text-primary mb-4">Explicación</h2>
-                <p className="text-gray-700">{currentTopicData.explanation}</p>
-                
-                <div className="mt-4 p-3 bg-primary/5 rounded">
-                  <p className="font-medium text-primary">Ejemplo:</p>
-                  <p className="text-gray-700 mt-1">{currentTopicData.example}</p>
+              <div className="glass-card rounded-2xl p-8">
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center text-2xl">📖</div>
+                  <h2 className="text-2xl font-bold text-primary">Explicación</h2>
+                </div>
+                <p className="text-gray-700 text-lg leading-relaxed">{currentTopicData.explanation}</p>
+
+                {currentTopicData.keyPoints.length > 0 && (
+                  <div className="mt-8">
+                    <h3 className="font-bold text-dark mb-4">Puntos clave</h3>
+                    <ul className="space-y-4">
+                      {currentTopicData.keyPoints.map((point, i) => (
+                        <li key={i} className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+                          <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold flex-shrink-0">
+                            {i + 1}
+                          </div>
+                          <p className="text-gray-700 leading-relaxed">{point}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                <div className="mt-8 p-5 bg-warning/5 border-l-4 border-warning rounded-xl">
+                  <p className="font-bold text-warning mb-2">💡 Ejemplo</p>
+                  <p className="text-gray-700 leading-relaxed italic">“{currentTopicData.example}”</p>
                 </div>
 
-                <div className="mt-6 flex gap-2">
-                  <button
-                    onClick={() => handleAnswer(0)}
-                    className={getProgress().completedActivities > 0 ? 'btn-outline' : 'btn-primary w-48 py-2 px-4 rounded'}
-                  >
-                    ✅ {currentTopicData.correct}
-                  </button>
-                  <button
-                    onClick={() => handleAnswer(1)}
-                    className="btn-outline w-48 py-2 px-4 rounded"
-                  >
-                    ❌ {currentTopicData.incorrect}
-                  </button>
+                <div className="mt-6 p-5 bg-primary/5 border border-primary/15 rounded-xl">
+                  <p className="font-bold text-primary mb-2">⚖️ Principio</p>
+                  <p className="text-gray-800 leading-relaxed font-medium">“{currentTopicData.theorem}”</p>
+                </div>
+
+                <div className="mt-8">
+                  <h3 className="font-bold text-dark mb-4">Comprensión rápida</h3>
+                  <div className="grid grid-cols-2 gap-5">
+                    <button
+                      onClick={() => handleAnswer(0)}
+                      className="btn-glow bg-success text-white font-bold py-4 px-5 rounded-xl text-lg"
+                    >
+                      ✅ {currentTopicData.correct}
+                    </button>
+                    <button
+                      onClick={() => handleAnswer(1)}
+                      className="btn-glow bg-white border-2 border-gray-200 text-dark font-bold py-4 px-5 rounded-xl hover:border-primary/50"
+                    >
+                      ❌ {currentTopicData.incorrect}
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
 
             {selectedTopic !== 'test' && !showCoimaONo && (
-              <div className="bg-white rounded-lg p-6 mb-8 shadow-sm">
-                <h2 className="text-xl font-bold text-primary mb-4">¿Coima o no?</h2>
-                <p className="text-gray-700 mb-4">Pon a prueba tu criterio con situaciones de la vida real.</p>
+              <div className="glass-card rounded-2xl p-8">
+                <h2 className="text-2xl font-bold text-primary mb-3">¿Coima o no?</h2>
+                <p className="text-gray-600 leading-relaxed mb-6">Pon a prueba tu criterio con situaciones de la vida real.</p>
                 <button
                   onClick={() => setShowCoimaONo(true)}
-                  className="btn-primary w-full py-3 px-6 rounded-lg text-lg"
+                  className="btn-glow bg-primary text-white font-bold py-4 px-6 rounded-xl text-lg w-full"
                 >
-                  Empezar test
+                  Empezar test →
                 </button>
               </div>
             )}
 
             {selectedTopic === 'test' && (
-              <div className="bg-white rounded-lg p-6 mb-8 shadow-sm">
-                <h2 className="text-xl font-bold text-primary mb-4">Pon a prueba tus conocimientos</h2>
-                <p className="text-gray-700 mb-4">
-                  Responde las siguientes preguntas seleccionando la opción correcta.
+              <div className="glass-card rounded-2xl p-8">
+                <h2 className="text-2xl font-bold text-primary mb-3">Pon a prueba tus conocimientos</h2>
+                <p className="text-gray-600 leading-relaxed mb-8">
+                  Responde cada pregunta con calma. Cada tarjeta es una pregunta separada.
                 </p>
-                
+
                 {/* Pregunta 1 */}
-                <div className="mb-4">
-                  <p className="font-medium text-gray-800 mb-2">Pregunta 1:</p>
-                  <p className="text-gray-700 mb-3">¿Qué es una coima?</p>
-                  <div className="space-y-2">
+                <div className="glass-card rounded-xl p-6 mb-6 border border-primary/15">
+                  <p className="font-bold text-primary mb-2">Pregunta 1</p>
+                  <p className="text-gray-800 text-lg mb-5">¿Qué es una coima?</p>
+                  <div className="space-y-4">
                     <button
                       onClick={() => handleAnswer(0)}
-                      className="btn-outline w-full py-2 px-4 rounded text-left"
+                      className="btn-glow w-full py-4 px-5 rounded-xl text-left bg-white border-2 border-gray-200 hover:border-primary/50 font-medium"
                     >
-                      <span className="font-medium">Ofrecer dinero para saltarse una regla</span>
+                      Ofrecer dinero para saltarse una regla
                     </button>
                     <button
                       onClick={() => handleAnswer(1)}
-                      className="btn-outline w-full py-2 px-4 rounded text-left"
+                      className="btn-glow w-full py-4 px-5 rounded-xl text-left bg-white border-2 border-gray-200 hover:border-primary/50 font-medium"
                     >
-                      <span className="font-medium">Respetar las reglas sin ofrecer nada</span>
+                      Respetar las reglas sin ofrecer nada
                     </button>
                   </div>
                 </div>
 
                 {/* Pregunta 2 */}
-                <div className="mb-4">
-                  <p className="font-medium text-gray-800 mb-2">Pregunta 2:</p>
-                  <p className="text-gray-700 mb-3">¿Puedo ofrecerle dinero a un amigo para que gane un concurso?</p>
-                  <div className="space-y-2">
+                <div className="glass-card rounded-xl p-6 mb-6 border border-secondary/15">
+                  <p className="font-bold text-secondary mb-2">Pregunta 2</p>
+                  <p className="text-gray-800 text-lg mb-5">¿Puedo ofrecerle dinero a un amigo para que gane un concurso?</p>
+                  <div className="space-y-4">
                     <button
                       onClick={() => handleAnswer(0)}
-                      className="btn-outline w-full py-2 px-4 rounded text-left"
+                      className="btn-glow w-full py-4 px-5 rounded-xl text-left bg-white border-2 border-gray-200 hover:border-secondary/50 font-medium"
                     >
-                      <span className="font-medium">Sí, es un regalo amable</span>
+                      Sí, es un regalo amable
                     </button>
                     <button
                       onClick={() => handleAnswer(1)}
-                      className="btn-outline w-full py-2 px-4 rounded text-left"
+                      className="btn-glow w-full py-4 px-5 rounded-xl text-left bg-white border-2 border-gray-200 hover:border-secondary/50 font-medium"
                     >
-                      <span className="font-medium">No, eso no es correcto</span>
+                      No, eso no es correcto
                     </button>
                   </div>
                 </div>
 
-                <div className="mt-8">
-                  <button
-                    onClick={() => navigateTo('result')}
-                    className="btn-primary w-full py-3 px-6 rounded-lg text-lg font-medium"
-                  >
-                    Terminar prueba
-                  </button>
+                {/* Pregunta 3 */}
+                <div className="glass-card rounded-xl p-6 mb-6 border border-warning/20">
+                  <p className="font-bold text-warning mb-2">Pregunta 3</p>
+                  <p className="text-gray-800 text-lg mb-5">Un funcionario pide un “extra” para acelerar un trámite. ¿Es coima?</p>
+                  <div className="space-y-4">
+                    <button
+                      onClick={() => handleAnswer(0)}
+                      className="btn-glow w-full py-4 px-5 rounded-xl text-left bg-white border-2 border-gray-200 hover:border-warning/50 font-medium"
+                    >
+                      Sí, es una coima
+                    </button>
+                    <button
+                      onClick={() => handleAnswer(1)}
+                      className="btn-glow w-full py-4 px-5 rounded-xl text-left bg-white border-2 border-gray-200 hover:border-warning/50 font-medium"
+                    >
+                      No, es un trámite normal
+                    </button>
+                  </div>
                 </div>
+
+                {/* Pregunta 4 */}
+                <div className="glass-card rounded-xl p-6 mb-8 border border-success/20">
+                  <p className="font-bold text-success mb-2">Pregunta 4</p>
+                  <p className="text-gray-800 text-lg mb-5">¿Cuál es una forma de prevenir la corrupción?</p>
+                  <div className="space-y-4">
+                    <button
+                      onClick={() => handleAnswer(0)}
+                      className="btn-glow w-full py-4 px-5 rounded-xl text-left bg-white border-2 border-gray-200 hover:border-success/50 font-medium"
+                    >
+                      Ignorar lo que pasa
+                    </button>
+                    <button
+                      onClick={() => handleAnswer(1)}
+                      className="btn-glow w-full py-4 px-5 rounded-xl text-left bg-white border-2 border-gray-200 hover:border-success/50 font-medium"
+                    >
+                      Exigir transparencia y denunciar
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => navigateTo('result')}
+                  className="btn-glow bg-success text-white font-bold py-4 px-6 rounded-xl text-lg w-full"
+                >
+                  Terminar prueba
+                </button>
               </div>
+            )}
+
+            {selectedTopic !== 'test' && !showCoimaONo && (
+              <button
+                onClick={() => {
+                  const topicKeys = Object.keys(topics) as LearningTopic[]
+                  const currentIndex = topicKeys.indexOf(selectedTopic ?? 'coima')
+                  setSelectedTopic(topicKeys[(currentIndex + 1) % topicKeys.length])
+                  setShowCoimaONo(false)
+                  setShowFeedback(false)
+                }}
+                className="btn-glow bg-gradient-to-r from-primary to-secondary text-white font-bold py-4 px-6 rounded-xl text-lg w-full"
+              >
+                Siguiente tema →
+              </button>
             )}
           </div>
         </div>
