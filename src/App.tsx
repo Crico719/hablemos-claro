@@ -437,12 +437,15 @@ export default function App() {
   // Orden obligatorio de temas (paso por paso, sin saltos)
   const topicOrder: LearningTopic[] = ['coima', 'recognition', 'impact', 'consequences', 'prevention', 'ethics', 'citizen', 'test']
 
-  // Completar un tema (solo cuenta la primera vez)
+  // Completar un tema (solo cuenta la primera vez) - un solo guardado para no sobrescribir el desbloqueo
   const completeTopic = (topic: LearningTopic) => {
     const currentProfile = profileType === 'student' ? studentProfile : familyProfile
     const alreadyDone = (currentProfile.progress.topicProgress[topic] ?? 0) >= 100
+    const completedActivities = currentProfile.progress.completedActivities + (alreadyDone ? 0 : 1)
     const newProgress = {
       ...currentProfile.progress,
+      completedActivities,
+      totalActivities: Math.max(currentProfile.progress.totalActivities, completedActivities),
       topicProgress: {
         ...currentProfile.progress.topicProgress,
         [topic]: 100,
@@ -455,16 +458,18 @@ export default function App() {
       setFamilyProfile({ ...familyProfile, progress: newProgress })
       saveFamilyProfile({ ...familyProfile, progress: newProgress })
     }
-    if (!alreadyDone) updateProgress(1)
   }
 
-  // Completar el test final: única forma de conseguir las insignias
+  // Completar el test final: única forma de conseguir las insignias - un solo guardado
   const completeTest = () => {
     const currentProfile = profileType === 'student' ? studentProfile : familyProfile
     const alreadyDone = (currentProfile.progress.topicProgress['test'] ?? 0) >= 100
     const newBadges = currentProfile.progress.badges.map(b => ({ ...b, unlocked: true }))
+    const completedActivities = currentProfile.progress.completedActivities + (alreadyDone ? 0 : 1)
     const newProgress = {
       ...currentProfile.progress,
+      completedActivities,
+      totalActivities: Math.max(currentProfile.progress.totalActivities, completedActivities),
       topicProgress: {
         ...currentProfile.progress.topicProgress,
         test: 100,
@@ -478,7 +483,6 @@ export default function App() {
       setFamilyProfile({ ...familyProfile, progress: newProgress })
       saveFamilyProfile({ ...familyProfile, progress: newProgress })
     }
-    if (!alreadyDone) updateProgress(1)
     const champion = newBadges.find(b => b.id === 'integrity-champion')!
     setEarnedBadge({ ...champion })
     setShowBadgeCelebration(true)
