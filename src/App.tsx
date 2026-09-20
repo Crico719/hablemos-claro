@@ -2306,7 +2306,7 @@ case 'about':
 
             {/* DETALLE TEMA HIJO */}
             {learnView === 'kid' && activeKid && (
-              <div className="w-full max-w-[760px] mx-auto space-y-8 rounded-3xl p-4 md:p-8" style={{ background: 'linear-gradient(180deg, #F0FDF4 0%, #FFFFFF 100%)' }}>
+              <div className="w-full max-w-[760px] mx-auto space-y-8 rounded-3xl p-4 md:p-8 text-center" style={{ background: 'linear-gradient(180deg, #F0FDF4 0%, #FFFFFF 100%)' }}>
                 {/* Cabecera */}
                 <div className="bg-white rounded-2xl p-5 shadow-sm">
                   <div className="flex items-center justify-between">
@@ -2430,7 +2430,7 @@ case 'about':
                           setFeedbackMessage(activeKid.scenarioFeedback[oi] ?? '')
                           setShowFeedback(true)
                         }}
-                        className={`btn-glow w-full py-4 px-5 rounded-xl text-left font-medium text-lg border-2 transition-all ${
+                        className={`btn-glow w-full py-4 px-5 rounded-xl text-center font-medium text-lg border-2 transition-all ${
                           answeredOpt === oi
                             ? oi === activeKid.scenarioCorrect
                               ? 'bg-success text-white border-success shadow-lg'
@@ -2580,7 +2580,7 @@ case 'about':
                     <h3 className="font-bold text-secondary text-lg mb-4">Preguntas para conversar</h3>
                     <ul className="space-y-4">
                       {activeGuide.questions.map((q, i) => (
-                        <li key={i} className="flex items-start gap-3">
+                      <li key={i} className="flex items-start justify-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-secondary text-white flex items-center justify-center font-bold flex-shrink-0 text-sm">
                             {i + 1}
                           </div>
