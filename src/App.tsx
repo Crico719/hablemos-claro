@@ -2121,7 +2121,7 @@ case 'about':
 
             {/* HUB */}
             {learnView === 'hub' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-4xl mx-auto items-stretch">
+              <div className="grid grid-cols-1 gap-6 md:gap-8 max-w-2xl mx-auto items-stretch">
                 <button
                   onClick={() => setLearnView('kids')}
                   className="group bg-white rounded-3xl p-10 shadow-xl border border-gray-100 text-center flex flex-col items-center transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl cursor-pointer"
