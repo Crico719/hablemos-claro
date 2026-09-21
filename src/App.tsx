@@ -2505,72 +2505,83 @@ case 'about':
 
             {/* DETALLE TEMA HIJO */}
             {learnView === 'kid' && activeKid && (
-              <div className="w-full max-w-[760px] mx-auto space-y-8 rounded-3xl p-4 md:p-8 text-center" style={{ background: 'linear-gradient(180deg, #F0FDF4 0%, #FFFFFF 100%)' }}>
-                {/* Cabecera */}
-                <div className="bg-white rounded-2xl p-5 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <span className="font-black text-dark">Hablemos Claro</span>
-                    <button onClick={() => setCurrentScreen('profile')} className="glass-card px-4 py-2 rounded-xl text-primary text-sm font-bold hover:bg-primary/10 transition-all">
-                      Mi progreso
-                    </button>
+              <div className="w-full max-w-[760px] mx-auto rounded-[28px] p-4 md:p-8 space-y-6" style={{ background: 'linear-gradient(180deg, #F8FAFF 0%, #EDF1F9 100%)' }}>
+                {/* NAVBAR */}
+                <div className="bg-white/90 backdrop-blur-xl border border-slate-100 rounded-[20px] px-4 md:px-5 py-3 flex items-center justify-between gap-3 shadow-sm">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center text-lg shadow-md shadow-primary/20">🛡️</div>
+                    <div className="min-w-0">
+                      <p className="font-black text-slate-800 leading-tight truncate text-[15px]">Hablemos Claro</p>
+                      <p className="text-[11px] font-semibold text-slate-500 truncate">📚 Temas</p>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between mt-3 text-sm font-bold">
-                    <span className="text-gray-500">Tema {KIDS_TOPICS.findIndex(k => k.id === activeKid.id) + 1} de {KIDS_TOPICS.length} · {activeKid.category}</span>
-                    <span className="text-primary">{Math.round((kidsDone.length / KIDS_TOPICS.length) * 100)}% completado</span>
+                  <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
+                    <span className="px-2.5 py-1.5 rounded-xl bg-white shadow-sm border border-slate-100 text-slate-700 font-bold text-xs tabular-nums">{Math.round((kidsDone.length / KIDS_TOPICS.length) * 100)}%</span>
+                    <button onClick={() => setCurrentScreen('profile')} className="w-9 h-9 rounded-xl bg-white hover:bg-primary/10 shadow-sm text-base transition-colors" aria-label="Mi progreso" title="Mi progreso">📈</button>
+                    <button onClick={() => setLearnView('kids')} className="px-3 h-9 rounded-xl bg-white hover:bg-primary/10 shadow-sm text-sm font-bold text-slate-600 hover:text-primary transition-colors">← Volver a temas</button>
                   </div>
-                  <div className="h-2.5 bg-gray-200 rounded-full mt-2 overflow-hidden">
-                    <div className="h-full rounded-full" style={{ width: `${(kidsDone.length / KIDS_TOPICS.length) * 100}%`, background: 'linear-gradient(90deg, #10B981, #2563EB)' }}></div>
-                  </div>
-                  <button onClick={() => setLearnView('kids')} className="text-gray-500 hover:text-primary text-sm font-bold mt-3">
-                    ← Volver a temas
-                  </button>
                 </div>
 
-                {/* Título + pasos */}
-                <div className="text-center">
-                  <h2 className="text-3xl md:text-4xl font-black text-[#166534] leading-tight">{activeKid.title}</h2>
-                  <p className="text-gray-600 text-lg mt-2">{activeKid.desc}</p>
-                </div>
+                {/* HERO */}
+                <section className="relative overflow-hidden rounded-[28px] border border-slate-100 bg-gradient-to-br from-primary-50 via-white to-secondary-50 shadow-[0_16px_48px_rgba(124,58,237,0.08)] px-6 py-10 md:px-10 md:py-12 text-center">
+                  <div aria-hidden className="pointer-events-none absolute -top-24 -right-24 w-72 h-72 rounded-full bg-secondary-100/60 blur-3xl" />
+                  <div aria-hidden className="pointer-events-none absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-primary-100/60 blur-3xl" />
+                  <div className="relative flex flex-col items-center gap-4">
+                    <span className="inline-flex gap-2 w-max px-4 py-1.5 rounded-full bg-white/80 border border-slate-100 text-[11px] font-bold uppercase tracking-widest text-primary shadow-sm">
+                      ✨ Tema {KIDS_TOPICS.findIndex(k => k.id === activeKid.id) + 1} de {KIDS_TOPICS.length} · {activeKid.category}
+                    </span>
+                    <h2 className="text-3xl md:text-4xl font-black gradient-text leading-tight max-w-xl">{activeKid.title}</h2>
+                    <p className="text-slate-600 text-base md:text-lg leading-relaxed max-w-lg mt-1">{activeKid.desc}</p>
+                    <div className="flex items-center gap-3 w-full max-w-[360px] mt-2">
+                      <div className="flex-1 h-2 bg-slate-200/70 rounded-full overflow-hidden" role="progressbar" aria-valuenow={Math.round((kidsDone.length / KIDS_TOPICS.length) * 100)} aria-valuemin={0} aria-valuemax={100} aria-label="Progreso de temas">
+                        <div className="progress-bar h-full rounded-full transition-[width] duration-700" style={{ width: `${Math.round((kidsDone.length / KIDS_TOPICS.length) * 100)}%`, background: 'linear-gradient(90deg, #10B981, #2563EB)' }}></div>
+                      </div>
+                      <span className="text-xs md:text-sm font-bold text-slate-600 shrink-0 tabular-nums">{Math.round((kidsDone.length / KIDS_TOPICS.length) * 100)}% completado</span>
+                    </div>
+                  </div>
+                </section>
+
+                {/* PASOS */}
                 <div className="flex gap-2 flex-wrap justify-center">
                   {['Aprende', 'Observa', 'Reflexiona', 'Elige', 'Conversa', 'Completa'].map((s, i) => (
                     <button
                       key={s}
                       onClick={() => { setTopicStep(i); setShowFeedback(false); }}
-                      className={`px-3 py-1 rounded-full text-xs font-bold shadow-sm transition-all ${
+                      className={`px-3 py-1.5 rounded-full text-xs font-bold shadow-sm transition-all ${
                         topicStep === i
-                          ? 'bg-[#166534] text-white'
+                          ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-primary/25'
                           : topicStep > i
                             ? 'bg-success/15 text-success'
-                            : 'bg-white text-gray-500 hover:bg-gray-100'
+                            : 'bg-white text-slate-500 hover:bg-slate-50 border border-slate-100'
                       }`}
                     >
                       {topicStep > i ? '✓ ' : `${i + 1} · `}{s}
                     </button>
                   ))}
                 </div>
-                <p className="text-center text-sm font-bold text-gray-400">Paso {topicStep + 1} de 6</p>
+                <p className="text-center text-xs font-bold text-slate-400 mt-3">Paso {topicStep + 1} de 6</p>
 
                 {/* Ilustración */}
-                <div className="bg-white rounded-3xl p-6 shadow-sm flex justify-center">
+                <div className="bg-white rounded-[24px] p-6 shadow-[0_4px_20px_rgba(30,41,82,0.05)] border border-slate-100 flex justify-center">
                   {KID_ART[activeKid.art]}
                 </div>
 
                 {/* 1. APRENDE */}
                 {topicStep === 0 && (
                   <>
-                <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm">
-                  <p className="text-xs font-black tracking-widest text-[#166534] mb-3">1 · EN POCAS PALABRAS</p>
-                  <p className="text-gray-800 text-lg leading-loose">{activeKid.summary}</p>
+                <div className="bg-white rounded-[20px] p-6 md:p-8 border border-slate-100 shadow-[0_4px_20px_rgba(30,41,82,0.05)]">
+                  <span className="inline-flex items-center gap-1.5 w-max px-3 py-[5px] rounded-full bg-primary-50 text-primary text-[11px] font-bold uppercase tracking-wider mb-3">1 · EN POCAS PALABRAS</span>
+                  <p className="text-slate-700 text-lg leading-loose">{activeKid.summary}</p>
                 </div>
 
                 {/* 3. Por qué es un problema */}
-                <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm">
-                  <p className="text-xs font-black tracking-widest text-[#166534] mb-4">3 · ¿POR QUÉ ES UN PROBLEMA?</p>
+                <div className="bg-white rounded-[20px] p-6 md:p-8 border border-slate-100 shadow-[0_4px_20px_rgba(30,41,82,0.05)]">
+                  <span className="inline-flex items-center gap-1.5 w-max px-3 py-[5px] rounded-full bg-primary-50 text-primary text-[11px] font-bold uppercase tracking-wider mb-4">3 · ¿POR QUÉ ES UN PROBLEMA?</span>
                   <ul className="space-y-4">
                     {activeKid.problems.map((pb, i) => (
                       <li key={i} className="flex items-start gap-3">
-                        <span className="w-7 h-7 rounded-full bg-[#166534] text-white flex items-center justify-center font-bold text-sm shrink-0">✓</span>
-                        <p className="text-gray-800 text-lg leading-relaxed">{pb}</p>
+                        <span className="w-7 h-7 rounded-full bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm shadow-primary/25">✓</span>
+                        <p className="text-slate-700 text-lg leading-relaxed">{pb}</p>
                       </li>
                     ))}
                   </ul>
@@ -2578,17 +2589,17 @@ case 'about':
 
                 {/* Corrupción vs coima */}
                 {activeKid.compareA && (
-                  <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm">
-                    <p className="text-xs font-black tracking-widest text-[#166534] mb-4">⚖️ CORRUPCIÓN Y COIMA NO SON LO MISMO</p>
+                  <div className="bg-white rounded-[20px] p-6 md:p-8 border border-slate-100 shadow-[0_4px_20px_rgba(30,41,82,0.05)]">
+                    <span className="inline-flex items-center gap-1.5 w-max px-3 py-[5px] rounded-full bg-warning-50 text-warning text-[11px] font-bold uppercase tracking-wider mb-4">⚖️ CORRUPCIÓN Y COIMA NO SON LO MISMO</span>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="rounded-xl p-5 bg-primary/5 border border-primary/15">
-                        <p className="text-gray-800 leading-relaxed">{activeKid.compareA}</p>
+                      <div className="rounded-xl p-5 bg-primary-50 border border-primary/15">
+                        <p className="text-slate-700 leading-relaxed">{activeKid.compareA}</p>
                       </div>
-                      <div className="rounded-xl p-5 bg-warning/10 border border-warning/25">
-                        <p className="text-gray-800 leading-relaxed">{activeKid.compareB}</p>
+                      <div className="rounded-xl p-5 bg-warning-50 border border-warning/25">
+                        <p className="text-slate-700 leading-relaxed">{activeKid.compareB}</p>
                       </div>
                     </div>
-                    <p className="text-center font-bold text-dark mt-5">{activeKid.compareNote}</p>
+                    <p className="text-center font-bold text-slate-800 mt-5">{activeKid.compareNote}</p>
                   </div>
                 )}
                   </>
@@ -2596,30 +2607,30 @@ case 'about':
                 {/* 2. OBSERVA */}
                 {topicStep === 1 && (
                   <>
-                    <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border-l-8" style={{ borderLeftColor: '#F59E0B' }}>
-                      <p className="text-xs font-black tracking-widest text-[#166534] mb-3">2 · OBSERVA</p>
-                      <p className="text-gray-800 text-lg leading-loose italic">“{activeKid.observe}”</p>
+                    <div className="bg-white rounded-[20px] p-6 md:p-8 border border-slate-100 shadow-[0_4px_20px_rgba(30,41,82,0.05)] border-l-8" style={{ borderLeftColor: '#F59E0B' }}>
+                      <span className="inline-flex items-center gap-1.5 w-max px-3 py-[5px] rounded-full bg-warning-50 text-warning text-[11px] font-bold uppercase tracking-wider mb-3">2 · OBSERVA</span>
+                      <p className="text-slate-700 text-lg leading-loose italic">“{activeKid.observe}”</p>
                     </div>
-                    <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm">
-                      <p className="font-bold text-black mb-2">💡 Ejemplo cotidiano</p>
-                      <p className="text-gray-800 text-lg leading-loose italic">“{activeKid.example}”</p>
+                    <div className="bg-white rounded-[20px] p-6 md:p-8 border border-slate-100 shadow-[0_4px_20px_rgba(30,41,82,0.05)]">
+                      <p className="font-bold text-slate-800 mb-2">💡 Ejemplo cotidiano</p>
+                      <p className="text-slate-700 text-lg leading-loose italic">“{activeKid.example}”</p>
                     </div>
                   </>
                 )}
                 {/* 3. REFLEXIONA */}
                 {topicStep === 2 && (
-                  <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm text-center">
-                    <p className="text-xs font-black tracking-widest text-[#166534] mb-3">3 · REFLEXIONA</p>
-                    <div className="text-5xl mb-4">🤔</div>
-                    <p className="text-gray-800 text-xl leading-relaxed font-medium">{activeKid.reflectQ}</p>
-                    <p className="text-gray-500 mt-4">Tómate un momento para pensarlo antes de continuar.</p>
+                  <div className="bg-white rounded-[20px] p-6 md:p-8 border border-slate-100 shadow-[0_4px_20px_rgba(30,41,82,0.05)] text-center">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-[5px] rounded-full bg-primary-50 text-primary text-[11px] font-bold uppercase tracking-wider mb-3">3 · REFLEXIONA</span>
+                    <div className="text-5xl mb-4 mt-3">🤔</div>
+                    <p className="text-slate-800 text-xl leading-relaxed font-medium">{activeKid.reflectQ}</p>
+                    <p className="text-slate-500 mt-4">Tómate un momento para pensarlo antes de continuar.</p>
                   </div>
                 )}
                 {/* 4. ELIGE */}
                 {topicStep === 3 && (
-                <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border-2 border-primary/20">
-                  <p className="text-xs font-black tracking-widest text-[#166534] mb-3">4 · ¿QUÉ HARÍAS TÚ?</p>
-                  <p className="text-gray-800 text-lg mb-5">{activeKid.scenarioQ}</p>
+                <div className="bg-white rounded-[20px] p-6 md:p-8 border border-slate-100 shadow-[0_4px_20px_rgba(30,41,82,0.05)] border-2 border-primary/20">
+                  <span className="inline-flex items-center gap-1.5 w-max px-3 py-[5px] rounded-full bg-primary-50 text-primary text-[11px] font-bold uppercase tracking-wider mb-3">4 · ¿QUÉ HARÍAS TÚ?</span>
+                  <p className="text-slate-800 text-lg mb-5">{activeKid.scenarioQ}</p>
                   <div className="space-y-4">
                     {activeKid.scenarioOpts.map((opt, oi) => (
                       <button
@@ -2629,12 +2640,12 @@ case 'about':
                           setFeedbackMessage(activeKid.scenarioFeedback[oi] ?? '')
                           setShowFeedback(true)
                         }}
-                        className={`btn-glow w-full py-4 px-5 rounded-xl text-center font-medium text-lg border-2 transition-all ${
+                        className={`btn-glow w-full py-4 px-5 rounded-[18px] text-center font-medium text-lg border-2 transition-all ${
                           answeredOpt === oi
                             ? oi === activeKid.scenarioCorrect
                               ? 'bg-success text-white border-success shadow-lg'
-                              : 'bg-white border-warning text-dark'
-                            : 'bg-white border-gray-200 hover:border-primary/60 text-dark'
+                              : 'bg-white border-warning text-slate-800'
+                            : 'bg-white border-gray-200 hover:border-primary/60 text-slate-800'
                         }`}
                       >
                         {opt}
@@ -2642,15 +2653,15 @@ case 'about':
                     ))}
                   </div>
                   {showFeedback && (
-                    <div className="mt-5 p-5 rounded-xl bg-primary/5 border border-primary/20 animate-fade-in">
-                      <p className="text-xs font-black tracking-widest text-primary mb-2">💡 PARA PENSAR</p>
-                      <p className="text-gray-800 text-lg leading-relaxed">{feedbackMessage}</p>
+                    <div className="mt-5 p-5 rounded-[18px] bg-primary-50 border border-primary/20 animate-fade-in">
+                      <p className="text-[11px] font-black tracking-widest text-primary mb-2">💡 PARA PENSAR</p>
+                      <p className="text-slate-800 text-lg leading-relaxed">{feedbackMessage}</p>
                     </div>
                   )}
                   {activeKid.id === 'k4' && (
                     <button
                       onClick={() => { setShowCoimaONo(true); setCurrentCoimaCase(0); setShowFeedback(false); }}
-                      className="btn-glow bg-[#166534] text-white font-bold py-4 px-6 rounded-xl text-lg w-full mt-6"
+                      className="btn-glow bg-gradient-to-r from-warning to-primary text-white font-bold py-4 px-6 rounded-full text-lg w-full mt-6"
                     >
                       🎯 Jugar ¿Coima o no?
                     </button>
@@ -2659,21 +2670,21 @@ case 'about':
                 )}
                 {/* 5. CONVERSA */}
                 {topicStep === 4 && (
-                <div className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-8">
-                  <p className="text-xs font-black tracking-widest text-warning mb-2">5 · CONVERSA EN FAMILIA</p>
-                  <h3 className="font-bold text-warning text-xl mb-2">💬 Conversarlo en familia</h3>
-                  <p className="text-gray-700 italic leading-relaxed">“{activeKid.familyPrompt}”</p>
-                  <p className="text-dark font-bold mt-3">Pregunta para conversar: {activeKid.familyQuestion}</p>
+                <div className="bg-white/85 backdrop-blur-xl rounded-[26px] shadow-lg shadow-indigo-500/5 p-8 border border-warning/20">
+                  <span className="inline-flex items-center gap-1.5 w-max px-3 py-[5px] rounded-full bg-warning-50 text-warning text-[11px] font-bold uppercase tracking-wider mb-2">5 · CONVERSA EN FAMILIA</span>
+                  <h3 className="font-bold text-warning text-xl mb-2 mt-2">💬 Conversarlo en familia</h3>
+                  <p className="text-slate-700 italic leading-relaxed">“{activeKid.familyPrompt}”</p>
+                  <p className="text-slate-800 font-bold mt-3">Pregunta para conversar: {activeKid.familyQuestion}</p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                     <button
                       onClick={() => setCurrentScreen('converse')}
-                      className="btn-glow bg-warning text-white font-bold py-4 px-6 rounded-xl"
+                      className="btn-glow bg-warning text-white font-bold py-4 px-6 rounded-full"
                     >
                       Iniciar conversación familiar →
                     </button>
                     <button
                       onClick={() => { setActiveGuideId(activeKid.relatedGuide); setLearnView('guide'); setShowFeedback(false); }}
-                      className="btn-glow bg-white border-2 border-secondary text-secondary font-bold py-4 px-6 rounded-xl"
+                      className="btn-glow bg-white border-2 border-secondary text-secondary font-bold py-4 px-6 rounded-full"
                     >
                       Ver guía para padres →
                     </button>
@@ -2683,22 +2694,21 @@ case 'about':
                 {/* 6. COMPLETA */}
                 {topicStep === 5 && (
                 <>
-                <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm text-center">
-                  <p className="text-xs font-black tracking-widest text-[#166534] mb-3">6 · COMPLETA</p>
-                  <div className="text-5xl mb-3">🎯</div>
-                  <p className="text-gray-800 text-lg leading-relaxed mb-2">{activeKid.finalTask}</p>
+                <div className="bg-white rounded-[20px] p-6 md:p-8 border border-slate-100 shadow-[0_4px_20px_rgba(30,41,82,0.05)] text-center">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-[5px] rounded-full bg-primary-50 text-primary text-[11px] font-bold uppercase tracking-wider mb-3">6 · COMPLETA</span>
+                  <div className="text-5xl mb-3 mt-3">🎯</div>
+                  <p className="text-slate-800 text-lg leading-relaxed mb-2">{activeKid.finalTask}</p>
                 </div>
                 <button
                   onClick={() => completeKidTopic(activeKid.id)}
                   disabled={kidsDone.includes(activeKid.id) || answeredOpt === null}
-                  className={`font-bold py-4 px-6 rounded-xl text-lg w-full ${
+                  className={`font-bold py-4 px-6 rounded-full text-lg w-full transition-all ${
                     kidsDone.includes(activeKid.id)
                       ? 'bg-success/15 text-success cursor-default'
                       : answeredOpt === null
-                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        : 'btn-glow text-white'
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'btn-glow bg-gradient-to-r from-primary to-secondary text-white shadow-lg shadow-primary/25 hover:scale-[1.01] active:scale-[0.99]'
                   }`}
-                  style={kidsDone.includes(activeKid.id) || answeredOpt === null ? undefined : { background: '#166534' }}
                 >
                   {kidsDone.includes(activeKid.id)
                     ? '✓ Tema completado'
@@ -2720,8 +2730,7 @@ case 'about':
                           setLearnView('kids')
                         }
                       }}
-                      className="btn-glow text-white font-bold py-4 px-6 rounded-xl text-lg w-full"
-                      style={{ background: '#166534' }}
+                      className="btn-glow bg-gradient-to-r from-primary to-secondary text-white font-bold py-4 px-6 rounded-full text-lg w-full shadow-lg shadow-primary/25 hover:scale-[1.01] active:scale-[0.99]"
                     >
                       {next ? `Continuar con: ${next.title} →` : 'Volver a la biblioteca →'}
                     </button>
@@ -2734,27 +2743,36 @@ case 'about':
                   <button
                     onClick={() => { setTopicStep(Math.max(0, topicStep - 1)); setShowFeedback(false); }}
                     disabled={topicStep === 0}
-                    className={`font-bold py-3 px-4 rounded-xl transition-all ${
-                      topicStep === 0 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-dark shadow-sm hover:bg-gray-50'
+                    className={`font-bold py-3 px-4 rounded-full transition-all ${
+                      topicStep === 0 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-slate-700 shadow-sm border border-slate-100 hover:bg-gray-50'
                     }`}
                   >
                     ← Anterior
                   </button>
                   <button
                     onClick={() => setLearnView('kids')}
-                    className="bg-white text-dark font-bold py-3 px-4 rounded-xl shadow-sm hover:bg-gray-50 transition-all"
+                    className="bg-white text-slate-700 font-bold py-3 px-4 rounded-full shadow-sm border border-slate-100 hover:bg-gray-50 transition-all"
                   >
                     Ver temas
                   </button>
                   <button
                     onClick={() => { setTopicStep(Math.min(5, topicStep + 1)); setShowFeedback(false); }}
                     disabled={topicStep === 5}
-                    className="font-bold py-3 px-4 rounded-xl transition-all text-white"
-                    style={topicStep === 5 ? undefined : { background: '#166534' }}
+                    className={`font-bold py-3 px-4 rounded-full transition-all text-white ${
+                      topicStep === 5
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-gradient-to-r from-primary to-secondary shadow-lg shadow-primary/25 hover:scale-[1.02] active:scale-[0.98]'
+                    }`}
                   >
                     Siguiente →
                   </button>
                 </div>
+
+                {/* Footer */}
+                <footer className="text-center">
+                  <p className="text-slate-500 text-sm">{t('bottomQuote')}</p>
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mt-2">Hablemos Claro · {t('selectTagline')}</p>
+                </footer>
               </div>
             )}
 
