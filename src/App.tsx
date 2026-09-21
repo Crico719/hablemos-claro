@@ -629,7 +629,7 @@ const examQuestions: ExamQuestion[] = [
   { topic: 'Ciudadanía', icon: '🗳️', question: 'Un comité vecinal detecta sobreprecio en una obra. ¿Qué puede hacer?', options: ['Pedir su parte', 'No meterse', 'Exigir el expediente y denunciar'], correct: 2 },
 ]
 
-const topicFilters = ['Todos', 'Corrupción', 'Coimas', 'Decisiones', 'Ciudadanía', 'Familia', 'Actividades']
+
 
 // Biblioteca de temas para hijos y adolescentes
 interface KidTopic {
@@ -1073,6 +1073,35 @@ const familyActivityQuestions = [
 const initialStudentProfile = getStoredStudentProfile()
 const initialFamilyProfile = getStoredFamilyProfile()
 
+function RoadmapReveal({ children, delay = 0 }: { children: ReactNode; delay?: number }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [visible, setVisible] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) { setVisible(true); return }
+    if (typeof IntersectionObserver === 'undefined') { setVisible(true); return }
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) { setVisible(true); obs.unobserve(e.target) }
+        })
+      },
+      { threshold: 0.2, rootMargin: '0px 0px -40px 0px' }
+    )
+    obs.observe(el)
+    return () => obs.disconnect()
+  }, [])
+  return (
+    <div
+      ref={ref}
+      className={`transition-all duration-500 ease-out ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
+      style={{ transitionDelay: `${delay}ms` }}
+    >
+      {children}
+    </div>
+  )
+}
+
 export default function App() {
   const [studentProfile, setStudentProfile] = useState<StudentProfile>(initialStudentProfile)
   const [familyProfile, setFamilyProfile] = useState<FamilyProfile>(initialFamilyProfile)
@@ -1081,8 +1110,6 @@ export default function App() {
   const [learnView, setLearnView] = useState<'hub' | 'kids' | 'parents' | 'kid' | 'guide' | 'exam'>('hub')
   const [activeKidId, setActiveKidId] = useState<string | null>(null)
   const [activeGuideId, setActiveGuideId] = useState<string | null>(null)
-  const [kidsFilter, setKidsFilter] = useState('Todos')
-  const [parentsFilter, setParentsFilter] = useState('Todos')
   const [topicStep, setTopicStep] = useState(0)
   const [answeredOpt, setAnsweredOpt] = useState<number | null>(null)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -2386,9 +2413,12 @@ case 'about':
                       <div className="px-3 py-2 rounded-2xl bg-white/15 backdrop-blur border border-white/20 font-bold text-sm">🔥 {learnStreak}</div>
                       <div className="px-3 py-2 rounded-2xl bg-white/15 backdrop-blur border border-white/20 font-bold text-sm">⭐ {kidsXp} XP</div>
                       <div className="px-3 py-2 rounded-2xl bg-white/15 backdrop-blur border border-white/20 font-bold text-sm">🏅 {learnBadge}/{learnBadgeTotal}</div>
-                      <div className="px-3 py-2 rounded-2xl bg-white/15 backdrop-blur border border-white/20 font-bold text-sm">📖 {kidsDone.length}/{KIDS_TOPICS.length}</div>
+                      <div className="px-3 py-2 rounded-2xl bg-white/15 backdrop-blur border border-white/20 font-bold text-sm tabular-nums">📖 {kidsDone.length}/{KIDS_TOPICS.length}</div>
                     </div>
-                    <div className="w-full max-w-[360px] mt-2">
+                    <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/20 backdrop-blur border border-white/25 text-[13px] font-black tabular-nums shadow-sm">
+                      🎯 Tema {Math.min(kidsDone.length + 1, KIDS_TOPICS.length)} de {KIDS_TOPICS.length} {kidsDone.length >= KIDS_TOPICS.length ? '· ¡Todo listo!' : ''}
+                    </span>
+                    <div className="w-full max-w-[360px] mt-3">
                       <div className="h-2 bg-white/25 rounded-full overflow-hidden">
                         <div className="progress-bar h-full rounded-full bg-white transition-[width] duration-700" style={{ width: `${Math.round((kidsDone.length / KIDS_TOPICS.length) * 100)}%` }}></div>
                       </div>
@@ -2396,133 +2426,119 @@ case 'about':
                   </div>
                 </section>
 
-                {/* RUTA / MAPA */}
-                <section className="rounded-[24px] bg-white border border-slate-100 shadow-[0_4px_20px_rgba(30,41,82,0.05)] p-5 md:p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-black text-slate-800 text-base">🗺️ Tu ruta de aprendizaje</h3>
-                    <span className="font-bold text-primary text-sm tabular-nums">{kidsDone.length}/{KIDS_TOPICS.length}</span>
-                  </div>
-                  {(() => {
-                    const firstUndone = KIDS_TOPICS.findIndex(k => !kidsDone.includes(k.id))
-                    return (
-                      <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 -mx-1 px-1">
-                        {KIDS_TOPICS.map((k, i) => {
-                          const done = kidsDone.includes(k.id)
-                          const isNext = i === firstUndone
-                          return (
-                            <div key={k.id} className="flex flex-col items-center gap-2 shrink-0 w-[84px]">
-                              <button
-                                onClick={() => { setActiveKidId(k.id); setLearnView('kid'); setShowFeedback(false); setTopicStep(0); setAnsweredOpt(null); }}
-                                className={`relative w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 ${
-                                  done
-                                    ? 'bg-gradient-to-br from-success to-emerald-400 text-white shadow-md shadow-success/30'
-                                    : isNext
-                                      ? 'bg-gradient-to-br from-primary to-secondary text-white shadow-lg shadow-primary/30 ring-4 ring-primary/15 animate-pulse'
-                                      : 'bg-slate-100 text-slate-400'
-                                }`}
-                                aria-label={k.title}
-                              >
-                                <span className="text-xl">{done ? '✓' : k.icon}</span>
-                                {isNext && <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-warning text-white text-[10px] font-black flex items-center justify-center shadow">!</span>}
-                              </button>
-                              <span className={`text-[10px] font-bold text-center leading-tight line-clamp-2 ${done ? 'text-success' : isNext ? 'text-primary' : 'text-slate-400'}`}>
-                                {String(i + 1).padStart(2, '0')}
-                              </span>
+                {/* ROADMAP VERTICAL DE APRENDIZAJE */}
+                {(() => {
+                  const firstUndone = KIDS_TOPICS.findIndex(k => !kidsDone.includes(k.id))
+                  const openTopic = (k: KidTopic) => { setActiveKidId(k.id); setLearnView('kid'); setShowFeedback(false); setTopicStep(0); setAnsweredOpt(null) }
+                  return (
+                    <section className="relative">
+                      {KIDS_TOPICS.map((k, i) => {
+                        const done = kidsDone.includes(k.id)
+                        const isCurrent = i === firstUndone
+                        const locked = !done && !isCurrent
+                        const even = i % 2 === 0
+                        return (
+                          <RoadmapReveal key={k.id}>
+                            <div className={`relative py-12 md:py-20 ${locked ? 'opacity-75' : ''}`}>
+                              {/* segmento de línea */}
+                              <div aria-hidden className={`absolute top-0 bottom-0 left-[23px] md:left-1/2 -translate-x-1/2 w-[3px] rounded-full transition-colors duration-500 ${
+                                done
+                                  ? 'bg-gradient-to-b from-success to-emerald-400'
+                                  : isCurrent
+                                    ? 'bg-gradient-to-b from-secondary to-pink-400'
+                                    : 'bg-secondary-100'
+                              }`} />
+                              {/* nodo */}
+                              <div className="absolute left-[24px] md:left-1/2 -translate-x-1/2 -translate-y-1/2 top-1/2 z-10">
+                                <button
+                                  onClick={locked ? undefined : () => openTopic(k)}
+                                  disabled={!!locked}
+                                  title={locked ? 'Completa el tema anterior para desbloquearlo.' : undefined}
+                                  aria-label={k.title}
+                                  className={`relative w-14 h-14 md:w-[68px] md:h-[68px] rounded-full flex items-center justify-center text-2xl md:text-3xl font-black border-2 transition-all duration-300 ${
+                                    done
+                                      ? 'bg-gradient-to-br from-success to-emerald-400 text-white border-emerald-300/60 shadow-[0_8px_24px_rgba(16,185,129,0.35)] hover:scale-105 active:scale-95 cursor-pointer'
+                                      : isCurrent
+                                        ? 'bg-gradient-to-br from-pink-500 to-secondary text-white border-white ring-4 ring-primary/15 shadow-[0_10px_30px_rgba(168,85,247,0.45)] animate-pulse hover:scale-110 active:scale-95 cursor-pointer'
+                                        : 'bg-slate-100 text-slate-400 border-slate-200 opacity-70 cursor-not-allowed'
+                                  }`}
+                                >
+                                  {done ? '✓' : locked ? '🔒' : k.icon}
+                                  {isCurrent && <span className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-warning text-white text-[11px] font-black flex items-center justify-center shadow-md">👆</span>}
+                                </button>
+                              </div>
+                              {/* contenido */}
+                              <div className={`pl-[92px] md:pl-0 md:w-[calc(50%-3rem)] ${even ? 'md:mr-auto md:text-right' : 'md:ml-auto'}`}>
+                                <div className={`bg-white rounded-[20px] border p-4 md:p-5 shadow-sm transition-all duration-300 ${
+                                  done ? 'border-success/20' : isCurrent ? 'border-secondary/30 shadow-md shadow-primary/10' : 'border-slate-100'
+                                }`}>
+                                  <span className={`inline-flex items-center gap-1 text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full ${
+                                    done
+                                      ? 'bg-success/15 text-success'
+                                      : isCurrent
+                                        ? 'bg-gradient-to-r from-pink-500 to-secondary text-white shadow-sm shadow-primary/25'
+                                        : 'bg-slate-100 text-slate-400'
+                                  }`}>
+                                    {done ? '✓ Completado' : isCurrent ? (kidsDone.length === 0 ? '● Empezar' : '● Continuar') : '🔒 Bloqueado'}
+                                  </span>
+                                  <p className="mt-3 text-[11px] font-bold text-slate-400 tabular-nums">{String(i + 1).padStart(2, '0')} · {k.category}{k.joint ? ' · 👨‍👩‍👧' : ''}</p>
+                                  <h3 className="mt-1 font-bold text-slate-800 text-[17px] md:text-lg leading-snug">{k.title}</h3>
+                                  <p className="text-sm text-slate-500 leading-relaxed mt-1 line-clamp-2">{k.desc}</p>
+                                  <div className={`flex items-center justify-between gap-2 mt-3 ${even ? 'md:flex-row-reverse' : ''}`}>
+                                    <span className="text-xs font-black text-primary">+50 XP</span>
+                                    <span className={`text-xs font-bold ${isCurrent && !done ? 'text-secondary' : 'text-slate-400'}`}>{done ? '✓ Repasado' : '1 lección'}</span>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
-                          )
-                        })}
-                        {/* Nodo examen */}
-                        <div className="flex flex-col items-center gap-2 shrink-0 w-[84px]">
-                          <button
-                            onClick={() => { if (examUnlocked) { setActiveKidId(null); setLearnView('exam'); setExamAnswers({}); } }}
-                            disabled={!examUnlocked}
-                            className={`relative w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ${
-                              examUnlocked
-                                ? 'bg-gradient-to-br from-warning to-orange-400 text-white shadow-md shadow-warning/30 hover:scale-105 active:scale-95'
-                                : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                            }`}
-                            aria-label="Examen final"
-                          >
-                            <span className="text-xl">{examUnlocked ? '🏁' : '🔒'}</span>
-                          </button>
-                          <span className="text-[10px] font-bold text-center leading-tight text-slate-400">EXAMEN</span>
-                        </div>
-                      </div>
-                    )
-                  })()}
-                </section>
-
-                {/* FILTROS */}
-                <div className="flex gap-2 flex-wrap justify-center">
-                  {topicFilters.map(f => (
-                    <button
-                      key={f}
-                      onClick={() => setKidsFilter(f)}
-                      className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
-                        kidsFilter === f ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-md shadow-primary/25' : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-100'
-                      }`}
-                    >
-                      {f}
-                    </button>
-                  ))}
-                </div>
-
-                {/* TARJETAS ISLA */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  {KIDS_TOPICS.filter(k => kidsFilter === 'Todos' || k.category === kidsFilter).map((k, i) => {
-                    const done = kidsDone.includes(k.id)
-                    return (
-                      <button
-                        key={k.id}
-                        onClick={() => { setActiveKidId(k.id); setLearnView('kid'); setShowFeedback(false); setTopicStep(0); setAnsweredOpt(null); }}
-                        className="group bg-white rounded-[22px] p-6 shadow-sm border border-slate-100 text-left transition-all hover:-translate-y-1 hover:shadow-lg hover:border-primary/20 cursor-pointer"
-                      >
-                        <div className="flex items-start gap-4">
-                          <div className={`w-14 h-14 shrink-0 rounded-2xl flex items-center justify-center text-3xl transition-transform duration-200 group-hover:scale-105 ${done ? 'bg-success/15' : 'bg-gradient-to-br from-primary/15 to-secondary/15'}`}>
-                            {k.icon}
+                          </RoadmapReveal>
+                        )
+                      })}
+                      {/* Nodo EXAMEN FINAL */}
+                      <RoadmapReveal>
+                        <div className="relative py-12 md:py-20">
+                          <div aria-hidden className={`absolute top-0 bottom-0 left-[23px] md:left-1/2 -translate-x-1/2 w-[3px] rounded-full transition-colors duration-500 ${
+                            examUnlocked ? 'bg-gradient-to-b from-secondary to-warning' : 'bg-secondary-100'
+                          }`} />
+                          <div className="absolute left-[24px] md:left-1/2 -translate-x-1/2 -translate-y-1/2 top-1/2 z-10">
+                            <button
+                              onClick={() => { if (examUnlocked) { setActiveKidId(null); setLearnView('exam'); setExamAnswers({}); } }}
+                              disabled={!examUnlocked}
+                              title={examUnlocked ? undefined : 'Completa todos los temas para desbloquearlo.'}
+                              aria-label="Examen final"
+                              className={`relative w-14 h-14 md:w-[68px] md:h-[68px] rounded-full flex items-center justify-center text-2xl md:text-3xl font-black border-2 transition-all duration-300 ${
+                                examUnlocked
+                                  ? 'bg-gradient-to-br from-warning to-orange-400 text-white border-orange-200/60 shadow-[0_8px_24px_rgba(245,158,11,0.4)] hover:scale-105 active:scale-95 cursor-pointer'
+                                  : 'bg-slate-100 text-slate-400 border-slate-200 opacity-70 cursor-not-allowed'
+                              }`}
+                            >
+                              {examUnlocked ? '🏁' : '🔒'}
+                            </button>
                           </div>
-                          <div className="flex-1">
-                            <p className="text-[11px] font-bold text-slate-400">{String(i + 1).padStart(2, '0')} · {k.category}{k.joint ? ' · 👨‍👩‍👧 Juntos' : ''}</p>
-                            <h3 className="font-bold text-slate-800 text-lg leading-snug mt-1">{k.title}</h3>
-                            <p className="text-sm text-slate-500 leading-relaxed mt-1 line-clamp-2">{k.desc}</p>
-                            <div className="flex items-center justify-between gap-2 mt-3">
-                              <span className="text-[11px] font-bold text-slate-400">1 lección · +50 XP</span>
-                              <span className={`inline-flex items-center gap-1 font-bold text-xs px-4 py-2 rounded-full transition-colors ${done ? 'bg-success/15 text-success' : 'bg-gradient-to-r from-primary to-secondary text-white shadow-sm shadow-primary/25'}`}>
-                                {done ? '✓ Completado' : 'Comenzar →'}
+                          <div className="pl-[92px] md:pl-0 md:w-[calc(50%-3rem)] md:mr-auto md:text-right">
+                            <div className={`bg-white rounded-[20px] border p-4 md:p-5 shadow-sm transition-all duration-300 ${
+                              examUnlocked ? 'border-warning/30 shadow-md shadow-warning/10' : 'border-slate-100'
+                            }`}>
+                              <span className={`inline-flex items-center gap-1 text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full ${
+                                examUnlocked ? 'bg-gradient-to-r from-warning to-orange-400 text-white shadow-sm shadow-warning/25' : 'bg-slate-100 text-slate-400'
+                              }`}>
+                                {examUnlocked ? '🎓 Examen final' : '🔒 Bloqueado'}
                               </span>
+                              <h3 className="mt-3 font-black text-slate-800 text-[17px] md:text-lg leading-snug">Examen final</h3>
+                              <p className="text-sm text-slate-500 leading-relaxed mt-1">
+                                {examUnlocked ? 'Pon a prueba todo lo aprendido y consigue tus insignias.' : `Completa los ${KIDS_TOPICS.length} temas para desbloquearlo.`}
+                              </p>
+                              <div className={`flex items-center justify-between gap-2 mt-3 md:flex-row-reverse`}>
+                                <span className="text-xs font-black text-warning">🏅 Insignias</span>
+                                <span className="text-xs font-bold text-slate-400">{examUnlocked ? 'Disponible' : 'Bloqueado'}</span>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </button>
-                    )
-                  })}
-                </div>
-
-                {/* EXAMEN FINAL */}
-                <button
-                  onClick={() => { if (examUnlocked) { setActiveKidId(null); setLearnView('exam'); setExamAnswers({}); } }}
-                  disabled={!examUnlocked}
-                  className={`group rounded-[22px] p-6 w-full text-left transition-all ${
-                    examUnlocked
-                      ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-lg shadow-primary/25 hover:shadow-xl cursor-pointer'
-                      : 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className={`w-14 h-14 shrink-0 rounded-2xl flex items-center justify-center text-3xl ${examUnlocked ? 'bg-white/20' : 'bg-white'}`}>
-                      {examUnlocked ? '🎓' : '🔒'}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-black text-xl">Examen final</h3>
-                      <p className={`text-sm ${examUnlocked ? 'text-white/85' : ''}`}>
-                        {examUnlocked ? 'Pon a prueba todo lo aprendido. ¡Consigue tus insignias! →' : `Completa los ${KIDS_TOPICS.length} temas para desbloquearlo`}
-                      </p>
-                    </div>
-                    <span className={`hidden sm:inline-flex items-center gap-1 font-bold text-sm px-5 py-2.5 rounded-full ${examUnlocked ? 'bg-white text-primary' : 'bg-slate-200 text-slate-400'}`}>
-                      {examUnlocked ? 'Comenzar →' : 'Bloqueado'}
-                    </span>
-                  </div>
-                </button>
+                      </RoadmapReveal>
+                    </section>
+                  )
+                })()}
               </>
             )}
 
@@ -2556,91 +2572,77 @@ case 'about':
                   </div>
                 </section>
 
-                {/* RUTA / MAPA */}
-                <section className="rounded-[24px] bg-white border border-slate-100 shadow-[0_4px_20px_rgba(30,41,82,0.05)] p-5 md:p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-black text-slate-800 text-base">🗺️ Tu ruta de acompañamiento</h3>
-                    <span className="font-bold text-secondary text-sm tabular-nums">{guidesDone.length}/{PARENT_GUIDES.length}</span>
-                  </div>
-                  {(() => {
-                    const firstUndone = PARENT_GUIDES.findIndex(g => !guidesDone.includes(g.id))
-                    return (
-                      <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 -mx-1 px-1">
-                        {PARENT_GUIDES.map((g, i) => {
-                          const done = guidesDone.includes(g.id)
-                          const isNext = i === firstUndone
-                          return (
-                            <div key={g.id} className="flex flex-col items-center gap-2 shrink-0 w-[84px]">
-                              <button
-                                onClick={() => { setActiveGuideId(g.id); setLearnView('guide'); setShowFeedback(false); }}
-                                className={`relative w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 ${
-                                  done
-                                    ? 'bg-gradient-to-br from-success to-emerald-400 text-white shadow-md shadow-success/30'
-                                    : isNext
-                                      ? 'bg-gradient-to-br from-secondary to-fuchsia-500 text-white shadow-lg shadow-secondary/30 ring-4 ring-secondary/15 animate-pulse'
-                                      : 'bg-slate-100 text-slate-400'
-                                }`}
-                                aria-label={g.title}
-                              >
-                                <span className="text-xl">{done ? '✓' : g.icon}</span>
-                                {isNext && <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-warning text-white text-[10px] font-black flex items-center justify-center shadow">!</span>}
-                              </button>
-                              <span className={`text-[10px] font-bold text-center leading-tight line-clamp-2 ${done ? 'text-success' : isNext ? 'text-secondary' : 'text-slate-400'}`}>
-                                {String(i + 1).padStart(2, '0')}
-                              </span>
+                {/* ROADMAP VERTICAL DE ACOMPAÑAMIENTO */}
+                {(() => {
+                  const firstUndone = PARENT_GUIDES.findIndex(g => !guidesDone.includes(g.id))
+                  const openGuide = (g: ParentGuide) => { setActiveGuideId(g.id); setLearnView('guide'); setShowFeedback(false) }
+                  return (
+                    <section className="relative">
+                      {PARENT_GUIDES.map((g, i) => {
+                        const done = guidesDone.includes(g.id)
+                        const isCurrent = i === firstUndone
+                        const locked = !done && !isCurrent
+                        const even = i % 2 === 0
+                        return (
+                          <RoadmapReveal key={g.id}>
+                            <div className={`relative py-12 md:py-20 ${locked ? 'opacity-75' : ''}`}>
+                              {/* segmento de línea */}
+                              <div aria-hidden className={`absolute top-0 bottom-0 left-[23px] md:left-1/2 -translate-x-1/2 w-[3px] rounded-full transition-colors duration-500 ${
+                                done
+                                  ? 'bg-gradient-to-b from-success to-emerald-400'
+                                  : isCurrent
+                                    ? 'bg-gradient-to-b from-secondary to-fuchsia-400'
+                                    : 'bg-secondary-100'
+                              }`} />
+                              {/* nodo */}
+                              <div className="absolute left-[24px] md:left-1/2 -translate-x-1/2 -translate-y-1/2 top-1/2 z-10">
+                                <button
+                                  onClick={locked ? undefined : () => openGuide(g)}
+                                  disabled={!!locked}
+                                  title={locked ? 'Revisa la guía anterior para desbloquear esta.' : undefined}
+                                  aria-label={g.title}
+                                  className={`relative w-14 h-14 md:w-[68px] md:h-[68px] rounded-full flex items-center justify-center text-2xl md:text-3xl font-black border-2 transition-all duration-300 ${
+                                    done
+                                      ? 'bg-gradient-to-br from-success to-emerald-400 text-white border-emerald-300/60 shadow-[0_8px_24px_rgba(16,185,129,0.35)] hover:scale-105 active:scale-95 cursor-pointer'
+                                      : isCurrent
+                                        ? 'bg-gradient-to-br from-fuchsia-500 to-secondary text-white border-white ring-4 ring-secondary/15 shadow-[0_10px_30px_rgba(217,70,239,0.45)] animate-pulse hover:scale-110 active:scale-95 cursor-pointer'
+                                        : 'bg-slate-100 text-slate-400 border-slate-200 opacity-70 cursor-not-allowed'
+                                  }`}
+                                >
+                                  {done ? '✓' : locked ? '🔒' : g.icon}
+                                  {isCurrent && <span className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-warning text-white text-[11px] font-black flex items-center justify-center shadow-md">👆</span>}
+                                </button>
+                              </div>
+                              {/* contenido */}
+                              <div className={`pl-[92px] md:pl-0 md:w-[calc(50%-3rem)] ${even ? 'md:mr-auto md:text-right' : 'md:ml-auto'}`}>
+                                <div className={`bg-white rounded-[20px] border p-4 md:p-5 shadow-sm transition-all duration-300 ${
+                                  done ? 'border-success/20' : isCurrent ? 'border-secondary/30 shadow-md shadow-secondary/10' : 'border-slate-100'
+                                }`}>
+                                  <span className={`inline-flex items-center gap-1 text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full ${
+                                    done
+                                      ? 'bg-success/15 text-success'
+                                      : isCurrent
+                                        ? 'bg-gradient-to-r from-fuchsia-500 to-secondary text-white shadow-sm shadow-secondary/25'
+                                        : 'bg-slate-100 text-slate-400'
+                                  }`}>
+                                    {done ? '✓ Revisada' : isCurrent ? (guidesDone.length === 0 ? '● Empezar' : '● Continuar') : '🔒 Bloqueado'}
+                                  </span>
+                                  <p className="mt-3 text-[11px] font-bold text-slate-400 tabular-nums">{String(i + 1).padStart(2, '0')} · {g.category}{g.joint ? ' · 👨‍👩‍👧' : ''}</p>
+                                  <h3 className="mt-1 font-bold text-slate-800 text-[17px] md:text-lg leading-snug">{g.title}</h3>
+                                  <p className="text-sm text-slate-500 leading-relaxed mt-1 line-clamp-2">{g.desc}</p>
+                                  <div className={`flex items-center justify-between gap-2 mt-3 ${even ? 'md:flex-row-reverse' : ''}`}>
+                                    <span className="text-xs font-black text-secondary">+30 XP</span>
+                                    <span className={`text-xs font-bold ${isCurrent && !done ? 'text-secondary' : 'text-slate-400'}`}>{done ? '✓ Repasada' : '1 guía'}</span>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
-                          )
-                        })}
-                      </div>
-                    )
-                  })()}
-                </section>
-
-                {/* FILTROS */}
-                <div className="flex gap-2 flex-wrap justify-center">
-                  {topicFilters.map(f => (
-                    <button
-                      key={f}
-                      onClick={() => setParentsFilter(f)}
-                      className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
-                        parentsFilter === f ? 'bg-gradient-to-r from-secondary to-fuchsia-500 text-white shadow-md shadow-secondary/25' : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-100'
-                      }`}
-                    >
-                      {f}
-                    </button>
-                  ))}
-                </div>
-
-                {/* TARJETAS ISLA */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  {PARENT_GUIDES.filter(g => parentsFilter === 'Todos' || g.category === parentsFilter).map((g, i) => {
-                    const done = guidesDone.includes(g.id)
-                    return (
-                      <button
-                        key={g.id}
-                        onClick={() => { setActiveGuideId(g.id); setLearnView('guide'); }}
-                        className="group bg-white rounded-[22px] p-6 shadow-sm border border-slate-100 text-left transition-all hover:-translate-y-1 hover:shadow-lg hover:border-secondary/20 cursor-pointer"
-                      >
-                        <div className="flex items-start gap-4">
-                          <div className={`w-14 h-14 shrink-0 rounded-2xl flex items-center justify-center text-3xl transition-transform duration-200 group-hover:scale-105 ${done ? 'bg-success/15' : 'bg-gradient-to-br from-secondary/15 to-fuchsia-500/15'}`}>
-                            {g.icon}
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-[11px] font-bold text-slate-400">{String(i + 1).padStart(2, '0')} · {g.category}{g.joint ? ' · 👨‍👩‍👧 Juntos' : ''}</p>
-                            <h3 className="font-bold text-slate-800 text-lg leading-snug mt-1">{g.title}</h3>
-                            <p className="text-sm text-slate-500 leading-relaxed mt-1 line-clamp-2">{g.desc}</p>
-                            <div className="flex items-center justify-between gap-2 mt-3">
-                              <span className="text-[11px] font-bold text-slate-400">1 guía · +30 XP</span>
-                              <span className={`inline-flex items-center gap-1 font-bold text-xs px-4 py-2 rounded-full transition-colors ${done ? 'bg-success/15 text-success' : 'bg-gradient-to-r from-secondary to-fuchsia-500 text-white shadow-sm shadow-secondary/25'}`}>
-                                {done ? '✓ Revisada' : 'Ver guía →'}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </button>
-                    )
-                  })}
-                </div>
+                          </RoadmapReveal>
+                        )
+                      })}
+                    </section>
+                  )
+                })()}
               </>
             )}
 
