@@ -336,6 +336,8 @@ const translations = {
     viewMore: 'Ver más',
     slidePrev: 'Anterior',
     slideNext: 'Siguiente',
+    heroEyebrow: '✨ Tu espacio de aprendizaje',
+    heroTitle: 'Aprende, conversa y toma decisiones justas',
   },
   qu: {
     greeting: '¡Napaykullayki! 👋',
@@ -456,6 +458,8 @@ const translations = {
     viewMore: 'Aswanta rikuy',
     slidePrev: 'Ñawpaqman',
     slideNext: 'Qatiqman',
+    heroEyebrow: '✨ Yachayninkipa wasin',
+    heroTitle: 'Yachay, rimay, allin yuyayta churakuy',
   },
 }
 
@@ -1116,52 +1120,9 @@ export default function App() {
     ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
   const [_tempPhoto, setTempPhoto] = useState<string>('')
-  const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid')
+const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid')
   const [kidAnswer, setKidAnswer] = useState<string>('')
   const [parentAnswer, setParentAnswer] = useState<string>('')
-
-  // Carrusel del inicio (autoplay, swipe e indicadores)
-  const [homeSlide, setHomeSlide] = useState(0)
-  const [homeSlideReduced, setHomeSlideReduced] = useState(false)
-  const slideTouchX = useRef<number | null>(null)
-  const slideTouchY = useRef<number | null>(null)
-  const homeSlideTotal = 4
-  const goSlide = (n: number) => setHomeSlide(((n % homeSlideTotal) + homeSlideTotal) % homeSlideTotal)
-  const nextSlide = () => goSlide(homeSlide + 1)
-  const prevSlide = () => goSlide(homeSlide - 1)
-  const onSlideTouchStart = (e: React.TouchEvent) => {
-    slideTouchX.current = e.touches[0].clientX
-    slideTouchY.current = e.touches[0].clientY
-  }
-  const onSlideTouchEnd = (e: React.TouchEvent) => {
-    if (slideTouchX.current === null || slideTouchY.current === null) return
-    const dx = e.changedTouches[0].clientX - slideTouchX.current
-    const dy = e.changedTouches[0].clientY - slideTouchY.current
-    slideTouchX.current = null
-    slideTouchY.current = null
-    if (Math.abs(dx) < 48 || Math.abs(dx) <= Math.abs(dy)) return
-    if (dx < 0) nextSlide(); else prevSlide()
-  }
-
-  useEffect(() => {
-    if (homeSlideReduced) return
-    const timer = setTimeout(() => setHomeSlide(i => (i + 1) % homeSlideTotal), 5000)
-    return () => clearTimeout(timer)
-  }, [homeSlide, homeSlideReduced])
-
-  useEffect(() => {
-    let mq: MediaQueryList | null = null
-    try {
-      mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-      setHomeSlideReduced(mq.matches)
-      const onChange = (e: MediaQueryListEvent) => setHomeSlideReduced(e.matches)
-      mq.addEventListener('change', onChange)
-      return () => mq?.removeEventListener('change', onChange)
-    } catch {
-      setHomeSlideReduced(false)
-    }
-  }, [])
-  
 
   // Sincronizar userName/userAge/userDistrict con studentProfile
   useEffect(() => {
@@ -2008,77 +1969,26 @@ case 'about':
       const lessonTotal = nextKid ? kidsTotal : nextGuide ? PARENT_GUIDES.length : kidsTotal
       const nextLessonNum = nextKid ? KIDS_TOPICS.indexOf(nextKid) + 1 : nextGuide ? PARENT_GUIDES.indexOf(nextGuide) + 1 : kidsDoneCount
 
-      const homeSlides = [
-        {
-          key: 'continue',
-          icon: nextLesson ? nextLesson.icon : '🏁',
-          pill: t('nextStepLabel'),
-          title: nextLesson ? nextLesson.title : t('allDone'),
-          desc: nextLesson ? nextLesson.desc : t('homeSubtitle'),
-          btn: t('continueLesson'),
-          go: nextLesson ? nextLesson.go : () => { setLearnView('hub'); setCurrentScreen('learn') },
-          deco: nextLesson ? nextLesson.icon : '🎉',
-          gradient: 'linear-gradient(135deg, #EEF2FF 0%, #F5F3FF 55%, #FDF2F8 100%)',
-          progress: { label: `${t('lessonWord')} ${nextLessonNum} de ${lessonTotal}`, pct: lessonsPct },
-        },
-        {
-          key: 'explore',
-          icon: '🧭',
-          pill: t('slideDiscoverPill'),
-          title: t('slideDiscoverTitle'),
-          desc: t('slideDiscoverDesc'),
-          btn: t('explore'),
-          go: () => { setLearnView('hub'); setCurrentScreen('learn') },
-          deco: '🧭',
-          gradient: 'linear-gradient(135deg, #F5F3FF 0%, #FFF7ED 100%)',
-          progress: null,
-        },
-        {
-          key: 'game',
-          icon: '🎮',
-          pill: t('slidePlayPill'),
-          title: t('slidePlayTitle'),
-          desc: t('slidePlayDesc'),
-          btn: t('slidePlayBtn'),
-          go: () => setCurrentScreen('games'),
-          deco: '🎮',
-          gradient: 'linear-gradient(135deg, #FDF2F8 0%, #FEF3C7 100%)',
-          progress: null,
-        },
-        {
-          key: 'family',
-          icon: '👨‍👩‍👧',
-          pill: t('slideFamilyPill'),
-          title: t('familyActivityLabel'),
-          desc: t('familyDesc'),
-          btn: t('viewActivity'),
-          go: () => setCurrentScreen('converse'),
-          deco: '👨‍👩‍👧',
-          gradient: 'linear-gradient(135deg, #F0FDF4 0%, #F5F3FF 100%)',
-          progress: null,
-        },
-      ]
-
-      const LearnCard = ({ icon, title, desc, tint, onClick }: { icon: string; title: string; desc: string; tint: string; onClick: () => void }) => (
+      const FeatureCard = ({ icon, title, desc, tint, onClick }: { icon: string; title: string; desc: string; tint: string; onClick: () => void }) => (
         <button
           onClick={onClick}
-          className="group rounded-[20px] bg-white border border-slate-100 p-6 min-h-[180px] shadow-[0_4px_20px_rgba(30,41,82,0.05)] hover:shadow-[0_12px_32px_rgba(30,41,82,0.09)] hover:-translate-y-0.5 transition-all duration-200 text-left flex flex-col gap-3"
+          className="group rounded-[22px] bg-white border border-slate-100 p-6 md:p-7 text-left shadow-[0_6px_24px_rgba(30,41,82,0.05)] hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(30,41,82,0.10)] hover:border-primary/20 transition-all duration-200 flex flex-col gap-3"
         >
-          <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl transition-transform duration-200 group-hover:scale-105 ${tint}`} aria-hidden>{icon}</div>
+          <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-transform duration-200 group-hover:scale-110 ${tint}`} aria-hidden>{icon}</div>
           <div className="flex-1">
-            <p className="font-bold text-slate-800 text-base md:text-[17px]">{title}</p>
-            <p className="text-[13px] md:text-sm text-slate-500 mt-1 leading-snug">{desc}</p>
+            <p className="font-extrabold text-slate-800 text-lg">{title}</p>
+            <p className="text-sm text-slate-500 mt-1 leading-relaxed">{desc}</p>
           </div>
-          <span className="inline-flex items-center gap-1 text-[13px] font-bold text-secondary mt-1">
-            {t('viewMore')} <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-0.5">→</span>
+          <span className="inline-flex items-center gap-1 text-sm font-bold text-secondary mt-1">
+            {t('viewMore')} <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
           </span>
         </button>
       )
 
       return (
         <div className="min-h-screen pb-36" style={{ background: 'linear-gradient(180deg, #F8FAFF 0%, #EDF1F9 100%)' }}>
-          {/* HEADER */}
-          <header className="h-16 md:h-[68px] bg-white/85 backdrop-blur-xl border-b border-slate-200/70 sticky top-0 z-30">
+          {/* NAVBAR */}
+          <header className="h-16 md:h-[68px] bg-white/80 backdrop-blur-xl border-b border-slate-200/60 sticky top-0 z-30">
             <div className="mx-auto w-full max-w-[1120px] px-5 md:px-8 lg:px-6 h-full flex items-center justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-10 h-10 md:w-11 md:h-11 shrink-0 rounded-xl bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center text-lg shadow-md shadow-primary/20">
@@ -2098,121 +2008,86 @@ case 'about':
             </div>
           </header>
 
-          <main className="mx-auto w-full max-w-[1120px] px-5 md:px-8 lg:px-6 pt-10 md:pt-[60px] animate-slide-up">
-            {/* CARRUSEL PRINCIPAL */}
-            <section
-              aria-roledescription="carousel"
-              aria-label={t('carouselAria')}
-              onTouchStart={onSlideTouchStart}
-              onTouchEnd={onSlideTouchEnd}
-              className="relative mx-auto w-full max-w-[1000px]"
-            >
-              <div className="relative overflow-hidden rounded-[24px] shadow-[0_6px_30px_rgba(30,41,82,0.06)] min-h-[220px] md:min-h-[210px] lg:min-h-[224px]">
-                {homeSlides.map((s, i) => i === homeSlide ? (
-                  <div key={s.key} className="home-slide-in relative flex flex-col gap-4 min-h-[220px] md:min-h-[210px] lg:min-h-[224px] p-[22px] md:p-10 pr-[22px] md:pr-16 overflow-hidden" style={{ background: s.gradient }}>
-                    <div aria-hidden className="hidden md:flex absolute -right-14 -top-14 w-64 h-64 rounded-full bg-white/40 blur-2xl" />
-                    <div aria-hidden className="hidden md:flex absolute right-12 bottom-4 w-28 h-28 rounded-[28px] bg-white/60 rotate-12 shadow-md shadow-indigo-500/5 items-center justify-center text-5xl">{s.deco}</div>
-                    <div aria-hidden className="md:hidden absolute -right-10 -top-10 w-36 h-36 rounded-full bg-white/40 blur-xl" />
+          <main className="mx-auto w-full max-w-[1120px] px-5 md:px-8 lg:px-6 pt-10 md:pt-16 pb-16 animate-slide-up">
+            {/* HERO */}
+            <section className="relative overflow-hidden rounded-[28px] border border-slate-100 bg-gradient-to-br from-primary-50 via-white to-secondary-50 shadow-[0_16px_48px_rgba(124,58,237,0.08)] px-6 py-12 md:px-14 md:py-20 text-center">
+              <div aria-hidden className="pointer-events-none absolute -top-24 -left-24 w-80 h-80 rounded-full bg-secondary-100/60 blur-3xl" />
+              <div aria-hidden className="pointer-events-none absolute -bottom-24 -right-24 w-80 h-80 rounded-full bg-primary-100/60 blur-3xl" />
+              <div className="relative mx-auto max-w-2xl flex flex-col items-center gap-5">
+                <span className="inline-flex items-center gap-2 w-max px-4 py-1.5 rounded-full bg-white/80 border border-slate-100 text-[11px] font-bold uppercase tracking-widest text-primary shadow-sm">
+                  {t('heroEyebrow')}
+                </span>
+                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-4xl md:text-5xl shadow-lg shadow-primary/25">
+                  🛡️
+                </div>
+                <h1 className="text-3xl md:text-[42px] font-black gradient-text leading-[1.08] max-w-xl">{t('heroTitle')}</h1>
+                <p className="text-slate-600 text-base md:text-lg leading-relaxed max-w-lg">{t('welcomeLine')}</p>
 
-                    <div className="relative flex-1 min-w-0 flex flex-col max-w-[480px]">
-                      <span className="inline-flex items-center gap-1.5 w-max px-3 py-[5px] rounded-full bg-white/70 backdrop-blur text-[11px] font-bold uppercase tracking-wider text-primary shadow-sm mb-1">
-                        {s.pill}
-                      </span>
-                      <h2 className="text-[24px] md:text-[27px] lg:text-[29px] font-extrabold text-slate-800 leading-tight mb-1.5">{s.title}</h2>
-                      <p className="text-[14px] md:text-[15px] text-slate-600 leading-relaxed max-w-[420px]">{s.desc}</p>
-                      {s.progress && (
-                        <div className="flex items-center gap-3 w-full max-w-[300px] mt-3">
-                          <div className="flex-1 h-1.5 bg-white/80 rounded-full overflow-hidden" role="progressbar" aria-valuenow={s.progress.pct} aria-valuemin={0} aria-valuemax={100} aria-label={t('topicsCompleted')}>
-                            <div className="progress-bar h-full rounded-full transition-[width] duration-700" style={{ width: `${s.progress.pct}%` }}></div>
-                          </div>
-                          <span className="text-xs font-bold text-slate-500 tabular-nums shrink-0">{s.progress.label}</span>
-                        </div>
-                      )}
-                      <div className="mt-auto pt-4">
-                        <button
-                          onClick={s.go}
-                          className="group inline-flex items-center gap-2 text-white text-[13px] md:text-sm font-bold rounded-full px-6 md:px-7 h-10 md:h-[42px] bg-gradient-to-r from-primary to-secondary shadow-md shadow-primary/25 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
-                        >
-                          {s.btn} <span aria-hidden className="inline-flex items-center gap-1"><span className="transition-transform duration-200 group-hover:translate-x-0.5">→</span></span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ) : null)}
-              </div>
-
-              {/* Flechas */}
-              <button
-                onClick={prevSlide}
-                aria-label={t('slidePrev')}
-                className="hidden md:flex absolute left-1 lg:left-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/90 backdrop-blur border border-slate-100 shadow-sm items-center justify-center text-slate-500 hover:text-secondary hover:scale-105 active:scale-95 transition-all duration-200 text-2xl leading-none"
-              >‹</button>
-              <button
-                onClick={nextSlide}
-                aria-label={t('slideNext')}
-                className="hidden md:flex absolute right-1 lg:right-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/90 backdrop-blur border border-slate-100 shadow-sm items-center justify-center text-slate-500 hover:text-secondary hover:scale-105 active:scale-95 transition-all duration-200 text-2xl leading-none"
-              >›</button>
-
-              {/* Indicadores */}
-              <div className="flex items-center justify-center gap-[7px] mt-5">
-                {homeSlides.map((s, i) => (
+                <div className="flex flex-col sm:flex-row items-center gap-3 mt-2 w-full sm:w-auto">
                   <button
-                    key={s.key}
-                    onClick={() => goSlide(i)}
-                    aria-label={`Slide ${i + 1}: ${s.title}`}
-                    aria-current={i === homeSlide ? 'step' : undefined}
-                    className={`h-[6px] rounded-full transition-all duration-300 ${i === homeSlide ? 'w-[18px] bg-gradient-to-r from-primary to-secondary' : 'w-[6px] bg-slate-300 hover:bg-slate-400'}`}
-                  />
-                ))}
-              </div>
-            </section>
+                    onClick={nextLesson ? nextLesson.go : () => { setLearnView('hub'); setCurrentScreen('learn') }}
+                    className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 text-white text-sm md:text-[15px] font-bold rounded-full px-8 h-12 bg-gradient-to-r from-primary to-secondary shadow-lg shadow-primary/25 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+                  >
+                    {t('continueLesson')} <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+                  </button>
+                  <button
+                    onClick={() => { setLearnView('hub'); setCurrentScreen('learn') }}
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 text-slate-700 text-sm md:text-[15px] font-bold rounded-full px-8 h-12 bg-white border border-slate-200 hover:border-primary/40 hover:text-primary hover:bg-primary-50/50 active:scale-[0.98] transition-all duration-200"
+                  >
+                    {t('explore')} <span aria-hidden>→</span>
+                  </button>
+                </div>
 
-            {/* FUNCIONALIDADES */}
-            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mt-14 md:mt-16">
-              <LearnCard icon="📖" title={t('themes')} desc={t('themesDesc')} tint="bg-secondary-50 text-secondary" onClick={() => { setLearnView('hub'); setCurrentScreen('learn') }} />
-              <LearnCard icon="🎮" title={t('game')} desc={t('gameDesc')} tint="bg-primary-50 text-primary" onClick={() => setCurrentScreen('games')} />
-              <LearnCard icon="📱" title={t('reels')} desc={t('reelsDesc')} tint="bg-warning-50 text-warning-600" onClick={() => setCurrentScreen('reels')} />
-            </section>
-
-            {/* RESUMEN RÁPIDO */}
-            <section className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mt-10 md:mt-12">
-              <button onClick={() => setCurrentScreen('profile')} className="group rounded-[20px] bg-white border border-slate-100 p-5 text-left hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 shadow-[0_4px_20px_rgba(30,41,82,0.04)] flex items-center gap-3">
-                <div className="w-11 h-11 shrink-0 rounded-xl bg-primary-50 flex items-center justify-center text-xl" aria-hidden>📈</div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 truncate">{t('yourProgress')}</p>
-                  <div className="flex items-baseline gap-1.5 mt-0.5">
-                    <p className="font-black text-slate-800 text-lg tabular-nums">{lessonsPct}%</p>
-                    <p className="text-xs text-slate-500">{kidsDoneCount} de {kidsTotal}</p>
+                <div className="flex items-center gap-3 w-full max-w-[360px] mt-4">
+                  <div className="flex-1 h-2 bg-slate-200/70 rounded-full overflow-hidden" role="progressbar" aria-valuenow={lessonsPct} aria-valuemin={0} aria-valuemax={100} aria-label={t('topicsCompleted')}>
+                    <div className="progress-bar h-full rounded-full transition-[width] duration-700" style={{ width: `${lessonsPct}%` }}></div>
                   </div>
+                  <span className="text-xs md:text-sm font-bold text-slate-600 shrink-0 tabular-nums">
+                    {t('lessonWord')} {nextLessonNum} de {lessonTotal}
+                  </span>
                 </div>
+              </div>
+            </section>
+
+            {/* CARACTERÍSTICAS */}
+            <section className="mt-12 md:mt-16">
+              <div className="flex items-center gap-3 mb-6 justify-center">
+                <span className="h-px flex-1 max-w-[120px] bg-slate-200/70" aria-hidden />
+                <h2 className="text-[11px] md:text-xs font-black uppercase tracking-widest text-slate-500">✨ {t('learnSection')}</h2>
+                <span className="h-px flex-1 max-w-[120px] bg-slate-200/70" aria-hidden />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+                <FeatureCard icon="📖" title={t('themes')} desc={t('themesDesc')} tint="bg-secondary-50" onClick={() => { setLearnView('hub'); setCurrentScreen('learn') }} />
+                <FeatureCard icon="🎮" title={t('game')} desc={t('gameDesc')} tint="bg-primary-50" onClick={() => setCurrentScreen('games')} />
+                <FeatureCard icon="📱" title={t('reels')} desc={t('reelsDesc')} tint="bg-warning-50" onClick={() => setCurrentScreen('reels')} />
+                <FeatureCard icon="👨‍👩‍👧" title={t('familyActivityLabel')} desc={t('familyDesc')} tint="bg-success-50" onClick={() => setCurrentScreen('converse')} />
+              </div>
+            </section>
+
+            {/* ESTADO RÁPIDO */}
+            <section className="grid grid-cols-3 gap-3 md:gap-5 mt-12 md:mt-16">
+              <button onClick={() => setCurrentScreen('profile')} className="group rounded-[20px] bg-white border border-slate-100 p-4 md:p-6 text-center hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 shadow-[0_4px_20px_rgba(30,41,82,0.04)]">
+                <div className="text-2xl" aria-hidden>📈</div>
+                <p className="font-black text-slate-800 text-lg md:text-2xl tabular-nums mt-1">{lessonsPct}%</p>
+                <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 mt-0.5 truncate">{t('yourProgress')}</p>
               </button>
-              <button onClick={() => setCurrentScreen('profile')} className="group rounded-[20px] bg-white border border-slate-100 p-5 text-left hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 shadow-[0_4px_20px_rgba(30,41,82,0.04)] flex items-center gap-3">
-                <div className="w-11 h-11 shrink-0 rounded-xl bg-orange-100 flex items-center justify-center text-xl" aria-hidden>🔥</div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 truncate">{t('streak')}</p>
-                  <p className="font-black text-slate-800 text-lg tabular-nums mt-0.5">{streakDays}</p>
-                </div>
+              <button onClick={() => setCurrentScreen('profile')} className="group rounded-[20px] bg-white border border-slate-100 p-4 md:p-6 text-center hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 shadow-[0_4px_20px_rgba(30,41,82,0.04)]">
+                <div className="text-2xl" aria-hidden>🔥</div>
+                <p className="font-black text-slate-800 text-lg md:text-2xl tabular-nums mt-1">{streakDays}</p>
+                <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 mt-0.5 truncate">{t('streak')}</p>
               </button>
-              <button onClick={() => setCurrentScreen('profile')} className="group rounded-[20px] bg-white border border-slate-100 p-5 text-left hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 shadow-[0_4px_20px_rgba(30,41,82,0.04)] flex items-center gap-3">
-                <div className="w-11 h-11 shrink-0 rounded-xl bg-warning-50 flex items-center justify-center text-xl" aria-hidden>🏅</div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 truncate">{t('quickBadges')}</p>
-                  <p className="font-black text-slate-800 text-lg tabular-nums mt-0.5">{homeBadgeCount}<span className="text-slate-400 text-sm font-bold">/{homeBadgeTotal}</span></p>
-                </div>
+              <button onClick={() => setCurrentScreen('profile')} className="group rounded-[20px] bg-white border border-slate-100 p-4 md:p-6 text-center hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 shadow-[0_4px_20px_rgba(30,41,82,0.04)]">
+                <div className="text-2xl" aria-hidden>🏅</div>
+                <p className="font-black text-slate-800 text-lg md:text-2xl tabular-nums mt-1">{homeBadgeCount}<span className="text-slate-400 text-base font-bold">/{homeBadgeTotal}</span></p>
+                <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 mt-0.5 truncate">{t('quickBadges')}</p>
               </button>
             </section>
 
-            {/* ACTIVIDAD FAMILIAR */}
-            <section className="rounded-[20px] bg-gradient-to-r from-[#FFF7E6] to-[#FEF3E2] border border-warning/20 p-5 md:p-6 mt-10 md:mt-12 flex flex-col sm:flex-row sm:items-center gap-4 shadow-[0_4px_20px_rgba(245,158,11,0.08)]">
-              <div className="w-12 h-12 shrink-0 rounded-xl bg-white shadow-sm flex items-center justify-center text-2xl" aria-hidden>👨‍👩‍👧</div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-slate-800 text-base md:text-lg">{t('familyActivityLabel')}</h3>
-                <p className="text-slate-600 text-sm mt-0.5 leading-snug line-clamp-2">{t('familyDesc')}</p>
-              </div>
-              <button onClick={() => setCurrentScreen('converse')} className="shrink-0 bg-warning text-white font-bold text-sm py-3 px-7 rounded-full hover:brightness-105 active:scale-[0.98] transition-all duration-200 w-full sm:w-auto">
-                {t('viewActivity')} <span aria-hidden>→</span>
-              </button>
-            </section>
+            {/* PIE DEL LANDING */}
+            <footer className="mt-14 md:mt-16 text-center">
+              <p className="text-slate-500 text-sm">{t('bottomQuote')}</p>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mt-2">Hablemos Claro · {t('selectTagline')}</p>
+            </footer>
           </main>
 
           {/* Navegación principal */}
