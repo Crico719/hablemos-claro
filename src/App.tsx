@@ -2468,11 +2468,11 @@ case 'about':
                                 </button>
                               </div>
                               {/* contenido */}
-                              <div className={`pl-[92px] md:pl-0 md:w-[calc(50%-3rem)] ${even ? 'md:mr-auto md:text-right' : 'md:ml-auto'}`}>
-                                <div className={`bg-white rounded-[20px] border p-4 md:p-5 shadow-sm transition-all duration-300 ${
+                              <div className={`pl-[92px] md:pl-0 md:w-[calc(50%-3rem)] ${even ? 'md:mr-auto' : 'md:ml-auto'}`}>
+                                <div className={`bg-white rounded-[20px] border p-4 md:p-5 text-center shadow-sm transition-all duration-300 ${
                                   done ? 'border-success/20' : isCurrent ? 'border-secondary/30 shadow-md shadow-primary/10' : 'border-slate-100'
                                 }`}>
-                                  <span className={`inline-flex items-center gap-1 text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full ${
+                                  <span className={`inline-flex items-center justify-center gap-1 text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full ${
                                     done
                                       ? 'bg-success/15 text-success'
                                       : isCurrent
@@ -2484,7 +2484,7 @@ case 'about':
                                   <p className="mt-3 text-[11px] font-bold text-slate-400 tabular-nums">{String(i + 1).padStart(2, '0')} · {k.category}{k.joint ? ' · 👨‍👩‍👧' : ''}</p>
                                   <h3 className="mt-1 font-bold text-slate-800 text-[17px] md:text-lg leading-snug">{k.title}</h3>
                                   <p className="text-sm text-slate-500 leading-relaxed mt-1 line-clamp-2">{k.desc}</p>
-                                  <div className={`flex items-center justify-between gap-2 mt-3 ${even ? 'md:flex-row-reverse' : ''}`}>
+                                  <div className="flex items-center justify-center gap-2 mt-3">
                                     <span className="text-xs font-black text-primary">+50 XP</span>
                                     <span className={`text-xs font-bold ${isCurrent && !done ? 'text-secondary' : 'text-slate-400'}`}>{done ? '✓ Repasado' : '1 lección'}</span>
                                   </div>
@@ -2515,11 +2515,11 @@ case 'about':
                               {examUnlocked ? '🏁' : '🔒'}
                             </button>
                           </div>
-                          <div className="pl-[92px] md:pl-0 md:w-[calc(50%-3rem)] md:mr-auto md:text-right">
-                            <div className={`bg-white rounded-[20px] border p-4 md:p-5 shadow-sm transition-all duration-300 ${
+                          <div className="pl-[92px] md:pl-0 md:w-[calc(50%-3rem)] md:mr-auto">
+                            <div className={`bg-white rounded-[20px] border p-4 md:p-5 text-center shadow-sm transition-all duration-300 ${
                               examUnlocked ? 'border-warning/30 shadow-md shadow-warning/10' : 'border-slate-100'
                             }`}>
-                              <span className={`inline-flex items-center gap-1 text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full ${
+                              <span className={`inline-flex items-center justify-center gap-1 text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full ${
                                 examUnlocked ? 'bg-gradient-to-r from-warning to-orange-400 text-white shadow-sm shadow-warning/25' : 'bg-slate-100 text-slate-400'
                               }`}>
                                 {examUnlocked ? '🎓 Examen final' : '🔒 Bloqueado'}
@@ -2528,7 +2528,7 @@ case 'about':
                               <p className="text-sm text-slate-500 leading-relaxed mt-1">
                                 {examUnlocked ? 'Pon a prueba todo lo aprendido y consigue tus insignias.' : `Completa los ${KIDS_TOPICS.length} temas para desbloquearlo.`}
                               </p>
-                              <div className={`flex items-center justify-between gap-2 mt-3 md:flex-row-reverse`}>
+                              <div className="flex items-center justify-center gap-2 mt-3">
                                 <span className="text-xs font-black text-warning">🏅 Insignias</span>
                                 <span className="text-xs font-bold text-slate-400">{examUnlocked ? 'Disponible' : 'Bloqueado'}</span>
                               </div>
@@ -2614,11 +2614,11 @@ case 'about':
                                 </button>
                               </div>
                               {/* contenido */}
-                              <div className={`pl-[92px] md:pl-0 md:w-[calc(50%-3rem)] ${even ? 'md:mr-auto md:text-right' : 'md:ml-auto'}`}>
-                                <div className={`bg-white rounded-[20px] border p-4 md:p-5 shadow-sm transition-all duration-300 ${
+                              <div className={`pl-[92px] md:pl-0 md:w-[calc(50%-3rem)] ${even ? 'md:mr-auto' : 'md:ml-auto'}`}>
+                                <div className={`bg-white rounded-[20px] border p-4 md:p-5 text-center shadow-sm transition-all duration-300 ${
                                   done ? 'border-success/20' : isCurrent ? 'border-secondary/30 shadow-md shadow-secondary/10' : 'border-slate-100'
                                 }`}>
-                                  <span className={`inline-flex items-center gap-1 text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full ${
+                                  <span className={`inline-flex items-center justify-center gap-1 text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full ${
                                     done
                                       ? 'bg-success/15 text-success'
                                       : isCurrent
@@ -2630,7 +2630,7 @@ case 'about':
                                   <p className="mt-3 text-[11px] font-bold text-slate-400 tabular-nums">{String(i + 1).padStart(2, '0')} · {g.category}{g.joint ? ' · 👨‍👩‍👧' : ''}</p>
                                   <h3 className="mt-1 font-bold text-slate-800 text-[17px] md:text-lg leading-snug">{g.title}</h3>
                                   <p className="text-sm text-slate-500 leading-relaxed mt-1 line-clamp-2">{g.desc}</p>
-                                  <div className={`flex items-center justify-between gap-2 mt-3 ${even ? 'md:flex-row-reverse' : ''}`}>
+                                  <div className="flex items-center justify-center gap-2 mt-3">
                                     <span className="text-xs font-black text-secondary">+30 XP</span>
                                     <span className={`text-xs font-bold ${isCurrent && !done ? 'text-secondary' : 'text-slate-400'}`}>{done ? '✓ Repasada' : '1 guía'}</span>
                                   </div>
