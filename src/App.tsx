@@ -1184,11 +1184,26 @@ export default function App() {
     }
   }
 
-  // Completar el test final: única forma de conseguir las insignias - un solo guardado
+  // Completar el test final: desbloqueo condicional de insignias
   const completeTest = () => {
     const currentProfile = profileType === 'student' ? studentProfile : familyProfile
     const alreadyDone = (currentProfile.progress.topicProgress['test'] ?? 0) >= 100
-    const newBadges = currentProfile.progress.badges.map(b => ({ ...b, unlocked: true }))
+    const topicsCompleted = mainTopics.filter(t => (currentProfile.progress.topicProgress[t] ?? 0) >= 100).length
+    const quizPlayed = currentProfile.progress.quizScores.length > 0
+
+    let newBadges: Badge[]
+    if (profileType === 'student') {
+      newBadges = currentProfile.progress.badges.map(b => ({
+        ...b,
+        unlocked: b.id === 'topics-explorer' ? topicsCompleted >= 3 :
+                   b.id === 'game-master' ? quizPlayed :
+                   b.id === 'integrity-champion' ? true :
+                   b.unlocked
+      }))
+    } else {
+      newBadges = currentProfile.progress.badges
+    }
+
     const completedActivities = currentProfile.progress.completedActivities + (alreadyDone ? 0 : 1)
     const newProgress = {
       ...currentProfile.progress,
@@ -1203,6 +1218,11 @@ export default function App() {
     if (profileType === 'student') {
       setStudentProfile({ ...studentProfile, progress: newProgress })
       saveStudentProfile({ ...studentProfile, progress: newProgress })
+      const unlockedStudent = newBadges.filter((b, i) => b.unlocked && !currentProfile.progress.badges[i].unlocked)
+      if (unlockedStudent.length > 0) {
+        setEarnedBadge({ ...unlockedStudent[0] })
+        setShowBadgeCelebration(true)
+      }
     } else {
       let updated: FamilyProfile = { ...familyProfile, progress: newProgress }
       updated = pushFamilyLog(updated, '🏅 ¡Examen final completado!')
@@ -1211,9 +1231,6 @@ export default function App() {
       saveFamilyProfile(checked.profile)
       celebrateFamilyBadges(checked.unlocked)
     }
-    const champion = newBadges.find(b => b.id === 'integrity-champion')!
-    setEarnedBadge({ ...champion })
-    setShowBadgeCelebration(true)
   }
 
   // --- Acciones de integrantes y nombre de familia ---
