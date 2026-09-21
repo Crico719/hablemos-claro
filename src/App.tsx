@@ -1641,7 +1641,7 @@ case 'about':
             </div>
 
             <button
-              onClick={() => setCurrentScreen('avatar')}
+              onClick={() => setCurrentScreen('device')}
               className="mt-8 btn-glow bg-primary text-white font-bold py-4 px-6 rounded-xl text-lg w-full"
             >
               Empezar →
