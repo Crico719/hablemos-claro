@@ -322,6 +322,8 @@ const translations = {
     nextBadgeLabel: 'Próxima insignia',
     familyActivityLabel: 'Actividad familiar',
     lessonWord: 'Lección',
+    explore: 'Explorar',
+    seeAll: 'Ver todos',
   },
   qu: {
     greeting: '¡Napaykullayki! 👋',
@@ -427,6 +429,8 @@ const translations = {
     nextBadgeLabel: 'Qatiq insignia',
     familyActivityLabel: 'Ayllu ruway',
     lessonWord: 'Yachay',
+    explore: 'Qhaway',
+    seeAll: 'Tukuyta rikuy',
   },
 }
 
@@ -1938,22 +1942,34 @@ case 'about':
       const nextLessonNum = nextKid ? KIDS_TOPICS.indexOf(nextKid) + 1 : nextGuide ? PARENT_GUIDES.indexOf(nextGuide) + 1 : kidsDoneCount
       const nextCore = mainTopics.find(t => (currentProgress.topicProgress[t] ?? 0) < 100) ?? null
       const topicIcons: Record<LearningTopic, string> = { coima: '💰', recognition: '🔍', impact: '💔', consequences: '⚖️', prevention: '🛡️', ethics: '🧭', citizen: '🤝', test: '📝' }
-      const roadmap = mainTopics.map(t => ({ key: t, title: topicTitles[t], icon: topicIcons[t], pct: currentProgress.topicProgress[t] ?? 0, isNext: t === nextCore }))
+      const topicDesc: Record<LearningTopic, string> = {
+        coima: 'Fundamentos sobre coimas y corrupción.',
+        recognition: 'Detecta señales de una coima.',
+        impact: 'Entiende el daño que causan.',
+        consequences: 'Consecuencias legales y sociales.',
+        prevention: 'Cómo prevenir la corrupción.',
+        ethics: 'Fortalece tu ética e integridad.',
+        citizen: 'Convierte tus valores en acción.',
+        test: 'Pon a prueba lo aprendido.',
+      }
+      const roadmap = mainTopics.map(t => ({ key: t, title: topicTitles[t], desc: topicDesc[t], icon: topicIcons[t], pct: currentProgress.topicProgress[t] ?? 0, isNext: t === nextCore }))
       const allBadges = isFamHome ? familyProfile.familyBadges : currentProgress.badges
       const nextLocked = allBadges.find(b => !b.unlocked) ?? null
       const nextBadgeName = nextLocked ? nextLocked.name : null
 
-      const LearnCard = ({ icon, title, desc, tint, onClick }: { icon: string; title: string; desc: string; tint: string; onClick: () => void }) => (
+      const LearnCard = ({ icon, title, desc, tint, ctaTint, onClick }: { icon: string; title: string; desc: string; tint: string; ctaTint: string; onClick: () => void }) => (
         <button
           onClick={onClick}
-          className="group bg-white rounded-2xl p-4 shadow-sm border border-slate-100 text-left hover:shadow-md hover:-translate-y-0.5 transition-all flex flex-col gap-3 min-h-[132px]"
+          className="group bg-white rounded-3xl p-5 shadow-sm border border-slate-100 text-left hover:shadow-lg hover:-translate-y-1 transition-all duration-200 flex flex-col gap-3"
         >
-          <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl transition-colors ${tint}`}>{icon}</div>
+          <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl transition-transform duration-200 group-hover:scale-105 ${tint}`}>{icon}</div>
           <div className="flex-1">
-            <p className="font-bold text-slate-800">{title}</p>
-            <p className="text-xs md:text-sm text-slate-500 mt-0.5 leading-snug truncate">{desc}</p>
+            <p className="font-extrabold text-slate-800 text-lg">{title}</p>
+            <p className="text-sm text-slate-500 mt-1 leading-snug truncate">{desc}</p>
           </div>
-          <span aria-hidden className="text-slate-300 group-hover:text-primary text-lg transition-colors">→</span>
+          <span className={`inline-flex items-center gap-1 text-sm font-bold mt-1 ${ctaTint}`}>
+            {t('explore')} <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+          </span>
         </button>
       )
 
@@ -1981,85 +1997,133 @@ case 'about':
             </header>
 
             {/* HERO — Continuar aprendiendo */}
-            <section className="relative overflow-hidden bg-white rounded-3xl shadow-md shadow-indigo-500/5 border border-slate-100 p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-6">
-              <div aria-hidden className="pointer-events-none absolute -top-20 -right-20 w-64 h-64 rounded-full bg-primary/5 blur-3xl" />
-              <div className="relative flex-1 min-w-0">
-                <p className="text-[11px] md:text-xs font-black uppercase tracking-widest text-primary mb-2">{t('nextStepLabel')}</p>
-                <h2 className="text-2xl md:text-3xl font-black text-slate-800 leading-tight mb-2">{nextLesson ? nextLesson.title : t('allDone')}</h2>
-                <p className="text-slate-600 text-sm md:text-base leading-relaxed mb-4">{nextLesson ? nextLesson.desc : '✨'}</p>
-                <div className="flex items-center gap-3 max-w-sm" role="progressbar" aria-valuenow={lessonsPct} aria-valuemin={0} aria-valuemax={100} aria-label={t('topicsCompleted')}>
+            <section className="relative overflow-hidden bg-white rounded-3xl shadow-md shadow-indigo-500/5 border border-slate-100 p-6 py-8 md:py-10 md:px-10 grid grid-cols-1 lg:grid-cols-[1fr_auto] items-center gap-8">
+              <div aria-hidden className="pointer-events-none absolute -top-24 -right-24 w-80 h-80 rounded-full bg-primary/5 blur-3xl" />
+              <div aria-hidden className="pointer-events-none absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-secondary/5 blur-3xl" />
+              <div className="relative min-w-0">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-black uppercase tracking-widest mb-4">
+                  ✨ {t('nextStepLabel')}
+                </span>
+                <h2 className="text-3xl md:text-4xl font-black text-slate-800 leading-[1.1] mb-3">{nextLesson ? nextLesson.title : t('allDone')}</h2>
+                <p className="text-slate-600 text-base md:text-lg leading-relaxed mb-5 max-w-xl">{nextLesson ? nextLesson.desc : '✨'}</p>
+                <div className="flex items-center gap-3 max-w-sm mb-7">
                   <span className="text-xs font-bold text-slate-500 shrink-0">{t('lessonWord')} {nextLessonNum} de {lessonTotal}</span>
-                  <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden" role="progressbar" aria-valuenow={lessonsPct} aria-valuemin={0} aria-valuemax={100} aria-label={t('topicsCompleted')}>
                     <div className="progress-bar h-full rounded-full transition-[width] duration-700" style={{ width: `${lessonsPct}%` }}></div>
                   </div>
                   <span className="text-xs font-bold text-slate-500 tabular-nums shrink-0">{lessonsPct}%</span>
                 </div>
                 <button
                   onClick={nextLesson ? nextLesson.go : () => { setLearnView('hub'); setCurrentScreen('learn') }}
-                  className="mt-6 btn-glow bg-gradient-to-r from-primary to-secondary text-white font-extrabold text-base md:text-lg rounded-2xl py-4 px-8 shadow-lg shadow-primary/25 hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] transition-all w-full sm:w-auto flex items-center justify-center gap-2"
+                  className="group btn-glow bg-gradient-to-r from-primary to-secondary text-white font-extrabold text-base md:text-lg rounded-2xl py-4 px-9 shadow-lg shadow-primary/30 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 w-full sm:w-auto flex items-center justify-center gap-2.5"
                 >
-                  <span aria-hidden>📚</span> {t('continueLesson')} <span aria-hidden>→</span>
+                  <span aria-hidden>📚</span> {t('continueLesson')} <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
                 </button>
               </div>
-              <div aria-hidden className="relative hidden sm:flex w-40 md:w-52 shrink-0 items-center justify-center self-center">
-                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/10 to-secondary/10 blur-md" />
-                <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-full bg-white shadow-lg shadow-indigo-500/10 flex items-center justify-center text-5xl md:text-6xl animate-float">
-                  {nextLesson ? nextLesson.icon : '🏆'}
+              <div aria-hidden className="relative hidden lg:flex w-72 shrink-0 items-center justify-center">
+                <div className="relative w-full rounded-3xl bg-gradient-to-br from-primary/10 via-white to-secondary/10 border border-slate-100 shadow-lg shadow-indigo-500/10 p-8 flex flex-col items-center gap-4">
+                  <div className="absolute -top-3 -right-3 w-20 h-20 rounded-full bg-warning/20 blur-xl" />
+                  <div className="relative w-24 h-24 rounded-3xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-5xl shadow-lg shadow-primary/30 animate-float">
+                    {nextLesson ? nextLesson.icon : '🏆'}
+                  </div>
+                  <p className="font-extrabold text-slate-800">{t('lessonWord')} {nextLessonNum} de {lessonTotal}</p>
+                  <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="progress-bar h-full rounded-full" style={{ width: `${lessonsPct}%` }}></div>
+                  </div>
+                  <p className="text-xs font-bold text-slate-500">{lessonsPct}% de tu camino</p>
                 </div>
               </div>
             </section>
 
             {/* TU PROGRESO */}
-            <section className="bg-white rounded-3xl p-5 md:p-6 shadow-md shadow-indigo-500/5">
-              <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
-                <p className="text-[11px] font-black uppercase tracking-widest text-slate-400">{t('yourProgress')}</p>
-                <span className="text-xs md:text-sm font-bold text-slate-500">🏅 {homeBadgeCount}/{homeBadgeTotal} · 🔥 {streakDays}</span>
+            <section className="bg-white rounded-3xl p-5 md:p-7 shadow-md shadow-indigo-500/5">
+              <p className="text-[11px] font-black uppercase tracking-widest text-slate-400 mb-4">{t('yourProgress')}</p>
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <div className="min-w-0">
+                  <p className="font-extrabold text-slate-800 text-lg md:text-xl">{kidsDoneCount} de {kidsTotal} {t('topicsCompleted')}</p>
+                  <p className="text-slate-500 text-sm mt-0.5">{lessonsPct}% completado</p>
+                </div>
+                <div className="text-primary font-black text-4xl md:text-5xl tabular-nums shrink-0">{lessonsPct}%</div>
               </div>
-              <div className="flex items-end justify-between gap-3 mb-2.5">
-                <p className="text-slate-600 font-semibold text-sm md:text-base">{kidsDoneCount} de {kidsTotal} {t('topicsCompleted')}</p>
-                <p className="font-black text-primary text-xl md:text-2xl tabular-nums">{lessonsPct}%</p>
-              </div>
-              <div className="h-3 bg-slate-100 rounded-full overflow-hidden" role="progressbar" aria-valuenow={lessonsPct} aria-valuemin={0} aria-valuemax={100} aria-label={t('topicsCompleted')}>
+              <div className="mt-4 h-3.5 bg-slate-100 rounded-full overflow-hidden" role="progressbar" aria-valuenow={lessonsPct} aria-valuemin={0} aria-valuemax={100} aria-label={t('topicsCompleted')}>
                 <div className="progress-bar h-full rounded-full transition-[width] duration-1000" style={{ width: `${lessonsPct}%` }}></div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6">
+                <div className="rounded-2xl border border-slate-100 bg-slate-50/60 p-4 flex items-center gap-3">
+                  <div className="w-11 h-11 shrink-0 rounded-xl bg-warning/15 flex items-center justify-center text-xl" aria-hidden>🏅</div>
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 truncate">{t('quickBadges')}</p>
+                    <p className="font-black text-slate-800 text-lg tabular-nums mt-0.5">{homeBadgeCount}<span className="text-slate-400 text-sm font-bold">/{homeBadgeTotal}</span></p>
+                  </div>
+                </div>
+                <div className="rounded-2xl border border-slate-100 bg-slate-50/60 p-4 flex items-center gap-3">
+                  <div className="w-11 h-11 shrink-0 rounded-xl bg-orange-100 flex items-center justify-center text-xl" aria-hidden>🔥</div>
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 truncate">{t('streak')}</p>
+                    <p className="font-black text-slate-800 text-lg tabular-nums mt-0.5">{streakDays}</p>
+                  </div>
+                </div>
+                <div className="rounded-2xl border border-slate-100 bg-slate-50/60 p-4 flex items-center gap-3">
+                  <div className="w-11 h-11 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center text-xl" aria-hidden>🏆</div>
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 truncate">{t('nextBadgeLabel')}</p>
+                    <p className="font-bold text-slate-800 text-sm md:text-base mt-0.5 truncate">{nextBadgeName ?? '—'}</p>
+                  </div>
+                </div>
               </div>
             </section>
 
             {/* TU RUTA DE APRENDIZAJE */}
             <section>
-              <p className="text-[11px] font-black uppercase tracking-widest text-slate-400 mb-3">🗺️ {t('learningPath')}</p>
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-[11px] font-black uppercase tracking-widest text-slate-400">🗺️ {t('learningPath')}</p>
+                <button onClick={() => { setLearnView('hub'); setCurrentScreen('learn') }} className="text-sm font-bold text-primary hover:text-primary/80 transition-colors">
+                  {t('seeAll')} →
+                </button>
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {roadmap.map(topic => {
                   const done = topic.pct >= 100
                   const inProg = !done && topic.pct > 0
+                  const stateText = done ? t('completedState') : inProg ? `${topic.pct}%` : t('pendingState')
                   return (
                     <button
                       key={topic.key}
                       onClick={() => { setLearnView('hub'); setCurrentScreen('learn') }}
-                      className={`group text-left bg-white rounded-2xl p-4 flex items-center gap-3 shadow-sm border transition-all hover:shadow-md hover:-translate-y-0.5 ${
-                        topic.isNext ? 'border-primary/30 ring-2 ring-primary/20' : 'border-slate-100'
+                      className={`group text-left rounded-3xl p-5 flex flex-col gap-3 border transition-all duration-200 hover:-translate-y-0.5 ${
+                        topic.isNext
+                          ? 'bg-gradient-to-br from-primary/10 to-secondary/10 border-primary/40 ring-2 ring-primary/20 shadow-md shadow-primary/10'
+                          : done
+                            ? 'bg-white border-emerald-200/70 shadow-sm hover:shadow-md'
+                            : 'bg-white border-slate-100 shadow-sm hover:shadow-md'
                       }`}
                       aria-label={`${topic.title} — ${done ? t('completedState') : inProg ? `${topic.pct}%` : t('pendingState')}`}
                     >
-                      <div className={`w-11 h-11 shrink-0 rounded-xl flex items-center justify-center text-xl ${done ? 'bg-success/10' : inProg ? 'bg-primary/10' : 'bg-slate-100'}`}>
-                        {done ? '✅' : topic.icon}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-slate-800 text-sm md:text-base truncate">{topic.title}</span>
-                          {topic.isNext && (
-                            <span className="shrink-0 text-[10px] font-black uppercase tracking-wide text-primary bg-primary/10 px-2 py-0.5 rounded-full">{t('next')}</span>
-                          )}
+                      <div className="flex items-center gap-3">
+                        <div className={`w-12 h-12 shrink-0 rounded-2xl flex items-center justify-center text-2xl ${
+                          done ? 'bg-success/15' : topic.isNext ? 'bg-white shadow-sm' : inProg ? 'bg-primary/10' : 'bg-slate-100'
+                        }`}>
+                          {done ? '✅' : topic.icon}
                         </div>
-                        <div className="flex items-center gap-2 mt-1.5">
-                          <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden" role="progressbar" aria-valuenow={topic.pct} aria-valuemin={0} aria-valuemax={100}>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-extrabold text-slate-800 text-sm md:text-base truncate">{topic.title}</span>
+                            {topic.isNext && (
+                              <span className="shrink-0 text-[10px] font-black uppercase tracking-wide text-white bg-gradient-to-r from-primary to-secondary px-2 py-0.5 rounded-full shadow-sm">{t('next')}</span>
+                            )}
+                          </div>
+                          <p className="text-xs text-slate-500 mt-0.5 truncate">{topic.desc}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div className={`flex-1 h-1.5 rounded-full overflow-hidden ${done ? 'bg-emerald-100' : 'bg-slate-100'}`} role="progressbar" aria-valuenow={topic.pct} aria-valuemin={0} aria-valuemax={100}>
                             <div className={`h-full rounded-full transition-[width] duration-700 ${done ? 'bg-success' : 'progress-bar'}`} style={{ width: `${topic.pct}%` }}></div>
                           </div>
-                          <span className={`text-xs font-bold shrink-0 ${done ? 'text-success' : inProg ? 'text-primary' : 'text-slate-400'}`}>
-                            {done ? t('completedState') : inProg ? `${topic.pct}%` : t('pendingState')}
-                          </span>
+                          <span className={`text-xs font-bold shrink-0 ${done ? 'text-success' : topic.isNext || inProg ? 'text-primary' : 'text-slate-400'}`}>{stateText}</span>
                         </div>
+                        <span aria-hidden className="text-slate-300 group-hover:text-primary text-lg transition-colors shrink-0">→</span>
                       </div>
-                      <span aria-hidden className="text-slate-300 group-hover:text-primary text-lg transition-colors shrink-0">→</span>
                     </button>
                   )
                 })}
@@ -2068,71 +2132,46 @@ case 'about':
 
             {/* APRENDE */}
             <section>
-              <p className="text-[11px] font-black uppercase tracking-widest text-slate-400 mb-3">🧩 {t('learnSection')}</p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <LearnCard icon="📖" title={t('themes')} desc={t('themesDesc')} tint="bg-primary/10 group-hover:bg-primary/15" onClick={() => { setLearnView('hub'); setCurrentScreen('learn') }} />
-                <LearnCard icon="🎮" title={t('game')} desc={t('gameDesc')} tint="bg-secondary/10 group-hover:bg-secondary/15" onClick={() => setCurrentScreen('games')} />
-                <LearnCard icon="📱" title={t('reels')} desc={t('reelsDesc')} tint="bg-warning/10 group-hover:bg-warning/15" onClick={() => setCurrentScreen('reels')} />
-              </div>
-            </section>
-
-            {/* MIS LOGROS */}
-            <section className="bg-white rounded-3xl p-5 md:p-6 shadow-md shadow-indigo-500/5">
-              <p className="text-[11px] font-black uppercase tracking-widest text-slate-400 mb-4">🎯 {t('achievements')}</p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="rounded-2xl bg-slate-50 p-4 flex items-center gap-3">
-                  <span className="text-2xl" aria-hidden>🏅</span>
-                  <div>
-                    <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500">{t('quickBadges')}</p>
-                    <p className="font-black text-slate-800 text-lg tabular-nums mt-0.5">{homeBadgeCount}<span className="text-slate-400 text-sm font-bold">/{homeBadgeTotal}</span></p>
-                  </div>
-                </div>
-                <div className="rounded-2xl bg-slate-50 p-4 flex items-center gap-3">
-                  <span className="text-2xl" aria-hidden>🔥</span>
-                  <div>
-                    <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500">{t('streak')}</p>
-                    <p className="font-black text-slate-800 text-lg tabular-nums mt-0.5">{streakDays}</p>
-                  </div>
-                </div>
-                <div className="rounded-2xl bg-slate-50 p-4 flex items-center gap-3">
-                  <span className="text-2xl" aria-hidden>🚀</span>
-                  <div className="min-w-0">
-                    <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500">{t('nextBadgeLabel')}</p>
-                    <p className="font-bold text-slate-800 text-sm md:text-base mt-0.5 truncate">{nextBadgeName ?? '—'}</p>
-                  </div>
-                </div>
+              <p className="text-[11px] font-black uppercase tracking-widest text-slate-400 mb-4">🧩 {t('learnSection')}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <LearnCard icon="📖" title={t('themes')} desc={t('themesDesc')} tint="bg-primary/10" ctaTint="text-primary" onClick={() => { setLearnView('hub'); setCurrentScreen('learn') }} />
+                <LearnCard icon="🎮" title={t('game')} desc={t('gameDesc')} tint="bg-secondary/10" ctaTint="text-secondary" onClick={() => setCurrentScreen('games')} />
+                <LearnCard icon="📱" title={t('reels')} desc={t('reelsDesc')} tint="bg-warning/15" ctaTint="text-warning" onClick={() => setCurrentScreen('reels')} />
               </div>
             </section>
 
             {/* ACTIVIDAD FAMILIAR */}
-            <section className="bg-white rounded-3xl p-5 md:p-6 shadow-md shadow-indigo-500/5 border border-slate-100 flex flex-col sm:flex-row sm:items-center gap-4">
-              <div className="w-12 h-12 shrink-0 rounded-2xl bg-warning/10 flex items-center justify-center text-2xl" aria-hidden>💬</div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-slate-800 text-lg">{t('familyActivityLabel')}</h3>
-                <p className="text-slate-600 text-sm mt-0.5 leading-snug line-clamp-2">{t('familyDesc')}</p>
+            <section className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#FFF7E6] to-[#FEF3E2] border border-warning/20 shadow-md shadow-warning/5 p-5 md:p-6 flex flex-col sm:flex-row sm:items-center gap-4">
+              <div aria-hidden className="pointer-events-none absolute -top-10 -right-10 w-40 h-40 rounded-full bg-warning/10 blur-2xl" />
+              <div className="relative w-14 h-14 shrink-0 rounded-2xl bg-white shadow-md shadow-warning/10 flex items-center justify-center text-3xl" aria-hidden>💬</div>
+              <div className="relative flex-1 min-w-0">
+                <h3 className="font-black text-slate-800 text-lg md:text-xl">{t('familyActivityLabel')}</h3>
+                <p className="text-slate-600 text-sm md:text-base mt-1 leading-snug line-clamp-2">{t('familyDesc')}</p>
               </div>
               <button
                 onClick={() => setCurrentScreen('converse')}
-                className="btn-glow bg-warning text-white font-bold py-3 px-6 rounded-2xl text-sm shrink-0 w-full sm:w-auto hover:brightness-105 active:scale-[0.98] transition-all"
+                className="relative btn-glow bg-warning text-white font-extrabold py-3.5 px-7 rounded-2xl text-sm md:text-base shrink-0 w-full sm:w-auto hover:brightness-105 active:scale-[0.98] transition-all duration-200"
               >
                 {t('viewActivity')} <span aria-hidden>→</span>
               </button>
             </section>
 
             {/* RECOMENDACIÓN DEL DÍA */}
-            {nextLesson && (
-              <section className="bg-gradient-to-br from-primary/5 to-secondary/5 rounded-3xl p-5 md:p-6 shadow-md shadow-indigo-500/5 border border-slate-100 flex flex-col sm:flex-row sm:items-center gap-4">
-                <div className="w-12 h-12 shrink-0 rounded-2xl bg-white shadow-sm flex items-center justify-center text-2xl" aria-hidden>✨</div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[11px] font-black uppercase tracking-widest text-primary mb-1">{t('recommendationTitle')}</p>
-                  <h3 className="font-bold text-slate-800 text-lg leading-snug">{nextLesson.title}</h3>
-                  <p className="text-slate-600 text-sm mt-0.5 leading-snug line-clamp-2">{nextLesson.desc}</p>
-                </div>
-                <button onClick={nextLesson.go} className="shrink-0 bg-primary text-white font-bold py-3 px-6 rounded-2xl text-sm w-full sm:w-auto hover:bg-primary/90 active:scale-[0.98] transition-all">
-                  {t('goToTopic')} <span aria-hidden>→</span>
-                </button>
-              </section>
-            )}
+            <section className="relative overflow-hidden rounded-3xl bg-white border-2 border-primary/10 ring-2 ring-primary/5 p-6 md:p-7 shadow-lg shadow-primary/10 flex flex-col sm:flex-row sm:items-center gap-5">
+              <div aria-hidden className="absolute top-0 left-6 right-6 h-1.5 rounded-b-full bg-gradient-to-r from-primary to-secondary" />
+              <div className="relative w-14 h-14 shrink-0 rounded-2xl bg-primary/10 flex items-center justify-center text-3xl" aria-hidden>✨</div>
+              <div className="relative flex-1 min-w-0">
+                <p className="text-[11px] font-black uppercase tracking-widest text-primary mb-1">{t('recommendationTitle')}</p>
+                <h3 className="font-black text-slate-800 text-lg md:text-xl leading-snug">{nextLesson ? nextLesson.title : t('allDone')}</h3>
+                <p className="text-slate-600 text-sm md:text-base mt-1 leading-snug line-clamp-2">{nextLesson ? nextLesson.desc : '✨'}</p>
+              </div>
+              <button
+                onClick={nextLesson ? nextLesson.go : () => { setLearnView('hub'); setCurrentScreen('learn') }}
+                className="relative btn-glow bg-gradient-to-r from-primary to-secondary text-white font-extrabold py-3.5 px-8 rounded-2xl text-sm md:text-base shrink-0 w-full sm:w-auto hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+              >
+                {t('goToTopic')} <span aria-hidden>→</span>
+              </button>
+            </section>
 
           </div>
 
