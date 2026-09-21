@@ -297,6 +297,15 @@ const translations = {
     enterBtn: 'Continuar →',
     learnTogether: 'Aprendemos juntos para tomar mejores decisiones.',
     bottomQuote: 'Una conversación puede ser el primer paso para generar un cambio.',
+    homeNav: 'Inicio',
+    homeSubtitle: 'Continúa donde lo dejaste',
+    learnSection: 'Aprender',
+    practiceSection: 'Practicar',
+    myProgressSection: 'Mi progreso',
+    continueLearning: 'Continuar aprendiendo',
+    viewActivity: 'Ver actividad',
+    topicsProgressLabel: 'Progreso en temas',
+    completedLabel: 'temas completados',
   },
   qu: {
     greeting: '¡Napaykullayki! 👋',
@@ -377,6 +386,15 @@ const translations = {
     timeSpent: 'Hora qawaykuy',
     streak: 'Punchaw qallariy',
     topicProgress: 'Yachay ñanni',
+    homeNav: 'Wasipi',
+    homeSubtitle: 'Saqillasqaykimanta katichiy',
+    learnSection: 'Yachay',
+    practiceSection: 'Kamachiy',
+    myProgressSection: 'Progresoy',
+    continueLearning: 'Yachayta katichiy',
+    viewActivity: 'Ruwayta rikuy',
+    topicsProgressLabel: 'Yachaykuna progreso',
+    completedLabel: 'yachaykuna tukukusqa',
   },
 }
 
@@ -1869,159 +1887,143 @@ case 'about':
     case 'home':
       const currentProgress = getProgress()
       const unlockedCount = currentProgress.badges.filter(b => b.unlocked).length
-      const cust5 = getCustomization();
       const isFamHome = profileType === 'family'
       const homeBadgeCount = isFamHome ? familyProfile.familyBadges.filter(b => b.unlocked).length : unlockedCount
       const homeBadgeTotal = isFamHome ? familyProfile.familyBadges.length : 3
-      return (
-        <div className="min-h-screen p-4 md:p-10" style={{ background: cust5.backgroundValue, backgroundSize: cust5.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
-          <div className="max-w-6xl mx-auto animate-slide-up space-y-8 md:space-y-12">
+      const topicsDone = mainTopics.filter(t => (currentProgress.topicProgress[t] ?? 0) >= 100).length
+      const topicsTotal = mainTopics.length
+      const topicsPct = topicsTotal > 0 ? Math.round((topicsDone / topicsTotal) * 100) : 0
 
-            {/* Header */}
-            <header className="bg-white/85 backdrop-blur-xl rounded-3xl p-5 md:p-6 flex items-center justify-between shadow-lg shadow-indigo-500/5">
-              <div className="flex items-center gap-4 md:gap-5">
-                <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-2xl md:text-3xl shadow-lg shadow-primary/25">
+      const NavCard = ({ icon, title, desc, ring, onClick, badge = '' }: { icon: string; title: string; desc: string; ring: string; onClick: () => void; badge?: string }) => (
+        <button
+          onClick={onClick}
+          className={`group bg-white rounded-3xl p-5 min-h-[88px] flex items-center gap-4 shadow-md shadow-indigo-500/5 card-hover text-left transition-all ${ring}`}
+        >
+          <div className={`w-12 h-12 shrink-0 rounded-2xl bg-slate-100 group-hover:bg-primary/10 flex items-center justify-center text-2xl transition-transform group-hover:scale-110 ${badge ? 'relative' : ''}`}>
+            {icon}
+            {badge && <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-success border-2 border-white text-[10px] leading-none text-white flex items-center justify-center font-extrabold">{badge}</span>}
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-bold text-slate-800 text-lg">{title}</h3>
+            <p className="text-slate-500 text-sm mt-0.5 leading-snug truncate">{desc}</p>
+          </div>
+          <span aria-hidden className="text-slate-300 group-hover:text-primary text-2xl transition-colors shrink-0">→</span>
+        </button>
+      )
+      const SectionLabel = ({ children }: { children: ReactNode }) => (
+        <h2 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-3">{children}</h2>
+      )
+
+      return (
+        <div className="min-h-screen pb-32" style={{ background: 'linear-gradient(180deg, #F8FAFF 0%, #EDF1F9 100%)' }}>
+          <div className="max-w-5xl mx-auto px-4 md:px-8 py-8 md:py-10 animate-slide-up space-y-8">
+
+            {/* Encabezado */}
+            <header className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 md:gap-4 min-w-0">
+                <div className="w-12 h-12 md:w-14 md:h-14 shrink-0 rounded-2xl bg-white shadow-md shadow-indigo-500/5 flex items-center justify-center text-xl md:text-2xl">
                   {device === 'phone' ? '📱' : device === 'laptop' ? '💻' : '🖥️'}
                 </div>
-                <div>
-                  <h1 className="text-2xl md:text-3xl font-black gradient-text leading-tight">{t('greeting')}</h1>
-                  <p className="text-sm md:text-base text-gray-500 mt-1">{isFamHome ? '👨‍👩‍👧‍👦 Modo familia' : device === 'phone' ? '📱 Modo móvil' : device === 'laptop' ? '💻 Modo laptop' : '🖥️ Modo PC'}</p>
+                <div className="min-w-0">
+                  <h1 className="text-2xl md:text-3xl font-black text-slate-800 leading-tight truncate">{t('greeting')}</h1>
+                  <p className="text-sm md:text-base text-slate-500 mt-0.5">{t('homeSubtitle')}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="px-4 py-2 rounded-2xl bg-warning/10 text-warning font-extrabold text-lg shadow-sm border border-warning/20">
+              <div className="flex items-center gap-2 shrink-0">
+                <div className="px-3.5 py-2 rounded-2xl bg-white shadow-sm border border-slate-100 text-slate-700 font-bold text-sm md:text-base" title={t('badges')}>
                   🏅 <span className="tabular-nums">{homeBadgeCount}/{homeBadgeTotal}</span>
                 </div>
                 <button
                   onClick={() => setCurrentScreen('config')}
-                  className="w-12 h-12 rounded-2xl bg-white hover:bg-primary/10 text-primary shadow-sm transition-all text-xl"
+                  className="w-11 h-11 rounded-2xl bg-white hover:bg-primary/10 shadow-sm text-slate-500 hover:text-primary transition-all text-lg"
                   aria-label={t('configTitle')}
+                  title={t('configTitle')}
                 >
                   ⚙️
                 </button>
               </div>
             </header>
 
-            {/* Welcome banner */}
-            <section className="relative overflow-hidden rounded-3xl px-8 py-8 md:px-12 md:py-10 shadow-xl shadow-primary/20 text-center" style={{ background: 'linear-gradient(135deg, #2563EB 0%, #7C3AED 55%, #DB2777 120%)' }}>
-              <div aria-hidden className="absolute -top-20 -left-12 w-56 h-56 rounded-full bg-white/10 blur-2xl" />
-              <div aria-hidden className="absolute -bottom-24 -right-12 w-72 h-72 rounded-full bg-pink-300/20 blur-3xl" />
-              <div aria-hidden className="absolute top-0 left-1/3 w-2 h-2 rounded-full bg-white/40" />
-              <div aria-hidden className="absolute top-10 right-1/4 w-3 h-3 rounded-full bg-white/30" />
-              <p className="relative text-lg md:text-2xl text-white font-bold tracking-tight drop-shadow">
-                ✨ {t('welcomeLine')} 🌟
-              </p>
-            </section>
-
-            {/* Badges Card */}
-            <section className="bg-white/85 backdrop-blur-xl rounded-3xl p-7 md:p-10 shadow-lg shadow-indigo-500/5 card-hover">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="font-bold text-secondary text-lg md:text-xl">{t('badges')}</h3>
-                <span className="text-base md:text-lg font-extrabold text-primary tabular-nums">{homeBadgeCount}/{homeBadgeTotal}</span>
-              </div>
-              <div className="flex gap-4 md:gap-6 mb-8">
-                {(isFamHome ? familyProfile.familyBadges : currentProgress.badges).map(badge => (
-                  <div key={badge.id} className={`flex-1 text-center p-5 md:p-6 rounded-2xl transition-all ${badge.unlocked ? 'bg-gradient-to-br from-warning/10 to-primary/10 border border-warning/20 animate-float' : 'bg-gray-50 border-2 border-dashed border-gray-200 opacity-50'}`}>
-                    <div className="text-4xl md:text-5xl mb-2">{badge.emoji}</div>
-                    <div className="text-xs md:text-sm font-bold mt-2 truncate">{badge.name}</div>
-                    <div className="text-[10px] mt-1 font-medium" style={{ color: badge.unlocked ? '#059669' : '#94a3b8' }}>
-                      {badge.unlocked ? '✓ Desbloqueada' : '🔒 Bloqueada'}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="h-3.5 bg-gray-100 rounded-full overflow-hidden">
-                <div
-                  className="progress-bar h-full"
-                  style={{ width: `${Math.min((homeBadgeCount / Math.max(homeBadgeTotal, 1)) * 100, 100)}%`, boxShadow: '0 2px 8px rgba(124,58,237,0.4)' }}
-                ></div>
-              </div>
-              <div className="flex justify-between mt-2 text-xs text-gray-400">
-                <span>{t('badges')}</span>
-                <span>{Math.round(Math.min((homeBadgeCount / Math.max(homeBadgeTotal, 1)) * 100, 100))}%</span>
-              </div>
-            </section>
-
-            {/* Main Grid - 2x2 */}
-            <section className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8">
+            {/* Acción principal + progreso */}
+            <section className="bg-white rounded-3xl p-5 md:p-6 shadow-md shadow-indigo-500/5">
               <button
                 onClick={() => { setLearnView('hub'); setCurrentScreen('learn') }}
-                className="group bg-white/85 backdrop-blur-xl rounded-3xl p-8 md:p-9 card-hover shadow-lg shadow-indigo-500/5 min-h-[200px] flex flex-col justify-between text-left relative overflow-hidden"
+                className="w-full rounded-2xl px-6 py-4 md:py-5 text-white font-extrabold text-lg md:text-xl bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.01] transition-all flex items-center justify-center gap-2"
               >
-                <div aria-hidden className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-primary/10 blur-2xl group-hover:bg-primary/20 transition-all duration-500" />
-                <div>
-                  <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-300">📚</div>
-                  <h3 className="font-bold text-primary text-xl md:text-2xl mb-2">{t('themes')}</h3>
-                  <p className="text-gray-500 leading-relaxed">{t('themesDesc')}</p>
-                </div>
-                <span className="inline-flex items-center gap-1 mt-6 text-primary font-semibold text-sm opacity-0 group-hover:opacity-100 transition-opacity">
-                  {t('continue')} <span aria-hidden>→</span>
-                </span>
+                <span aria-hidden>📚</span> {t('continueLearning')} <span aria-hidden>→</span>
               </button>
-              <button
-                onClick={() => setCurrentScreen('games')}
-                className="group bg-white/85 backdrop-blur-xl rounded-3xl p-8 md:p-9 card-hover shadow-lg shadow-indigo-500/5 min-h-[200px] flex flex-col justify-between text-left relative overflow-hidden"
-              >
-                <div aria-hidden className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-secondary/10 blur-2xl group-hover:bg-secondary/20 transition-all duration-500" />
-                <div>
-                  <div className="w-16 h-16 rounded-2xl bg-secondary/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-300">🎮</div>
-                  <h3 className="font-bold text-secondary text-xl md:text-2xl mb-2">{t('game')}</h3>
-                  <p className="text-gray-500 leading-relaxed">{t('gameDesc')}</p>
+              <div className="mt-5">
+                <div className="flex items-center justify-between text-sm mb-2 gap-2 flex-wrap">
+                  <span className="font-semibold text-slate-600">{t('topicsProgressLabel')}</span>
+                  <span className="font-bold text-slate-800 tabular-nums">{topicsDone} de {topicsTotal} {t('completedLabel')} · {topicsPct}%</span>
                 </div>
-                <span className="inline-flex items-center gap-1 mt-6 text-secondary font-semibold text-sm opacity-0 group-hover:opacity-100 transition-opacity">
-                  {t('continue')} <span aria-hidden>→</span>
-                </span>
-              </button>
-              <button
-                onClick={() => setCurrentScreen('reels')}
-                className="group bg-white/85 backdrop-blur-xl rounded-3xl p-8 md:p-9 card-hover shadow-lg shadow-indigo-500/5 min-h-[200px] flex flex-col justify-between text-left relative overflow-hidden"
-              >
-                <div aria-hidden className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-warning/10 blur-2xl group-hover:bg-warning/20 transition-all duration-500" />
-                <div>
-                  <div className="w-16 h-16 rounded-2xl bg-warning/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-300">📱</div>
-                  <h3 className="font-bold text-warning text-xl md:text-2xl mb-2">{t('reels')}</h3>
-                  <p className="text-gray-500 leading-relaxed">{t('reelsDesc')}</p>
+                <div className="h-3 bg-slate-100 rounded-full overflow-hidden" role="progressbar" aria-valuenow={topicsPct} aria-valuemin={0} aria-valuemax={100} aria-label={t('topicsProgressLabel')}>
+                  <div className="progress-bar h-full rounded-full" style={{ width: `${topicsPct}%` }}></div>
                 </div>
-                <span className="inline-flex items-center gap-1 mt-6 text-warning font-semibold text-sm opacity-0 group-hover:opacity-100 transition-opacity">
-                  {t('continue')} <span aria-hidden>→</span>
-                </span>
-              </button>
-              <button
-                onClick={() => setCurrentScreen('profile')}
-                className="group bg-white/85 backdrop-blur-xl rounded-3xl p-8 md:p-9 card-hover shadow-lg shadow-indigo-500/5 min-h-[200px] flex flex-col justify-between text-left relative overflow-hidden"
-              >
-                <div aria-hidden className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-success/10 blur-2xl group-hover:bg-success/20 transition-all duration-500" />
-                <div>
-                  <div className="w-16 h-16 rounded-2xl bg-success/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-300">👤</div>
-                  <h3 className="font-bold text-success text-xl md:text-2xl mb-2">{t('profile')}</h3>
-                  <p className="text-gray-500 leading-relaxed">{t('profileDesc')}</p>
-                </div>
-                <span className="inline-flex items-center gap-1 mt-6 text-success font-semibold text-sm opacity-0 group-hover:opacity-100 transition-opacity">
-                  {t('continue')} <span aria-hidden>→</span>
-                </span>
-              </button>
+              </div>
             </section>
 
-            {/* Family Activity */}
-            <section className="relative overflow-hidden bg-white/85 backdrop-blur-xl rounded-3xl p-8 md:p-12 card-hover shadow-lg shadow-indigo-500/5 text-center">
-              <div aria-hidden className="absolute -top-14 -right-10 w-48 h-48 rounded-full bg-warning/10 blur-3xl" />
-              <div aria-hidden className="absolute -bottom-14 -left-10 w-48 h-48 rounded-full bg-primary/10 blur-3xl" />
-              <div className="relative">
-                <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-warning/10 flex items-center justify-center text-4xl animate-float">💬</div>
-                <h3 className="font-bold text-warning text-xl md:text-2xl mb-4">{t('familyActivity')}</h3>
-                <p className="text-gray-600 mb-7 leading-relaxed max-w-xl mx-auto">
-                  {t('familyDesc')}
-                </p>
-                <button
-                  onClick={() => setCurrentScreen('converse')}
-                  className="btn-glow bg-warning text-white font-bold py-4 px-10 rounded-2xl text-base w-full max-w-xs"
-                >
-                  {t('converse')}
-                </button>
+            {/* Aprender */}
+            <section>
+              <SectionLabel>📚 {t('learnSection')}</SectionLabel>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <NavCard icon="📖" title={t('themes')} desc={t('themesDesc')} ring="hover:ring-primary/30" onClick={() => { setLearnView('hub'); setCurrentScreen('learn') }} />
+                <NavCard icon="🎮" title={t('game')} desc={t('gameDesc')} ring="hover:ring-secondary/30" onClick={() => setCurrentScreen('games')} />
               </div>
+            </section>
+
+            {/* Practicar */}
+            <section>
+              <SectionLabel>🛡️ {t('practiceSection')}</SectionLabel>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <NavCard icon="📱" title={t('reels')} desc={t('reelsDesc')} ring="hover:ring-warning/40" onClick={() => setCurrentScreen('reels')} />
+              </div>
+            </section>
+
+            {/* Mi progreso */}
+            <section>
+              <SectionLabel>📈 {t('myProgressSection')}</SectionLabel>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <NavCard icon="👤" title={t('profile')} desc={t('profileDesc')} ring="hover:ring-success/30" onClick={() => setCurrentScreen('profile')} />
+                <NavCard icon="🏅" title={t('badges')} desc={`${homeBadgeCount} de ${homeBadgeTotal} ${t('unlockedBadge')}`} ring="hover:ring-warning/40" onClick={() => setCurrentScreen('profile')} badge={homeBadgeCount === homeBadgeTotal ? '✓' : ''} />
+              </div>
+            </section>
+
+            {/* Actividad familiar */}
+            <section className="bg-white rounded-3xl p-5 shadow-md shadow-indigo-500/5 flex items-center gap-4">
+              <div className="w-12 h-12 shrink-0 rounded-2xl bg-warning/10 flex items-center justify-center text-2xl">💬</div>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-bold text-slate-800 text-lg truncate">{t('familyActivity')}</h3>
+                <p className="text-slate-500 text-sm mt-0.5 leading-snug truncate">{t('familyDesc')}</p>
+              </div>
+              <button
+                onClick={() => setCurrentScreen('converse')}
+                className="btn-glow bg-warning text-white font-bold py-2.5 px-4 rounded-2xl text-sm shrink-0"
+              >
+                {t('viewActivity')}
+              </button>
             </section>
 
           </div>
+
+          {/* Navegación principal */}
+          <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-max max-w-[94vw] bg-white/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-indigo-500/10 px-3 py-2 flex items-center gap-1">
+            {[
+              { label: t('homeNav'), icon: '🏠', active: true, go: () => setCurrentScreen('home') },
+              { label: t('themes'), icon: '📖', active: false, go: () => { setLearnView('hub'); setCurrentScreen('learn') } },
+              { label: t('reels'), icon: '📱', active: false, go: () => setCurrentScreen('reels') },
+              { label: t('profile'), icon: '👤', active: false, go: () => setCurrentScreen('profile') },
+            ].map(navItem => (
+              <button
+                key={navItem.label}
+                onClick={navItem.go}
+                className={`px-3 md:px-4 py-2 rounded-2xl flex flex-col items-center gap-0.5 text-xs font-bold transition-all ${navItem.active ? 'text-white bg-gradient-to-r from-primary to-secondary shadow-md shadow-primary/25' : 'text-slate-500 hover:text-primary hover:bg-primary/5'}`}
+              >
+                <span className="text-base leading-none">{navItem.icon}</span>
+                {navItem.label}
+              </button>
+            ))}
+          </nav>
         </div>
       )
 
