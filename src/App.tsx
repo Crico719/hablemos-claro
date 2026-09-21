@@ -2468,7 +2468,7 @@ case 'about':
                                 </button>
                               </div>
                               {/* contenido */}
-                              <div className={`pl-[92px] md:pl-0 md:w-[calc(50%-3rem)] ${even ? 'md:mr-auto' : 'md:ml-auto'}`}>
+                              <div className={`pl-[92px] md:pl-0 md:w-[calc(50%-6rem)] ${even ? 'md:mr-auto' : 'md:ml-auto'}`}>
                                 <div className={`bg-white rounded-[20px] border p-4 md:p-5 text-center shadow-sm transition-all duration-300 ${
                                   done ? 'border-success/20' : isCurrent ? 'border-secondary/30 shadow-md shadow-primary/10' : 'border-slate-100'
                                 }`}>
@@ -2515,7 +2515,7 @@ case 'about':
                               {examUnlocked ? '🏁' : '🔒'}
                             </button>
                           </div>
-                          <div className="pl-[92px] md:pl-0 md:w-[calc(50%-3rem)] md:mr-auto">
+                          <div className="pl-[92px] md:pl-0 md:w-[calc(50%-6rem)] md:mr-auto">
                             <div className={`bg-white rounded-[20px] border p-4 md:p-5 text-center shadow-sm transition-all duration-300 ${
                               examUnlocked ? 'border-warning/30 shadow-md shadow-warning/10' : 'border-slate-100'
                             }`}>
@@ -2614,7 +2614,7 @@ case 'about':
                                 </button>
                               </div>
                               {/* contenido */}
-                              <div className={`pl-[92px] md:pl-0 md:w-[calc(50%-3rem)] ${even ? 'md:mr-auto' : 'md:ml-auto'}`}>
+                              <div className={`pl-[92px] md:pl-0 md:w-[calc(50%-6rem)] ${even ? 'md:mr-auto' : 'md:ml-auto'}`}>
                                 <div className={`bg-white rounded-[20px] border p-4 md:p-5 text-center shadow-sm transition-all duration-300 ${
                                   done ? 'border-success/20' : isCurrent ? 'border-secondary/30 shadow-md shadow-secondary/10' : 'border-slate-100'
                                 }`}>
