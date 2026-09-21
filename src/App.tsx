@@ -1102,14 +1102,28 @@ function RoadmapReveal({ children, delay = 0 }: { children: ReactNode; delay?: n
   )
 }
 
+// Enlace profundo: si la URL trae #temas... abrimos directo la pestaña de Temas
+const BOOT_HASH = (() => {
+  const h = window.location.hash.replace('#', '').trim()
+  if (!h.startsWith('temas')) return null
+  const parts = h.split('-')
+  return { view: parts[1] ?? 'hub', id: parts.slice(2).join('-') || null }
+})()
+
+// Abrir Temas en una pestaña nueva del navegador (Pantalla queda en su pestaña)
+const openTemasTab = (deep = '') => {
+  const url = `${window.location.origin}${window.location.pathname}${window.location.search}#temas${deep}`
+  window.open(url, '_blank', 'noopener,noreferrer')
+}
+
 export default function App() {
   const [studentProfile, setStudentProfile] = useState<StudentProfile>(initialStudentProfile)
   const [familyProfile, setFamilyProfile] = useState<FamilyProfile>(initialFamilyProfile)
-  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'device' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents' | 'profile-type'>('welcome')
+  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'device' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents' | 'profile-type'>(BOOT_HASH ? 'learn' : 'welcome')
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null)
-  const [learnView, setLearnView] = useState<'hub' | 'kids' | 'parents' | 'kid' | 'guide' | 'exam'>('hub')
-  const [activeKidId, setActiveKidId] = useState<string | null>(null)
-  const [activeGuideId, setActiveGuideId] = useState<string | null>(null)
+  const [learnView, setLearnView] = useState<'hub' | 'kids' | 'parents' | 'kid' | 'guide' | 'exam'>(BOOT_HASH ? (BOOT_HASH.view === 'tema' ? 'kid' : BOOT_HASH.view === 'guia' ? 'guide' : BOOT_HASH.view === 'examen' ? 'exam' : BOOT_HASH.view === 'padres' ? 'parents' : BOOT_HASH.view === 'kids' ? 'kids' : 'hub') : 'hub')
+  const [activeKidId, setActiveKidId] = useState<string | null>(BOOT_HASH && BOOT_HASH.view === 'tema' ? BOOT_HASH.id : null)
+  const [activeGuideId, setActiveGuideId] = useState<string | null>(BOOT_HASH && BOOT_HASH.view === 'guia' ? BOOT_HASH.id : null)
   const [topicStep, setTopicStep] = useState(0)
   const [answeredOpt, setAnsweredOpt] = useState<number | null>(null)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
@@ -1989,9 +2003,9 @@ case 'about':
       const nextKid = KIDS_TOPICS.find(k => !kidsDoneArr.includes(k.id)) ?? null
       const nextGuide = PARENT_GUIDES.find(g => !(currentProgress.guidesDone ?? []).includes(g.id)) ?? null
       const nextLesson = nextKid
-        ? { title: nextKid.title, desc: nextKid.desc, icon: nextKid.icon, go: () => { setActiveKidId(nextKid.id); setLearnView('kid'); setCurrentScreen('learn') } }
+        ? { title: nextKid.title, desc: nextKid.desc, icon: nextKid.icon, go: () => openTemasTab(`-tema-${nextKid.id}`) }
         : nextGuide
-          ? { title: nextGuide.title, desc: nextGuide.desc, icon: nextGuide.icon, go: () => { setActiveGuideId(nextGuide.id); setLearnView('guide'); setCurrentScreen('learn') } }
+          ? { title: nextGuide.title, desc: nextGuide.desc, icon: nextGuide.icon, go: () => openTemasTab(`-guia-${nextGuide.id}`) }
           : null
       const lessonTotal = nextKid ? kidsTotal : nextGuide ? PARENT_GUIDES.length : kidsTotal
       const nextLessonNum = nextKid ? KIDS_TOPICS.indexOf(nextKid) + 1 : nextGuide ? PARENT_GUIDES.indexOf(nextGuide) + 1 : kidsDoneCount
@@ -2052,13 +2066,13 @@ case 'about':
 
                 <div className="flex flex-col sm:flex-row items-center gap-3 mt-2 w-full sm:w-auto">
                   <button
-                    onClick={nextLesson ? nextLesson.go : () => { setLearnView('hub'); setCurrentScreen('learn') }}
+                    onClick={nextLesson ? nextLesson.go : () => openTemasTab('')}
                     className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 text-white text-sm md:text-[15px] font-bold rounded-full px-8 h-12 bg-gradient-to-r from-primary to-secondary shadow-lg shadow-primary/25 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
                   >
                     {t('continueLesson')} <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
                   </button>
                   <button
-                    onClick={() => { setLearnView('hub'); setCurrentScreen('learn') }}
+                    onClick={() => openTemasTab('')}
                     className="w-full sm:w-auto inline-flex items-center justify-center gap-2 text-slate-700 text-sm md:text-[15px] font-bold rounded-full px-8 h-12 bg-white border border-slate-200 hover:border-primary/40 hover:text-primary hover:bg-primary-50/50 active:scale-[0.98] transition-all duration-200"
                   >
                     {t('explore')} <span aria-hidden>→</span>
@@ -2084,7 +2098,7 @@ case 'about':
                 <span className="h-px flex-1 max-w-[120px] bg-slate-200/70" aria-hidden />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
-                <FeatureCard icon="📖" title={t('themes')} desc={t('themesDesc')} tint="bg-secondary-50" onClick={() => { setLearnView('hub'); setCurrentScreen('learn') }} />
+                <FeatureCard icon="📖" title={t('themes')} desc={t('themesDesc')} tint="bg-secondary-50" onClick={() => openTemasTab('')} />
                 <FeatureCard icon="🎮" title={t('game')} desc={t('gameDesc')} tint="bg-primary-50" onClick={() => setCurrentScreen('games')} />
                 <FeatureCard icon="📱" title={t('reels')} desc={t('reelsDesc')} tint="bg-warning-50" onClick={() => setCurrentScreen('reels')} />
                 <FeatureCard icon="👨‍👩‍👧" title={t('familyActivityLabel')} desc={t('familyDesc')} tint="bg-success-50" onClick={() => setCurrentScreen('converse')} />
@@ -2121,7 +2135,7 @@ case 'about':
           <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-max max-w-[94vw] bg-white/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-indigo-500/10 px-3 py-2 flex items-center gap-1">
             {[
               { label: t('homeNav'), icon: '🏠', active: true, go: () => setCurrentScreen('home') },
-              { label: t('themes'), icon: '📖', active: false, go: () => { setLearnView('hub'); setCurrentScreen('learn') } },
+              { label: t('themes'), icon: '📖', active: false, go: () => openTemasTab('') },
               { label: t('reels'), icon: '📱', active: false, go: () => setCurrentScreen('reels') },
               { label: t('profile'), icon: '👤', active: false, go: () => setCurrentScreen('profile') },
             ].map(navItem => (
@@ -2326,11 +2340,16 @@ case 'about':
               </div>
               <button
                 onClick={() => {
-                  if (learnView === 'hub') navigateTo('home')
-                  else if (learnView === 'kid') setLearnView('kids')
-                  else if (learnView === 'guide') setLearnView('parents')
-                  else if (learnView === 'exam') setLearnView('kids')
-                  else setLearnView('hub')
+                  if (learnView !== 'hub') {
+                    if (learnView === 'kid') setLearnView('kids')
+                    else if (learnView === 'guide') setLearnView('parents')
+                    else if (learnView === 'exam') setLearnView('kids')
+                    else setLearnView('hub')
+                  } else if (BOOT_HASH) {
+                    window.close()
+                  } else {
+                    navigateTo('home')
+                  }
                 }}
                 className="glass-card px-6 py-3 rounded-xl text-gray-600 hover:text-primary text-base font-bold hover:bg-gray-100 transition-all shrink-0"
               >
