@@ -2933,17 +2933,17 @@ case 'about':
 case 'converse':
       const cust10 = getCustomization();
       return (
-        <div className="min-h-screen bg-green-50 p-8" style={{ background: cust10.backgroundValue, backgroundSize: cust10.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
+        <div className="min-h-screen bg-green-600 p-8" style={{ background: cust10.backgroundValue, backgroundSize: cust10.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           <div className="max-w-5xl mx-auto">
             {/* Header */}
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-primary text-center mb-2">Conversemos en familia 💬</h1>
-              <p className="text-lg text-gray-600 text-center">Hablen juntos durante 5 minutos sobre lo aprendido y compartan sus ideas. Así la familia entiende qué debe hacer.</p>
+              <h1 className="text-3xl font-bold text-white text-center mb-2">Conversemos en familia 💬</h1>
+              <p className="text-lg text-white text-center">Hablen juntos durante 5 minutos sobre lo aprendido y compartan sus ideas. Así la familia entiende qué debe hacer.</p>
             </div>
 
             {/* Progress indicator */}
             <div className="mb-6 text-center">
-              <p className="text-sm text-gray-500">Pregunta {currentQuestionIndex + 1} de {conversationPrompts.length}</p>
+              <p className="text-sm text-white">Pregunta {currentQuestionIndex + 1} de {conversationPrompts.length}</p>
               <div className="inline-flex bg-white rounded-full px-3 mt-2">
                 {conversationPrompts.map((_, i) => (
                   <div
