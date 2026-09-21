@@ -2974,20 +2974,20 @@ case 'converse':
               </div>
               
               {/* Navigation buttons */}
-              <div className="flex gap-3 justify-center">
+              <div className="flex gap-2 justify-center">
                 {currentQuestionIndex > 0 && (
                   <button
                     onClick={() => setCurrentQuestionIndex(prev => prev - 1)}
-                    className="flex-1 py-3 px-6 rounded-xl border border-gray-200 text-sm font-medium hover:bg-gray-50 transition-all"
+                    className="py-3 px-4 rounded-xl border border-gray-200 text-sm font-medium hover:bg-gray-50 transition-all"
                   >
                     Anterior
                   </button>
                 )}
                 <button
                   onClick={() => navigateTo('home')}
-                  className="flex-1 py-3 px-6 rounded-xl bg-gray-800 text-white text-sm font-bold hover:bg-gray-700 transition-all"
+                  className="py-3 px-4 rounded-xl bg-gray-800 text-white text-sm font-bold hover:bg-gray-700 transition-all"
                 >
-                  ← Volver al inicio
+                  Inicio
                 </button>
                 <button
                   onClick={() => {
@@ -2995,7 +2995,7 @@ case 'converse':
                       setCurrentQuestionIndex(prev => prev + 1)
                     }
                   }}
-                  className="flex-1 py-3 px-6 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary-dark transition-all"
+                  className="py-3 px-6 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary-dark transition-all"
                 >
                   {currentQuestionIndex < conversationPrompts.length - 1 ? 'Siguiente →' : 'Terminar'}
                 </button>
