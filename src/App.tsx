@@ -2943,56 +2943,110 @@ case 'about':
         </div>
       )
 
-    case 'converse':
+case 'converse':
       const cust10 = getCustomization();
       return (
-        <div className="min-h-screen p-8" style={{ background: cust10.backgroundValue, backgroundSize: cust10.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
+        <div className="min-h-screen bg-green-50 p-8" style={{ background: cust10.backgroundValue, backgroundSize: cust10.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           <div className="max-w-5xl mx-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="text-2xl font-bold text-primary">Conversemos en familia 💬</h1>
-              <button onClick={() => navigateTo('home')} className="text-gray-500 hover:text-primary">
-                ← Atrás
-              </button>
+            {/* Header */}
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold text-primary text-center mb-2">Conversemos en familia 💬</h1>
+              <p className="text-lg text-gray-600 text-center">Hablen juntos durante 5 minutos sobre lo aprendido y compartan sus ideas. Así la familia entiende qué debe hacer.</p>
             </div>
 
-            <div className="bg-white rounded-lg p-6 shadow-sm mb-8">
-              <h2 className="text-xl font-bold text-primary mb-6">Preguntas para conversar</h2>
+            {/* Progress indicator */}
+            <div className="mb-6 text-center">
+              <p className="text-sm text-gray-500">Pregunta {currentQuestionIndex + 1} de {conversationPrompts.length}</p>
+              <div className="inline-flex bg-white rounded-full px-3 mt-2">
+                {conversationPrompts.map((_, i) => (
+                  <div
+                    key={i}
+                    className={`flex-1 ${i < currentQuestionIndex ? 'bg-primary text-white' : 'text-gray-300'} rounded-full h-2 transition-colors duration-300`}
+                  ></div>
+                ))}
+              </div>
+            </div>
+
+            {/* Question card */}
+            <div className="bg-white rounded-3xl p-8 md:p-10 shadow-2xl max-w-2xl mx-auto mb-8">
+              {/* Question text */}
+              <p className="text-2xl md:text-3xl text-gray-800 leading-relaxed mb-8 line-clamp-4 text-center">
+                {conversationPrompts[currentQuestionIndex].question}
+              </p>
               
-              {conversationPrompts.map((prompt, _index) => (
-                <div key={prompt.id} className="mb-4">
-                  <p className="font-medium text-gray-800 mb-2">{prompt.question}</p>
+              {/* Answer field */}
+              <div className="mb-6 pt-4 border-t border-gray-100">
+                <label className="block text-sm text-gray-600 mb-2 text-left">
+                  Tu respuesta:
+                </label>
+                <textarea
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent resize-none min-h-[160px] placeholder-gray-400"
+                  placeholder="Escribe aquí lo que piensas..."
+                  onChange={(e) => { void e; }}
+                ></textarea>
+              </div>
+              
+              {/* Navigation buttons */}
+              <div className="flex gap-3 justify-center">
+                {currentQuestionIndex > 0 && (
+                  <button
+                    onClick={() => setCurrentQuestionIndex(prev => prev - 1)}
+                    className="flex-1 py-3 px-6 rounded-xl border border-gray-200 text-sm font-medium hover:bg-gray-50 transition-all"
+                  >
+                    Anterior
+                  </button>
+                )}
+                <button
+                  onClick={() => {
+                    if (currentQuestionIndex < conversationPrompts.length - 1) {
+                      setCurrentQuestionIndex(prev => prev + 1)
+                    }
+                  }}
+                  className="flex-1 py-3 px-6 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary-dark transition-all"
+                >
+                  {currentQuestionIndex < conversationPrompts.length - 1 ? 'Siguiente →' : 'Terminar'}
+                </button>
+              </div>
+            </div>
+
+            {/* Completion state */}
+            {currentQuestionIndex >= conversationPrompts.length && (
+              <div className="mt-8 text-center">
+                <div className="w-24 h-24 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-12 h-12 text-primary" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 6L9 17l-5-5" />
+                    <path d="M6 9l-5 5" />
+                    <path d="M2 9l5 5" />
+                    <path d="M9 19v6" />
+                    <path d="M15 19v6" />
+                  </svg>
+                </div>
+                <h2 className="text-3xl font-bold text-primary mb-3">¡Excelente!</h2>
+                <p className="text-gray-600 mb-4">
+                  Han completado todas las preguntas de conversación familiar.
+                </p>
+                <p className="text-lg text-gray-700">
+                  ¡Muy bien! Conversar en familia nos ayuda a aprender y convivir mejor.
+                </p>
+                <div className="mt-6 space-y-3">
                   <button
                     onClick={() => {
-// Marcar como preguntado y guardar progreso
-                       completeConversation()
+                      setCurrentQuestionIndex(0)
+                      completeConversation()
                     }}
-                    className="btn-primary py-2 px-4 rounded text-sm"
+                    className="w-full py-3 px-6 rounded-xl bg-green-100 text-green-800 hover:bg-green-100 transition-all"
                   >
-                    Empezar conversación
+                    Volver a empezar
                   </button>
-                  
-                  {prompt.asked && (
-                    <p className="text-green-600 text-sm mt-2">✓ Ya conversamos</p>
-                  )}
+                  <button
+                    onClick={() => navigateTo('home')}
+                    className="w-full py-3 px-6 rounded-xl bg-primary text-white hover:bg-primary-dark transition-all"
+                  >
+                    Volver al inicio
+                  </button>
                 </div>
-              ))}
-
-              {conversationPrompts.every(p => p.asked) && (
-                <div className="mt-8 p-4 bg-primary/5 rounded text-center">
-                  <h3 className="font-bold text-primary">¡Excelente! Hoy tuvieron una conversación importante.</h3>
-                  <p>Han completado todas las preguntas de conversación familiar.</p>
-                </div>
-              )}
-            </div>
-
-            <div>
-              <button
-                onClick={() => navigateTo('activity')}
-                className="btn-primary w-full py-3 px-6 rounded-lg text-lg mt-4"
-              >
-                Ir a Actividad familiar
-              </button>
-            </div>
+              </div>
+            )}
           </div>
         </div>
       )
