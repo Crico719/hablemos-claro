@@ -168,6 +168,18 @@ const backgrounds: Array<{ name: string; type: 'gradient' | 'pattern' | 'solid';
   { name: 'Lavanda', type: 'solid', value: '#faf5ff' },
 ]
 
+// Determina colores de texto según el fondo del tema (oscuro = blanco, claro = oscuro)
+const getTextColorForTheme = (backgroundValue: string): { primary: string; secondary: string; cardBg: string; label: string; border: string } => {
+  const isLight = ['#f1f5f9', '#fefce8', '#f0fdf4', '#faf5ff', '#f8fafc', '#e2e8f0', '#cbd5e1'].some(c => backgroundValue.includes(c)) ||
+    backgroundValue.includes('#f8fafc') || backgroundValue.includes('#f1f5f9') || backgroundValue.includes('#fefce8') ||
+    backgroundValue.includes('#f0fdf4') || backgroundValue.includes('#faf5ff') || backgroundValue.includes('white') ||
+    backgroundValue.includes('#cbd5e1') || backgroundValue.includes('#e2e8f0')
+  if (isLight) {
+    return { primary: '#1e293b', secondary: '#475569', cardBg: '#ffffff', label: '#334155', border: '#cbd5e1' }
+  }
+  return { primary: '#ffffff', secondary: '#cbd5e1', cardBg: 'rgba(255,255,255,0.15)', label: '#f1f5f9', border: 'rgba(255,255,255,0.2)' }
+}
+
 const translations = {
   es: {
     greeting: '¡Hola! 👋',
@@ -2931,61 +2943,66 @@ case 'about':
       )
 
 case 'converse':
-      const cust10 = getCustomization();
+      const cust10 = getCustomization()
+      const textColors = getTextColorForTheme(cust10.backgroundValue)
       return (
-        <div className="min-h-screen bg-green-600 p-8" style={{ background: cust10.backgroundValue, backgroundSize: cust10.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
+        <div className="min-h-screen p-8" style={{ background: cust10.backgroundValue, backgroundSize: cust10.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           <div className="max-w-5xl mx-auto">
             {/* Header */}
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-white text-center mb-2">Conversemos en familia 💬</h1>
-              <p className="text-lg text-white text-center">Hablen juntos durante 5 minutos sobre lo aprendido y compartan sus ideas. Así la familia entiende qué debe hacer.</p>
+              <h1 className="text-3xl font-bold text-center mb-2" style={{ color: textColors.primary }}>Conversemos en familia 💬</h1>
+              <p className="text-lg text-center" style={{ color: textColors.secondary }}>Hablen juntos durante 5 minutos sobre lo aprendido y compartan sus ideas. Así la familia entiende qué debe hacer.</p>
             </div>
 
             {/* Progress indicator */}
             <div className="mb-6 text-center">
-              <p className="text-sm text-white">Pregunta {currentQuestionIndex + 1} de {conversationPrompts.length}</p>
-              <div className="inline-flex bg-white rounded-full px-3 mt-2">
+              <p className="text-sm" style={{ color: textColors.secondary }}>Pregunta {currentQuestionIndex + 1} de {conversationPrompts.length}</p>
+              <div className="inline-flex rounded-full px-3 mt-2" style={{ backgroundColor: textColors.cardBg }}>
                 {conversationPrompts.map((_, i) => (
                   <div
                     key={i}
-                    className={`flex-1 ${i < currentQuestionIndex ? 'bg-primary text-white' : 'text-gray-300'} rounded-full h-2 transition-colors duration-300`}
+                    className={`flex-1 rounded-full h-2 transition-colors duration-300`}
+                    style={{ backgroundColor: i < currentQuestionIndex ? '#10b981' : textColors.border }}
                   ></div>
                 ))}
               </div>
             </div>
 
             {/* Question card */}
-            <div className="bg-white rounded-3xl p-8 md:p-10 shadow-2xl max-w-2xl mx-auto mb-8">
+            <div className="rounded-3xl p-8 md:p-10 shadow-2xl max-w-2xl mx-auto mb-8" style={{ backgroundColor: textColors.cardBg }}>
               {/* Question text */}
-              <p className="text-2xl md:text-3xl text-gray-800 leading-relaxed mb-8 line-clamp-4 text-center">
+              <p className="text-2xl md:text-3xl leading-relaxed mb-8 line-clamp-4 text-center" style={{ color: textColors.primary }}>
                 {conversationPrompts[currentQuestionIndex].question}
               </p>
-              
+
               {/* Answer field */}
-              <div className="mb-6 pt-4 border-t border-gray-100">
-                <label className="block text-sm text-gray-600 mb-2 text-left">
+              <div className="mb-6 pt-4" style={{ borderTop: `1px solid ${textColors.border}` }}>
+                <label className="block text-sm mb-2 text-left" style={{ color: textColors.label }}>
                   Tu respuesta:
                 </label>
                 <textarea
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent resize-none min-h-[160px] placeholder-gray-400"
+                  className="w-full px-4 py-3 rounded-xl resize-none min-h-[160px] placeholder-gray-400"
+                  style={{ borderColor: textColors.border }}
                   placeholder="Escribe aquí lo que piensas..."
                   onChange={(e) => { void e; }}
                 ></textarea>
               </div>
-              
+
               {/* Navigation buttons */}
               <div className="flex gap-2 justify-center">
                 {currentQuestionIndex > 0 && (
                   <button
                     onClick={() => setCurrentQuestionIndex(prev => prev - 1)}
-                    className="py-3 px-4 rounded-xl border border-gray-200 text-sm font-medium hover:bg-gray-50 transition-all"
+                    className="py-3 px-4 rounded-xl text-sm font-medium transition-all"
+                    style={{ borderColor: textColors.border, color: textColors.label }}
                   >
                     Anterior
                   </button>
                 )}
                 <button
                   onClick={() => navigateTo('home')}
-                  className="py-3 px-4 rounded-xl bg-gray-800 text-white text-sm font-bold hover:bg-gray-700 transition-all"
+                  className="py-3 px-4 rounded-xl text-sm font-bold transition-all"
+                  style={{ backgroundColor: '#1e293b', color: '#ffffff' }}
                 >
                   Inicio
                 </button>
@@ -2995,7 +3012,8 @@ case 'converse':
                       setCurrentQuestionIndex(prev => prev + 1)
                     }
                   }}
-                  className="py-3 px-6 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary-dark transition-all"
+                  className="py-3 px-6 rounded-xl text-sm font-bold transition-all"
+                  style={{ backgroundColor: '#10b981', color: '#ffffff' }}
                 >
                   {currentQuestionIndex < conversationPrompts.length - 1 ? 'Siguiente →' : 'Terminar'}
                 </button>
@@ -3005,8 +3023,8 @@ case 'converse':
             {/* Completion state */}
             {currentQuestionIndex >= conversationPrompts.length && (
               <div className="mt-8 text-center">
-                <div className="w-24 h-24 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-12 h-12 text-primary" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <div className="w-24 h-24 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#10b98120' }}>
+                  <svg className="w-12 h-12" style={{ color: '#10b981' }} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M20 6L9 17l-5-5" />
                     <path d="M6 9l-5 5" />
                     <path d="M2 9l5 5" />
@@ -3014,11 +3032,11 @@ case 'converse':
                     <path d="M15 19v6" />
                   </svg>
                 </div>
-                <h2 className="text-3xl font-bold text-primary mb-3">¡Excelente!</h2>
-                <p className="text-gray-600 mb-4">
+                <h2 className="text-3xl font-bold mb-3" style={{ color: textColors.primary }}>¡Excelente!</h2>
+                <p className="mb-4" style={{ color: textColors.label }}>
                   Han completado todas las preguntas de conversación familiar.
                 </p>
-                <p className="text-lg text-gray-700">
+                <p className="text-lg" style={{ color: textColors.secondary }}>
                   ¡Muy bien! Conversar en familia nos ayuda a aprender y convivir mejor.
                 </p>
                 <div className="mt-6 space-y-3">
@@ -3027,13 +3045,15 @@ case 'converse':
                       setCurrentQuestionIndex(0)
                       completeConversation()
                     }}
-                    className="w-full py-3 px-6 rounded-xl bg-green-100 text-green-800 hover:bg-green-100 transition-all"
+                    className="w-full py-3 px-6 rounded-xl transition-all"
+                    style={{ backgroundColor: '#f0fdf4', color: '#065f46' }}
                   >
                     Volver a empezar
                   </button>
                   <button
                     onClick={() => navigateTo('home')}
-                    className="w-full py-3 px-6 rounded-xl bg-primary text-white hover:bg-primary-dark transition-all"
+                    className="w-full py-3 px-6 rounded-xl transition-all"
+                    style={{ backgroundColor: '#10b981', color: '#ffffff' }}
                   >
                     Volver al inicio
                   </button>
