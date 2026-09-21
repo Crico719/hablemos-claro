@@ -85,7 +85,12 @@ interface ProfileCustomization {
 
 interface ConversationPrompt {
   id: string
+  type: 'closed' | 'open'
   question: string
+  kidQuestion: string
+  parentQuestion?: string
+  kidOptions?: string[]
+  parentOptions?: string[]
   asked: boolean
 }
 
@@ -946,11 +951,11 @@ const KID_ART: Record<string, ReactNode> = {
 
 // Datos de preguntas para la sección Conversemos
 const conversationPrompts: ConversationPrompt[] = [
-  { id: '1', question: '¿Qué entiendes por coima?', asked: false },
-  { id: '2', question: '¿Por qué crees que algunas personas ofrecen coimas?', asked: false },
-  { id: '3', question: '¿Quiénes pueden verse afectados por una coima?', asked: false },
-  { id: '4', question: '¿Qué harías si alguien te pidiera participar en algo que sabes que está mal?', asked: false },
-  { id: '5', question: '¿Por qué es importante respetar las reglas?', asked: false },
+  { id: '1', type: 'closed', question: '¿Qué es una coima?', kidQuestion: '¿Qué es una coima según tú?', kidOptions: ['Es dinero que se da por trabajo', 'Es dinero o favor injusto por un beneficio', 'Es un regalo bonito', 'Es un salario más alto'], parentOptions: ['Es un pago por servicio', 'Es un soborno por ventaja injusta', 'Es una propina normal', 'Es una tarifa oficial'], asked: false },
+  { id: '2', type: 'closed', question: '¿Cómo reconoces una coima?', kidQuestion: '¿Qué señal te dice que están pidiendo una coima?', kidOptions: ['Te piden dinero para trabajar', 'Te ofrecen ayuda sin pedir nada', 'Te dan un regalo sorpresa', 'Te invitan a comer'], parentOptions: ['Te exigen pago para agilizar un trámite', 'Te piden un favor sin condiciones', 'Te regalan algo genuinamente', 'Te invitan a una comida social'], asked: false },
+  { id: '3', type: 'open', question: '¿Qué harías si alguien te pide una coima?', kidQuestion: 'Si un adulto te pide dinero para resolver algo rápido, ¿qué harías?', parentQuestion: 'Si un funcionario te pide un "extra" para agilizar un trámite, ¿qué harías?', asked: false },
+  { id: '4', type: 'closed', question: '¿Qué le pasa a la familia cuando hay coimas?', kidQuestion: '¿Qué sentiría tu familia si alguien les pide una coima?', kidOptions: ['Triste y enojada', 'Feliz porque se resuelve', 'Indiferente', 'Contenta porque ahorra dinero'], parentOptions: ['Frustrada e injusta', 'Agradecida porque se resolvió', 'Sin opinión', 'Contenta porque ahorró tiempo'], asked: false },
+  { id: '5', type: 'open', question: '¿Cómo podemos prevenir las coimas en nuestra familia?', kidQuestion: '¿Qué regla podemos poner en casa para evitar coimas?', parentQuestion: '¿Qué acuerdo familiar pueden hacer todos sobre las coimas?', asked: false },
 ]
 
 // Preguntas para la actividad familiar - pool de ≥20 preguntas organizadas por tipo
@@ -1032,6 +1037,10 @@ export default function App() {
     ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
   const [_tempPhoto, setTempPhoto] = useState<string>('')
+  const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid')
+  const [kidAnswer, setKidAnswer] = useState<string>('')
+  const [parentAnswer, setParentAnswer] = useState<string>('')
+  
 
   // Sincronizar userName/userAge/userDistrict con studentProfile
   useEffect(() => {
@@ -2945,117 +2954,165 @@ case 'about':
 case 'converse':
       const cust10 = getCustomization()
       const textColors = getTextColorForTheme(cust10.backgroundValue)
+      const prompt = conversationPrompts[currentQuestionIndex]
+      const isLastQ = currentQuestionIndex >= conversationPrompts.length
+      const turnIsKid = conversationTurn === 'kid'
+      const isClosed = prompt?.type === 'closed'
+      
       return (
-        <div className="min-h-screen p-8" style={{ background: cust10.backgroundValue, backgroundSize: cust10.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
-          <div className="max-w-5xl mx-auto">
+        <div className="min-h-screen p-4 md:p-8" style={{ background: cust10.backgroundValue, backgroundSize: cust10.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
+          <div className="max-w-3xl mx-auto">
             {/* Header */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-center mb-2" style={{ color: textColors.primary }}>Conversemos en familia 💬</h1>
-              <p className="text-lg text-center" style={{ color: textColors.secondary }}>Hablen juntos durante 5 minutos sobre lo aprendido y compartan sus ideas. Así la familia entiende qué debe hacer.</p>
+            <div className="mb-6 text-center">
+              <h1 className="text-2xl md:text-3xl font-bold mb-2" style={{ color: textColors.primary }}>Conversemos en familia 💬</h1>
+              <p className="text-sm md:text-base" style={{ color: textColors.secondary }}>Turno: {turnIsKid ? '👧 Joven' : '👨 Padre'}</p>
             </div>
 
-            {/* Progress indicator */}
-            <div className="mb-6 text-center">
-              <p className="text-sm" style={{ color: textColors.secondary }}>Pregunta {currentQuestionIndex + 1} de {conversationPrompts.length}</p>
-              <div className="inline-flex rounded-full px-3 mt-2" style={{ backgroundColor: textColors.cardBg }}>
+            {/* Progress */}
+            <div className="mb-4 text-center">
+              <p className="text-sm mb-2" style={{ color: textColors.secondary }}>Pregunta {currentQuestionIndex + 1} de {conversationPrompts.length}</p>
+              <div className="inline-flex rounded-full px-3" style={{ backgroundColor: textColors.cardBg }}>
                 {conversationPrompts.map((_, i) => (
-                  <div
-                    key={i}
-                    className={`flex-1 rounded-full h-2 transition-colors duration-300`}
-                    style={{ backgroundColor: i < currentQuestionIndex ? '#10b981' : textColors.border }}
-                  ></div>
+                  <div key={i} className={`h-2 rounded-full transition-colors duration-300 ${i < currentQuestionIndex ? 'bg-primary' : ''}`} style={{ backgroundColor: i < currentQuestionIndex ? '#10b981' : textColors.border, width: '24px', margin: '0 2px' }}></div>
                 ))}
               </div>
             </div>
 
-            {/* Question card */}
-            <div className="rounded-3xl p-8 md:p-10 shadow-2xl max-w-2xl mx-auto mb-8" style={{ backgroundColor: textColors.cardBg }}>
-              {/* Question text */}
-              <p className="text-2xl md:text-3xl leading-relaxed mb-8 line-clamp-4 text-center" style={{ color: textColors.primary }}>
-                {conversationPrompts[currentQuestionIndex].question}
-              </p>
-
-              {/* Answer field */}
-              <div className="mb-6 pt-4" style={{ borderTop: `1px solid ${textColors.border}` }}>
-                <label className="block text-sm mb-2 text-left" style={{ color: textColors.label }}>
-                  Tu respuesta:
-                </label>
-                <textarea
-                  className="w-full px-4 py-3 rounded-xl resize-none min-h-[160px] placeholder-gray-400"
-                  style={{ borderColor: textColors.border }}
-                  placeholder="Escribe aquí lo que piensas..."
-                  onChange={(e) => { void e; }}
-                ></textarea>
-              </div>
-
-              {/* Navigation buttons */}
-              <div className="flex gap-2 justify-center">
-                {currentQuestionIndex > 0 && (
-                  <button
-                    onClick={() => setCurrentQuestionIndex(prev => prev - 1)}
-                    className="py-3 px-4 rounded-xl text-sm font-medium transition-all"
-                    style={{ borderColor: textColors.border, color: textColors.label }}
-                  >
-                    Anterior
-                  </button>
-                )}
-                <button
-                  onClick={() => navigateTo('home')}
-                  className="py-3 px-4 rounded-xl text-sm font-bold transition-all"
-                  style={{ backgroundColor: '#1e293b', color: '#ffffff' }}
-                >
-                  Inicio
-                </button>
-                <button
-                  onClick={() => {
-                    if (currentQuestionIndex < conversationPrompts.length - 1) {
-                      setCurrentQuestionIndex(prev => prev + 1)
-                    }
-                  }}
-                  className="py-3 px-6 rounded-xl text-sm font-bold transition-all"
-                  style={{ backgroundColor: '#10b981', color: '#ffffff' }}
-                >
-                  {currentQuestionIndex < conversationPrompts.length - 1 ? 'Siguiente →' : 'Terminar'}
-                </button>
-              </div>
+            {/* Turn badge */}
+            <div className="mb-6 text-center">
+              <span className={`inline-block px-6 py-2 rounded-full text-sm font-bold ${turnIsKid ? 'bg-primary text-white' : 'bg-secondary text-white'}`}>
+                {turnIsKid ? '👧 Turno del Joven' : '👨 Turno del Padre'}
+              </span>
             </div>
 
-            {/* Completion state */}
-            {currentQuestionIndex >= conversationPrompts.length && (
+            {!isLastQ ? (
+              <>
+                {/* Question card */}
+                <div className="rounded-2xl p-6 md:p-8 shadow-xl mb-6" style={{ backgroundColor: textColors.cardBg }}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-2xl">{turnIsKid ? '👧' : '👨'}</span>
+                    <span className="font-bold" style={{ color: textColors.primary }}>{turnIsKid ? 'Joven' : 'Padre'}</span>
+                  </div>
+                  <p className="text-xl md:text-2xl font-semibold mb-6 text-center" style={{ color: textColors.primary }}>
+                    {turnIsKid ? prompt.kidQuestion : prompt.parentQuestion}
+                  </p>
+
+                  {isClosed ? (
+                    <div className="space-y-3">
+                      {(turnIsKid ? prompt?.kidOptions : prompt?.parentOptions)?.map((opt, i) => (
+                        <button
+                          key={i}
+                          onClick={() => {
+                            if (turnIsKid) {
+                              setKidAnswer(opt)
+                            } else {
+                              setParentAnswer(opt)
+                            }
+                            // Auto-advance to next turn or next question
+                            setTimeout(() => {
+                              if (!turnIsKid) {
+                                // Parent just answered, move to next question
+                                setConversationTurn('kid')
+                                setKidAnswer('')
+                                setParentAnswer('')
+                                setCurrentQuestionIndex(prev => prev + 1)
+                              } else {
+                                // Kid just answered, switch to parent
+                                setConversationTurn('parent')
+                              }
+                            }, 300)
+                          }}
+                          className="w-full text-left py-3 px-4 rounded-xl border text-sm font-medium transition-all hover:shadow-md"
+                          style={{ borderColor: textColors.border, color: textColors.label, backgroundColor: 'transparent' }}
+                        >
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div>
+                      <textarea
+                        className="w-full px-4 py-3 rounded-xl resize-none min-h-[120px] placeholder-gray-400"
+                        style={{ borderColor: textColors.border, backgroundColor: textColors.cardBg, color: textColors.primary }}
+                        placeholder={turnIsKid ? 'Escribe tu respuesta como joven...' : 'Escribe tu respuesta como padre...'}
+                        value={turnIsKid ? kidAnswer : parentAnswer}
+                        onChange={(e) => {
+                          if (turnIsKid) setKidAnswer(e.target.value)
+                          else setParentAnswer(e.target.value)
+                        }}
+                      ></textarea>
+                      <button
+                        onClick={() => {
+                          const answer = turnIsKid ? kidAnswer : parentAnswer
+                          if (answer.trim()) {
+if (turnIsKid) {
+                               setKidAnswer(answer)
+                             } else {
+                               setParentAnswer(answer)
+                             }
+                            if (!turnIsKid) {
+                              // Parent finished, go to next question
+                              setConversationTurn('kid')
+                              setKidAnswer('')
+                              setParentAnswer('')
+                              setCurrentQuestionIndex(prev => prev + 1)
+                            } else {
+                              // Kid finished, switch to parent
+                              setConversationTurn('parent')
+                            }
+                          }
+                        }}
+                        className="mt-3 py-2 px-6 rounded-xl text-sm font-bold transition-all"
+                        style={{ backgroundColor: '#10b981', color: '#ffffff' }}
+                      >
+                        {turnIsKid ? 'Joven respondió → Cambiar a Padre' : 'Padre respondió → Siguiente pregunta'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Navigation */}
+                <div className="flex gap-2 justify-center">
+                  <button
+                    onClick={() => navigateTo('home')}
+                    className="py-2 px-4 rounded-xl text-sm font-medium transition-all"
+                    style={{ borderColor: textColors.border, color: textColors.label }}
+                  >
+                    ← Inicio
+                  </button>
+                </div>
+              </>
+            ) : (
+              /* Completion */
               <div className="mt-8 text-center">
-                <div className="w-24 h-24 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#10b98120' }}>
-                  <svg className="w-12 h-12" style={{ color: '#10b981' }} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 6L9 17l-5-5" />
-                    <path d="M6 9l-5 5" />
-                    <path d="M2 9l5 5" />
-                    <path d="M9 19v6" />
-                    <path d="M15 19v6" />
+                <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#10b98120' }}>
+                  <svg className="w-10 h-10" style={{ color: '#10b981' }} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 6L9 17l-5-5" /><path d="M6 9l-5 5" /><path d="M2 9l5 5" /><path d="M9 19v6" /><path d="M15 19v6" />
                   </svg>
                 </div>
-                <h2 className="text-3xl font-bold mb-3" style={{ color: textColors.primary }}>¡Excelente!</h2>
-                <p className="mb-4" style={{ color: textColors.label }}>
-                  Han completado todas las preguntas de conversación familiar.
-                </p>
-                <p className="text-lg" style={{ color: textColors.secondary }}>
-                  ¡Muy bien! Conversar en familia nos ayuda a aprender y convivir mejor.
-                </p>
-                <div className="mt-6 space-y-3">
+                <h2 className="text-2xl font-bold mb-3" style={{ color: textColors.primary }}>¡Excelente!</h2>
+                <p className="mb-2" style={{ color: textColors.label }}>Ambos participaron en la conversación familiar.</p>
+                <p className="text-sm mb-6" style={{ color: textColors.secondary }}>Las respuestas se han guardado en tus perfiles.</p>
+                <div className="space-y-3">
                   <button
                     onClick={() => {
                       setCurrentQuestionIndex(0)
+                      setConversationTurn('kid')
+                      setKidAnswer('')
+                      setParentAnswer('')
                       completeConversation()
                     }}
-                    className="w-full py-3 px-6 rounded-xl transition-all"
-                    style={{ backgroundColor: '#f0fdf4', color: '#065f46' }}
+                    className="w-full py-3 px-6 rounded-xl text-white font-bold transition-all"
+                    style={{ backgroundColor: '#10b981' }}
                   >
-                    Volver a empezar
+                    🔄 Volver a empezar
                   </button>
                   <button
                     onClick={() => navigateTo('home')}
-                    className="w-full py-3 px-6 rounded-xl transition-all"
-                    style={{ backgroundColor: '#10b981', color: '#ffffff' }}
+                    className="w-full py-3 px-6 rounded-xl text-white font-bold transition-all"
+                    style={{ backgroundColor: '#1e293b' }}
                   >
-                    Volver al inicio
+                    🏠 Volver al inicio
                   </button>
                 </div>
               </div>
