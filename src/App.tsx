@@ -426,6 +426,7 @@ const translations = {
     pendingState: 'Manaraq',
     completedState: 'Tukukusqa',
     achievements: 'Atiyniykuna',
+    quickBadges: 'Insigniykuna',
     nextBadgeLabel: 'Qatiq insignia',
     familyActivityLabel: 'Ayllu ruway',
     lessonWord: 'Yachay',
