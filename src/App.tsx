@@ -2187,6 +2187,11 @@ case 'about':
       const activeGuide = PARENT_GUIDES.find(g => g.id === activeGuideId) ?? null
       const examUnlocked = kidsDone.length >= KIDS_TOPICS.length
       const cust7 = getCustomization();
+      const learnStreak = getProgress().streakDays ?? 0
+      const learnBadge = getProgress().badges?.filter(b => b.unlocked).length ?? 0
+      const learnBadgeTotal = getProgress().badges?.length ?? 3
+      const kidsXp = kidsDone.length * 50
+      const guidesXp = guidesDone.length * 30
 
       // Pantalla "¿Coima o no?"
       if (showCoimaONo) {
@@ -2364,43 +2369,105 @@ case 'about':
             {/* BIBLIOTECA HIJOS */}
             {learnView === 'kids' && (
               <>
-                <div className="bg-white rounded-2xl p-6 shadow-sm">
-                  <div className="flex items-center justify-between mb-2">
-                    <h2 className="text-2xl font-black text-primary">🧒 Temas para ti</h2>
-                    <span className="font-bold text-primary">{kidsDone.length}/{KIDS_TOPICS.length}</span>
+                {/* HERO ACADEMY */}
+                <section className="relative overflow-hidden rounded-[28px] border border-primary/15 bg-gradient-to-br from-primary via-primary/90 to-secondary shadow-[0_16px_48px_rgba(37,99,235,0.25)] px-6 py-8 md:px-10 md:py-10 text-white text-center">
+                  <div aria-hidden className="pointer-events-none absolute -top-16 -left-16 w-56 h-56 rounded-full bg-white/10 blur-2xl" />
+                  <div aria-hidden className="pointer-events-none absolute -bottom-16 -right-16 w-56 h-56 rounded-full bg-white/10 blur-2xl" />
+                  <div aria-hidden className="pointer-events-none absolute top-6 right-8 text-4xl opacity-30">☁️</div>
+                  <div aria-hidden className="pointer-events-none absolute bottom-6 left-8 text-4xl opacity-30">☁️</div>
+                  <div className="relative flex flex-col items-center gap-3">
+                    <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-4xl shadow-lg">🎓</div>
+                    <h2 className="text-2xl md:text-3xl font-black leading-tight">Academia de Integridad</h2>
+                    <p className="text-white/85 text-sm md:text-base max-w-md leading-relaxed">
+                      Temas cortitos, con reflexión, reto y racha diaria. ¡Completa los {KIDS_TOPICS.length} para desbloquear el examen!
+                    </p>
+                    {/* CHIPS */}
+                    <div className="flex flex-wrap items-center justify-center gap-2 mt-3">
+                      <div className="px-3 py-2 rounded-2xl bg-white/15 backdrop-blur border border-white/20 font-bold text-sm">🔥 {learnStreak}</div>
+                      <div className="px-3 py-2 rounded-2xl bg-white/15 backdrop-blur border border-white/20 font-bold text-sm">⭐ {kidsXp} XP</div>
+                      <div className="px-3 py-2 rounded-2xl bg-white/15 backdrop-blur border border-white/20 font-bold text-sm">🏅 {learnBadge}/{learnBadgeTotal}</div>
+                      <div className="px-3 py-2 rounded-2xl bg-white/15 backdrop-blur border border-white/20 font-bold text-sm">📖 {kidsDone.length}/{KIDS_TOPICS.length}</div>
+                    </div>
+                    <div className="w-full max-w-[360px] mt-2">
+                      <div className="h-2 bg-white/25 rounded-full overflow-hidden">
+                        <div className="progress-bar h-full rounded-full bg-white transition-[width] duration-700" style={{ width: `${Math.round((kidsDone.length / KIDS_TOPICS.length) * 100)}%` }}></div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="h-3 bg-gray-200 rounded-full overflow-hidden mb-5">
-                    <div className="progress-bar h-full" style={{ width: `${(kidsDone.length / KIDS_TOPICS.length) * 100}%` }}></div>
+                </section>
+
+                {/* RUTA / MAPA */}
+                <section className="rounded-[24px] bg-white border border-slate-100 shadow-[0_4px_20px_rgba(30,41,82,0.05)] p-5 md:p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-black text-slate-800 text-base">🗺️ Tu ruta de aprendizaje</h3>
+                    <span className="font-bold text-primary text-sm tabular-nums">{kidsDone.length}/{KIDS_TOPICS.length}</span>
                   </div>
-                  <div className="flex gap-2 flex-wrap">
-                    {topicFilters.map(f => (
-                      <button
-                        key={f}
-                        onClick={() => setKidsFilter(f)}
-                        className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
-                          kidsFilter === f ? 'bg-primary text-white shadow' : 'bg-gray-100 text-dark hover:bg-gray-200'
-                        }`}
-                      >
-                        {f}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                {(() => {
-                  const next = KIDS_TOPICS.find(k => !kidsDone.includes(k.id))
-                  if (!next) return null
-                  return (
+                  {(() => {
+                    const firstUndone = KIDS_TOPICS.findIndex(k => !kidsDone.includes(k.id))
+                    return (
+                      <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 -mx-1 px-1">
+                        {KIDS_TOPICS.map((k, i) => {
+                          const done = kidsDone.includes(k.id)
+                          const isNext = i === firstUndone
+                          return (
+                            <div key={k.id} className="flex flex-col items-center gap-2 shrink-0 w-[84px]">
+                              <button
+                                onClick={() => { setActiveKidId(k.id); setLearnView('kid'); setShowFeedback(false); setTopicStep(0); setAnsweredOpt(null); }}
+                                className={`relative w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 ${
+                                  done
+                                    ? 'bg-gradient-to-br from-success to-emerald-400 text-white shadow-md shadow-success/30'
+                                    : isNext
+                                      ? 'bg-gradient-to-br from-primary to-secondary text-white shadow-lg shadow-primary/30 ring-4 ring-primary/15 animate-pulse'
+                                      : 'bg-slate-100 text-slate-400'
+                                }`}
+                                aria-label={k.title}
+                              >
+                                <span className="text-xl">{done ? '✓' : k.icon}</span>
+                                {isNext && <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-warning text-white text-[10px] font-black flex items-center justify-center shadow">!</span>}
+                              </button>
+                              <span className={`text-[10px] font-bold text-center leading-tight line-clamp-2 ${done ? 'text-success' : isNext ? 'text-primary' : 'text-slate-400'}`}>
+                                {String(i + 1).padStart(2, '0')}
+                              </span>
+                            </div>
+                          )
+                        })}
+                        {/* Nodo examen */}
+                        <div className="flex flex-col items-center gap-2 shrink-0 w-[84px]">
+                          <button
+                            onClick={() => { if (examUnlocked) { setActiveKidId(null); setLearnView('exam'); setExamAnswers({}); } }}
+                            disabled={!examUnlocked}
+                            className={`relative w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ${
+                              examUnlocked
+                                ? 'bg-gradient-to-br from-warning to-orange-400 text-white shadow-md shadow-warning/30 hover:scale-105 active:scale-95'
+                                : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                            }`}
+                            aria-label="Examen final"
+                          >
+                            <span className="text-xl">{examUnlocked ? '🏁' : '🔒'}</span>
+                          </button>
+                          <span className="text-[10px] font-bold text-center leading-tight text-slate-400">EXAMEN</span>
+                        </div>
+                      </div>
+                    )
+                  })()}
+                </section>
+
+                {/* FILTROS */}
+                <div className="flex gap-2 flex-wrap justify-center">
+                  {topicFilters.map(f => (
                     <button
-                      onClick={() => { setActiveKidId(next.id); setLearnView('kid'); setShowFeedback(false); }}
-                      className="rounded-2xl p-6 w-full text-left text-white shadow-lg transition-all hover:shadow-xl cursor-pointer"
-                      style={{ background: 'linear-gradient(135deg, #F59E0B, #EA580C)' }}
+                      key={f}
+                      onClick={() => setKidsFilter(f)}
+                      className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                        kidsFilter === f ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-md shadow-primary/25' : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-100'
+                      }`}
                     >
-                      <p className="text-xs font-black tracking-widest text-white/80">🎯 RETO ACTUAL</p>
-                      <p className="text-xl font-black mt-1">{next.icon} {next.title}</p>
-                      <p className="text-sm text-white/85 mt-1">Continúa donde te quedaste →</p>
+                      {f}
                     </button>
-                  )
-                })()}
+                  ))}
+                </div>
+
+                {/* TARJETAS ISLA */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   {KIDS_TOPICS.filter(k => kidsFilter === 'Todos' || k.category === kidsFilter).map((k, i) => {
                     const done = kidsDone.includes(k.id)
@@ -2408,42 +2475,52 @@ case 'about':
                       <button
                         key={k.id}
                         onClick={() => { setActiveKidId(k.id); setLearnView('kid'); setShowFeedback(false); setTopicStep(0); setAnsweredOpt(null); }}
-                        className="bg-white rounded-2xl p-6 shadow-sm text-left border border-gray-100 transition-all hover:-translate-y-1 hover:shadow-lg cursor-pointer"
+                        className="group bg-white rounded-[22px] p-6 shadow-sm border border-slate-100 text-left transition-all hover:-translate-y-1 hover:shadow-lg hover:border-primary/20 cursor-pointer"
                       >
                         <div className="flex items-start gap-4">
-                          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/15 to-secondary/15 flex items-center justify-center text-4xl shrink-0">
+                          <div className={`w-14 h-14 shrink-0 rounded-2xl flex items-center justify-center text-3xl transition-transform duration-200 group-hover:scale-105 ${done ? 'bg-success/15' : 'bg-gradient-to-br from-primary/15 to-secondary/15'}`}>
                             {k.icon}
                           </div>
                           <div className="flex-1">
-                            <p className="text-xs font-bold text-gray-400">{String(i + 1).padStart(2, '0')} · {k.category}{k.joint ? ' · 👨‍👩‍👧 Juntos' : ''}</p>
-                            <h3 className="font-bold text-dark text-lg leading-snug mt-1">{k.title}</h3>
-                            <p className="text-sm text-gray-500 leading-relaxed mt-1">{k.desc}</p>
-                            <span className={`inline-block mt-3 font-bold text-sm px-4 py-2 rounded-full ${done ? 'bg-success/15 text-success' : 'bg-primary text-white'}`}>
-                              {done ? '✓ Completado' : 'Comenzar →'}
-                            </span>
+                            <p className="text-[11px] font-bold text-slate-400">{String(i + 1).padStart(2, '0')} · {k.category}{k.joint ? ' · 👨‍👩‍👧 Juntos' : ''}</p>
+                            <h3 className="font-bold text-slate-800 text-lg leading-snug mt-1">{k.title}</h3>
+                            <p className="text-sm text-slate-500 leading-relaxed mt-1 line-clamp-2">{k.desc}</p>
+                            <div className="flex items-center justify-between gap-2 mt-3">
+                              <span className="text-[11px] font-bold text-slate-400">1 lección · +50 XP</span>
+                              <span className={`inline-flex items-center gap-1 font-bold text-xs px-4 py-2 rounded-full transition-colors ${done ? 'bg-success/15 text-success' : 'bg-gradient-to-r from-primary to-secondary text-white shadow-sm shadow-primary/25'}`}>
+                                {done ? '✓ Completado' : 'Comenzar →'}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </button>
                     )
                   })}
                 </div>
+
+                {/* EXAMEN FINAL */}
                 <button
                   onClick={() => { if (examUnlocked) { setActiveKidId(null); setLearnView('exam'); setExamAnswers({}); } }}
                   disabled={!examUnlocked}
-                  className={`rounded-2xl p-6 w-full text-left transition-all ${
+                  className={`group rounded-[22px] p-6 w-full text-left transition-all ${
                     examUnlocked
-                      ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-lg hover:shadow-xl cursor-pointer'
-                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-lg shadow-primary/25 hover:shadow-xl cursor-pointer'
+                      : 'bg-slate-100 text-slate-400 cursor-not-allowed'
                   }`}
                 >
                   <div className="flex items-center gap-4">
-                    <div className="text-5xl">{examUnlocked ? '📝' : '🔒'}</div>
-                    <div>
+                    <div className={`w-14 h-14 shrink-0 rounded-2xl flex items-center justify-center text-3xl ${examUnlocked ? 'bg-white/20' : 'bg-white'}`}>
+                      {examUnlocked ? '🎓' : '🔒'}
+                    </div>
+                    <div className="flex-1">
                       <h3 className="font-black text-xl">Examen final</h3>
                       <p className={`text-sm ${examUnlocked ? 'text-white/85' : ''}`}>
-                        {examUnlocked ? '14 preguntas de todos los temas. ¡Consigue tus insignias! →' : `Completa los ${KIDS_TOPICS.length} temas para desbloquearlo`}
+                        {examUnlocked ? 'Pon a prueba todo lo aprendido. ¡Consigue tus insignias! →' : `Completa los ${KIDS_TOPICS.length} temas para desbloquearlo`}
                       </p>
                     </div>
+                    <span className={`hidden sm:inline-flex items-center gap-1 font-bold text-sm px-5 py-2.5 rounded-full ${examUnlocked ? 'bg-white text-primary' : 'bg-slate-200 text-slate-400'}`}>
+                      {examUnlocked ? 'Comenzar →' : 'Bloqueado'}
+                    </span>
                   </div>
                 </button>
               </>
@@ -2452,28 +2529,89 @@ case 'about':
             {/* BIBLIOTECA PADRES */}
             {learnView === 'parents' && (
               <>
-                <div className="bg-white rounded-2xl p-6 shadow-sm">
-                  <div className="flex items-center justify-between mb-2">
-                    <h2 className="text-2xl font-black text-secondary">👨‍👩‍👧 Guías para acompañar</h2>
-                    <span className="font-bold text-secondary">{guidesDone.length}/{PARENT_GUIDES.length}</span>
+                {/* HERO ACADEMY */}
+                <section className="relative overflow-hidden rounded-[28px] border border-secondary/15 bg-gradient-to-br from-secondary via-secondary/90 to-fuchsia-500 shadow-[0_16px_48px_rgba(124,58,237,0.25)] px-6 py-8 md:px-10 md:py-10 text-white text-center">
+                  <div aria-hidden className="pointer-events-none absolute -top-16 -left-16 w-56 h-56 rounded-full bg-white/10 blur-2xl" />
+                  <div aria-hidden className="pointer-events-none absolute -bottom-16 -right-16 w-56 h-56 rounded-full bg-white/10 blur-2xl" />
+                  <div aria-hidden className="pointer-events-none absolute top-6 right-8 text-4xl opacity-30">☁️</div>
+                  <div aria-hidden className="pointer-events-none absolute bottom-6 left-8 text-4xl opacity-30">☁️</div>
+                  <div className="relative flex flex-col items-center gap-3">
+                    <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-4xl shadow-lg">👨‍👩‍👧</div>
+                    <h2 className="text-2xl md:text-3xl font-black leading-tight">Academia para Padres</h2>
+                    <p className="text-white/85 text-sm md:text-base max-w-md leading-relaxed">
+                      Guías cortitas para conversar y acompañar a tus hijos. Revisa las {PARENT_GUIDES.length} guías a tu ritmo.
+                    </p>
+                    {/* CHIPS */}
+                    <div className="flex flex-wrap items-center justify-center gap-2 mt-3">
+                      <div className="px-3 py-2 rounded-2xl bg-white/15 backdrop-blur border border-white/20 font-bold text-sm">🔥 {learnStreak}</div>
+                      <div className="px-3 py-2 rounded-2xl bg-white/15 backdrop-blur border border-white/20 font-bold text-sm">⭐ {guidesXp} XP</div>
+                      <div className="px-3 py-2 rounded-2xl bg-white/15 backdrop-blur border border-white/20 font-bold text-sm">🏅 {learnBadge}/{learnBadgeTotal}</div>
+                      <div className="px-3 py-2 rounded-2xl bg-white/15 backdrop-blur border border-white/20 font-bold text-sm">📖 {guidesDone.length}/{PARENT_GUIDES.length}</div>
+                    </div>
+                    <div className="w-full max-w-[360px] mt-2">
+                      <div className="h-2 bg-white/25 rounded-full overflow-hidden">
+                        <div className="progress-bar h-full rounded-full bg-white transition-[width] duration-700" style={{ width: `${Math.round((guidesDone.length / PARENT_GUIDES.length) * 100)}%` }}></div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="h-3 bg-gray-200 rounded-full overflow-hidden mb-5">
-                    <div className="h-full rounded-full" style={{ width: `${(guidesDone.length / PARENT_GUIDES.length) * 100}%`, background: 'linear-gradient(90deg, #7C3AED, #EC4899)' }}></div>
+                </section>
+
+                {/* RUTA / MAPA */}
+                <section className="rounded-[24px] bg-white border border-slate-100 shadow-[0_4px_20px_rgba(30,41,82,0.05)] p-5 md:p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-black text-slate-800 text-base">🗺️ Tu ruta de acompañamiento</h3>
+                    <span className="font-bold text-secondary text-sm tabular-nums">{guidesDone.length}/{PARENT_GUIDES.length}</span>
                   </div>
-                  <div className="flex gap-2 flex-wrap">
-                    {topicFilters.map(f => (
-                      <button
-                        key={f}
-                        onClick={() => setParentsFilter(f)}
-                        className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
-                          parentsFilter === f ? 'bg-secondary text-white shadow' : 'bg-gray-100 text-dark hover:bg-gray-200'
-                        }`}
-                      >
-                        {f}
-                      </button>
-                    ))}
-                  </div>
+                  {(() => {
+                    const firstUndone = PARENT_GUIDES.findIndex(g => !guidesDone.includes(g.id))
+                    return (
+                      <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 -mx-1 px-1">
+                        {PARENT_GUIDES.map((g, i) => {
+                          const done = guidesDone.includes(g.id)
+                          const isNext = i === firstUndone
+                          return (
+                            <div key={g.id} className="flex flex-col items-center gap-2 shrink-0 w-[84px]">
+                              <button
+                                onClick={() => { setActiveGuideId(g.id); setLearnView('guide'); setShowFeedback(false); }}
+                                className={`relative w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 ${
+                                  done
+                                    ? 'bg-gradient-to-br from-success to-emerald-400 text-white shadow-md shadow-success/30'
+                                    : isNext
+                                      ? 'bg-gradient-to-br from-secondary to-fuchsia-500 text-white shadow-lg shadow-secondary/30 ring-4 ring-secondary/15 animate-pulse'
+                                      : 'bg-slate-100 text-slate-400'
+                                }`}
+                                aria-label={g.title}
+                              >
+                                <span className="text-xl">{done ? '✓' : g.icon}</span>
+                                {isNext && <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-warning text-white text-[10px] font-black flex items-center justify-center shadow">!</span>}
+                              </button>
+                              <span className={`text-[10px] font-bold text-center leading-tight line-clamp-2 ${done ? 'text-success' : isNext ? 'text-secondary' : 'text-slate-400'}`}>
+                                {String(i + 1).padStart(2, '0')}
+                              </span>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )
+                  })()}
+                </section>
+
+                {/* FILTROS */}
+                <div className="flex gap-2 flex-wrap justify-center">
+                  {topicFilters.map(f => (
+                    <button
+                      key={f}
+                      onClick={() => setParentsFilter(f)}
+                      className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${
+                        parentsFilter === f ? 'bg-gradient-to-r from-secondary to-fuchsia-500 text-white shadow-md shadow-secondary/25' : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-100'
+                      }`}
+                    >
+                      {f}
+                    </button>
+                  ))}
                 </div>
+
+                {/* TARJETAS ISLA */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   {PARENT_GUIDES.filter(g => parentsFilter === 'Todos' || g.category === parentsFilter).map((g, i) => {
                     const done = guidesDone.includes(g.id)
@@ -2481,19 +2619,22 @@ case 'about':
                       <button
                         key={g.id}
                         onClick={() => { setActiveGuideId(g.id); setLearnView('guide'); }}
-                        className="bg-white rounded-2xl p-6 shadow-sm text-left border border-gray-100 transition-all hover:-translate-y-1 hover:shadow-lg cursor-pointer"
+                        className="group bg-white rounded-[22px] p-6 shadow-sm border border-slate-100 text-left transition-all hover:-translate-y-1 hover:shadow-lg hover:border-secondary/20 cursor-pointer"
                       >
                         <div className="flex items-start gap-4">
-                          <div className="w-14 h-14 rounded-2xl bg-secondary/10 flex items-center justify-center text-3xl shrink-0">
+                          <div className={`w-14 h-14 shrink-0 rounded-2xl flex items-center justify-center text-3xl transition-transform duration-200 group-hover:scale-105 ${done ? 'bg-success/15' : 'bg-gradient-to-br from-secondary/15 to-fuchsia-500/15'}`}>
                             {g.icon}
                           </div>
                           <div className="flex-1">
-                            <p className="text-xs font-bold text-gray-400">{String(i + 1).padStart(2, '0')} · {g.category}{g.joint ? ' · 👨‍👩‍👧 Juntos' : ''}</p>
-                            <h3 className="font-bold text-dark text-lg leading-snug mt-1">{g.title}</h3>
-                            <p className="text-sm text-gray-500 leading-relaxed mt-1">{g.desc}</p>
-                            <span className={`inline-block mt-3 font-bold text-sm px-4 py-2 rounded-full ${done ? 'bg-success/15 text-success' : 'bg-secondary text-white'}`}>
-                              {done ? '✓ Revisada' : 'Ver guía →'}
-                            </span>
+                            <p className="text-[11px] font-bold text-slate-400">{String(i + 1).padStart(2, '0')} · {g.category}{g.joint ? ' · 👨‍👩‍👧 Juntos' : ''}</p>
+                            <h3 className="font-bold text-slate-800 text-lg leading-snug mt-1">{g.title}</h3>
+                            <p className="text-sm text-slate-500 leading-relaxed mt-1 line-clamp-2">{g.desc}</p>
+                            <div className="flex items-center justify-between gap-2 mt-3">
+                              <span className="text-[11px] font-bold text-slate-400">1 guía · +30 XP</span>
+                              <span className={`inline-flex items-center gap-1 font-bold text-xs px-4 py-2 rounded-full transition-colors ${done ? 'bg-success/15 text-success' : 'bg-gradient-to-r from-secondary to-fuchsia-500 text-white shadow-sm shadow-secondary/25'}`}>
+                                {done ? '✓ Revisada' : 'Ver guía →'}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </button>
