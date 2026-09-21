@@ -2984,6 +2984,12 @@ case 'converse':
                   </button>
                 )}
                 <button
+                  onClick={() => navigateTo('home')}
+                  className="flex-1 py-3 px-6 rounded-xl bg-gray-800 text-white text-sm font-bold hover:bg-gray-700 transition-all"
+                >
+                  ← Volver al inicio
+                </button>
+                <button
                   onClick={() => {
                     if (currentQuestionIndex < conversationPrompts.length - 1) {
                       setCurrentQuestionIndex(prev => prev + 1)
