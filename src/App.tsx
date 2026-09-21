@@ -1411,21 +1411,28 @@ export default function App() {
     switch (currentScreen) {
     case 'welcome':
       return (
-        <div className="min-h-screen welcome-bg flex items-center justify-center p-8">
-          <div className="max-w-5xl mx-auto text-center text-white animate-fade-in">
-            <h1 className="text-5xl font-bold mb-4 drop-shadow-lg">{t('welcomeTitle')}</h1>
-            <p className="text-xl mb-8 opacity-90">{t('welcomeSub')}</p>
-            
-            <div className="space-y-4">
-<button
+        <div className="min-h-screen welcome-bg flex items-center justify-center p-6 md:p-8 relative overflow-hidden">
+          <div aria-hidden className="pointer-events-none absolute inset-0">
+            <div className="absolute -top-20 -left-16 w-72 h-72 rounded-full bg-white/10 blur-3xl" />
+            <div className="absolute -bottom-24 -right-16 w-96 h-96 rounded-full bg-white/15 blur-3xl" />
+          </div>
+          <div className="relative max-w-2xl mx-auto text-center text-white animate-fade-in py-10 md:py-16">
+            <div className="w-20 h-20 md:w-24 md:h-24 mx-auto mb-8 rounded-3xl bg-white/15 backdrop-blur-md border border-white/25 flex items-center justify-center text-5xl md:text-6xl shadow-xl animate-float">
+              💬
+            </div>
+            <h1 className="text-4xl md:text-6xl font-black mb-5 drop-shadow-lg tracking-tight">{t('welcomeTitle')}</h1>
+            <p className="text-lg md:text-2xl mb-10 opacity-90 leading-relaxed max-w-xl mx-auto">{t('welcomeSub')}</p>
+
+            <div className="space-y-4 max-w-sm mx-auto">
+              <button
                 onClick={() => setCurrentScreen('profile-type')}
-                className="btn-glow bg-white text-black font-bold py-4 px-8 rounded-full text-lg shadow-lg w-full"
+                className="btn-glow bg-white text-indigo-700 font-extrabold py-5 px-8 rounded-2xl text-lg shadow-xl w-full transition-transform hover:scale-[1.02]"
               >
-                {t('start')}
+                {t('start')} <span aria-hidden>→</span>
               </button>
               <button
                 onClick={() => setCurrentScreen('about')}
-                className="bg-white/20 backdrop-blur-sm border-2 border-white/30 text-white font-bold py-4 px-8 rounded-full text-lg w-full hover:bg-white/30 transition-all"
+                className="bg-white/15 backdrop-blur-md border-2 border-white/30 text-white font-bold py-4 px-8 rounded-2xl text-lg w-full hover:bg-white/25 transition-all"
               >
                 {t('howItWorks')}
               </button>
@@ -1707,7 +1714,7 @@ case 'about':
             <div className="grid grid-cols-3 gap-8 mb-12">
               <button
                 onClick={() => setDevice('pc')}
-                className={`glass-card rounded-2xl p-8 card-hover shadow-custom-lg ${device === 'pc' ? 'ring-4 ring-primary' : ''}`}
+                className={`bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-8 card-hover shadow-custom-lg ${device === 'pc' ? 'ring-4 ring-primary' : ''}`}
               >
                 <div className="text-6xl mb-4 animate-float">🖥️</div>
                 <div className="font-bold text-dark text-xl mb-2">PC</div>
@@ -1715,7 +1722,7 @@ case 'about':
               </button>
               <button
                 onClick={() => setDevice('phone')}
-                className={`glass-card rounded-2xl p-8 card-hover shadow-custom-lg ${device === 'phone' ? 'ring-4 ring-secondary' : ''}`}
+                className={`bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-8 card-hover shadow-custom-lg ${device === 'phone' ? 'ring-4 ring-secondary' : ''}`}
               >
                 <div className="text-6xl mb-4 animate-float">📱</div>
                 <div className="font-bold text-dark text-xl mb-2">Móvil</div>
@@ -1723,7 +1730,7 @@ case 'about':
               </button>
               <button
                 onClick={() => setDevice('laptop')}
-                className={`glass-card rounded-2xl p-8 card-hover shadow-custom-lg ${device === 'laptop' ? 'ring-4 ring-warning' : ''}`}
+                className={`bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-8 card-hover shadow-custom-lg ${device === 'laptop' ? 'ring-4 ring-warning' : ''}`}
               >
                 <div className="text-6xl mb-4 animate-float">💻</div>
                 <div className="font-bold text-dark text-xl mb-2">Laptop</div>
@@ -1751,7 +1758,7 @@ case 'about':
             </div>
             
             <div className="space-y-8">
-              <div className="glass-card rounded-2xl p-8 mb-6">
+              <div className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-8 mb-6">
                 <h3 className="font-bold text-xl mb-6 text-center">{t('yourData')}</h3>
                 <div className="space-y-5">
                   <div>
@@ -1867,114 +1874,153 @@ case 'about':
       const homeBadgeCount = isFamHome ? familyProfile.familyBadges.filter(b => b.unlocked).length : unlockedCount
       const homeBadgeTotal = isFamHome ? familyProfile.familyBadges.length : 3
       return (
-        <div className="min-h-screen p-8" style={{ background: cust5.backgroundValue, backgroundSize: cust5.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
-          <div className="max-w-6xl mx-auto animate-slide-up space-y-16">
-            
+        <div className="min-h-screen p-4 md:p-10" style={{ background: cust5.backgroundValue, backgroundSize: cust5.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
+          <div className="max-w-6xl mx-auto animate-slide-up space-y-8 md:space-y-12">
+
             {/* Header */}
-            <div className="bg-white rounded-2xl p-6 flex items-center justify-between shadow-sm">
-              <div className="flex items-center gap-4">
-                <div className="glass-card px-5 py-3 rounded-xl text-primary font-bold text-xl shadow-lg">
-                  🏅 {homeBadgeCount}/{homeBadgeTotal}
+            <header className="bg-white/85 backdrop-blur-xl rounded-3xl p-5 md:p-6 flex items-center justify-between shadow-lg shadow-indigo-500/5">
+              <div className="flex items-center gap-4 md:gap-5">
+                <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-2xl md:text-3xl shadow-lg shadow-primary/25">
+                  {device === 'phone' ? '📱' : device === 'laptop' ? '💻' : '🖥️'}
                 </div>
                 <div>
-                  <h1 className="text-3xl font-black text-black">{t('greeting')}</h1>
-                  <p className="text-base text-gray-600">{device === 'phone' ? '📱 Móvil' : device === 'laptop' ? '💻 Laptop' : '🖥️ PC'}</p>
+                  <h1 className="text-2xl md:text-3xl font-black gradient-text leading-tight">{t('greeting')}</h1>
+                  <p className="text-sm md:text-base text-gray-500 mt-1">{isFamHome ? '👨‍👩‍👧‍👦 Modo familia' : device === 'phone' ? '📱 Modo móvil' : device === 'laptop' ? '💻 Modo laptop' : '🖥️ Modo PC'}</p>
                 </div>
               </div>
-              <button onClick={() => setCurrentScreen('config')} className="glass-card px-5 py-3 rounded-xl text-primary text-base font-medium hover:bg-primary/10 transition-all">
-                ⚙️ {t('configTitle')}
-              </button>
-            </div>
+              <div className="flex items-center gap-3">
+                <div className="px-4 py-2 rounded-2xl bg-warning/10 text-warning font-extrabold text-lg shadow-sm border border-warning/20">
+                  🏅 <span className="tabular-nums">{homeBadgeCount}/{homeBadgeTotal}</span>
+                </div>
+                <button
+                  onClick={() => setCurrentScreen('config')}
+                  className="w-12 h-12 rounded-2xl bg-white hover:bg-primary/10 text-primary shadow-sm transition-all text-xl"
+                  aria-label={t('configTitle')}
+                >
+                  ⚙️
+                </button>
+              </div>
+            </header>
 
-            {/* Welcome line */}
-            <div className="rounded-2xl px-6 py-5 shadow-lg text-center" style={{ background: 'linear-gradient(135deg, #2563EB, #7C3AED, #EC4899)' }}>
-              <p className="text-xl text-white font-bold drop-shadow">✨ {t('welcomeLine')} 🌟</p>
-            </div>
+            {/* Welcome banner */}
+            <section className="relative overflow-hidden rounded-3xl px-8 py-8 md:px-12 md:py-10 shadow-xl shadow-primary/20 text-center" style={{ background: 'linear-gradient(135deg, #2563EB 0%, #7C3AED 55%, #DB2777 120%)' }}>
+              <div aria-hidden className="absolute -top-20 -left-12 w-56 h-56 rounded-full bg-white/10 blur-2xl" />
+              <div aria-hidden className="absolute -bottom-24 -right-12 w-72 h-72 rounded-full bg-pink-300/20 blur-3xl" />
+              <div aria-hidden className="absolute top-0 left-1/3 w-2 h-2 rounded-full bg-white/40" />
+              <div aria-hidden className="absolute top-10 right-1/4 w-3 h-3 rounded-full bg-white/30" />
+              <p className="relative text-lg md:text-2xl text-white font-bold tracking-tight drop-shadow">
+                ✨ {t('welcomeLine')} 🌟
+              </p>
+            </section>
 
             {/* Badges Card */}
-            <div className="glass-card rounded-2xl p-10 card-hover">
+            <section className="bg-white/85 backdrop-blur-xl rounded-3xl p-7 md:p-10 shadow-lg shadow-indigo-500/5 card-hover">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="font-bold text-secondary text-xl">{t('badges')}</h3>
-                <span className="text-lg font-bold text-primary">{homeBadgeCount}/{homeBadgeTotal}</span>
+                <h3 className="font-bold text-secondary text-lg md:text-xl">{t('badges')}</h3>
+                <span className="text-base md:text-lg font-extrabold text-primary tabular-nums">{homeBadgeCount}/{homeBadgeTotal}</span>
               </div>
-              <div className="flex gap-6 mb-8">
+              <div className="flex gap-4 md:gap-6 mb-8">
                 {(isFamHome ? familyProfile.familyBadges : currentProgress.badges).map(badge => (
-                  <div key={badge.id} className={`flex-1 text-center p-5 rounded-xl ${badge.unlocked ? 'animate-float' : 'opacity-30 grayscale'}`}>
-                    <div className="text-4xl">{badge.emoji}</div>
-                    <div className="text-xs font-bold mt-2 truncate">{badge.name}</div>
+                  <div key={badge.id} className={`flex-1 text-center p-5 md:p-6 rounded-2xl transition-all ${badge.unlocked ? 'bg-gradient-to-br from-warning/10 to-primary/10 border border-warning/20 animate-float' : 'bg-gray-50 border-2 border-dashed border-gray-200 opacity-50'}`}>
+                    <div className="text-4xl md:text-5xl mb-2">{badge.emoji}</div>
+                    <div className="text-xs md:text-sm font-bold mt-2 truncate">{badge.name}</div>
+                    <div className="text-[10px] mt-1 font-medium" style={{ color: badge.unlocked ? '#059669' : '#94a3b8' }}>
+                      {badge.unlocked ? '✓ Desbloqueada' : '🔒 Bloqueada'}
+                    </div>
                   </div>
                 ))}
               </div>
-              <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
+              <div className="h-3.5 bg-gray-100 rounded-full overflow-hidden">
                 <div
                   className="progress-bar h-full"
-                  style={{ width: `${Math.min((homeBadgeCount / Math.max(homeBadgeTotal, 1)) * 100, 100)}%` }}
+                  style={{ width: `${Math.min((homeBadgeCount / Math.max(homeBadgeTotal, 1)) * 100, 100)}%`, boxShadow: '0 2px 8px rgba(124,58,237,0.4)' }}
                 ></div>
               </div>
-            </div>
+              <div className="flex justify-between mt-2 text-xs text-gray-400">
+                <span>{t('badges')}</span>
+                <span>{Math.round(Math.min((homeBadgeCount / Math.max(homeBadgeTotal, 1)) * 100, 100))}%</span>
+              </div>
+            </section>
 
             {/* Main Grid - 2x2 */}
-            <div className="grid grid-cols-2 gap-12">
+            <section className="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8">
               <button
                 onClick={() => { setLearnView('hub'); setCurrentScreen('learn') }}
-                className="glass-card rounded-2xl p-10 card-hover shadow-custom-lg min-h-[180px] flex flex-col justify-between group"
+                className="group bg-white/85 backdrop-blur-xl rounded-3xl p-8 md:p-9 card-hover shadow-lg shadow-indigo-500/5 min-h-[200px] flex flex-col justify-between text-left relative overflow-hidden"
               >
+                <div aria-hidden className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-primary/10 blur-2xl group-hover:bg-primary/20 transition-all duration-500" />
                 <div>
-                  <div className="text-6xl mb-6 group-hover:scale-110 transition-transform duration-300">📚</div>
-                  <h3 className="font-bold text-primary text-2xl mb-3">{t('themes')}</h3>
+                  <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-300">📚</div>
+                  <h3 className="font-bold text-primary text-xl md:text-2xl mb-2">{t('themes')}</h3>
                   <p className="text-gray-500 leading-relaxed">{t('themesDesc')}</p>
                 </div>
+                <span className="inline-flex items-center gap-1 mt-6 text-primary font-semibold text-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                  {t('continue')} <span aria-hidden>→</span>
+                </span>
               </button>
               <button
                 onClick={() => setCurrentScreen('games')}
-                className="glass-card rounded-2xl p-10 card-hover shadow-custom-lg min-h-[180px] flex flex-col justify-between group"
+                className="group bg-white/85 backdrop-blur-xl rounded-3xl p-8 md:p-9 card-hover shadow-lg shadow-indigo-500/5 min-h-[200px] flex flex-col justify-between text-left relative overflow-hidden"
               >
+                <div aria-hidden className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-secondary/10 blur-2xl group-hover:bg-secondary/20 transition-all duration-500" />
                 <div>
-                  <div className="text-6xl mb-6 group-hover:scale-110 transition-transform duration-300">🎮</div>
-                  <h3 className="font-bold text-secondary text-2xl mb-3">{t('game')}</h3>
+                  <div className="w-16 h-16 rounded-2xl bg-secondary/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-300">🎮</div>
+                  <h3 className="font-bold text-secondary text-xl md:text-2xl mb-2">{t('game')}</h3>
                   <p className="text-gray-500 leading-relaxed">{t('gameDesc')}</p>
                 </div>
+                <span className="inline-flex items-center gap-1 mt-6 text-secondary font-semibold text-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                  {t('continue')} <span aria-hidden>→</span>
+                </span>
               </button>
               <button
                 onClick={() => setCurrentScreen('reels')}
-                className="glass-card rounded-2xl p-10 card-hover shadow-custom-lg min-h-[180px] flex flex-col justify-between group"
+                className="group bg-white/85 backdrop-blur-xl rounded-3xl p-8 md:p-9 card-hover shadow-lg shadow-indigo-500/5 min-h-[200px] flex flex-col justify-between text-left relative overflow-hidden"
               >
+                <div aria-hidden className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-warning/10 blur-2xl group-hover:bg-warning/20 transition-all duration-500" />
                 <div>
-                  <div className="text-6xl mb-6 group-hover:scale-110 transition-transform duration-300">📱</div>
-                  <h3 className="font-bold text-warning text-2xl mb-3">{t('reels')}</h3>
+                  <div className="w-16 h-16 rounded-2xl bg-warning/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-300">📱</div>
+                  <h3 className="font-bold text-warning text-xl md:text-2xl mb-2">{t('reels')}</h3>
                   <p className="text-gray-500 leading-relaxed">{t('reelsDesc')}</p>
                 </div>
+                <span className="inline-flex items-center gap-1 mt-6 text-warning font-semibold text-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                  {t('continue')} <span aria-hidden>→</span>
+                </span>
               </button>
               <button
                 onClick={() => setCurrentScreen('profile')}
-                className="glass-card rounded-2xl p-10 card-hover shadow-custom-lg min-h-[180px] flex flex-col justify-between group"
+                className="group bg-white/85 backdrop-blur-xl rounded-3xl p-8 md:p-9 card-hover shadow-lg shadow-indigo-500/5 min-h-[200px] flex flex-col justify-between text-left relative overflow-hidden"
               >
+                <div aria-hidden className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-success/10 blur-2xl group-hover:bg-success/20 transition-all duration-500" />
                 <div>
-                  <div className="text-6xl mb-6 group-hover:scale-110 transition-transform duration-300">👤</div>
-                  <h3 className="font-bold text-success text-2xl mb-3">{t('profile')}</h3>
+                  <div className="w-16 h-16 rounded-2xl bg-success/10 flex items-center justify-center text-4xl mb-6 group-hover:scale-110 group-hover:-rotate-6 transition-transform duration-300">👤</div>
+                  <h3 className="font-bold text-success text-xl md:text-2xl mb-2">{t('profile')}</h3>
                   <p className="text-gray-500 leading-relaxed">{t('profileDesc')}</p>
                 </div>
+                <span className="inline-flex items-center gap-1 mt-6 text-success font-semibold text-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                  {t('continue')} <span aria-hidden>→</span>
+                </span>
               </button>
-            </div>
-
-            {/* Divider */}
-            <hr className="border-gray-200 my-16" />
+            </section>
 
             {/* Family Activity */}
-            <div className="glass-card rounded-2xl p-10 card-hover text-center">
-              <div className="text-4xl mb-4">💬</div>
-              <h3 className="font-bold text-warning text-xl mb-4">{t('familyActivity')}</h3>
-              <p className="text-gray-600 mb-6 leading-relaxed max-w-xl mx-auto">
-                {t('familyDesc')}
-              </p>
-              <button
-                onClick={() => setCurrentScreen('converse')}
-                className="btn-glow bg-warning text-white font-bold py-4 px-8 rounded-xl text-base w-full max-w-xs"
-              >
-                {t('converse')}
-              </button>
-            </div>
-            
+            <section className="relative overflow-hidden bg-white/85 backdrop-blur-xl rounded-3xl p-8 md:p-12 card-hover shadow-lg shadow-indigo-500/5 text-center">
+              <div aria-hidden className="absolute -top-14 -right-10 w-48 h-48 rounded-full bg-warning/10 blur-3xl" />
+              <div aria-hidden className="absolute -bottom-14 -left-10 w-48 h-48 rounded-full bg-primary/10 blur-3xl" />
+              <div className="relative">
+                <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-warning/10 flex items-center justify-center text-4xl animate-float">💬</div>
+                <h3 className="font-bold text-warning text-xl md:text-2xl mb-4">{t('familyActivity')}</h3>
+                <p className="text-gray-600 mb-7 leading-relaxed max-w-xl mx-auto">
+                  {t('familyDesc')}
+                </p>
+                <button
+                  onClick={() => setCurrentScreen('converse')}
+                  className="btn-glow bg-warning text-white font-bold py-4 px-10 rounded-2xl text-base w-full max-w-xs"
+                >
+                  {t('converse')}
+                </button>
+              </div>
+            </section>
+
           </div>
         </div>
       )
@@ -1996,7 +2042,7 @@ case 'about':
 
             <div className="space-y-4">
               {reelsMessages.map((reel, index) => (
-                <div key={reel.id} className="glass-card rounded-2xl p-6 shadow-custom-lg card-hover animate-slide-up" style={{ animationDelay: `${index * 80}ms` }}>
+                <div key={reel.id} className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-6 shadow-custom-lg card-hover animate-slide-up" style={{ animationDelay: `${index * 80}ms` }}>
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-warning to-primary flex items-center justify-center text-white font-bold">
                       {reel.author[0]}
@@ -2111,7 +2157,7 @@ case 'about':
               </div>
 
               {showFeedback && (
-                <div className="glass-card rounded-2xl p-6 animate-fade-in">
+                <div className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-6 animate-fade-in">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 rounded-full flex items-center justify-center text-xl"
                          style={{ background: feedbackMessage.includes('Correcto') ? '#10B98120' : '#EF444420' }}>
@@ -2527,7 +2573,7 @@ case 'about':
                 )}
                 {/* 5. CONVERSA */}
                 {topicStep === 4 && (
-                <div className="glass-card rounded-2xl p-8">
+                <div className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-8">
                   <p className="text-xs font-black tracking-widest text-warning mb-2">5 · CONVERSA EN FAMILIA</p>
                   <h3 className="font-bold text-warning text-xl mb-2">💬 Conversarlo en familia</h3>
                   <p className="text-gray-700 italic leading-relaxed">“{activeKid.familyPrompt}”</p>
@@ -2693,7 +2739,7 @@ case 'about':
                     📌 Asignar actividad familiar
                   </button>
                 </div>
-                <div className="glass-card rounded-2xl p-8">
+                <div className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-8">
                   <h3 className="font-bold text-primary text-xl mb-2">👦 Actividad relacionada</h3>
                   <p className="text-gray-600 mb-6">Tu hijo puede trabajar este tema desde su biblioteca.</p>
                   <button
@@ -2708,7 +2754,7 @@ case 'about':
 
             {/* EXAMEN FINAL */}
             {learnView === 'exam' && examUnlocked && (
-              <div className="glass-card rounded-2xl p-8">
+              <div className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-8">
                 <button onClick={() => setLearnView('kids')} className="text-gray-500 hover:text-primary text-sm font-medium mb-4">
                   ← Biblioteca
                 </button>
@@ -2801,7 +2847,7 @@ case 'about':
               </button>
             </div>
 
-            <div className="glass-card rounded-2xl p-6 shadow-custom-lg mb-6 card-hover">
+            <div className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-6 shadow-custom-lg mb-6 card-hover">
               <p className="text-lg text-gray-700 mb-4 leading-relaxed">{quizCases[currentQuestionIndex].situation}</p>
               
               {quizCases[currentQuestionIndex].options.map((opt, _i) => (
@@ -3466,7 +3512,7 @@ onChange={() => {
               <span className="absolute bottom-24 right-8 text-2xl opacity-20">💡</span>
             </div>
             {/* Profile Type Tabs */}
-            <div className="glass-card rounded-2xl p-3 mb-8 flex gap-3">
+            <div className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-3 mb-8 flex gap-3">
               <button
                 onClick={() => setProfileType('student')}
                 className={`flex-1 py-4 px-6 rounded-xl font-bold text-base transition-all ${
@@ -3541,7 +3587,7 @@ onChange={() => {
                 </div>
 
                 {/* Stats Cards */}
-                <div className="glass-card rounded-2xl p-8 shadow-custom-lg mb-8">
+                <div className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-8 shadow-custom-lg mb-8">
                   <div className="grid grid-cols-4 gap-6">
                     <div className="text-center p-5 bg-primary/5 rounded-xl">
                       <div className="text-4xl font-bold gradient-text">{currentUnlockedCount}/3</div>
@@ -3563,16 +3609,18 @@ onChange={() => {
                 </div>
 
                 {/* Badges or Stats when no badges */}
-                <div className="glass-card rounded-2xl p-8 mb-8">
+                <div className="bg-white/85 backdrop-blur-xl rounded-3xl p-7 md:p-8 mb-8 shadow-lg shadow-indigo-500/5">
                   {currentUnlockedCount > 0 ? (
                     <>
-                      <h3 className="font-bold text-dark mb-4">{t('myBadges')}</h3>
-                      <div className="flex gap-4 justify-center">
+                      <h3 className="font-bold text-dark mb-6 text-lg">{t('myBadges')}</h3>
+                      <div className="flex flex-wrap gap-4 md:gap-6 justify-center">
                         {currentBadges.map(badge => (
-                          <div key={badge.id} className={`text-center p-4 rounded-xl ${badge.unlocked ? '' : 'opacity-40 grayscale'}`} style={{ border: badge.unlocked ? `3px solid ${badge.color}` : '2px dashed gray' }}>
-                            <div className="text-3xl">{badge.emoji}</div>
-                            <div className="text-xs font-bold mt-2" style={{ color: badge.color }}>{badge.name}</div>
-                            <div className="text-[10px] text-gray-500 mt-1">{badge.unlocked ? '✓ Desbloqueada' : 'Bloqueada'}</div>
+                          <div key={badge.id} className={`flex-1 min-w-[140px] max-w-[220px] text-center p-5 md:p-6 rounded-2xl transition-all ${badge.unlocked ? 'bg-gradient-to-br from-warning/10 to-primary/10 border-2 border-warning/30 animate-float' : 'bg-gray-50 border-2 border-dashed border-gray-200 opacity-60'}`}>
+                            <div className="text-5xl mb-3">{badge.emoji}</div>
+                            <div className="text-sm font-bold mt-2" style={{ color: badge.color }}>{badge.name}</div>
+                            <div className="text-xs mt-2" style={{ color: badge.unlocked ? '#059669' : '#94a3b8' }}>
+                              {badge.unlocked ? '✓ Desbloqueada' : '🔒 Bloqueada'}
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -3580,7 +3628,7 @@ onChange={() => {
                   ) : (
                     // Stats/Graphs when no badges
                     <>
-                      <h3 className="font-bold text-dark mb-4">{t('noBadgesYet')} - {t('yourStats')}</h3>
+                      <h3 className="font-bold text-dark mb-6 text-lg">{t('noBadgesYet')} - {t('yourStats')}</h3>
                       <div className="space-y-6">
                         {/* Progress bars per topic */}
                         <div>
@@ -3592,7 +3640,7 @@ onChange={() => {
                                   <span className="capitalize">{topic}</span>
                                   <span className="font-bold text-primary">{value}%</span>
                                 </div>
-                                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
                                   <div 
                                     className="h-full bg-gradient-to-r from-primary to-secondary rounded-full transition-all"
                                     style={{ width: `${value}%` }}
@@ -3649,7 +3697,7 @@ onChange={() => {
                 </div>
 
                 {/* General Progress */}
-                <div className="glass-card rounded-2xl p-6 mb-6">
+                <div className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-6 mb-6">
                   <h3 className="font-bold text-dark mb-3">{t('generalProgress')}</h3>
                   <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
                     <div 
@@ -3664,7 +3712,7 @@ onChange={() => {
                 </div>
 
                 {/* Customization Panel - Solo Fondos */}
-                <div className="glass-card rounded-2xl p-8 mb-8">
+                <div className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-8 mb-8">
                   <h3 className="font-bold text-dark mb-6 flex items-center gap-2">{t('customization')}</h3>
                   
                   {/* Backgrounds */}
@@ -3795,16 +3843,16 @@ onChange={() => {
 
                 {/* Accesos rápidos */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                  <button onClick={() => setCurrentScreen('learn')} className="glass-card rounded-2xl p-4 font-bold text-primary card-hover">
+                  <button onClick={() => setCurrentScreen('learn')} className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-4 font-bold text-primary card-hover">
                     📚 {t('quickActivities')}
                   </button>
-                  <button onClick={() => setCurrentScreen('converse')} className="glass-card rounded-2xl p-4 font-bold text-warning card-hover">
+                  <button onClick={() => setCurrentScreen('converse')} className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-4 font-bold text-warning card-hover">
                     💬 {t('quickConvos')}
                   </button>
-                  <button onClick={() => scrollToRef(badgesRef)} className="glass-card rounded-2xl p-4 font-bold text-secondary card-hover">
+                  <button onClick={() => scrollToRef(badgesRef)} className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-4 font-bold text-secondary card-hover">
                     🏅 {t('quickBadges')}
                   </button>
-                  <button onClick={() => scrollToRef(membersRef)} className="glass-card rounded-2xl p-4 font-bold text-success card-hover">
+                  <button onClick={() => scrollToRef(membersRef)} className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-4 font-bold text-success card-hover">
                     👨‍👩‍👧 {t('quickMembers')}
                   </button>
                 </div>
@@ -3834,7 +3882,7 @@ onChange={() => {
                 </div>
 
                 {/* Progreso general */}
-                <div className="glass-card rounded-2xl p-8 mb-8 text-center">
+                <div className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-8 mb-8 text-center">
                   <h3 className="font-bold text-dark text-xl mb-4">{t('generalProgress')}</h3>
                   <div className="flex justify-center">
                     <svg width="150" height="150" viewBox="0 0 140 140">
@@ -3853,7 +3901,7 @@ onChange={() => {
                 </div>
 
                 {/* Mis insignias */}
-                <div ref={badgesRef} className="glass-card rounded-2xl p-8 mb-8 scroll-mt-4 relative overflow-hidden">
+                <div ref={badgesRef} className="bg-white/85 backdrop-blur-xl rounded-3xl p-7 md:p-8 mb-8 scroll-mt-4 relative overflow-hidden shadow-lg shadow-indigo-500/5">
                   <span aria-hidden className="pointer-events-none absolute top-3 right-5 text-xl opacity-30 animate-float">✨</span>
                   <span aria-hidden className="pointer-events-none absolute top-3 left-5 text-xl opacity-30">🌟</span>
                   <h3 className="font-bold text-dark text-xl mb-1">🏅 {t('myBadges')}</h3>
@@ -3862,10 +3910,10 @@ onChange={() => {
                     {famBadges.map(b => (
                       <div
                         key={b.id}
-                        className={`rounded-2xl p-5 text-center border-2 ${
+                        className={`rounded-2xl p-5 text-center border-2 card-hover ${
                           b.unlocked
-                            ? 'bg-white border-warning shadow-lg'
-                            : 'bg-gray-50 border-dashed border-gray-300'
+                            ? 'bg-gradient-to-br from-warning/10 to-primary/10 border-warning/30 shadow-lg'
+                            : 'bg-gray-50 border-dashed border-gray-200'
                         }`}
                       >
                         <div className="relative inline-block">
@@ -3883,7 +3931,7 @@ onChange={() => {
                 </div>
 
                 {/* Actividad reciente */}
-                <div className="glass-card rounded-2xl p-8 mb-8">
+                <div className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-8 mb-8">
                   <h3 className="font-bold text-dark text-xl mb-4">🕘 {t('recentActivity')}</h3>
                   {familyProfile.activityLog.length === 0 ? (
                     <p className="text-gray-500">{t('noActivity')}</p>
@@ -3900,7 +3948,7 @@ onChange={() => {
                 </div>
 
                 {/* Integrantes */}
-                <div ref={membersRef} className="glass-card rounded-2xl p-8 mb-8 scroll-mt-4">
+                <div ref={membersRef} className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-8 mb-8 scroll-mt-4">
                   <h3 className="font-bold text-dark text-xl mb-6">👨‍👩‍👧 {t('membersTitle')} ({familyProfile.members.length})</h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-5 mb-8">
                     {familyProfile.members.map(m => (

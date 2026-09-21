@@ -1,5 +1,70 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+  --color-primary: #2563eb;
+
+  --color-secondary-50: #f5f3ff;
+  --color-secondary-100: #ede9fe;
+  --color-secondary-200: #ddd6fe;
+  --color-secondary-300: #c4b5fd;
+  --color-secondary-400: #a78bfa;
+  --color-secondary-500: #8b5cf6;
+  --color-secondary-600: #7c3aed;
+  --color-secondary-700: #6d28d9;
+  --color-secondary-800: #5b21b6;
+  --color-secondary-900: #4c1d95;
+  --color-secondary: #7c3aed;
+
+  --color-success-50: #ecfdf5;
+  --color-success-100: #d1fae5;
+  --color-success-200: #a7f3d0;
+  --color-success-300: #6ee7b7;
+  --color-success-400: #34d399;
+  --color-success-500: #10b981;
+  --color-success-600: #059669;
+  --color-success-700: #047857;
+  --color-success-800: #065f46;
+  --color-success-900: #064e3b;
+  --color-success: #10b981;
+
+  --color-warning-50: #fffbeb;
+  --color-warning-100: #fef3c7;
+  --color-warning-200: #fde68a;
+  --color-warning-300: #fcd34d;
+  --color-warning-400: #fbbf24;
+  --color-warning-500: #f59e0b;
+  --color-warning-600: #d97706;
+  --color-warning-700: #b45309;
+  --color-warning-800: #92400e;
+  --color-warning-900: #78350f;
+  --color-warning: #f59e0b;
+
+  --color-alert-50: #fff7ed;
+  --color-alert-100: #ffedd5;
+  --color-alert-200: #fed7aa;
+  --color-alert-300: #fdba74;
+  --color-alert-400: #fb923c;
+  --color-alert-500: #f97316;
+  --color-alert-600: #ea580c;
+  --color-alert-700: #c2410c;
+  --color-alert-800: #9a3412;
+  --color-alert-900: #7c2d12;
+  --color-alert: #f97316;
+
+  --color-light: #f8f9fa;
+  --color-dark: #121212;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -7,9 +72,12 @@
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(135deg, #f0f4ff 0%, #e8edf5 50%, #f5f0ff 100%);
+  font-family: 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: linear-gradient(135deg, #f6f9ff 0%, #eef1f8 50%, #f7f3ff 100%);
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 @media (min-width: 1024px) {
@@ -55,23 +123,25 @@ body {
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow: 0 8px 32px rgba(30, 41, 82, 0.08), 0 1px 2px rgba(30, 41, 82, 0.04);
 }
 
 .glass-card-dark {
   background: rgba(18, 18, 18, 0.85);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
 }
 
 .btn-glow {
   position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
+  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.25);
 }
 
 .btn-glow::before {
@@ -91,23 +161,27 @@ body {
 
 .btn-glow:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 12px 32px rgba(37, 99, 235, 0.4);
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #2563EB, #7C3AED);
+  background: linear-gradient(135deg, #2563EB, #7C3AED, #DB2777);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .card-hover {
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  transform: translateY(-6px);
+  box-shadow: 0 20px 50px rgba(30, 41, 82, 0.14), 0 4px 12px rgba(30, 41, 82, 0.08);
+}
+
+.card-hover:active {
+  transform: translateY(-2px) scale(0.995);
 }
 
 .welcome-bg {
@@ -150,4 +224,46 @@ body {
 .pc-mode .min-h-screen {
   padding-left: 2rem;
   padding-right: 2rem;
+}
+
+/* ===== Pulido global ===== */
+html {
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background: rgba(124, 58, 237, 0.22);
+  color: inherit;
+}
+
+*:focus-visible {
+  outline: 2px solid #7c3aed;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #94a3b8, #c4b5fd);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #64748b, #a78bfa);
+  background-clip: content-box;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.soft-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
 }
