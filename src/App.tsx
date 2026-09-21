@@ -313,6 +313,15 @@ const translations = {
     goalKeepGoing: 'Sigue con tus lecciones para completar tu nivel.',
     recommendationTitle: 'Recomendación del día',
     goToTopic: 'Ir al tema',
+    yourProgress: 'Tu progreso',
+    learningPath: 'Tu ruta de aprendizaje',
+    next: 'Siguiente',
+    pendingState: 'Pendiente',
+    completedState: 'Completado',
+    achievements: 'Mis logros',
+    nextBadgeLabel: 'Próxima insignia',
+    familyActivityLabel: 'Actividad familiar',
+    lessonWord: 'Lección',
   },
   qu: {
     greeting: '¡Napaykullayki! 👋',
@@ -409,6 +418,15 @@ const translations = {
     goalKeepGoing: 'Yachaykunaykita qatiy nivelniykita tukukuykunaykipaq.',
     recommendationTitle: 'Kunan punchaw willakuq',
     goToTopic: 'Yachayman risun',
+    yourProgress: 'Progresoyki',
+    learningPath: 'Yachay ñanniyki',
+    next: 'Qatiq',
+    pendingState: 'Manaraq',
+    completedState: 'Tukukusqa',
+    achievements: 'Atiyniykuna',
+    nextBadgeLabel: 'Qatiq insignia',
+    familyActivityLabel: 'Ayllu ruway',
+    lessonWord: 'Yachay',
   },
 }
 
@@ -1908,181 +1926,211 @@ case 'about':
       const kidsDoneCount = kidsDoneArr.length
       const kidsTotal = KIDS_TOPICS.length
       const lessonsPct = kidsTotal > 0 ? Math.round((kidsDoneCount / kidsTotal) * 100) : 0
-      const goalsLeft = Math.max(kidsTotal - kidsDoneCount, 0)
       const streakDays = currentProgress.streakDays ?? 0
       const nextKid = KIDS_TOPICS.find(k => !kidsDoneArr.includes(k.id)) ?? null
       const nextGuide = PARENT_GUIDES.find(g => !(currentProgress.guidesDone ?? []).includes(g.id)) ?? null
       const nextLesson = nextKid
-        ? { title: nextKid.title, desc: nextKid.desc, go: () => { setActiveKidId(nextKid.id); setLearnView('kid'); setCurrentScreen('learn') } }
+        ? { title: nextKid.title, desc: nextKid.desc, icon: nextKid.icon, go: () => { setActiveKidId(nextKid.id); setLearnView('kid'); setCurrentScreen('learn') } }
         : nextGuide
-          ? { title: nextGuide.title, desc: nextGuide.desc, go: () => { setActiveGuideId(nextGuide.id); setLearnView('guide'); setCurrentScreen('learn') } }
+          ? { title: nextGuide.title, desc: nextGuide.desc, icon: nextGuide.icon, go: () => { setActiveGuideId(nextGuide.id); setLearnView('guide'); setCurrentScreen('learn') } }
           : null
-      const goalMsg = goalsLeft === 0 ? t('allDone') : goalsLeft <= 2 ? t('goalAlmost') : t('goalKeepGoing')
-      const topicBars = mainTopics.map(t => ({ key: t, title: topicTitles[t], pct: currentProgress.topicProgress[t] ?? 0 }))
+      const lessonTotal = nextKid ? kidsTotal : nextGuide ? PARENT_GUIDES.length : kidsTotal
+      const nextLessonNum = nextKid ? KIDS_TOPICS.indexOf(nextKid) + 1 : nextGuide ? PARENT_GUIDES.indexOf(nextGuide) + 1 : kidsDoneCount
+      const nextCore = mainTopics.find(t => (currentProgress.topicProgress[t] ?? 0) < 100) ?? null
+      const topicIcons: Record<LearningTopic, string> = { coima: '💰', recognition: '🔍', impact: '💔', consequences: '⚖️', prevention: '🛡️', ethics: '🧭', citizen: '🤝', test: '📝' }
+      const roadmap = mainTopics.map(t => ({ key: t, title: topicTitles[t], icon: topicIcons[t], pct: currentProgress.topicProgress[t] ?? 0, isNext: t === nextCore }))
+      const allBadges = isFamHome ? familyProfile.familyBadges : currentProgress.badges
+      const nextLocked = allBadges.find(b => !b.unlocked) ?? null
+      const nextBadgeName = nextLocked ? nextLocked.name : null
 
-      const NavCard = ({ icon, title, desc, ring, onClick, badge = '' }: { icon: string; title: string; desc: string; ring: string; onClick: () => void; badge?: string }) => (
+      const LearnCard = ({ icon, title, desc, tint, onClick }: { icon: string; title: string; desc: string; tint: string; onClick: () => void }) => (
         <button
           onClick={onClick}
-          className={`group bg-white rounded-3xl p-5 min-h-[88px] flex items-center gap-4 shadow-md shadow-indigo-500/5 card-hover text-left transition-all ${ring}`}
+          className="group bg-white rounded-2xl p-4 shadow-sm border border-slate-100 text-left hover:shadow-md hover:-translate-y-0.5 transition-all flex flex-col gap-3 min-h-[132px]"
         >
-          <div className={`w-12 h-12 shrink-0 rounded-2xl bg-slate-100 group-hover:bg-primary/10 flex items-center justify-center text-2xl transition-transform group-hover:scale-110 ${badge ? 'relative' : ''}`}>
-            {icon}
-            {badge && <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-success border-2 border-white text-[10px] leading-none text-white flex items-center justify-center font-extrabold">{badge}</span>}
+          <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl transition-colors ${tint}`}>{icon}</div>
+          <div className="flex-1">
+            <p className="font-bold text-slate-800">{title}</p>
+            <p className="text-xs md:text-sm text-slate-500 mt-0.5 leading-snug truncate">{desc}</p>
           </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-slate-800 text-lg">{title}</h3>
-            <p className="text-slate-600 text-sm mt-0.5 leading-snug truncate">{desc}</p>
-          </div>
-          <span aria-hidden className="text-slate-300 group-hover:text-primary text-2xl transition-colors shrink-0">→</span>
+          <span aria-hidden className="text-slate-300 group-hover:text-primary text-lg transition-colors">→</span>
         </button>
-      )
-      const SectionLabel = ({ children }: { children: ReactNode }) => (
-        <h2 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-3">{children}</h2>
       )
 
       return (
         <div className="min-h-screen pb-32" style={{ background: 'linear-gradient(180deg, #F8FAFF 0%, #EDF1F9 100%)' }}>
-          <div className="max-w-5xl mx-auto px-4 md:px-8 py-8 md:py-10 animate-slide-up space-y-7 md:space-y-8">
+          <div className="max-w-7xl mx-auto px-4 md:px-8 py-6 md:py-8 animate-slide-up space-y-5 md:space-y-6">
 
-            {/* Encabezado */}
-            <header className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-3 md:gap-4 min-w-0">
-                <div className="w-12 h-12 md:w-14 md:h-14 shrink-0 rounded-2xl bg-white shadow-md shadow-indigo-500/5 flex items-center justify-center text-xl md:text-2xl">
-                  {device === 'phone' ? '📱' : device === 'laptop' ? '💻' : '🖥️'}
+            {/* HEADER */}
+            <header className="flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 md:w-11 md:h-11 shrink-0 rounded-xl bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center text-lg shadow-md shadow-primary/20">
+                  💬
                 </div>
                 <div className="min-w-0">
-                  <h1 className="text-2xl md:text-3xl font-black text-slate-800 leading-tight truncate">{t('greeting')}</h1>
-                  <p className="text-sm md:text-base text-slate-600 mt-0.5">{t('homeSubtitle')}</p>
+                  <p className="font-black text-slate-800 leading-tight truncate">{t('welcomeTitle')}</p>
+                  <p className="text-xs font-semibold text-slate-500">🏠 {t('homeNav')}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <div className="px-3.5 py-2 rounded-2xl bg-white shadow-sm border border-slate-100 text-slate-700 font-bold text-sm md:text-base" title={t('badges')}>
-                  🏅 <span className="tabular-nums">{homeBadgeCount}/{homeBadgeTotal}</span>
-                </div>
-                <button
-                  onClick={() => setCurrentScreen('config')}
-                  className="w-11 h-11 rounded-2xl bg-white hover:bg-primary/10 shadow-sm text-slate-500 hover:text-primary transition-all text-lg"
-                  aria-label={t('configTitle')}
-                  title={t('configTitle')}
-                >
-                  ⚙️
-                </button>
+              <div className="flex items-center gap-1.5 md:gap-2 shrink-0 flex-wrap justify-end">
+                <div className="px-2.5 py-2 rounded-xl bg-white shadow-sm border border-slate-100 text-slate-700 font-bold text-sm" title={t('streak')}>🔥 {streakDays}</div>
+                <div className="px-2.5 py-2 rounded-xl bg-white shadow-sm border border-slate-100 text-slate-700 font-bold text-sm" title={t('quickBadges')}>🏅 {homeBadgeCount}/{homeBadgeTotal}</div>
+                <button onClick={() => setCurrentScreen('profile')} className="w-10 h-10 rounded-xl bg-white hover:bg-primary/10 shadow-sm text-xl transition-all" aria-label={t('profile')} title={t('profile')}>👤</button>
+                <button onClick={() => setCurrentScreen('config')} className="w-10 h-10 rounded-xl bg-white hover:bg-primary/10 shadow-sm text-lg transition-all" aria-label={t('configTitle')} title={t('configTitle')}>⚙️</button>
               </div>
             </header>
 
-            {/* Acción principal: continuar lección */}
-            <section className="rounded-3xl p-5 md:p-7 shadow-xl shadow-primary/15" style={{ background: 'linear-gradient(135deg, #2563EB 0%, #6D28D9 100%)' }}>
-              <div className="flex flex-col md:flex-row md:items-center gap-4">
+            {/* HERO — Continuar aprendiendo */}
+            <section className="relative overflow-hidden bg-white rounded-3xl shadow-md shadow-indigo-500/5 border border-slate-100 p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-6">
+              <div aria-hidden className="pointer-events-none absolute -top-20 -right-20 w-64 h-64 rounded-full bg-primary/5 blur-3xl" />
+              <div className="relative flex-1 min-w-0">
+                <p className="text-[11px] md:text-xs font-black uppercase tracking-widest text-primary mb-2">{t('nextStepLabel')}</p>
+                <h2 className="text-2xl md:text-3xl font-black text-slate-800 leading-tight mb-2">{nextLesson ? nextLesson.title : t('allDone')}</h2>
+                <p className="text-slate-600 text-sm md:text-base leading-relaxed mb-4">{nextLesson ? nextLesson.desc : '✨'}</p>
+                <div className="flex items-center gap-3 max-w-sm" role="progressbar" aria-valuenow={lessonsPct} aria-valuemin={0} aria-valuemax={100} aria-label={t('topicsCompleted')}>
+                  <span className="text-xs font-bold text-slate-500 shrink-0">{t('lessonWord')} {nextLessonNum} de {lessonTotal}</span>
+                  <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="progress-bar h-full rounded-full transition-[width] duration-700" style={{ width: `${lessonsPct}%` }}></div>
+                  </div>
+                  <span className="text-xs font-bold text-slate-500 tabular-nums shrink-0">{lessonsPct}%</span>
+                </div>
                 <button
                   onClick={nextLesson ? nextLesson.go : () => { setLearnView('hub'); setCurrentScreen('learn') }}
-                  className="bg-white text-primary font-extrabold text-lg md:text-xl rounded-2xl px-6 py-4 md:px-8 hover:scale-[1.02] hover:shadow-lg transition-all flex items-center justify-center gap-2 shadow-lg shrink-0"
+                  className="mt-6 btn-glow bg-gradient-to-r from-primary to-secondary text-white font-extrabold text-base md:text-lg rounded-2xl py-4 px-8 shadow-lg shadow-primary/25 hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] transition-all w-full sm:w-auto flex items-center justify-center gap-2"
                 >
                   <span aria-hidden>📚</span> {t('continueLesson')} <span aria-hidden>→</span>
                 </button>
-                <div className="flex-1 min-w-0">
-                  <p className="text-blue-200 text-xs md:text-sm font-bold uppercase tracking-widest">{t('nextStepLabel')}</p>
-                  <p className="text-white font-bold text-base md:text-lg leading-snug">
-                    {nextLesson ? nextLesson.title : t('allDone')}
-                  </p>
-                </div>
               </div>
-              <div className="mt-5 flex items-center gap-3 flex-wrap text-sm">
-                <span className="px-3 py-1.5 rounded-full bg-white/15 backdrop-blur-sm font-bold">🔥 {streakDays}</span>
-                <span className="px-3 py-1.5 rounded-full bg-white/15 backdrop-blur-sm font-bold">🏅 {homeBadgeCount}/{homeBadgeTotal}</span>
-                <span className="flex-1 min-w-[180px] px-3 py-1.5 rounded-full bg-white/15 backdrop-blur-sm font-semibold text-blue-50">{goalMsg}</span>
+              <div aria-hidden className="relative hidden sm:flex w-40 md:w-52 shrink-0 items-center justify-center self-center">
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/10 to-secondary/10 blur-md" />
+                <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-full bg-white shadow-lg shadow-indigo-500/10 flex items-center justify-center text-5xl md:text-6xl animate-float">
+                  {nextLesson ? nextLesson.icon : '🏆'}
+                </div>
               </div>
             </section>
 
-            {/* Progreso: general + por tema */}
+            {/* TU PROGRESO */}
             <section className="bg-white rounded-3xl p-5 md:p-6 shadow-md shadow-indigo-500/5">
-              <div className="flex items-end justify-between mb-2 gap-2">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl md:text-4xl font-black text-slate-800 tabular-nums">{kidsDoneCount}</span>
-                  <span className="text-xl md:text-2xl font-bold text-slate-400">/ {kidsTotal}</span>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-slate-700">{t('topicsCompleted')}</p>
-                  <p className="text-sm font-semibold text-slate-500">{lessonsPct}% · {t('completedLabel')}</p>
-                </div>
+              <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
+                <p className="text-[11px] font-black uppercase tracking-widest text-slate-400">{t('yourProgress')}</p>
+                <span className="text-xs md:text-sm font-bold text-slate-500">🏅 {homeBadgeCount}/{homeBadgeTotal} · 🔥 {streakDays}</span>
               </div>
-              <div className="h-4 bg-slate-100 rounded-full overflow-hidden" role="progressbar" aria-valuenow={lessonsPct} aria-valuemin={0} aria-valuemax={100} aria-label={t('topicsCompleted')}>
-                <div className="progress-bar h-full rounded-full" style={{ width: `${lessonsPct}%` }}></div>
+              <div className="flex items-end justify-between gap-3 mb-2.5">
+                <p className="text-slate-600 font-semibold text-sm md:text-base">{kidsDoneCount} de {kidsTotal} {t('topicsCompleted')}</p>
+                <p className="font-black text-primary text-xl md:text-2xl tabular-nums">{lessonsPct}%</p>
               </div>
-              <div className="mt-5">
-                <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-3">{t('topicProgress')}</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5">
-                  {topicBars.map(tb => (
-                    <div key={tb.key} className="flex items-center gap-3">
-                      <span className="text-slate-600 font-medium flex-1 min-w-0 truncate">{tb.title}</span>
-                      <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden shrink-0">
-                        <div className="h-full progress-bar rounded-full" style={{ width: `${Math.min(tb.pct, 100)}%` }}></div>
+              <div className="h-3 bg-slate-100 rounded-full overflow-hidden" role="progressbar" aria-valuenow={lessonsPct} aria-valuemin={0} aria-valuemax={100} aria-label={t('topicsCompleted')}>
+                <div className="progress-bar h-full rounded-full transition-[width] duration-1000" style={{ width: `${lessonsPct}%` }}></div>
+              </div>
+            </section>
+
+            {/* TU RUTA DE APRENDIZAJE */}
+            <section>
+              <p className="text-[11px] font-black uppercase tracking-widest text-slate-400 mb-3">🗺️ {t('learningPath')}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {roadmap.map(topic => {
+                  const done = topic.pct >= 100
+                  const inProg = !done && topic.pct > 0
+                  return (
+                    <button
+                      key={topic.key}
+                      onClick={() => { setLearnView('hub'); setCurrentScreen('learn') }}
+                      className={`group text-left bg-white rounded-2xl p-4 flex items-center gap-3 shadow-sm border transition-all hover:shadow-md hover:-translate-y-0.5 ${
+                        topic.isNext ? 'border-primary/30 ring-2 ring-primary/20' : 'border-slate-100'
+                      }`}
+                      aria-label={`${topic.title} — ${done ? t('completedState') : inProg ? `${topic.pct}%` : t('pendingState')}`}
+                    >
+                      <div className={`w-11 h-11 shrink-0 rounded-xl flex items-center justify-center text-xl ${done ? 'bg-success/10' : inProg ? 'bg-primary/10' : 'bg-slate-100'}`}>
+                        {done ? '✅' : topic.icon}
                       </div>
-                      <span className="text-sm font-bold text-slate-500 tabular-nums w-9 text-right">{tb.pct}%</span>
-                    </div>
-                  ))}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-slate-800 text-sm md:text-base truncate">{topic.title}</span>
+                          {topic.isNext && (
+                            <span className="shrink-0 text-[10px] font-black uppercase tracking-wide text-primary bg-primary/10 px-2 py-0.5 rounded-full">{t('next')}</span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 mt-1.5">
+                          <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden" role="progressbar" aria-valuenow={topic.pct} aria-valuemin={0} aria-valuemax={100}>
+                            <div className={`h-full rounded-full transition-[width] duration-700 ${done ? 'bg-success' : 'progress-bar'}`} style={{ width: `${topic.pct}%` }}></div>
+                          </div>
+                          <span className={`text-xs font-bold shrink-0 ${done ? 'text-success' : inProg ? 'text-primary' : 'text-slate-400'}`}>
+                            {done ? t('completedState') : inProg ? `${topic.pct}%` : t('pendingState')}
+                          </span>
+                        </div>
+                      </div>
+                      <span aria-hidden className="text-slate-300 group-hover:text-primary text-lg transition-colors shrink-0">→</span>
+                    </button>
+                  )
+                })}
+              </div>
+            </section>
+
+            {/* APRENDE */}
+            <section>
+              <p className="text-[11px] font-black uppercase tracking-widest text-slate-400 mb-3">🧩 {t('learnSection')}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <LearnCard icon="📖" title={t('themes')} desc={t('themesDesc')} tint="bg-primary/10 group-hover:bg-primary/15" onClick={() => { setLearnView('hub'); setCurrentScreen('learn') }} />
+                <LearnCard icon="🎮" title={t('game')} desc={t('gameDesc')} tint="bg-secondary/10 group-hover:bg-secondary/15" onClick={() => setCurrentScreen('games')} />
+                <LearnCard icon="📱" title={t('reels')} desc={t('reelsDesc')} tint="bg-warning/10 group-hover:bg-warning/15" onClick={() => setCurrentScreen('reels')} />
+              </div>
+            </section>
+
+            {/* MIS LOGROS */}
+            <section className="bg-white rounded-3xl p-5 md:p-6 shadow-md shadow-indigo-500/5">
+              <p className="text-[11px] font-black uppercase tracking-widest text-slate-400 mb-4">🎯 {t('achievements')}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="rounded-2xl bg-slate-50 p-4 flex items-center gap-3">
+                  <span className="text-2xl" aria-hidden>🏅</span>
+                  <div>
+                    <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500">{t('quickBadges')}</p>
+                    <p className="font-black text-slate-800 text-lg tabular-nums mt-0.5">{homeBadgeCount}<span className="text-slate-400 text-sm font-bold">/{homeBadgeTotal}</span></p>
+                  </div>
+                </div>
+                <div className="rounded-2xl bg-slate-50 p-4 flex items-center gap-3">
+                  <span className="text-2xl" aria-hidden>🔥</span>
+                  <div>
+                    <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500">{t('streak')}</p>
+                    <p className="font-black text-slate-800 text-lg tabular-nums mt-0.5">{streakDays}</p>
+                  </div>
+                </div>
+                <div className="rounded-2xl bg-slate-50 p-4 flex items-center gap-3">
+                  <span className="text-2xl" aria-hidden>🚀</span>
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500">{t('nextBadgeLabel')}</p>
+                    <p className="font-bold text-slate-800 text-sm md:text-base mt-0.5 truncate">{nextBadgeName ?? '—'}</p>
+                  </div>
                 </div>
               </div>
             </section>
 
-            {/* Aprender */}
-            <section>
-              <SectionLabel>📚 {t('learnSection')}</SectionLabel>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <NavCard icon="📖" title={t('themes')} desc={t('themesDesc')} ring="hover:ring-primary/30" onClick={() => { setLearnView('hub'); setCurrentScreen('learn') }} />
-                <NavCard icon="🎮" title={t('game')} desc={t('gameDesc')} ring="hover:ring-secondary/30" onClick={() => setCurrentScreen('games')} />
-              </div>
-            </section>
-
-            {/* Practicar */}
-            <section>
-              <SectionLabel>🛡️ {t('practiceSection')}</SectionLabel>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <NavCard icon="📱" title={t('reels')} desc={t('reelsDesc')} ring="hover:ring-warning/40" onClick={() => setCurrentScreen('reels')} />
-              </div>
-            </section>
-
-            {/* Mi perfil */}
-            <section>
-              <SectionLabel>📈 {t('myProgressSection')}</SectionLabel>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <NavCard icon="👤" title={t('profile')} desc={t('profileDesc')} ring="hover:ring-success/30" onClick={() => setCurrentScreen('profile')} />
-                <NavCard icon="🏅" title={t('badges')} desc={`${homeBadgeCount} de ${homeBadgeTotal} ${t('unlockedBadge')}`} ring="hover:ring-warning/40" onClick={() => setCurrentScreen('profile')} badge={homeBadgeCount === homeBadgeTotal ? '✓' : ''} />
-              </div>
-            </section>
-
-            {/* Actividad familiar (sección secundaria) */}
-            <section className="bg-white rounded-3xl p-5 shadow-md shadow-indigo-500/5 flex items-center gap-4">
-              <div className="w-12 h-12 shrink-0 rounded-2xl bg-warning/10 flex items-center justify-center text-2xl">💬</div>
+            {/* ACTIVIDAD FAMILIAR */}
+            <section className="bg-white rounded-3xl p-5 md:p-6 shadow-md shadow-indigo-500/5 border border-slate-100 flex flex-col sm:flex-row sm:items-center gap-4">
+              <div className="w-12 h-12 shrink-0 rounded-2xl bg-warning/10 flex items-center justify-center text-2xl" aria-hidden>💬</div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-slate-800 text-lg truncate">{t('familyActivity')}</h3>
-                <p className="text-slate-600 text-sm mt-0.5 leading-snug truncate">{t('familyDesc')}</p>
+                <h3 className="font-bold text-slate-800 text-lg">{t('familyActivityLabel')}</h3>
+                <p className="text-slate-600 text-sm mt-0.5 leading-snug line-clamp-2">{t('familyDesc')}</p>
               </div>
               <button
                 onClick={() => setCurrentScreen('converse')}
-                className="btn-glow bg-warning text-white font-bold py-2.5 px-4 rounded-2xl text-sm shrink-0"
+                className="btn-glow bg-warning text-white font-bold py-3 px-6 rounded-2xl text-sm shrink-0 w-full sm:w-auto hover:brightness-105 active:scale-[0.98] transition-all"
               >
-                {t('viewActivity')}
+                {t('viewActivity')} <span aria-hidden>→</span>
               </button>
             </section>
 
-            {/* Recomendación del día (rellena el espacio inferior) */}
-            {nextLesson ? (
-              <section className="bg-white rounded-3xl p-5 md:p-6 shadow-md shadow-indigo-500/5 flex flex-col sm:flex-row sm:items-center gap-4">
-                <div className="w-12 h-12 shrink-0 rounded-2xl bg-primary/10 flex items-center justify-center text-2xl">✨</div>
+            {/* RECOMENDACIÓN DEL DÍA */}
+            {nextLesson && (
+              <section className="bg-gradient-to-br from-primary/5 to-secondary/5 rounded-3xl p-5 md:p-6 shadow-md shadow-indigo-500/5 border border-slate-100 flex flex-col sm:flex-row sm:items-center gap-4">
+                <div className="w-12 h-12 shrink-0 rounded-2xl bg-white shadow-sm flex items-center justify-center text-2xl" aria-hidden>✨</div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-black uppercase tracking-widest text-primary mb-1">{t('recommendationTitle')}</p>
+                  <p className="text-[11px] font-black uppercase tracking-widest text-primary mb-1">{t('recommendationTitle')}</p>
                   <h3 className="font-bold text-slate-800 text-lg leading-snug">{nextLesson.title}</h3>
-                  <p className="text-slate-600 text-sm mt-0.5 leading-snug truncate">{nextLesson.desc}</p>
+                  <p className="text-slate-600 text-sm mt-0.5 leading-snug line-clamp-2">{nextLesson.desc}</p>
                 </div>
-                <button onClick={nextLesson.go} className="shrink-0 bg-primary text-white font-bold py-2.5 px-5 rounded-2xl text-sm hover:bg-primary/90 transition-colors">
-                  {t('goToTopic')} →
+                <button onClick={nextLesson.go} className="shrink-0 bg-primary text-white font-bold py-3 px-6 rounded-2xl text-sm w-full sm:w-auto hover:bg-primary/90 active:scale-[0.98] transition-all">
+                  {t('goToTopic')} <span aria-hidden>→</span>
                 </button>
-              </section>
-            ) : (
-              <section className="bg-white rounded-3xl p-6 md:p-8 shadow-md shadow-indigo-500/5 text-center">
-                <div className="text-5xl mb-3 animate-float">🏆</div>
-                <h3 className="font-bold text-slate-800 text-lg mb-1">{t('allDone')}</h3>
-                <p className="text-slate-600 text-sm">🏅 {homeBadgeCount}/{homeBadgeTotal} {t('unlockedBadge')} · 🔥 {streakDays} {t('streak')}</p>
               </section>
             )}
 
