@@ -301,11 +301,18 @@ const translations = {
     homeSubtitle: 'Continúa donde lo dejaste',
     learnSection: 'Aprender',
     practiceSection: 'Practicar',
-    myProgressSection: 'Mi progreso',
+    myProgressSection: 'Mi perfil',
     continueLearning: 'Continuar aprendiendo',
     viewActivity: 'Ver actividad',
     topicsProgressLabel: 'Progreso en temas',
     completedLabel: 'temas completados',
+    continueLesson: 'Continuar lección',
+    nextStepLabel: 'Tu siguiente paso',
+    allDone: '¡Lo lograste! Completaste todo tu camino de aprendizaje. 🎉',
+    goalAlmost: '¡Muy cerca! Te falta poco para completar tu nivel.',
+    goalKeepGoing: 'Sigue con tus lecciones para completar tu nivel.',
+    recommendationTitle: 'Recomendación del día',
+    goToTopic: 'Ir al tema',
   },
   qu: {
     greeting: '¡Napaykullayki! 👋',
@@ -390,11 +397,18 @@ const translations = {
     homeSubtitle: 'Saqillasqaykimanta katichiy',
     learnSection: 'Yachay',
     practiceSection: 'Kamachiy',
-    myProgressSection: 'Progresoy',
+    myProgressSection: 'Kayniymi',
     continueLearning: 'Yachayta katichiy',
     viewActivity: 'Ruwayta rikuy',
     topicsProgressLabel: 'Yachaykuna progreso',
     completedLabel: 'yachaykuna tukukusqa',
+    continueLesson: 'Yachayta katichiy',
+    nextStepLabel: 'Qatiq ruwayki',
+    allDone: '¡Atiyki! Tukuy yachay ñanniykita tukukuykurqanki. 🎉',
+    goalAlmost: '¡Ñakaña! Pisillamanta puchun nivelniykita tukukuykunaykipaq.',
+    goalKeepGoing: 'Yachaykunaykita qatiy nivelniykita tukukuykunaykipaq.',
+    recommendationTitle: 'Kunan punchaw willakuq',
+    goToTopic: 'Yachayman risun',
   },
 }
 
@@ -1890,9 +1904,21 @@ case 'about':
       const isFamHome = profileType === 'family'
       const homeBadgeCount = isFamHome ? familyProfile.familyBadges.filter(b => b.unlocked).length : unlockedCount
       const homeBadgeTotal = isFamHome ? familyProfile.familyBadges.length : 3
-      const topicsDone = mainTopics.filter(t => (currentProgress.topicProgress[t] ?? 0) >= 100).length
-      const topicsTotal = mainTopics.length
-      const topicsPct = topicsTotal > 0 ? Math.round((topicsDone / topicsTotal) * 100) : 0
+      const kidsDoneArr = currentProgress.kidsDone ?? []
+      const kidsDoneCount = kidsDoneArr.length
+      const kidsTotal = KIDS_TOPICS.length
+      const lessonsPct = kidsTotal > 0 ? Math.round((kidsDoneCount / kidsTotal) * 100) : 0
+      const goalsLeft = Math.max(kidsTotal - kidsDoneCount, 0)
+      const streakDays = currentProgress.streakDays ?? 0
+      const nextKid = KIDS_TOPICS.find(k => !kidsDoneArr.includes(k.id)) ?? null
+      const nextGuide = PARENT_GUIDES.find(g => !(currentProgress.guidesDone ?? []).includes(g.id)) ?? null
+      const nextLesson = nextKid
+        ? { title: nextKid.title, desc: nextKid.desc, go: () => { setActiveKidId(nextKid.id); setLearnView('kid'); setCurrentScreen('learn') } }
+        : nextGuide
+          ? { title: nextGuide.title, desc: nextGuide.desc, go: () => { setActiveGuideId(nextGuide.id); setLearnView('guide'); setCurrentScreen('learn') } }
+          : null
+      const goalMsg = goalsLeft === 0 ? t('allDone') : goalsLeft <= 2 ? t('goalAlmost') : t('goalKeepGoing')
+      const topicBars = mainTopics.map(t => ({ key: t, title: topicTitles[t], pct: currentProgress.topicProgress[t] ?? 0 }))
 
       const NavCard = ({ icon, title, desc, ring, onClick, badge = '' }: { icon: string; title: string; desc: string; ring: string; onClick: () => void; badge?: string }) => (
         <button
@@ -1905,7 +1931,7 @@ case 'about':
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="font-bold text-slate-800 text-lg">{title}</h3>
-            <p className="text-slate-500 text-sm mt-0.5 leading-snug truncate">{desc}</p>
+            <p className="text-slate-600 text-sm mt-0.5 leading-snug truncate">{desc}</p>
           </div>
           <span aria-hidden className="text-slate-300 group-hover:text-primary text-2xl transition-colors shrink-0">→</span>
         </button>
@@ -1916,7 +1942,7 @@ case 'about':
 
       return (
         <div className="min-h-screen pb-32" style={{ background: 'linear-gradient(180deg, #F8FAFF 0%, #EDF1F9 100%)' }}>
-          <div className="max-w-5xl mx-auto px-4 md:px-8 py-8 md:py-10 animate-slide-up space-y-8">
+          <div className="max-w-5xl mx-auto px-4 md:px-8 py-8 md:py-10 animate-slide-up space-y-7 md:space-y-8">
 
             {/* Encabezado */}
             <header className="flex items-center justify-between gap-3">
@@ -1926,7 +1952,7 @@ case 'about':
                 </div>
                 <div className="min-w-0">
                   <h1 className="text-2xl md:text-3xl font-black text-slate-800 leading-tight truncate">{t('greeting')}</h1>
-                  <p className="text-sm md:text-base text-slate-500 mt-0.5">{t('homeSubtitle')}</p>
+                  <p className="text-sm md:text-base text-slate-600 mt-0.5">{t('homeSubtitle')}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
@@ -1944,21 +1970,56 @@ case 'about':
               </div>
             </header>
 
-            {/* Acción principal + progreso */}
-            <section className="bg-white rounded-3xl p-5 md:p-6 shadow-md shadow-indigo-500/5">
-              <button
-                onClick={() => { setLearnView('hub'); setCurrentScreen('learn') }}
-                className="w-full rounded-2xl px-6 py-4 md:py-5 text-white font-extrabold text-lg md:text-xl bg-gradient-to-r from-primary to-secondary hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.01] transition-all flex items-center justify-center gap-2"
-              >
-                <span aria-hidden>📚</span> {t('continueLearning')} <span aria-hidden>→</span>
-              </button>
-              <div className="mt-5">
-                <div className="flex items-center justify-between text-sm mb-2 gap-2 flex-wrap">
-                  <span className="font-semibold text-slate-600">{t('topicsProgressLabel')}</span>
-                  <span className="font-bold text-slate-800 tabular-nums">{topicsDone} de {topicsTotal} {t('completedLabel')} · {topicsPct}%</span>
+            {/* Acción principal: continuar lección */}
+            <section className="rounded-3xl p-5 md:p-7 shadow-xl shadow-primary/15" style={{ background: 'linear-gradient(135deg, #2563EB 0%, #6D28D9 100%)' }}>
+              <div className="flex flex-col md:flex-row md:items-center gap-4">
+                <button
+                  onClick={nextLesson ? nextLesson.go : () => { setLearnView('hub'); setCurrentScreen('learn') }}
+                  className="bg-white text-primary font-extrabold text-lg md:text-xl rounded-2xl px-6 py-4 md:px-8 hover:scale-[1.02] hover:shadow-lg transition-all flex items-center justify-center gap-2 shadow-lg shrink-0"
+                >
+                  <span aria-hidden>📚</span> {t('continueLesson')} <span aria-hidden>→</span>
+                </button>
+                <div className="flex-1 min-w-0">
+                  <p className="text-blue-200 text-xs md:text-sm font-bold uppercase tracking-widest">{t('nextStepLabel')}</p>
+                  <p className="text-white font-bold text-base md:text-lg leading-snug">
+                    {nextLesson ? nextLesson.title : t('allDone')}
+                  </p>
                 </div>
-                <div className="h-3 bg-slate-100 rounded-full overflow-hidden" role="progressbar" aria-valuenow={topicsPct} aria-valuemin={0} aria-valuemax={100} aria-label={t('topicsProgressLabel')}>
-                  <div className="progress-bar h-full rounded-full" style={{ width: `${topicsPct}%` }}></div>
+              </div>
+              <div className="mt-5 flex items-center gap-3 flex-wrap text-sm">
+                <span className="px-3 py-1.5 rounded-full bg-white/15 backdrop-blur-sm font-bold">🔥 {streakDays}</span>
+                <span className="px-3 py-1.5 rounded-full bg-white/15 backdrop-blur-sm font-bold">🏅 {homeBadgeCount}/{homeBadgeTotal}</span>
+                <span className="flex-1 min-w-[180px] px-3 py-1.5 rounded-full bg-white/15 backdrop-blur-sm font-semibold text-blue-50">{goalMsg}</span>
+              </div>
+            </section>
+
+            {/* Progreso: general + por tema */}
+            <section className="bg-white rounded-3xl p-5 md:p-6 shadow-md shadow-indigo-500/5">
+              <div className="flex items-end justify-between mb-2 gap-2">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3xl md:text-4xl font-black text-slate-800 tabular-nums">{kidsDoneCount}</span>
+                  <span className="text-xl md:text-2xl font-bold text-slate-400">/ {kidsTotal}</span>
+                </div>
+                <div className="text-right">
+                  <p className="font-bold text-slate-700">{t('topicsCompleted')}</p>
+                  <p className="text-sm font-semibold text-slate-500">{lessonsPct}% · {t('completedLabel')}</p>
+                </div>
+              </div>
+              <div className="h-4 bg-slate-100 rounded-full overflow-hidden" role="progressbar" aria-valuenow={lessonsPct} aria-valuemin={0} aria-valuemax={100} aria-label={t('topicsCompleted')}>
+                <div className="progress-bar h-full rounded-full" style={{ width: `${lessonsPct}%` }}></div>
+              </div>
+              <div className="mt-5">
+                <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-3">{t('topicProgress')}</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5">
+                  {topicBars.map(tb => (
+                    <div key={tb.key} className="flex items-center gap-3">
+                      <span className="text-slate-600 font-medium flex-1 min-w-0 truncate">{tb.title}</span>
+                      <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden shrink-0">
+                        <div className="h-full progress-bar rounded-full" style={{ width: `${Math.min(tb.pct, 100)}%` }}></div>
+                      </div>
+                      <span className="text-sm font-bold text-slate-500 tabular-nums w-9 text-right">{tb.pct}%</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </section>
@@ -1980,7 +2041,7 @@ case 'about':
               </div>
             </section>
 
-            {/* Mi progreso */}
+            {/* Mi perfil */}
             <section>
               <SectionLabel>📈 {t('myProgressSection')}</SectionLabel>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1989,12 +2050,12 @@ case 'about':
               </div>
             </section>
 
-            {/* Actividad familiar */}
+            {/* Actividad familiar (sección secundaria) */}
             <section className="bg-white rounded-3xl p-5 shadow-md shadow-indigo-500/5 flex items-center gap-4">
               <div className="w-12 h-12 shrink-0 rounded-2xl bg-warning/10 flex items-center justify-center text-2xl">💬</div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-bold text-slate-800 text-lg truncate">{t('familyActivity')}</h3>
-                <p className="text-slate-500 text-sm mt-0.5 leading-snug truncate">{t('familyDesc')}</p>
+                <p className="text-slate-600 text-sm mt-0.5 leading-snug truncate">{t('familyDesc')}</p>
               </div>
               <button
                 onClick={() => setCurrentScreen('converse')}
@@ -2003,6 +2064,27 @@ case 'about':
                 {t('viewActivity')}
               </button>
             </section>
+
+            {/* Recomendación del día (rellena el espacio inferior) */}
+            {nextLesson ? (
+              <section className="bg-white rounded-3xl p-5 md:p-6 shadow-md shadow-indigo-500/5 flex flex-col sm:flex-row sm:items-center gap-4">
+                <div className="w-12 h-12 shrink-0 rounded-2xl bg-primary/10 flex items-center justify-center text-2xl">✨</div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-black uppercase tracking-widest text-primary mb-1">{t('recommendationTitle')}</p>
+                  <h3 className="font-bold text-slate-800 text-lg leading-snug">{nextLesson.title}</h3>
+                  <p className="text-slate-600 text-sm mt-0.5 leading-snug truncate">{nextLesson.desc}</p>
+                </div>
+                <button onClick={nextLesson.go} className="shrink-0 bg-primary text-white font-bold py-2.5 px-5 rounded-2xl text-sm hover:bg-primary/90 transition-colors">
+                  {t('goToTopic')} →
+                </button>
+              </section>
+            ) : (
+              <section className="bg-white rounded-3xl p-6 md:p-8 shadow-md shadow-indigo-500/5 text-center">
+                <div className="text-5xl mb-3 animate-float">🏆</div>
+                <h3 className="font-bold text-slate-800 text-lg mb-1">{t('allDone')}</h3>
+                <p className="text-slate-600 text-sm">🏅 {homeBadgeCount}/{homeBadgeTotal} {t('unlockedBadge')} · 🔥 {streakDays} {t('streak')}</p>
+              </section>
+            )}
 
           </div>
 
