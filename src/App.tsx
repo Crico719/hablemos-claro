@@ -2441,7 +2441,7 @@ case 'about':
                           <RoadmapReveal key={k.id}>
                             <div className={`relative py-12 md:py-20 ${locked ? 'opacity-75' : ''}`}>
                               {/* segmento de línea */}
-                              <div aria-hidden className={`absolute top-0 bottom-0 left-[23px] md:left-1/2 -translate-x-1/2 w-[3px] rounded-full transition-colors duration-500 ${
+                              <div aria-hidden className={`absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[3px] rounded-full transition-colors duration-500 ${
                                 done
                                   ? 'bg-gradient-to-b from-success to-emerald-400'
                                   : isCurrent
@@ -2449,7 +2449,7 @@ case 'about':
                                     : 'bg-secondary-100'
                               }`} />
                               {/* nodo */}
-                              <div className="absolute left-[24px] md:left-1/2 -translate-x-1/2 -translate-y-1/2 top-1/2 z-10">
+                              <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 top-1/2 z-10">
                                 <button
                                   onClick={locked ? undefined : () => openTopic(k)}
                                   disabled={!!locked}
@@ -2468,7 +2468,7 @@ case 'about':
                                 </button>
                               </div>
                               {/* contenido */}
-                              <div className={`pl-[92px] md:pl-0 md:w-[calc(50%-6rem)] ${even ? 'md:mr-auto' : 'md:ml-auto'}`}>
+                              <div className={`w-[calc(50%-2.5rem)] md:w-[calc(50%-6rem)] ${even ? 'mr-auto' : 'ml-auto'}`}>
                                 <div className={`bg-white rounded-[20px] border p-4 md:p-5 text-center shadow-sm transition-all duration-300 ${
                                   done ? 'border-success/20' : isCurrent ? 'border-secondary/30 shadow-md shadow-primary/10' : 'border-slate-100'
                                 }`}>
@@ -2497,10 +2497,10 @@ case 'about':
                       {/* Nodo EXAMEN FINAL */}
                       <RoadmapReveal>
                         <div className="relative py-12 md:py-20">
-                          <div aria-hidden className={`absolute top-0 bottom-0 left-[23px] md:left-1/2 -translate-x-1/2 w-[3px] rounded-full transition-colors duration-500 ${
+                          <div aria-hidden className={`absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[3px] rounded-full transition-colors duration-500 ${
                             examUnlocked ? 'bg-gradient-to-b from-secondary to-warning' : 'bg-secondary-100'
                           }`} />
-                          <div className="absolute left-[24px] md:left-1/2 -translate-x-1/2 -translate-y-1/2 top-1/2 z-10">
+                          <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 top-1/2 z-10">
                             <button
                               onClick={() => { if (examUnlocked) { setActiveKidId(null); setLearnView('exam'); setExamAnswers({}); } }}
                               disabled={!examUnlocked}
@@ -2515,7 +2515,7 @@ case 'about':
                               {examUnlocked ? '🏁' : '🔒'}
                             </button>
                           </div>
-                          <div className="pl-[92px] md:pl-0 md:w-[calc(50%-6rem)] md:mr-auto">
+                          <div className="w-[calc(50%-2.5rem)] md:w-[calc(50%-6rem)] mr-auto">
                             <div className={`bg-white rounded-[20px] border p-4 md:p-5 text-center shadow-sm transition-all duration-300 ${
                               examUnlocked ? 'border-warning/30 shadow-md shadow-warning/10' : 'border-slate-100'
                             }`}>
@@ -2587,7 +2587,7 @@ case 'about':
                           <RoadmapReveal key={g.id}>
                             <div className={`relative py-12 md:py-20 ${locked ? 'opacity-75' : ''}`}>
                               {/* segmento de línea */}
-                              <div aria-hidden className={`absolute top-0 bottom-0 left-[23px] md:left-1/2 -translate-x-1/2 w-[3px] rounded-full transition-colors duration-500 ${
+                              <div aria-hidden className={`absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[3px] rounded-full transition-colors duration-500 ${
                                 done
                                   ? 'bg-gradient-to-b from-success to-emerald-400'
                                   : isCurrent
@@ -2595,7 +2595,7 @@ case 'about':
                                     : 'bg-secondary-100'
                               }`} />
                               {/* nodo */}
-                              <div className="absolute left-[24px] md:left-1/2 -translate-x-1/2 -translate-y-1/2 top-1/2 z-10">
+                              <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 top-1/2 z-10">
                                 <button
                                   onClick={locked ? undefined : () => openGuide(g)}
                                   disabled={!!locked}
@@ -2614,7 +2614,7 @@ case 'about':
                                 </button>
                               </div>
                               {/* contenido */}
-                              <div className={`pl-[92px] md:pl-0 md:w-[calc(50%-6rem)] ${even ? 'md:mr-auto' : 'md:ml-auto'}`}>
+                              <div className={`w-[calc(50%-2.5rem)] md:w-[calc(50%-6rem)] ${even ? 'mr-auto' : 'ml-auto'}`}>
                                 <div className={`bg-white rounded-[20px] border p-4 md:p-5 text-center shadow-sm transition-all duration-300 ${
                                   done ? 'border-success/20' : isCurrent ? 'border-secondary/30 shadow-md shadow-secondary/10' : 'border-slate-100'
                                 }`}>
