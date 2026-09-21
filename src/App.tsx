@@ -941,7 +941,35 @@ const conversationPrompts: ConversationPrompt[] = [
   { id: '5', question: '¿Por qué es importante respetar las reglas?', asked: false },
 ]
 
-// Estado global de la aplicación
+// Preguntas para la actividad familiar - pool de ≥20 preguntas organizadas por tipo
+const familyActivityQuestions = [
+  // COMPRENDEMOS - usando familyQuestion de los kid topics
+  { id: 'f1', text: '¿Qué aprendiste en esta actividad?', type: 'comprendemos', category: 'kids', asked: false, answered: false },
+  { id: 'f2', text: '¿Qué significa actuar con integridad?', type: 'comprendemos', category: 'kids', asked: false, answered: false },
+  { id: 'f3', text: '¿Qué aprendiste hoy y cómo puedes aplicarlo en casa?', type: 'comprendemos', category: 'kids', asked: false, answered: false },
+  // RELACIONAMOS - usando familyQuestion de kids topics
+  { id: 'f4', text: '¿Te ha ocurrido algo parecido?', type: 'relaciona', category: 'kids', asked: false, answered: false },
+  { id: 'f5', text: '¿Cómo te sentirías en esa situación?', type: 'relaciona', category: 'kids', asked: false, answered: false },
+  { id: 'f6', text: '¿Has vivido una situación como esta en la escuela?', type: 'relaciona', category: 'kids', asked: false, answered: false },
+  // ACTUAMOS - usando questions de parent guides
+  { id: 'f7', text: '¿Qué podríamos hacer como familia?', type: 'actuamos', category: 'parents', asked: false, answered: false },
+  { id: 'f8', text: '¿Qué regla nos ayuda a convivir mejor?', type: 'actuamos', category: 'parents', asked: false, answered: false },
+  { id: 'f9', text: '¿Qué acción haríamos para corregir esto?', type: 'actuamos', category: 'parents', asked: false, answered: false },
+  // Additional questions from conversation prompts
+  { id: 'f10', text: '¿Por qué es importante respetar las reglas?', type: 'comprendemos', category: 'conversation', asked: false, answered: false },
+  { id: 'f11', text: '¿Qué harías si alguien te pidiera participar en algo que sabes que está mal?', type: 'comprendemos', category: 'conversation', asked: false, answered: false },
+  { id: 'f12', text: '¿Quiénes pueden verse afectados por una coima?', type: 'relaciona', category: 'conversation', asked: false, answered: false },
+  { id: 'f13', text: '¿Por qué crees que algunas personas ofrecen coimas?', type: 'relaciona', category: 'conversation', asked: false, answered: false },
+  { id: 'f14', text: '¿Qué entiendes por coima?', type: 'comprendemos', category: 'conversation', asked: false, answered: false },
+  // More questions from parent guides (using their questions array)
+  { id: 'f15', text: '¿Cómo iniciaríamos esta conversación en casa?', type: 'actuamos', category: 'parents', asked: false, answered: false },
+  { id: 'f16', text: '¿Qué escucharíamos más importante en la respuesta de nuestros hijos?', type: 'actuamos', category: 'parents', asked: false, answered: false },
+  { id: 'f17', text: '¿Qué valor familiar se reforzaría con esta actividad?', type: 'actuamos', category: 'parents', asked: false, answered: false },
+  { id: 'f18', text: '¿Cómo celebraríamos haber completado la actividad?', type: 'comprendemos', category: 'parents', asked: false, answered: false },
+  { id: 'f19', text: '¿A qué hora del día sería mejor para conversar en familia?', type: 'relaciona', category: 'familia', asked: false, answered: false },
+  { id: 'f20', text: '¿Qué aprendimos juntos y cómo lo recordaremos?', type: 'comprendemos', category: 'familia', asked: false, answered: false },
+]
+
 const initialStudentProfile = getStoredStudentProfile()
 const initialFamilyProfile = getStoredFamilyProfile()
 
@@ -958,6 +986,8 @@ export default function App() {
   const [topicStep, setTopicStep] = useState(0)
   const [answeredOpt, setAnsweredOpt] = useState<number | null>(null)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
+  const [familyActivityIndex, setFamilyActivityIndex] = useState(0)
+  const [familyActivityType, setFamilyActivityType] = useState<'comprendemos' | 'relacionamos' | 'actuamos'>('comprendemos')
   const [userAnswers, setUserAnswers] = useState<number[]>([])
   const [showFeedback, setShowFeedback] = useState(false)
   const [feedbackMessage, setFeedbackMessage] = useState<string>('')
@@ -2097,12 +2127,12 @@ case 'about':
           <div className="max-w-4xl mx-auto animate-slide-up space-y-14">
             
             {/* Header */}
-            <div className="bg-white rounded-2xl p-6 flex items-center justify-between shadow-sm">
+            <div className="bg-white rounded-2xl p-8 flex items-center justify-between shadow-sm">
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-4xl">📚</div>
                 <div>
-                  <h1 className="text-3xl font-bold gradient-text">Explora los temas</h1>
-                  <p className="text-gray-600 mt-1">Elige contenidos según tu rol dentro de la familia.</p>
+                  <h1 className="text-4xl font-bold gradient-text">Explora los temas</h1>
+                  <p className="text-gray-600 text-lg mt-2 mb-1">Elige contenidos según tu rol dentro de la familia.</p>
                 </div>
               </div>
               <button
@@ -2113,7 +2143,7 @@ case 'about':
                   else if (learnView === 'exam') setLearnView('kids')
                   else setLearnView('hub')
                 }}
-                className="glass-card px-5 py-2 rounded-xl text-gray-500 hover:text-primary text-sm font-medium hover:bg-gray-100 transition-all"
+                className="glass-card px-6 py-3 rounded-xl text-gray-600 hover:text-primary text-base font-bold hover:bg-gray-100 transition-all shrink-0"
               >
                 {learnView === 'hub' ? '← Inicio' : '← Atrás'}
               </button>
@@ -2121,11 +2151,12 @@ case 'about':
 
             {/* HUB */}
             {learnView === 'hub' && (
-              <div className="grid grid-cols-1 gap-6 md:gap-8 max-w-2xl mx-auto items-stretch">
+              <div className="grid grid-cols-1 gap-6 md:gap-8 max-w-2xl mx-auto items-stretch min-h-[45vh] place-content-center">
                 <button
                   onClick={() => setLearnView('kids')}
-                  className="group bg-white rounded-3xl p-10 shadow-xl border border-gray-100 text-center flex flex-col items-center transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl cursor-pointer"
+                  className="group bg-white rounded-3xl p-10 md:p-12 shadow-xl border border-gray-100 text-center flex flex-col items-center transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl cursor-pointer"
                 >
+                  <div className="w-full h-2 rounded-full mb-6" style={{ background: 'linear-gradient(90deg, #2563EB, #10B981)' }} />
                   <div className="w-24 h-24 rounded-3xl mb-6 flex items-center justify-center transition-transform duration-300 group-hover:scale-105" style={{ background: 'linear-gradient(135deg, #DBEAFE, #EDE9FE)' }}>
                     <svg viewBox="0 0 24 24" className="w-12 h-12 text-primary" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                       <path d="M12 4 22 9l-10 5L2 9l10-5Z" />
@@ -2134,21 +2165,22 @@ case 'about':
                     </svg>
                   </div>
                   <h2 className="text-2xl font-black text-primary mb-3">PARA HIJOS</h2>
-                  <p className="text-gray-600 text-lg leading-relaxed mb-6 flex-1">Aprende de forma sencilla, interactiva y con ejemplos de situaciones cotidianas.</p>
-                  <span className="inline-flex items-center justify-center gap-2 w-full bg-primary text-white font-bold text-lg py-4 px-6 rounded-full shadow-lg transition-all duration-300 group-hover:gap-3 group-hover:shadow-xl">
-                    Explorar temas →
+                  <p className="text-gray-700 text-lg leading-relaxed mb-6 flex-1">Aprende de forma sencilla, interactiva y con ejemplos de situaciones cotidianas.</p>
+                  <span className="inline-flex items-center justify-center gap-2 bg-primary text-white font-bold text-lg py-3 px-10 rounded-full shadow-lg transition-all duration-300 group-hover:gap-3 group-hover:shadow-xl">
+                    {kidsDone.length === 0 ? 'Comenzar →' : kidsDone.length >= KIDS_TOPICS.length ? 'Explorar temas →' : 'Continuar aprendiendo →'}
                   </span>
-                  <div className="w-full mt-5">
-                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="w-full mt-6">
+                    <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden">
                       <div className="h-full rounded-full bg-primary" style={{ width: `${(kidsDone.length / KIDS_TOPICS.length) * 100}%` }}></div>
                     </div>
-                    <p className="text-sm font-bold text-gray-500 mt-2">{kidsDone.length} de {KIDS_TOPICS.length} completados</p>
+                    <p className="text-base font-bold text-gray-600 mt-2">{kidsDone.length} de {KIDS_TOPICS.length} completados</p>
                   </div>
                 </button>
                 <button
                   onClick={() => setLearnView('parents')}
-                  className="group bg-white rounded-3xl p-10 shadow-xl border border-gray-100 text-center flex flex-col items-center transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl cursor-pointer"
+                  className="group bg-white rounded-3xl p-10 md:p-12 shadow-xl border border-gray-100 text-center flex flex-col items-center transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl cursor-pointer"
                 >
+                  <div className="w-full h-2 rounded-full mb-6" style={{ background: 'linear-gradient(90deg, #7C3AED, #F59E0B)' }} />
                   <div className="w-24 h-24 rounded-3xl mb-6 flex items-center justify-center transition-transform duration-300 group-hover:scale-105" style={{ background: 'linear-gradient(135deg, #EDE9FE, #FEF3C7)' }}>
                     <svg viewBox="0 0 24 24" className="w-12 h-12 text-secondary" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                       <circle cx="9" cy="8" r="3.2" />
@@ -2158,15 +2190,15 @@ case 'about':
                     </svg>
                   </div>
                   <h2 className="text-2xl font-black text-secondary mb-3">PARA PADRES Y TUTORES</h2>
-                  <p className="text-gray-600 text-lg leading-relaxed mb-6 flex-1">Encuentra herramientas para conversar y acompañar a tus hijos.</p>
-                  <span className="inline-flex items-center justify-center gap-2 w-full text-white font-bold text-lg py-4 px-6 rounded-full shadow-lg transition-all duration-300 group-hover:gap-3 group-hover:shadow-xl" style={{ background: '#7C3AED' }}>
-                    Explorar temas →
+                  <p className="text-gray-700 text-lg leading-relaxed mb-6 flex-1">Encuentra herramientas para conversar y acompañar a tus hijos.</p>
+                  <span className="inline-flex items-center justify-center gap-2 text-white font-bold text-lg py-3 px-10 rounded-full shadow-lg transition-all duration-300 group-hover:gap-3 group-hover:shadow-xl" style={{ background: '#7C3AED' }}>
+                    {guidesDone.length === 0 ? 'Comenzar →' : guidesDone.length >= PARENT_GUIDES.length ? 'Explorar temas →' : 'Continuar aprendiendo →'}
                   </span>
-                  <div className="w-full mt-5">
-                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="w-full mt-6">
+                    <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden">
                       <div className="h-full rounded-full" style={{ width: `${(guidesDone.length / PARENT_GUIDES.length) * 100}%`, background: '#7C3AED' }}></div>
                     </div>
-                    <p className="text-sm font-bold text-gray-500 mt-2">{guidesDone.length} de {PARENT_GUIDES.length} revisados</p>
+                    <p className="text-base font-bold text-gray-600 mt-2">{guidesDone.length} de {PARENT_GUIDES.length} revisados</p>
                   </div>
                 </button>
               </div>
@@ -2967,52 +2999,201 @@ case 'about':
 
     case 'activity':
       const cust11 = getCustomization();
+      const currentPrompt = familyActivityQuestions[familyActivityIndex];
+      const totalPrompts = familyActivityQuestions.length;
+      const isLastPrompt = familyActivityIndex === totalPrompts - 1;
+      
+      // Determinar título según tipo
+      const typeTitles: Record<string, string> = {
+        comprendemos: 'Comprendemos',
+        relaciona: 'Relacionamos',
+        actuamos: 'Actuamos'
+      };
+      
+      // Determinar subtítulo según tipo
+      const typeSubtitles: Record<string, string> = {
+        comprendemos: 'Hablen juntos sobre lo aprendido',
+        relaciona: 'Relacionen con sus experiencias',
+        actuamos: 'Propongan acciones en familia'
+      };
+      
       return (
         <div className="min-h-screen p-8" style={{ background: cust11.backgroundValue, backgroundSize: cust11.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           <div className="max-w-5xl mx-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="text-2xl font-bold text-family">Detectemos juntos</h1>
-              <button onClick={() => navigateTo('converse')} className="text-gray-500 hover:text-primary">
-                ← Atrás
-              </button>
-            </div>
-
-            <div className="bg-white rounded-lg p-6 shadow-sm mb-8">
-              <p className="text-gray-700 mb-4">
-                "Una persona quiere obtener un beneficio que no le corresponde y ofrece dinero para conseguirlo."
-              </p>
+            {/* Header with instruction */}
+            <div className="bg-white rounded-2xl p-8 mb-8 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h1 className="text-3xl font-bold text-primary">Conversamos en familia</h1>
+                  <p className="text-gray-600 text-sm mb-1">Hablen juntos durante 5 minutos sobre lo aprendido y compartan sus ideas. Así la familia entiende qué debe hacer.</p>
+                  <p className="text-sm text-gray-500">{typeTitles[currentPrompt.type]} - {typeSubtitles[currentPrompt.type]}</p>
+                </div>
+                <button onClick={() => navigateTo('converse')} className="text-gray-500 hover:text-primary">
+                  ← Atrás
+                </button>
+              </div>
               
-              <div className="grid grid-cols-2 gap-8">
-                <div>
-                  <p className="font-medium">Señales de alerta:</p>
-                  <ul className="text-sm text-gray-600 space-y-1">
-                    <li>Ofrecer dinero para obtener algo injusto</li>
-                    <li>Pedidos discretos para "ayudar"</li>
-                    <li>Intentos de saltarse reglas</li>
-                  </ul>
-                </div>
-                <div>
-                  <p className="font-medium">¿Qué harían?</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button className="btn-outline py-2 px-3 rounded">Padre: Detener la situación</button>
-                    <button className="btn-outline py-2 px-3 rounded">Hijo: Preguntar por qué está mal</button>
-                  </div>
-                </div>
+              {/* Type tabs */}
+<div className="flex mb-4" role="tablist">
+                <button
+                  role="tab"
+                  aria-selected={familyActivityType === 'comprendemos'}
+                  onClick={() => setFamilyActivityType('comprendemos')}
+                  className="px-4 py-2 rounded text-sm font-medium capitalize transition-colors duration-200 ${
+                    familyActivityType === 'comprendemos' ? 'bg-primary text-primary' : 'text-gray-500 hover:bg-gray-100'
+                  }"
+                >
+                  Comprendemos
+                </button>
+                <button
+                  role="tab"
+                  aria-selected={familyActivityType === 'relacionamos'}
+                  onClick={() => setFamilyActivityType('relacionamos')}
+                  className="px-4 py-2 rounded text-sm font-medium capitalize transition-colors duration-200 ${
+                    familyActivityType === 'relacionamos' ? 'bg-primary text-primary' : 'text-gray-500 hover:bg-gray-100'
+                  }"
+                >
+                  Relacionamos
+                </button>
+                <button
+                  role="tab"
+                  aria-selected={familyActivityType === 'actuamos'}
+                  onClick={() => setFamilyActivityType('actuamos')}
+                  className="px-4 py-2 rounded text-sm font-medium capitalize transition-colors duration-200 ${
+                    familyActivityType === 'actuamos' ? 'bg-primary text-primary' : 'text-gray-500 hover:bg-gray-100'
+                  }"
+                >
+                  Actuamos
+                </button>
               </div>
             </div>
 
-            <div className="mt-8 p-4 bg-primary/5 rounded">
-              <p className="font-medium text-primary">
-                Hablar sobre estas situaciones ayuda a reconocer decisiones incorrectas antes de enfrentarlas en la vida real.
+            {/* Question card */}
+            <div className="bg-white rounded-2xl p-8 md:p-10 shadow-lg max-w-2xl mx-auto">
+              {/* Progress indicator */}
+              <div className="mb-6 flex items-center justify-between">
+                <span className="text-sm text-gray-500">Pregunta {familyActivityIndex + 1} de {totalPrompts}</span>
+                {isLastPrompt && (
+                  <span className="text-sm font-bold text-primary">Última pregunta</span>
+                )}
+              </div>
+              
+              {/* Question text with highlighted words */}
+              <p className="text-2xl md:text-3xl text-gray-800 leading-relaxed mb-8 line-clamp-4">
+                {currentPrompt.text}
               </p>
+              
+              {/* Family participation options */}
+              <div className="mb-6 pt-4 border-t border-gray-100">
+                <button
+                  onClick={() => {
+                    // Read aloud - simple alert for now
+                    alert('Leyendo en voz alta: "' + currentPrompt.text + '"')
+                  }}
+                  className="flex items-center gap-2 text-primary text-sm hover:underline mb-2">
+                    🔊 Leer en voz alta
+                </button>
+                <div className="space-y-1">
+                  <button
+                    onClick={() => setUserAnswers(prev => [...prev, 1])}
+                    className="flex items-center gap-2 text-gray-600 hover:text-primary text-sm underline">
+                      ⭐ Marcar como conversada
+                    </button>
+                  <button
+                    onClick={() => setFamilyActivityIndex(prev => prev - 1)}
+                    disabled={familyActivityIndex === 0}
+                    className="flex items-center gap-2 text-gray-400 hover:text-primary disabled:opacity-50 cursor-not-allowed text-sm">
+                      ← Anterior
+                    </button>
+                  <span className="text-gray-400 text-sm mx-2">|</span>
+                  <button
+                    onClick={() => setFamilyActivityIndex(prev => prev + 1)}
+                    disabled={isLastPrompt}
+                    className="flex items-center gap-2 text-gray-400 hover:text-primary disabled:opacity-50 cursor-not-allowed text-sm">
+                      Siguiente →
+                    </button>
+                </div>
+              </div>
+              
+              {/* Answer field */}
+              <div className="mb-6 pt-4">
+                <label className="block text-sm text-gray-600 mb-2">
+                  Escribe una respuesta breve:
+                </label>
+                <textarea
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent resize-none min-h-[120px]"
+                  placeholder="Tu respuesta aquí..."
+onChange={() => {
+                      // Update answer in state if needed
+                    }}
+                ></textarea>
+              </div>
+              
+              {/* Navigation buttons */}
+              <div className="flex gap-3 mt-8">
+                {familyActivityIndex > 0 && (
+                  <button
+                    onClick={() => setFamilyActivityIndex(prev => prev - 1)}
+                    className="flex-1 py-3 px-4 rounded-xl border border-gray-200 text-sm font-medium hover:bg-gray-50 transition-all"
+                  >
+                    Anterior
+                  </button>
+                )}
+                <button
+                  onClick={() => {
+                    if (familyActivityIndex < totalPrompts - 1) {
+                      setFamilyActivityIndex(prev => prev + 1)
+                    } else {
+                      // Show completion message
+                      setFamilyActivityIndex(totalPrompts) // Move to "completed" state
+                    }
+                  }}
+                  className="flex-1 py-3 px-6 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary-dark transition-all"
+                  disabled={!currentPrompt.answered}
+                >
+                  {isLastPrompt ? 'Terminar' : 'Siguiente'}
+                </button>
+              </div>
             </div>
 
-            <button
-              onClick={() => navigateTo('cases')}
-              className="btn-primary w-full py-3 px-6 rounded-lg text-lg mt-4"
-            >
-                Ver casos de la vida cotidiana
-            </button>
+            {/* Completion state */}
+            {familyActivityIndex >= totalPrompts && (
+              <div className="mt-8 text-center">
+                <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-10 h-10 text-primary" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 6L9 17l-5-5" />
+                    <path d="M6 9l-5 5" />
+                    <path d="M2 9l5 5" />
+                    <path d="M9 19v6" />
+                    <path d="M15 19v6" />
+                  </svg>
+                </div>
+                <h2 className="text-2xl font-bold text-primary mb-3">¡Muy bien!</h2>
+                <p className="text-gray-600 mb-4">
+                  Conversar en familia nos ayuda a aprender y convivir mejor.
+                </p>
+                <p className="text-lg text-gray-700 mb-6">
+                  Elijan una acción para practicar esta semana:
+                </p>
+                <div className="space-y-2">
+                  <button className="w-full py-3 px-4 rounded-xl bg-green-50 text-green-800 hover:bg-green-100 transition-all">
+                    Compartir un momento de alegría cada día
+                  </button>
+                  <button className="w-full py-3 px-4 rounded-xl bg-green-50 text-green-800 hover:bg-green-100 transition-all">
+                    Reconocer una buena decisión familiar esta semana
+                  </button>
+                  <button className="w-full py-3 px-4 rounded-xl bg-green-50 text-green-800 hover:bg-green-100 transition-all">
+                    Crear un ritual de conversación familiar
+                  </button>
+                </div>
+                <button
+                  onClick={() => setFamilyActivityIndex(0)}
+                  className="mt-4 py-2 px-6 rounded-xl bg-primary text-white text-sm hover:bg-primary-dark transition-all"
+                >
+                  Volver a empezar
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )
