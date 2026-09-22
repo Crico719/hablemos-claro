@@ -1127,7 +1127,8 @@ export default function App() {
   const [answeredOpt, setAnsweredOpt] = useState<number | null>(null)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [familyActivityIndex, setFamilyActivityIndex] = useState(0)
-  const [familyActivityType, setFamilyActivityType] = useState<'comprendemos' | 'relacionamos' | 'actuamos'>('comprendemos')
+  const [familyDoneList, setFamilyDoneList] = useState<number[]>([])
+  const [familyWeeklyAction, setFamilyWeeklyAction] = useState<number | null>(null)
   const [userAnswers, setUserAnswers] = useState<number[]>([])
   const [showFeedback, setShowFeedback] = useState(false)
   const [feedbackMessage, setFeedbackMessage] = useState<string>('')
@@ -3142,49 +3143,66 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
         </div>
       )
 
-case 'converse':
+    case 'converse':
       const cust10 = getCustomization()
       const textColors = getTextColorForTheme(cust10.backgroundValue)
       const prompt = conversationPrompts[currentQuestionIndex]
       const isLastQ = currentQuestionIndex >= conversationPrompts.length
       const turnIsKid = conversationTurn === 'kid'
       const isClosed = prompt?.type === 'closed'
-      
+      const convPct = Math.round((Math.min(currentQuestionIndex, conversationPrompts.length) / conversationPrompts.length) * 100)
+
       return (
-        <div className="min-h-screen p-4 md:p-8" style={{ background: cust10.backgroundValue, backgroundSize: cust10.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
-          <div className="max-w-3xl mx-auto">
-            {/* Header */}
-            <div className="mb-6 text-center">
-              <h1 className="text-2xl md:text-3xl font-bold mb-2" style={{ color: textColors.primary }}>Conversemos en familia 💬</h1>
-              <p className="text-sm md:text-base" style={{ color: textColors.secondary }}>Turno: {turnIsKid ? '👧 Joven' : '👨 Padre'}</p>
-            </div>
+        <div className="min-h-screen p-4 md:p-8 relative overflow-hidden" style={{ background: cust10.backgroundValue, backgroundSize: cust10.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
+          <div aria-hidden className="pointer-events-none absolute inset-0">
+            <div className="absolute -top-20 -right-16 w-72 h-72 rounded-full blur-3xl" style={{ backgroundColor: 'rgba(16,185,129,0.18)' }} />
+            <div className="absolute -bottom-24 -left-16 w-80 h-80 rounded-full blur-3xl" style={{ backgroundColor: 'rgba(37,99,235,0.18)' }} />
+            <div className="absolute top-24 left-[6%] text-3xl animate-float hidden md:block">💬</div>
+            <div className="absolute bottom-32 right-[7%] text-3xl animate-float hidden md:block" style={{ animationDelay: '1.1s' }}>👨‍👧</div>
+          </div>
 
-            {/* Progress */}
-            <div className="mb-4 text-center">
-              <p className="text-sm mb-2" style={{ color: textColors.secondary }}>Pregunta {currentQuestionIndex + 1} de {conversationPrompts.length}</p>
-              <div className="inline-flex rounded-full px-3" style={{ backgroundColor: textColors.cardBg }}>
-                {conversationPrompts.map((_, i) => (
-                  <div key={i} className={`h-2 rounded-full transition-colors duration-300 ${i < currentQuestionIndex ? 'bg-primary' : ''}`} style={{ backgroundColor: i < currentQuestionIndex ? '#10b981' : textColors.border, width: '24px', margin: '0 2px' }}></div>
-                ))}
+          <div className="relative max-w-3xl mx-auto animate-slide-up py-2">
+            {/* Encabezado */}
+            <div className="text-center mb-6">
+              <div className="w-14 h-14 mx-auto mb-3 rounded-3xl shadow-lg flex items-center justify-center text-3xl animate-float" style={{ background: 'linear-gradient(135deg, #10b981, #2563EB)' }}>
+                💬
               </div>
-            </div>
-
-            {/* Turn badge */}
-            <div className="mb-6 text-center">
-              <span className={`inline-block px-6 py-2 rounded-full text-sm font-bold ${turnIsKid ? 'bg-primary text-white' : 'bg-secondary text-white'}`}>
-                {turnIsKid ? '👧 Turno del Joven' : '👨 Turno del Padre'}
-              </span>
+              <h1 className="text-2xl md:text-4xl font-black mb-2" style={{ color: textColors.primary }}>Conversemos en familia</h1>
+              <p className="text-sm md:text-base max-w-lg mx-auto" style={{ color: textColors.secondary }}>
+                Respondan por turnos: primero 👦 y luego 👨. ¡Aquí no hay respuestas malas!
+              </p>
             </div>
 
             {!isLastQ ? (
               <>
-                {/* Question card */}
-                <div className="rounded-2xl p-6 md:p-8 shadow-xl mb-6" style={{ backgroundColor: textColors.cardBg }}>
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="text-2xl">{turnIsKid ? '👧' : '👨'}</span>
-                    <span className="font-bold" style={{ color: textColors.primary }}>{turnIsKid ? 'Joven' : 'Padre'}</span>
+                {/* Progreso */}
+                <div className="mb-5">
+                  <div className="flex justify-between mb-1.5 text-xs font-black" style={{ color: textColors.secondary }}>
+                    <span>Pregunta {currentQuestionIndex + 1} de {conversationPrompts.length}</span>
+                    <span>{convPct}%</span>
                   </div>
-                  <p className="text-xl md:text-2xl font-semibold mb-6 text-center" style={{ color: textColors.primary }}>
+                  <div className="h-2.5 rounded-full overflow-hidden" style={{ backgroundColor: textColors.border }}>
+                    <div className="h-full rounded-full transition-all duration-500" style={{ width: `${convPct}%`, background: 'linear-gradient(90deg, #10b981, #2563EB)' }} />
+                  </div>
+                </div>
+
+                {/* Turno actual */}
+                <div className="flex justify-center mb-5">
+                  <span className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-black shadow-lg" style={{ background: turnIsKid ? 'linear-gradient(135deg, #2563EB, #7C3AED)' : 'linear-gradient(135deg, #10b981, #059669)', color: '#ffffff' }}>
+                    {turnIsKid ? '👧 Turno del joven' : '👨 Turno del padre'}
+                  </span>
+                </div>
+
+                {/* Tarjeta de pregunta */}
+                <div className="rounded-3xl p-6 md:p-8 shadow-custom-lg border border-white/70 mb-6 animate-fade-in" style={{ backgroundColor: '#ffffff' }}>
+                  <div className="flex items-center gap-2 mb-3 flex-wrap">
+                    <span className="text-2xl">{turnIsKid ? '👦' : '👨'}</span>
+                    <span className="font-black text-slate-800">{turnIsKid ? 'Joven' : 'Padre'}</span>
+                    <span className="ml-auto text-xs font-bold px-2.5 py-1 rounded-full" style={{ backgroundColor: isClosed ? '#EFF6FF' : '#F0FDF4', color: isClosed ? '#2563EB' : '#059669' }}>
+                      {isClosed ? 'Opción múltiple ✅' : 'Respuesta abierta ✍️'}
+                    </span>
+                  </div>
+                  <p className="text-xl md:text-2xl font-black text-center text-slate-900 leading-snug mb-6">
                     {turnIsKid ? prompt.kidQuestion : prompt.parentQuestion}
                   </p>
 
@@ -3213,18 +3231,16 @@ case 'converse':
                               }
                             }, 300)
                           }}
-                          className="w-full text-left py-3 px-4 rounded-xl border text-sm font-medium transition-all hover:shadow-md"
-                          style={{ borderColor: textColors.border, color: textColors.label, backgroundColor: 'transparent' }}
+                          className="w-full text-left py-3.5 px-4 rounded-2xl border-2 border-slate-200 text-sm font-bold text-slate-700 hover:border-emerald-400 hover:bg-emerald-50 transition-all"
                         >
-                          {opt}
+                          <span className="mr-2 font-black text-slate-400">{'ABCDEF'[i] ?? '•'}</span>{opt}
                         </button>
                       ))}
                     </div>
                   ) : (
                     <div>
                       <textarea
-                        className="w-full px-4 py-3 rounded-xl resize-none min-h-[120px] placeholder-gray-400"
-                        style={{ borderColor: textColors.border, backgroundColor: textColors.cardBg, color: textColors.primary }}
+                        className="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-emerald-400 focus:outline-none resize-none min-h-[120px] placeholder-slate-400 text-slate-800 bg-white"
                         placeholder={turnIsKid ? 'Escribe tu respuesta como joven...' : 'Escribe tu respuesta como padre...'}
                         value={turnIsKid ? kidAnswer : parentAnswer}
                         onChange={(e) => {
@@ -3236,11 +3252,11 @@ case 'converse':
                         onClick={() => {
                           const answer = turnIsKid ? kidAnswer : parentAnswer
                           if (answer.trim()) {
-if (turnIsKid) {
-                               setKidAnswer(answer)
-                             } else {
-                               setParentAnswer(answer)
-                             }
+                            if (turnIsKid) {
+                              setKidAnswer(answer)
+                            } else {
+                              setParentAnswer(answer)
+                            }
                             if (!turnIsKid) {
                               // Parent finished, go to next question
                               setConversationTurn('kid')
@@ -3253,37 +3269,40 @@ if (turnIsKid) {
                             }
                           }
                         }}
-                        className="mt-3 py-2 px-6 rounded-xl text-sm font-bold transition-all"
-                        style={{ backgroundColor: '#10b981', color: '#ffffff' }}
+                        className="mt-3 w-full py-3.5 rounded-2xl text-white font-black text-sm transition-all hover:scale-[1.01] shadow-lg"
+                        style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}
                       >
-                        {turnIsKid ? 'Joven respondió → Cambiar a Padre' : 'Padre respondió → Siguiente pregunta'}
+                        {turnIsKid ? '👦 Respondí → Le toca al padre' : '👨 Respondí → Siguiente pregunta'}
                       </button>
                     </div>
                   )}
                 </div>
 
-                {/* Navigation */}
-                <div className="flex gap-2 justify-center">
+                {/* Navegación */}
+                <div className="flex flex-wrap gap-2 justify-center">
                   <button
                     onClick={() => navigateTo('home')}
-                    className="py-2 px-4 rounded-xl text-sm font-medium transition-all"
-                    style={{ borderColor: textColors.border, color: textColors.label }}
+                    className="py-2.5 px-5 rounded-full text-sm font-bold transition-all"
+                    style={{ backgroundColor: textColors.cardBg, color: textColors.label, border: `1.5px solid ${textColors.border}` }}
                   >
-                    ← Inicio
+                    🏠 Inicio
+                  </button>
+                  <button
+                    onClick={() => navigateTo('activity')}
+                    className="py-2.5 px-5 rounded-full text-sm font-black text-white shadow-lg transition-all hover:scale-[1.02]"
+                    style={{ background: 'linear-gradient(135deg, #7C3AED, #2563EB)' }}
+                  >
+                    🎯 Actividad familiar completa →
                   </button>
                 </div>
               </>
             ) : (
-              /* Completion */
-              <div className="mt-8 text-center">
-                <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#10b98120' }}>
-                  <svg className="w-10 h-10" style={{ color: '#10b981' }} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 6L9 17l-5-5" /><path d="M6 9l-5 5" /><path d="M2 9l5 5" /><path d="M9 19v6" /><path d="M15 19v6" />
-                  </svg>
-                </div>
-                <h2 className="text-2xl font-bold mb-3" style={{ color: textColors.primary }}>¡Excelente!</h2>
-                <p className="mb-2" style={{ color: textColors.label }}>Ambos participaron en la conversación familiar.</p>
-                <p className="text-sm mb-6" style={{ color: textColors.secondary }}>Las respuestas se han guardado en tus perfiles.</p>
+              /* Completado */
+              <div className="rounded-3xl p-7 md:p-9 shadow-custom-lg border border-white/70 text-center animate-slide-up" style={{ backgroundColor: '#ffffff' }}>
+                <div className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-4 text-4xl animate-float" style={{ backgroundColor: '#ECFDF5' }}>🎉</div>
+                <h2 className="text-2xl font-black text-slate-900 mb-2">¡Excelente conversación!</h2>
+                <p className="text-slate-600 mb-1">Los dos participaron: así se construye una familia más honesta. 💚</p>
+                <p className="text-sm text-slate-500 mb-6">Tu progreso se guardó en el perfil.</p>
                 <div className="space-y-3">
                   <button
                     onClick={() => {
@@ -3293,15 +3312,21 @@ if (turnIsKid) {
                       setParentAnswer('')
                       completeConversation()
                     }}
-                    className="w-full py-3 px-6 rounded-xl text-white font-bold transition-all"
-                    style={{ backgroundColor: '#10b981' }}
+                    className="w-full py-3.5 px-6 rounded-2xl text-white font-black transition-all hover:scale-[1.01] shadow-lg"
+                    style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}
                   >
                     🔄 Volver a empezar
                   </button>
                   <button
+                    onClick={() => navigateTo('activity')}
+                    className="w-full py-3.5 px-6 rounded-2xl text-white font-black transition-all hover:scale-[1.01] shadow-lg"
+                    style={{ background: 'linear-gradient(135deg, #7C3AED, #2563EB)' }}
+                  >
+                    🎯 Seguir con la actividad familiar
+                  </button>
+                  <button
                     onClick={() => navigateTo('home')}
-                    className="w-full py-3 px-6 rounded-xl text-white font-bold transition-all"
-                    style={{ backgroundColor: '#1e293b' }}
+                    className="w-full py-3.5 px-6 rounded-2xl font-black transition-all bg-slate-100 text-slate-700 hover:bg-slate-200"
                   >
                     🏠 Volver al inicio
                   </button>
@@ -3311,208 +3336,232 @@ if (turnIsKid) {
           </div>
         </div>
       )
-
     case 'activity':
       const cust11 = getCustomization();
-      const currentPrompt = familyActivityQuestions[familyActivityIndex];
       const totalPrompts = familyActivityQuestions.length;
-      const isLastPrompt = familyActivityIndex === totalPrompts - 1;
-      
-      // Determinar título según tipo
-      const typeTitles: Record<string, string> = {
-        comprendemos: 'Comprendemos',
-        relaciona: 'Relacionamos',
-        actuamos: 'Actuamos'
-      };
-      
-      // Determinar subtítulo según tipo
-      const typeSubtitles: Record<string, string> = {
+      const isDoneView = familyActivityIndex >= totalPrompts;
+      const safeIndex = Math.min(familyActivityIndex, totalPrompts - 1);
+      const currentPrompt = familyActivityQuestions[safeIndex];
+      const isLastPrompt = safeIndex === totalPrompts - 1;
+      const activityPct = isDoneView ? 100 : Math.round((safeIndex / totalPrompts) * 100);
+      const phaseTabs = [
+        { id: 'comprendemos' as const, dataType: 'comprendemos', label: 'Comprendemos', emoji: '🧠', color: '#2563EB' },
+        { id: 'relacionamos' as const, dataType: 'relaciona', label: 'Relacionamos', emoji: '🔗', color: '#7C3AED' },
+        { id: 'actuamos' as const, dataType: 'actuamos', label: 'Actuamos', emoji: '🚀', color: '#10b981' },
+      ];
+      const activePhase = phaseTabs.find(p => p.dataType === currentPrompt.type)?.id ?? 'comprendemos';
+      const activePhaseMeta = phaseTabs.find(p => p.id === activePhase) ?? phaseTabs[0];
+      const typeSubs: Record<string, string> = {
         comprendemos: 'Hablen juntos sobre lo aprendido',
-        relaciona: 'Relacionen con sus experiencias',
-        actuamos: 'Propongan acciones en familia'
+        relaciona: 'Conecten con sus experiencias',
+        actuamos: 'Propongan acciones en familia',
       };
-      
+      const speakPrompt = () => {
+        try {
+          const synth = window.speechSynthesis;
+          if (!synth) return;
+          synth.cancel();
+          const utter = new SpeechSynthesisUtterance(currentPrompt.text);
+          utter.lang = 'es-PE';
+          utter.rate = 0.95;
+          synth.speak(utter);
+        } catch {
+          // El navegador no soporta lectura en voz alta
+        }
+      };
+
       return (
-        <div className="min-h-screen p-8" style={{ background: cust11.backgroundValue, backgroundSize: cust11.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
-          <div className="max-w-5xl mx-auto">
-            {/* Header with instruction */}
-            <div className="bg-white rounded-2xl p-8 mb-8 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h1 className="text-3xl font-bold text-primary">Conversamos en familia</h1>
-                  <p className="text-gray-600 text-sm mb-1">Hablen juntos durante 5 minutos sobre lo aprendido y compartan sus ideas. Así la familia entiende qué debe hacer.</p>
-                  <p className="text-sm text-gray-500">{typeTitles[currentPrompt.type]} - {typeSubtitles[currentPrompt.type]}</p>
-                </div>
-                <button onClick={() => navigateTo('converse')} className="text-gray-500 hover:text-primary">
-                  ← Atrás
-                </button>
-              </div>
-              
-              {/* Type tabs */}
-<div className="flex mb-4" role="tablist">
-                <button
-                  role="tab"
-                  aria-selected={familyActivityType === 'comprendemos'}
-                  onClick={() => setFamilyActivityType('comprendemos')}
-                  className="px-4 py-2 rounded text-sm font-medium capitalize transition-colors duration-200 ${
-                    familyActivityType === 'comprendemos' ? 'bg-primary text-primary' : 'text-gray-500 hover:bg-gray-100'
-                  }"
-                >
-                  Comprendemos
-                </button>
-                <button
-                  role="tab"
-                  aria-selected={familyActivityType === 'relacionamos'}
-                  onClick={() => setFamilyActivityType('relacionamos')}
-                  className="px-4 py-2 rounded text-sm font-medium capitalize transition-colors duration-200 ${
-                    familyActivityType === 'relacionamos' ? 'bg-primary text-primary' : 'text-gray-500 hover:bg-gray-100'
-                  }"
-                >
-                  Relacionamos
-                </button>
-                <button
-                  role="tab"
-                  aria-selected={familyActivityType === 'actuamos'}
-                  onClick={() => setFamilyActivityType('actuamos')}
-                  className="px-4 py-2 rounded text-sm font-medium capitalize transition-colors duration-200 ${
-                    familyActivityType === 'actuamos' ? 'bg-primary text-primary' : 'text-gray-500 hover:bg-gray-100'
-                  }"
-                >
-                  Actuamos
-                </button>
-              </div>
-            </div>
+        <div className="min-h-screen p-4 md:p-8 relative overflow-hidden" style={{ background: cust11.backgroundValue, backgroundSize: cust11.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
+          <div aria-hidden className="pointer-events-none absolute inset-0">
+            <div className="absolute -top-20 -left-16 w-72 h-72 rounded-full blur-3xl" style={{ backgroundColor: 'rgba(124,58,237,0.18)' }} />
+            <div className="absolute -bottom-24 -right-16 w-80 h-80 rounded-full blur-3xl" style={{ backgroundColor: 'rgba(16,185,129,0.16)' }} />
+            <div className="absolute top-24 right-[8%] text-3xl animate-float hidden md:block">✨</div>
+            <div className="absolute bottom-32 left-[7%] text-3xl animate-float hidden md:block" style={{ animationDelay: '1.2s' }}>🎯</div>
+          </div>
 
-            {/* Question card */}
-            <div className="bg-white rounded-2xl p-8 md:p-10 shadow-lg max-w-2xl mx-auto">
-              {/* Progress indicator */}
-              <div className="mb-6 flex items-center justify-between">
-                <span className="text-sm text-gray-500">Pregunta {familyActivityIndex + 1} de {totalPrompts}</span>
-                {isLastPrompt && (
-                  <span className="text-sm font-bold text-primary">Última pregunta</span>
-                )}
+          <button
+            onClick={() => navigateTo('converse')}
+            className="absolute top-5 left-5 z-10 bg-white/80 backdrop-blur px-4 py-2 rounded-full text-gray-600 text-sm font-bold shadow-sm hover:bg-white hover:text-primary transition-all"
+          >
+            ← Atrás
+          </button>
+
+          <div className="relative max-w-3xl mx-auto animate-slide-up py-10 md:py-14">
+            {/* Encabezado */}
+            <div className="text-center mb-6">
+              <div className="w-14 h-14 mx-auto mb-3 rounded-3xl shadow-lg flex items-center justify-center text-3xl animate-float" style={{ background: 'linear-gradient(135deg, #7C3AED, #10b981)' }}>
+                🗣️
               </div>
-              
-              {/* Question text with highlighted words */}
-              <p className="text-2xl md:text-3xl text-gray-800 leading-relaxed mb-8 line-clamp-4">
-                {currentPrompt.text}
+              <h1 className="text-2xl md:text-4xl font-black text-white drop-shadow-lg mb-2">Conversamos en familia</h1>
+              <p className="text-white/85 text-sm md:text-base max-w-lg mx-auto">
+                Elijan una pregunta, hablen 5 minutos todos y escriban solo palabras clave. ¡Escuchar es tan importante como hablar! 👂
               </p>
-              
-              {/* Family participation options */}
-              <div className="mb-6 pt-4 border-t border-gray-100">
-                <button
-                  onClick={() => {
-                    // Read aloud - simple alert for now
-                    alert('Leyendo en voz alta: "' + currentPrompt.text + '"')
-                  }}
-                  className="flex items-center gap-2 text-primary text-sm hover:underline mb-2">
-                    🔊 Leer en voz alta
-                </button>
-                <div className="space-y-1">
-                  <button
-                    onClick={() => setUserAnswers(prev => [...prev, 1])}
-                    className="flex items-center gap-2 text-gray-600 hover:text-primary text-sm underline">
-                      ⭐ Marcar como conversada
-                    </button>
-                  <button
-                    onClick={() => setFamilyActivityIndex(prev => prev - 1)}
-                    disabled={familyActivityIndex === 0}
-                    className="flex items-center gap-2 text-gray-400 hover:text-primary disabled:opacity-50 cursor-not-allowed text-sm">
-                      ← Anterior
-                    </button>
-                  <span className="text-gray-400 text-sm mx-2">|</span>
-                  <button
-                    onClick={() => setFamilyActivityIndex(prev => prev + 1)}
-                    disabled={isLastPrompt}
-                    className="flex items-center gap-2 text-gray-400 hover:text-primary disabled:opacity-50 cursor-not-allowed text-sm">
-                      Siguiente →
-                    </button>
-                </div>
-              </div>
-              
-              {/* Answer field */}
-              <div className="mb-6 pt-4">
-                <label className="block text-sm text-gray-600 mb-2">
-                  Escribe una respuesta breve:
-                </label>
-                <textarea
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent resize-none min-h-[120px]"
-                  placeholder="Tu respuesta aquí..."
-onChange={() => {
-                      // Update answer in state if needed
-                    }}
-                ></textarea>
-              </div>
-              
-              {/* Navigation buttons */}
-              <div className="flex gap-3 mt-8">
-                {familyActivityIndex > 0 && (
-                  <button
-                    onClick={() => setFamilyActivityIndex(prev => prev - 1)}
-                    className="flex-1 py-3 px-4 rounded-xl border border-gray-200 text-sm font-medium hover:bg-gray-50 transition-all"
-                  >
-                    Anterior
-                  </button>
-                )}
-                <button
-                  onClick={() => {
-                    if (familyActivityIndex < totalPrompts - 1) {
-                      setFamilyActivityIndex(prev => prev + 1)
-                    } else {
-                      // Show completion message
-                      setFamilyActivityIndex(totalPrompts) // Move to "completed" state
-                    }
-                  }}
-                  className="flex-1 py-3 px-6 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary-dark transition-all"
-                  disabled={!currentPrompt.answered}
-                >
-                  {isLastPrompt ? 'Terminar' : 'Siguiente'}
-                </button>
-              </div>
             </div>
 
-            {/* Completion state */}
-            {familyActivityIndex >= totalPrompts && (
-              <div className="mt-8 text-center">
-                <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-10 h-10 text-primary" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 6L9 17l-5-5" />
-                    <path d="M6 9l-5 5" />
-                    <path d="M2 9l5 5" />
-                    <path d="M9 19v6" />
-                    <path d="M15 19v6" />
-                  </svg>
+            {/* Fases */}
+            {!isDoneView && (
+              <div className="flex justify-center gap-2 mb-5 flex-wrap">
+                {phaseTabs.map(tab => {
+                  const active = activePhase === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => {
+                        const first = familyActivityQuestions.findIndex(q => q.type === tab.dataType);
+                        if (first >= 0) setFamilyActivityIndex(first);
+                      }}
+                      className="px-4 py-2 rounded-full text-xs md:text-sm font-black transition-all shadow-sm"
+                      style={
+                        active
+                          ? { background: tab.color, color: '#ffffff', boxShadow: `0 6px 16px ${tab.color}55` }
+                          : { backgroundColor: 'rgba(255,255,255,0.85)', color: '#475569' }
+                      }
+                    >
+                      {tab.emoji} {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {!isDoneView ? (
+              <>
+                {/* Progreso */}
+                <div className="mb-5">
+                  <div className="flex justify-between mb-1.5 text-xs font-black text-white/85">
+                    <span>Pregunta {safeIndex + 1} de {totalPrompts}</span>
+                    <span>{activityPct}%</span>
+                  </div>
+                  <div className="h-2.5 rounded-full overflow-hidden bg-white/25">
+                    <div className="h-full rounded-full transition-all duration-500" style={{ width: `${activityPct}%`, background: 'linear-gradient(90deg, #7C3AED, #10b981)' }} />
+                  </div>
                 </div>
-                <h2 className="text-2xl font-bold text-primary mb-3">¡Muy bien!</h2>
-                <p className="text-gray-600 mb-4">
-                  Conversar en familia nos ayuda a aprender y convivir mejor.
-                </p>
-                <p className="text-lg text-gray-700 mb-6">
-                  Elijan una acción para practicar esta semana:
-                </p>
-                <div className="space-y-2">
-                  <button className="w-full py-3 px-4 rounded-xl bg-green-50 text-green-800 hover:bg-green-100 transition-all">
-                    Compartir un momento de alegría cada día
+
+                {/* Tarjeta de pregunta */}
+                <div className="rounded-3xl p-6 md:p-9 shadow-custom-lg border border-white/70 mb-6 animate-fade-in" style={{ backgroundColor: '#ffffff' }}>
+                  <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black" style={{ backgroundColor: `${activePhaseMeta.color}18`, color: activePhaseMeta.color }}>
+                      {activePhaseMeta.emoji} {activePhaseMeta.label}
+                    </span>
+                    {isLastPrompt ? (
+                      <span className="text-xs font-black px-2.5 py-1 rounded-full" style={{ backgroundColor: '#FFF7ED', color: '#C2410C' }}>🏁 ¡Última pregunta!</span>
+                    ) : (
+                      <span className="text-xs font-bold text-slate-400">{typeSubs[currentPrompt.type]}</span>
+                    )}
+                  </div>
+
+                  <p className="text-2xl md:text-3xl font-black text-slate-900 leading-snug mb-6">
+                    {currentPrompt.text}
+                  </p>
+
+                  <div className="flex flex-wrap gap-2 mb-5">
+                    <button
+                      onClick={speakPrompt}
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-black transition-all hover:scale-[1.02]"
+                      style={{ backgroundColor: '#EFF6FF', color: '#2563EB' }}
+                    >
+                      🔊 Leer en voz alta
+                    </button>
+                    <button
+                      onClick={() => setFamilyDoneList(prev => prev.includes(safeIndex) ? prev.filter(i => i !== safeIndex) : [...prev, safeIndex])}
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-black transition-all hover:scale-[1.02]"
+                      style={
+                        familyDoneList.includes(safeIndex)
+                          ? { backgroundColor: '#DCFCE7', color: '#15803D' }
+                          : { backgroundColor: '#F8FAFC', color: '#64748B' }
+                      }
+                    >
+                      {familyDoneList.includes(safeIndex) ? '⭐ Ya la conversaron' : '☆ Marcar como conversada'}
+                    </button>
+                    <span className="inline-flex items-center px-3 py-2.5 text-xs font-bold text-white/80">
+                      ⭐ {familyDoneList.length}/{totalPrompts}
+                    </span>
+                  </div>
+
+                  <label className="block text-sm font-bold text-slate-600 mb-2">Notas de la familia ✍️ (opcional)</label>
+                  <textarea
+                    className="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-emerald-400 focus:outline-none resize-none min-h-[100px] text-slate-800 placeholder-slate-400"
+                    placeholder="Escriban palabras clave de lo que hablaron..."
+                  ></textarea>
+                </div>
+
+                {/* Navegación */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setFamilyActivityIndex(prev => Math.max(0, prev - 1))}
+                    disabled={safeIndex === 0}
+                    className="flex-1 py-3.5 px-4 rounded-2xl text-sm font-black transition-all disabled:opacity-40 bg-white/90 text-slate-700 border-2 border-white hover:bg-white"
+                  >
+                    ← Anterior
                   </button>
-                  <button className="w-full py-3 px-4 rounded-xl bg-green-50 text-green-800 hover:bg-green-100 transition-all">
-                    Reconocer una buena decisión familiar esta semana
-                  </button>
-                  <button className="w-full py-3 px-4 rounded-xl bg-green-50 text-green-800 hover:bg-green-100 transition-all">
-                    Crear un ritual de conversación familiar
+                  <button
+                    onClick={() => setFamilyActivityIndex(prev => (prev < totalPrompts - 1 ? prev + 1 : totalPrompts))}
+                    className="flex-1 py-3.5 px-6 rounded-2xl text-sm font-black text-white shadow-lg transition-all hover:scale-[1.02]"
+                    style={{ background: isLastPrompt ? 'linear-gradient(135deg, #F59E0B, #EA580C)' : 'linear-gradient(135deg, #7C3AED, #2563EB)' }}
+                  >
+                    {isLastPrompt ? '🏁 Terminar' : 'Siguiente →'}
                   </button>
                 </div>
-                <button
-                  onClick={() => setFamilyActivityIndex(0)}
-                  className="mt-4 py-2 px-6 rounded-xl bg-primary text-white text-sm hover:bg-primary-dark transition-all"
-                >
-                  Volver a empezar
-                </button>
+              </>
+            ) : (
+              // Completado
+              <div className="rounded-3xl p-7 md:p-9 shadow-custom-lg border border-white/70 text-center animate-slide-up" style={{ backgroundColor: '#ffffff' }}>
+                <div className="text-6xl mb-3 animate-float">🎉</div>
+                <h2 className="text-2xl md:text-3xl font-black text-slate-900 mb-2">¡Actividad completada!</h2>
+                <p className="text-slate-600 mb-1">Conversar en familia nos ayuda a aprender y convivir mejor. 💚</p>
+                <p className="text-sm text-slate-500 mb-5">
+                  Marcaron {familyDoneList.length} de {totalPrompts} preguntas.
+                </p>
+
+                <p className="font-black text-slate-800 mb-3">Elijan UNA acción para esta semana 👇</p>
+                <div className="grid gap-2.5 mb-6 text-left">
+                  {[
+                    '😄 Compartir un momento de alegría cada día',
+                    '🏅 Reconocer una buena decisión familiar esta semana',
+                    '🗣️ Crear un ritual de conversación familiar',
+                  ].map((actionText, i) => {
+                    const selected = familyWeeklyAction === i;
+                    return (
+                      <button
+                        key={i}
+                        onClick={() => setFamilyWeeklyAction(i)}
+                        className="w-full py-3 px-4 rounded-2xl text-sm font-bold text-left transition-all border-2"
+                        style={
+                          selected
+                            ? { backgroundColor: '#ECFDF5', borderColor: '#10b981', color: '#065F46' }
+                            : { backgroundColor: '#F8FAFC', borderColor: '#E2E8F0', color: '#334155' }
+                        }
+                      >
+                        {selected ? '✅ ' : ''}{actionText}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="grid gap-2.5">
+                  <button
+                    onClick={() => {
+                      setFamilyActivityIndex(0);
+                      setFamilyDoneList([]);
+                      setFamilyWeeklyAction(null);
+                    }}
+                    className="w-full py-3.5 rounded-2xl text-white font-black transition-all hover:scale-[1.01] shadow-lg"
+                    style={{ background: 'linear-gradient(135deg, #7C3AED, #2563EB)' }}
+                  >
+                    🔄 Volver a empezar
+                  </button>
+                  <button
+                    onClick={() => goHome()}
+                    className="w-full py-3.5 rounded-2xl font-black transition-all bg-slate-100 text-slate-700 hover:bg-slate-200"
+                  >
+                    🏠 Volver al inicio
+                  </button>
+                </div>
               </div>
             )}
           </div>
         </div>
       )
-
     case 'cases':
       const lifeCases = [
         {
