@@ -6,7 +6,6 @@ import './index.css'
 type UserRole = 'parent' | 'child'
 type LearningTopic = 'coima' | 'recognition' | 'impact' | 'consequences' | 'prevention' | 'ethics' | 'citizen' | 'test'
 type BadgeType = 'topics-explorer' | 'game-master' | 'integrity-champion'
-type DeviceType = 'pc' | 'phone' | 'laptop'
 type ProfileType = 'student' | 'family'
 
 interface Badge {
@@ -1119,7 +1118,7 @@ const openTemasTab = (deep = '') => {
 export default function App() {
   const [studentProfile, setStudentProfile] = useState<StudentProfile>(initialStudentProfile)
   const [familyProfile, setFamilyProfile] = useState<FamilyProfile>(initialFamilyProfile)
-  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'device' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents' | 'profile-type'>(BOOT_HASH ? 'learn' : 'welcome')
+  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents' | 'profile-type'>(BOOT_HASH ? 'learn' : 'welcome')
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null)
   const [learnView, setLearnView] = useState<'hub' | 'kid' | 'guide' | 'exam'>(BOOT_HASH ? (BOOT_HASH.view === 'tema' ? 'kid' : BOOT_HASH.view === 'guia' ? 'guide' : BOOT_HASH.view === 'examen' ? 'exam' : 'hub') : 'hub')
   const [activeKidId, setActiveKidId] = useState<string | null>(BOOT_HASH && BOOT_HASH.view === 'tema' ? BOOT_HASH.id : null)
@@ -1135,7 +1134,6 @@ export default function App() {
   const [showCoimaONo, setShowCoimaONo] = useState(false)
   const [currentCoimaCase, setCurrentCoimaCase] = useState(0)
   const [examAnswers, setExamAnswers] = useState<Record<number, number>>({})
-  const [device, setDevice] = useState<DeviceType>('pc')
   const [showBadgeCelebration, setShowBadgeCelebration] = useState(false)
   const [earnedBadge, setEarnedBadge] = useState<Badge | null>(null)
   const [userName, setUserName] = useState<string>(() => localStorage.getItem('hablemos-claro-name') || '')
@@ -1796,63 +1794,10 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
             </div>
 
             <button
-              onClick={() => setCurrentScreen('device')}
+              onClick={goHome}
               className="btn-glow bg-primary text-white font-extrabold py-5 px-8 rounded-2xl text-lg w-full shadow-xl transition-transform hover:scale-[1.02]"
             >
               ¡Empezar! <span aria-hidden>→</span>
-            </button>
-          </div>
-        </div>
-      )
-
-    case 'device':
-      const cust3 = getCustomization();
-      return (
-        <div className="min-h-screen p-8" style={{ background: cust3.backgroundValue, backgroundSize: cust3.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
-          <div className="max-w-3xl mx-auto animate-slide-up text-center">
-            <div className="flex items-center justify-between mb-2">
-              <button onClick={() => setCurrentScreen('welcome')} className="glass-card px-3 py-1 rounded-xl text-gray-600 text-sm hover:bg-gray-100 transition-all">
-                {t('back')}
-              </button>
-              <span className="text-xs text-gray-400 font-medium">1 / 2</span>
-            </div>
-            <div className="bg-white rounded-2xl p-6 mb-8 shadow-sm">
-              <h1 className="text-3xl font-bold gradient-text mb-2">{t('deviceQuestion')}</h1>
-              <p className="text-gray-600">{t('deviceSub')}</p>
-            </div>
-
-            <div className="grid grid-cols-3 gap-8 mb-12">
-              <button
-                onClick={() => setDevice('pc')}
-                className={`bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-8 card-hover shadow-custom-lg ${device === 'pc' ? 'ring-4 ring-primary' : ''}`}
-              >
-                <div className="text-6xl mb-4 animate-float">🖥️</div>
-                <div className="font-bold text-dark text-xl mb-2">PC</div>
-                <p className="text-sm text-gray-500">Pantalla completa</p>
-              </button>
-              <button
-                onClick={() => setDevice('phone')}
-                className={`bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-8 card-hover shadow-custom-lg ${device === 'phone' ? 'ring-4 ring-secondary' : ''}`}
-              >
-                <div className="text-6xl mb-4 animate-float">📱</div>
-                <div className="font-bold text-dark text-xl mb-2">Móvil</div>
-                <p className="text-sm text-gray-500">Formato celular</p>
-              </button>
-              <button
-                onClick={() => setDevice('laptop')}
-                className={`bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-8 card-hover shadow-custom-lg ${device === 'laptop' ? 'ring-4 ring-warning' : ''}`}
-              >
-                <div className="text-6xl mb-4 animate-float">💻</div>
-                <div className="font-bold text-dark text-xl mb-2">Laptop</div>
-                <p className="text-sm text-gray-500">Formato portátil</p>
-              </button>
-            </div>
-
-            <button
-              onClick={goHome}
-              className="btn-glow bg-primary text-white font-bold py-5 px-8 rounded-xl text-xl w-full mt-10"
-            >
-              {t('continue')} →
             </button>
           </div>
         </div>
@@ -1924,28 +1869,6 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                   className={selectedRole === 'child' ? 'bg-secondary text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'bg-white font-bold py-5 px-6 rounded-xl text-black border-2 border-gray-200 shadow-sm hover:bg-secondary/20 transition-all text-lg'}
                 >
                   {t('child')}
-                </button>
-              </div>
-
-              <p className="text-black font-bold text-center text-lg bg-white rounded-xl px-4 py-3 shadow-sm border border-gray-200 mt-10">{t('deviceQuestion')}</p>
-              <div className="grid grid-cols-3 gap-5 mt-3">
-                <button
-                  onClick={() => setDevice('pc')}
-                  className={device === 'pc' ? 'bg-primary text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'bg-white font-bold py-5 px-6 rounded-xl text-black border-2 border-gray-200 shadow-sm hover:bg-primary/20 transition-all text-lg'}
-                >
-                  🖥️ PC
-                </button>
-                <button
-                  onClick={() => setDevice('phone')}
-                  className={device === 'phone' ? 'bg-secondary text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'bg-white font-bold py-5 px-6 rounded-xl text-black border-2 border-gray-200 shadow-sm hover:bg-secondary/20 transition-all text-lg'}
-                >
-                  📱 Móvil
-                </button>
-                <button
-                  onClick={() => setDevice('laptop')}
-                  className={device === 'laptop' ? 'bg-warning text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'bg-white font-bold py-5 px-6 rounded-xl text-black border-2 border-gray-200 shadow-sm hover:bg-warning/20 transition-all text-lg'}
-                >
-                  💻 Laptop
                 </button>
               </div>
 
@@ -4453,31 +4376,8 @@ onChange={() => {
     ) : null
 
   return (
-    <div className={`${device === 'pc' ? 'pc-mode' : ''}`}>
-      {device === 'phone' ? (
-        // Marco de móvil: la app se muestra como un celular centrado
-        <div className="min-h-screen flex items-center justify-center p-3" style={{ background: 'linear-gradient(135deg, #0f172a, #1e293b, #0f172a)' }}>
-          <div className="relative w-[390px] max-w-full h-screen rounded-[3rem] bg-slate-900 p-2.5 shadow-2xl">
-            <div className="absolute top-5 left-1/2 -translate-x-1/2 w-32 h-5 rounded-full bg-slate-900 border border-slate-700 z-20 pointer-events-none"></div>
-            <div className="h-full rounded-[2rem] overflow-y-auto overflow-x-hidden bg-white">
-              {renderScreen()}
-            </div>
-          </div>
-        </div>
-      ) : device === 'laptop' ? (
-        // Marco de laptop: formato de computadora portátil centrado
-        <div className="min-h-screen flex items-center justify-center p-6" style={{ background: 'linear-gradient(135deg, #334155, #1e293b, #334155)' }}>
-          <div className="w-full max-w-[1280px] h-screen rounded-2xl overflow-hidden shadow-2xl bg-white relative">
-            <div className="absolute top-3 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-slate-400 z-20 pointer-events-none"></div>
-            <div className="max-w-6xl mx-auto">
-              {renderScreen()}
-            </div>
-          </div>
-        </div>
-      ) : (
-        // PC: la app ocupa toda la pantalla
-        renderScreen()
-      )}
+    <div className="pc-mode">
+      {renderScreen()}
 {showBadgeCelebration && earnedBadge && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
           <div className="rounded-3xl p-8 max-w-sm w-full text-center text-white animate-slide-up shadow-2xl" style={{ background: 'linear-gradient(135deg, #1e3a8a, #6d28d9, #b45309)' }}>
