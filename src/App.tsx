@@ -1154,10 +1154,13 @@ const openTemasTab = (deep = '') => {
   window.open(url, '_blank', 'noopener,noreferrer')
 }
 
+// Brain Flight — juego HTML5 (GDevelop export) hosteado en GitHub Pages
+const BRAIN_FLIGHT_URL = 'https://crico719.github.io/brain-flight/'
+
 export default function App() {
   const [studentProfile, setStudentProfile] = useState<StudentProfile>(initialStudentProfile)
   const [familyProfile, setFamilyProfile] = useState<FamilyProfile>(initialFamilyProfile)
-  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents' | 'profile-type'>(BOOT_HASH ? 'learn' : 'welcome')
+  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'brainflight' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents' | 'profile-type'>(BOOT_HASH ? 'learn' : 'welcome')
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null)
   const [learnView, setLearnView] = useState<'hub' | 'kid' | 'guide' | 'exam'>(BOOT_HASH ? (BOOT_HASH.view === 'tema' ? 'kid' : BOOT_HASH.view === 'guia' ? 'guide' : BOOT_HASH.view === 'examen' ? 'exam' : 'hub') : 'hub')
   const [activeKidId, setActiveKidId] = useState<string | null>(BOOT_HASH && BOOT_HASH.view === 'tema' ? BOOT_HASH.id : null)
@@ -3128,6 +3131,40 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
         </div>
       )
 
+    case 'brainflight':
+      return (
+        <div className="min-h-screen flex flex-col bg-[#0b1020]">
+          {/* Header del juego */}
+          <div className="flex items-center justify-between gap-3 px-4 md:px-6 py-3 bg-[#111731] border-b border-white/10 shrink-0">
+            <button
+              onClick={() => navigateTo('games')}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-sm font-bold transition-colors shrink-0"
+            >
+              ← Juegos
+            </button>
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-xl">🧠</span>
+              <span className="text-white font-black text-sm md:text-base truncate">Brain Flight</span>
+            </div>
+            <button
+              onClick={() => window.open(BRAIN_FLIGHT_URL, '_blank', 'noopener,noreferrer')}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-sm font-bold transition-colors shrink-0"
+              title="Abrir en una pestaña nueva"
+            >
+              ↗ Abrir
+            </button>
+          </div>
+          {/* Juego a pantalla completa */}
+          <iframe
+            src={BRAIN_FLIGHT_URL}
+            title="Brain Flight"
+            className="flex-1 w-full border-0"
+            allow="autoplay; fullscreen; gamepad; clipboard-write; encrypted-media"
+            allowFullScreen
+          />
+        </div>
+      )
+
     case 'games':
       const cust9 = getCustomization();
       return (
@@ -3139,6 +3176,24 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                 ← Atrás
               </button>
             </div>
+
+            {/* Brain Flight — juego externo (GDevelop HTML5 en GitHub Pages) */}
+            <button
+              onClick={() => navigateTo('brainflight')}
+              className="w-full mb-8 text-left bg-white rounded-2xl p-6 shadow-sm border-2 border-transparent hover:border-primary/50 hover:shadow-md transition-all group"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 shrink-0 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-3xl">🧠</div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-xl font-bold text-primary">Brain Flight</h2>
+                    <span className="px-2 py-0.5 rounded-full bg-success/15 text-success text-[11px] font-black uppercase">Nuevo</span>
+                  </div>
+                  <p className="text-gray-600 text-sm mt-1">Pilota tu cerebro: esquiva, recoge energía y supera tu mejor puntaje.</p>
+                </div>
+                <span className="shrink-0 px-5 py-2.5 rounded-xl bg-primary text-white font-bold group-hover:bg-primary/90 transition-colors">▶ Jugar</span>
+              </div>
+            </button>
 
             <div className="bg-white rounded-lg p-6 shadow-sm mb-8">
               <h2 className="text-xl font-bold text-primary mb-6">Minijuegos</h2>
