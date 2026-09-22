@@ -1072,6 +1072,45 @@ const familyActivityQuestions = [
 const initialStudentProfile = getStoredStudentProfile()
 const initialFamilyProfile = getStoredFamilyProfile()
 
+// Mascota Duli — búho guía de la Academia de Integridad
+function DuliMascot({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 200 210" className={className} role="img" aria-label="Duli, el búho de la academia" xmlns="http://www.w3.org/2000/svg">
+      {/* patas */}
+      <ellipse cx="76" cy="199" rx="18" ry="8" fill="#FF9600" />
+      <ellipse cx="124" cy="199" rx="18" ry="8" fill="#FF9600" />
+      <path d="M68 201 v5 M76 203 v5 M84 201 v5 M116 201 v5 M124 203 v5 M132 201 v5" stroke="#E58500" strokeWidth="3" strokeLinecap="round" />
+      {/* penachos */}
+      <path d="M62 52 L50 14 L88 38 Z" fill="#46A302" />
+      <path d="M138 52 L150 14 L112 38 Z" fill="#46A302" />
+      {/* cuerpo */}
+      <path d="M100 26 C150 26 178 70 178 118 C178 166 144 200 100 200 C56 200 22 166 22 118 C22 70 50 26 100 26 Z" fill="#58CC02" />
+      {/* panza */}
+      <ellipse cx="100" cy="150" rx="44" ry="38" fill="#F0FCD9" />
+      {/* alas */}
+      <path d="M34 112 Q16 152 40 186 Q58 172 56 136 Q54 116 44 108 Q38 104 34 112 Z" fill="#46A302" />
+      <path className="duli-wing" d="M166 112 Q184 152 160 186 Q142 172 144 136 Q146 116 156 108 Q162 104 166 112 Z" fill="#46A302" />
+      {/* mejillas */}
+      <circle cx="46" cy="130" r="9" fill="#FF8F85" opacity="0.5" />
+      <circle cx="154" cy="130" r="9" fill="#FF8F85" opacity="0.5" />
+      {/* ojos */}
+      <g className="duli-eyes">
+        <circle cx="72" cy="96" r="30" fill="#FFFFFF" />
+        <circle cx="128" cy="96" r="30" fill="#FFFFFF" />
+        <circle cx="72" cy="99" r="14" fill="#1F2937" />
+        <circle cx="128" cy="99" r="14" fill="#1F2937" />
+        <circle cx="77" cy="94" r="5" fill="#FFFFFF" />
+        <circle cx="133" cy="94" r="5" fill="#FFFFFF" />
+      </g>
+      {/* cejas */}
+      <path d="M50 64 Q72 52 94 64" stroke="#3F6D12" strokeWidth="7" fill="none" strokeLinecap="round" />
+      <path d="M106 64 Q128 52 150 64" stroke="#3F6D12" strokeWidth="7" fill="none" strokeLinecap="round" />
+      {/* pico */}
+      <path d="M78 120 L122 120 L100 154 Z" fill="#FF9600" stroke="#E58500" strokeWidth="2" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
 function RoadmapReveal({ children, delay = 0 }: { children: ReactNode; delay?: number }) {
   const ref = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(false)
@@ -1178,7 +1217,11 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
   }, [studentProfile.name, studentProfile.age, studentProfile.district])
 
   // Al cambiar de perfil: volver al inicio de Temas y limpiar respuestas (no mezclar datos)
+  // (solo al CAMBIAR profileType: evita pisar deep-links y el doble-mount de StrictMode)
+  const prevProfileTypeRef = useRef(profileType)
   useEffect(() => {
+    if (prevProfileTypeRef.current === profileType) return
+    prevProfileTypeRef.current = profileType
     setLearnView('hub')
     setActiveKidId(null)
     setActiveGuideId(null)
@@ -2100,6 +2143,14 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
 
     case 'learn':
       // Temas educativos
+      const duliTip = (() => {
+        const kd = getProgress().kidsDone ?? []
+        return kd.length === 0
+          ? '¡Toca el primer tema y gana tu primer XP! 🚀'
+          : kd.length < KIDS_TOPICS.length
+            ? `¡Vas ${kd.length}/${KIDS_TOPICS.length}! No pierdas tu racha 🔥`
+            : '¡Todos los temas listos! ¿Probamos el examen? 🏆'
+      })()
       const coimaCases = [
         {
           id: 1,
@@ -2275,7 +2326,15 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                   <div aria-hidden className="pointer-events-none absolute top-6 right-8 text-4xl opacity-30">☁️</div>
                   <div aria-hidden className="pointer-events-none absolute bottom-6 left-8 text-4xl opacity-30">☁️</div>
                   <div className="relative flex flex-col items-center gap-3">
-                    <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-4xl shadow-lg">🏛️</div>
+                    <div className="flex items-center justify-center gap-4 pt-1">
+                      <div className="w-20 h-20 md:w-24 md:h-24 shrink-0 animate-float" style={{ filter: 'drop-shadow(0 10px 18px rgba(15,23,42,0.3))' }}>
+                        <DuliMascot className="w-full h-full" />
+                      </div>
+                      <div className="text-left bg-white text-slate-800 rounded-2xl rounded-bl-sm px-4 py-3 shadow-xl border border-white/80 max-w-[230px]">
+                        <p className="text-sm font-black leading-tight">¡Hola, soy Duli! 🦉</p>
+                        <p className="text-xs font-semibold text-slate-500 mt-1 leading-snug">Te acompaño a aprender integridad paso a paso.</p>
+                      </div>
+                    </div>
                     <h2 className="text-2xl md:text-3xl font-black leading-tight">Academia de Integridad</h2>
                     <p className="text-white/85 text-sm md:text-base max-w-md leading-relaxed">
                       Espacios separados para cada etapa: los hijos aprenden temas cortitos con reto y racha; los padres encuentran guías para conversar en familia.
@@ -2534,7 +2593,9 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                 {/* NAVBAR */}
                 <div className="bg-white/90 backdrop-blur-xl border border-slate-100 rounded-[20px] px-4 md:px-5 py-3 flex items-center justify-between gap-3 shadow-sm">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center text-lg shadow-md shadow-primary/20">🛡️</div>
+                    <div className="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-primary/15 to-secondary/15 flex items-center justify-center overflow-hidden shadow-sm">
+                      <DuliMascot className="w-8 h-8" />
+                    </div>
                     <div className="min-w-0">
                       <p className="font-black text-slate-800 leading-tight truncate text-[15px]">Hablemos Claro</p>
                       <p className="text-[11px] font-semibold text-slate-500 truncate">📚 Temas</p>
@@ -2557,6 +2618,10 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                     </span>
                     <h2 className="text-3xl md:text-4xl font-black gradient-text leading-tight max-w-xl">{activeKid.title}</h2>
                     <p className="text-slate-600 text-base md:text-lg leading-relaxed max-w-lg mt-1">{activeKid.desc}</p>
+                    <div className="inline-flex items-center gap-2 bg-white/90 border border-slate-100 rounded-full pl-1.5 pr-4 py-1.5 shadow-sm">
+                      <DuliMascot className="w-8 h-8 animate-float" />
+                      <span className="text-xs font-black text-slate-600">¡Tú puedes! Aprende y gana XP 💪</span>
+                    </div>
                     <div className="flex items-center gap-3 w-full max-w-[360px] mt-2">
                       <div className="flex-1 h-2 bg-slate-200/70 rounded-full overflow-hidden" role="progressbar" aria-valuenow={Math.round((kidsDone.length / KIDS_TOPICS.length) * 100)} aria-valuemin={0} aria-valuemax={100} aria-label="Progreso de temas">
                         <div className="progress-bar h-full rounded-full transition-[width] duration-700" style={{ width: `${Math.round((kidsDone.length / KIDS_TOPICS.length) * 100)}%`, background: 'linear-gradient(90deg, #10B981, #2563EB)' }}></div>
@@ -2933,6 +2998,19 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
               </div>
             )}
           </div>
+
+          {/* MASCOTA DULI — compañera flotante del mapa de Temas */}
+          {learnView === 'hub' && (
+            <div className="fixed bottom-5 right-5 z-40 flex items-end gap-2 pointer-events-none">
+              <div className="relative bg-white rounded-2xl rounded-br-sm border border-slate-100 shadow-xl px-3.5 py-2.5 max-w-[210px] pointer-events-auto">
+                <p className="text-[11px] font-black text-slate-700 leading-snug">{duliTip}</p>
+                <span className="absolute -bottom-1.5 -right-1.5 w-4 h-4 bg-white border-r border-b border-slate-100 rotate-45" aria-hidden />
+              </div>
+              <div className="w-14 h-14 md:w-16 md:h-16 shrink-0 animate-float pointer-events-auto" style={{ filter: 'drop-shadow(0 8px 16px rgba(30,41,82,0.25))' }}>
+                <DuliMascot className="w-full h-full" />
+              </div>
+            </div>
+          )}
         </div>
       )
 

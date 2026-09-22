@@ -262,6 +262,26 @@ button {
   animation: fadeIn 0.5s ease-out forwards;
 }
 
+/* ===== Mascota Duli (búho de la academia) ===== */
+@keyframes duliBlink {
+  0%, 93%, 100% { transform: scaleY(1); }
+  96% { transform: scaleY(0.08); }
+}
+.duli-eyes {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: duliBlink 5s ease-in-out infinite;
+}
+@keyframes duliWave {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-18deg); }
+}
+.duli-wing {
+  transform-box: fill-box;
+  transform-origin: 12% 15%;
+  animation: duliWave 1.8s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .transition-all,
   .transition,
@@ -269,6 +289,10 @@ button {
   .transition-colors,
   .transition-opacity {
     transition-duration: 0.01ms !important;
+  }
+  .duli-eyes,
+  .duli-wing {
+    animation: none !important;
   }
   html {
     scroll-behavior: auto;
