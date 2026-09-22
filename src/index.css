@@ -65,12 +65,6 @@
   --color-dark: #121212;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
   font-family: 'Segoe UI', system-ui, -apple-system, Roboto, 'Helvetica Neue', Arial, sans-serif;
   background: linear-gradient(135deg, #f6f9ff 0%, #eef1f8 50%, #f7f3ff 100%);
