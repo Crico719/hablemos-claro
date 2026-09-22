@@ -1121,7 +1121,7 @@ export default function App() {
   const [familyProfile, setFamilyProfile] = useState<FamilyProfile>(initialFamilyProfile)
   const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'device' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents' | 'profile-type'>(BOOT_HASH ? 'learn' : 'welcome')
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null)
-  const [learnView, setLearnView] = useState<'hub' | 'kids' | 'parents' | 'kid' | 'guide' | 'exam'>(BOOT_HASH ? (BOOT_HASH.view === 'tema' ? 'kid' : BOOT_HASH.view === 'guia' ? 'guide' : BOOT_HASH.view === 'examen' ? 'exam' : BOOT_HASH.view === 'padres' ? 'parents' : BOOT_HASH.view === 'kids' ? 'kids' : 'hub') : 'hub')
+  const [learnView, setLearnView] = useState<'hub' | 'kid' | 'guide' | 'exam'>(BOOT_HASH ? (BOOT_HASH.view === 'tema' ? 'kid' : BOOT_HASH.view === 'guia' ? 'guide' : BOOT_HASH.view === 'examen' ? 'exam' : 'hub') : 'hub')
   const [activeKidId, setActiveKidId] = useState<string | null>(BOOT_HASH && BOOT_HASH.view === 'tema' ? BOOT_HASH.id : null)
   const [activeGuideId, setActiveGuideId] = useState<string | null>(BOOT_HASH && BOOT_HASH.view === 'guia' ? BOOT_HASH.id : null)
   const [topicStep, setTopicStep] = useState(0)
@@ -2341,10 +2341,7 @@ case 'about':
               <button
                 onClick={() => {
                   if (learnView !== 'hub') {
-                    if (learnView === 'kid') setLearnView('kids')
-                    else if (learnView === 'guide') setLearnView('parents')
-                    else if (learnView === 'exam') setLearnView('kids')
-                    else setLearnView('hub')
+                    setLearnView('hub')
                   } else if (BOOT_HASH) {
                     window.close()
                   } else {
@@ -2353,316 +2350,271 @@ case 'about':
                 }}
                 className="glass-card px-6 py-3 rounded-xl text-gray-600 hover:text-primary text-base font-bold hover:bg-gray-100 transition-all shrink-0"
               >
-                {learnView === 'hub' ? '← Inicio' : '← Atrás'}
+                {learnView === 'hub' ? '← Inicio' : '← Volver al mapa'}
               </button>
             </div>
 
-            {/* HUB */}
+            {/* HUB — ACADEMIA SEPARADA EN ISLAS */}
             {learnView === 'hub' && (
-              <div className="grid grid-cols-1 gap-6 md:gap-8 max-w-2xl mx-auto items-stretch min-h-[45vh] place-content-center">
-                <button
-                  onClick={() => setLearnView('kids')}
-                  className="group bg-white rounded-3xl p-10 md:p-12 shadow-xl border border-gray-100 text-center flex flex-col items-center transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl cursor-pointer"
-                >
-                  <div className="w-full h-2 rounded-full mb-6" style={{ background: 'linear-gradient(90deg, #2563EB, #10B981)' }} />
-                  <div className="w-24 h-24 rounded-3xl mb-6 flex items-center justify-center transition-transform duration-300 group-hover:scale-105" style={{ background: 'linear-gradient(135deg, #DBEAFE, #EDE9FE)' }}>
-                    <svg viewBox="0 0 24 24" className="w-12 h-12 text-primary" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                      <path d="M12 4 22 9l-10 5L2 9l10-5Z" />
-                      <path d="M6 11.5V16c0 1.7 2.7 3 6 3s6-1.3 6-3v-4.5" />
-                      <path d="M22 9v6" />
-                    </svg>
-                  </div>
-                  <h2 className="text-2xl font-black text-primary mb-3">PARA HIJOS</h2>
-                  <p className="text-gray-700 text-lg leading-relaxed mb-6 flex-1">Aprende de forma sencilla, interactiva y con ejemplos de situaciones cotidianas.</p>
-                  <span className="inline-flex items-center justify-center gap-2 bg-primary text-white font-bold text-lg py-3 px-10 rounded-full shadow-lg transition-all duration-300 group-hover:gap-3 group-hover:shadow-xl">
-                    {kidsDone.length === 0 ? 'Comenzar →' : kidsDone.length >= KIDS_TOPICS.length ? 'Explorar temas →' : 'Continuar aprendiendo →'}
-                  </span>
-                  <div className="w-full mt-6">
-                    <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden">
-                      <div className="h-full rounded-full bg-primary" style={{ width: `${(kidsDone.length / KIDS_TOPICS.length) * 100}%` }}></div>
-                    </div>
-                    <p className="text-base font-bold text-gray-600 mt-2">{kidsDone.length} de {KIDS_TOPICS.length} completados</p>
-                  </div>
-                </button>
-                <button
-                  onClick={() => setLearnView('parents')}
-                  className="group bg-white rounded-3xl p-10 md:p-12 shadow-xl border border-gray-100 text-center flex flex-col items-center transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl cursor-pointer"
-                >
-                  <div className="w-full h-2 rounded-full mb-6" style={{ background: 'linear-gradient(90deg, #7C3AED, #F59E0B)' }} />
-                  <div className="w-24 h-24 rounded-3xl mb-6 flex items-center justify-center transition-transform duration-300 group-hover:scale-105" style={{ background: 'linear-gradient(135deg, #EDE9FE, #FEF3C7)' }}>
-                    <svg viewBox="0 0 24 24" className="w-12 h-12 text-secondary" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                      <circle cx="9" cy="8" r="3.2" />
-                      <path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5" />
-                      <circle cx="16.8" cy="9" r="2.4" />
-                      <path d="M16 14.3c2.6.4 4.3 2 4.7 4.2" />
-                    </svg>
-                  </div>
-                  <h2 className="text-2xl font-black text-secondary mb-3">PARA PADRES Y TUTORES</h2>
-                  <p className="text-gray-700 text-lg leading-relaxed mb-6 flex-1">Encuentra herramientas para conversar y acompañar a tus hijos.</p>
-                  <span className="inline-flex items-center justify-center gap-2 text-white font-bold text-lg py-3 px-10 rounded-full shadow-lg transition-all duration-300 group-hover:gap-3 group-hover:shadow-xl" style={{ background: '#7C3AED' }}>
-                    {guidesDone.length === 0 ? 'Comenzar →' : guidesDone.length >= PARENT_GUIDES.length ? 'Explorar temas →' : 'Continuar aprendiendo →'}
-                  </span>
-                  <div className="w-full mt-6">
-                    <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden">
-                      <div className="h-full rounded-full" style={{ width: `${(guidesDone.length / PARENT_GUIDES.length) * 100}%`, background: '#7C3AED' }}></div>
-                    </div>
-                    <p className="text-base font-bold text-gray-600 mt-2">{guidesDone.length} de {PARENT_GUIDES.length} revisados</p>
-                  </div>
-                </button>
-              </div>
-            )}
-
-            {/* BIBLIOTECA HIJOS */}
-            {learnView === 'kids' && (
-              <>
-                {/* HERO ACADEMY */}
+              <div className="space-y-10 md:space-y-14 max-w-2xl mx-auto">
+                {/* HERO COMPARTIDO */}
                 <section className="relative overflow-hidden rounded-[28px] border border-primary/15 bg-gradient-to-br from-primary via-primary/90 to-secondary shadow-[0_16px_48px_rgba(37,99,235,0.25)] px-6 py-8 md:px-10 md:py-10 text-white text-center">
                   <div aria-hidden className="pointer-events-none absolute -top-16 -left-16 w-56 h-56 rounded-full bg-white/10 blur-2xl" />
                   <div aria-hidden className="pointer-events-none absolute -bottom-16 -right-16 w-56 h-56 rounded-full bg-white/10 blur-2xl" />
                   <div aria-hidden className="pointer-events-none absolute top-6 right-8 text-4xl opacity-30">☁️</div>
                   <div aria-hidden className="pointer-events-none absolute bottom-6 left-8 text-4xl opacity-30">☁️</div>
                   <div className="relative flex flex-col items-center gap-3">
-                    <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-4xl shadow-lg">🎓</div>
+                    <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-4xl shadow-lg">🏛️</div>
                     <h2 className="text-2xl md:text-3xl font-black leading-tight">Academia de Integridad</h2>
                     <p className="text-white/85 text-sm md:text-base max-w-md leading-relaxed">
+                      Espacios separados para cada etapa: los hijos aprenden temas cortitos con reto y racha; los padres encuentran guías para conversar en familia.
+                    </p>
+                    {/* CHIPS */}
+                    <div className="flex flex-wrap items-center justify-center gap-2 mt-3">
+                      <div className="px-3 py-2 rounded-2xl bg-white/15 backdrop-blur border border-white/20 font-bold text-sm">🔥 {learnStreak}</div>
+                      <div className="px-3 py-2 rounded-2xl bg-white/15 backdrop-blur border border-white/20 font-bold text-sm">⭐ {kidsXp + guidesXp} XP</div>
+                      <div className="px-3 py-2 rounded-2xl bg-white/15 backdrop-blur border border-white/20 font-bold text-sm">🏅 {learnBadge}/{learnBadgeTotal}</div>
+                      <div className="px-3 py-2 rounded-2xl bg-white/15 backdrop-blur border border-white/20 font-bold text-sm">📖 {kidsDone.length + guidesDone.length} lecciones</div>
+                    </div>
+                  </div>
+                </section>
+
+                {/* ISLA 1 · ACADEMIA HIJOS */}
+                <section className="rounded-[28px] border border-primary/10 bg-gradient-to-b from-white to-primary/[0.03] shadow-xl overflow-hidden">
+                  {/* cabecera de la isla */}
+                  <div className="pt-8 px-6 md:px-10 text-center">
+                    <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/10 text-[11px] font-black uppercase tracking-wider">🎓 Academia Hijos</span>
+                    <h3 className="mt-3 text-2xl md:text-3xl font-black text-primary">Para Hijos y Estudiante</h3>
+                    <p className="text-slate-500 text-sm md:text-base max-w-md mx-auto leading-relaxed mt-1">
                       Temas cortitos, con reflexión, reto y racha diaria. ¡Completa los {KIDS_TOPICS.length} para desbloquear el examen!
                     </p>
-                    {/* CHIPS */}
-                    <div className="flex flex-wrap items-center justify-center gap-2 mt-3">
-                      <div className="px-3 py-2 rounded-2xl bg-white/15 backdrop-blur border border-white/20 font-bold text-sm">🔥 {learnStreak}</div>
-                      <div className="px-3 py-2 rounded-2xl bg-white/15 backdrop-blur border border-white/20 font-bold text-sm">⭐ {kidsXp} XP</div>
-                      <div className="px-3 py-2 rounded-2xl bg-white/15 backdrop-blur border border-white/20 font-bold text-sm">🏅 {learnBadge}/{learnBadgeTotal}</div>
-                      <div className="px-3 py-2 rounded-2xl bg-white/15 backdrop-blur border border-white/20 font-bold text-sm tabular-nums">📖 {kidsDone.length}/{KIDS_TOPICS.length}</div>
+                    <div className="flex flex-wrap items-center justify-center gap-2 mt-4">
+                      <div className="px-3 py-2 rounded-2xl bg-slate-100 border border-slate-200 font-bold text-sm">🔥 {learnStreak}</div>
+                      <div className="px-3 py-2 rounded-2xl bg-slate-100 border border-slate-200 font-bold text-sm">⭐ {kidsXp} XP</div>
+                      <div className="px-3 py-2 rounded-2xl bg-slate-100 border border-slate-200 font-bold text-sm">🏅 {learnBadge}/{learnBadgeTotal}</div>
+                      <div className="px-3 py-2 rounded-2xl bg-slate-100 border border-slate-200 font-bold text-sm">📖 {kidsDone.length}/{KIDS_TOPICS.length}</div>
                     </div>
-                    <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/20 backdrop-blur border border-white/25 text-[13px] font-black tabular-nums shadow-sm">
-                      🎯 Tema {Math.min(kidsDone.length + 1, KIDS_TOPICS.length)} de {KIDS_TOPICS.length} {kidsDone.length >= KIDS_TOPICS.length ? '· ¡Todo listo!' : ''}
-                    </span>
-                    <div className="w-full max-w-[360px] mt-3">
-                      <div className="h-2 bg-white/25 rounded-full overflow-hidden">
-                        <div className="progress-bar h-full rounded-full bg-white transition-[width] duration-700" style={{ width: `${Math.round((kidsDone.length / KIDS_TOPICS.length) * 100)}%` }}></div>
+                    <div className="w-full max-w-[360px] mx-auto mt-5">
+                      <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="h-full rounded-full progress-bar bg-primary transition-[width] duration-700" style={{ width: `${(kidsDone.length / KIDS_TOPICS.length) * 100}%` }}></div>
                       </div>
+                      <p className="text-sm font-bold text-gray-500 mt-2">{kidsDone.length} de {KIDS_TOPICS.length} temas completados</p>
                     </div>
                   </div>
-                </section>
-
-                {/* ROADMAP VERTICAL DE APRENDIZAJE */}
-                {(() => {
-                  const firstUndone = KIDS_TOPICS.findIndex(k => !kidsDone.includes(k.id))
-                  const openTopic = (k: KidTopic) => { setActiveKidId(k.id); setLearnView('kid'); setShowFeedback(false); setTopicStep(0); setAnsweredOpt(null) }
-                  return (
-                    <section className="relative">
-                      {KIDS_TOPICS.map((k, i) => {
-                        const done = kidsDone.includes(k.id)
-                        const isCurrent = i === firstUndone
-                        const locked = !done && !isCurrent
-                        const even = i % 2 === 0
-                        return (
-                          <RoadmapReveal key={k.id}>
-                            <div className={`relative py-12 md:py-20 ${locked ? 'opacity-75' : ''}`}>
-                              {/* segmento de línea */}
+                  {/* camino de la isla */}
+                  <div className="px-4 md:px-6 pb-2">
+                    {(() => {
+                      const firstUndone = KIDS_TOPICS.findIndex(k => !kidsDone.includes(k.id))
+                      const openTopic = (k: KidTopic) => { setActiveKidId(k.id); setLearnView('kid'); setShowFeedback(false); setTopicStep(0); setAnsweredOpt(null) }
+                      return (
+                        <section className="relative">
+                          {KIDS_TOPICS.map((k, i) => {
+                            const done = kidsDone.includes(k.id)
+                            const isCurrent = i === firstUndone
+                            const locked = !done && !isCurrent
+                            const even = i % 2 === 0
+                            return (
+                              <RoadmapReveal key={k.id}>
+                                <div className={`relative py-12 md:py-20 ${locked ? 'opacity-75' : ''}`}>
+                                  {/* segmento de línea */}
+                                  <div aria-hidden className={`absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[3px] rounded-full transition-colors duration-500 ${
+                                    done
+                                      ? 'bg-gradient-to-b from-success to-emerald-400'
+                                      : isCurrent
+                                        ? 'bg-gradient-to-b from-primary to-teal-400'
+                                        : 'bg-secondary-100'
+                                  }`} />
+                                  {/* nodo */}
+                                  <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 top-1/2 z-10">
+                                    <button
+                                      onClick={locked ? undefined : () => openTopic(k)}
+                                      disabled={!!locked}
+                                      title={locked ? 'Completa el tema anterior para desbloquearlo.' : undefined}
+                                      aria-label={k.title}
+                                      className={`relative w-14 h-14 md:w-[68px] md:h-[68px] rounded-full flex items-center justify-center text-2xl md:text-3xl font-black border-2 transition-all duration-300 ${
+                                        done
+                                          ? 'bg-gradient-to-br from-success to-emerald-400 text-white border-emerald-300/60 shadow-[0_8px_24px_rgba(16,185,129,0.35)] hover:scale-105 active:scale-95 cursor-pointer'
+                                          : isCurrent
+                                            ? 'bg-gradient-to-br from-primary to-teal-400 text-white border-white ring-4 ring-primary/15 shadow-[0_10px_30px_rgba(37,99,235,0.45)] animate-pulse hover:scale-110 active:scale-95 cursor-pointer'
+                                            : 'bg-slate-100 text-slate-400 border-slate-200 opacity-70 cursor-not-allowed'
+                                      }`}
+                                    >
+                                      {done ? '✓' : locked ? '🔒' : k.icon}
+                                      {isCurrent && <span className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-warning text-white text-[11px] font-black flex items-center justify-center shadow-md">👆</span>}
+                                    </button>
+                                  </div>
+                                  {/* contenido */}
+                                  <div className={`w-[calc(50%-2.5rem)] md:w-[calc(50%-6rem)] ${even ? 'mr-auto' : 'ml-auto'}`}>
+                                    <div className={`bg-white rounded-[20px] border p-4 md:p-5 text-center shadow-sm transition-all duration-300 ${
+                                      done ? 'border-success/20' : isCurrent ? 'border-primary/30 shadow-md shadow-primary/10' : 'border-slate-100'
+                                    }`}>
+                                      <span className={`inline-flex items-center justify-center gap-1 text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full ${
+                                        done
+                                          ? 'bg-success/15 text-success'
+                                          : isCurrent
+                                            ? 'bg-gradient-to-r from-primary to-teal-500 text-white shadow-sm shadow-primary/25'
+                                            : 'bg-slate-100 text-slate-400'
+                                      }`}>
+                                        {done ? '✓ Completado' : isCurrent ? (kidsDone.length === 0 ? '● Empezar' : '● Continuar') : '🔒 Bloqueado'}
+                                      </span>
+                                      <p className="mt-3 text-[11px] font-bold text-slate-400 tabular-nums">{String(i + 1).padStart(2, '0')} · {k.category}</p>
+                                      <h4 className="mt-1 font-bold text-slate-800 text-[17px] md:text-lg leading-snug">{k.title}</h4>
+                                      <p className="text-sm text-slate-500 leading-relaxed mt-1 line-clamp-2">{k.desc}</p>
+                                      <div className="flex items-center justify-center gap-2 mt-3">
+                                        <span className="text-xs font-black text-primary">+50 XP</span>
+                                        <span className={`text-xs font-bold ${isCurrent && !done ? 'text-primary' : 'text-slate-400'}`}>{done ? '✓ Repasado' : '1 lección'}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </RoadmapReveal>
+                            )
+                          })}
+                          {/* Nodo EXAMEN FINAL */}
+                          <RoadmapReveal>
+                            <div className="relative py-12 md:py-20">
                               <div aria-hidden className={`absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[3px] rounded-full transition-colors duration-500 ${
-                                done
-                                  ? 'bg-gradient-to-b from-success to-emerald-400'
-                                  : isCurrent
-                                    ? 'bg-gradient-to-b from-secondary to-pink-400'
-                                    : 'bg-secondary-100'
+                                examUnlocked ? 'bg-gradient-to-b from-secondary to-warning' : 'bg-secondary-100'
                               }`} />
-                              {/* nodo */}
                               <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 top-1/2 z-10">
                                 <button
-                                  onClick={locked ? undefined : () => openTopic(k)}
-                                  disabled={!!locked}
-                                  title={locked ? 'Completa el tema anterior para desbloquearlo.' : undefined}
-                                  aria-label={k.title}
+                                  aria-label="Examen final"
+                                  disabled={!examUnlocked}
+                                  onClick={examUnlocked ? () => { setActiveKidId(null); setLearnView('exam'); setExamAnswers({}) } : undefined}
+                                  title={examUnlocked ? undefined : 'Completa todos los temas para desbloquearlo.'}
                                   className={`relative w-14 h-14 md:w-[68px] md:h-[68px] rounded-full flex items-center justify-center text-2xl md:text-3xl font-black border-2 transition-all duration-300 ${
-                                    done
-                                      ? 'bg-gradient-to-br from-success to-emerald-400 text-white border-emerald-300/60 shadow-[0_8px_24px_rgba(16,185,129,0.35)] hover:scale-105 active:scale-95 cursor-pointer'
-                                      : isCurrent
-                                        ? 'bg-gradient-to-br from-pink-500 to-secondary text-white border-white ring-4 ring-primary/15 shadow-[0_10px_30px_rgba(168,85,247,0.45)] animate-pulse hover:scale-110 active:scale-95 cursor-pointer'
-                                        : 'bg-slate-100 text-slate-400 border-slate-200 opacity-70 cursor-not-allowed'
+                                    examUnlocked
+                                      ? 'bg-gradient-to-br from-secondary to-warning text-white border-purple-300/60 shadow-[0_8px_24px_rgba(217,70,239,0.35)] hover:scale-105 active:scale-95 cursor-pointer'
+                                      : 'bg-slate-100 text-slate-400 border-slate-200 opacity-70 cursor-not-allowed'
                                   }`}
                                 >
-                                  {done ? '✓' : locked ? '🔒' : k.icon}
-                                  {isCurrent && <span className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-warning text-white text-[11px] font-black flex items-center justify-center shadow-md">👆</span>}
+                                  {examUnlocked ? '🏁' : '🔒'}
                                 </button>
                               </div>
-                              {/* contenido */}
-                              <div className={`w-[calc(50%-2.5rem)] md:w-[calc(50%-6rem)] ${even ? 'mr-auto' : 'ml-auto'}`}>
+                              <div className="w-[calc(50%-2.5rem)] md:w-[calc(50%-6rem)] ml-auto">
                                 <div className={`bg-white rounded-[20px] border p-4 md:p-5 text-center shadow-sm transition-all duration-300 ${
-                                  done ? 'border-success/20' : isCurrent ? 'border-secondary/30 shadow-md shadow-primary/10' : 'border-slate-100'
+                                  examUnlocked ? 'border-warning/30 shadow-md shadow-warning/10' : 'border-slate-100'
                                 }`}>
-                                  <span className={`inline-flex items-center justify-center gap-1 text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full ${
-                                    done
-                                      ? 'bg-success/15 text-success'
-                                      : isCurrent
-                                        ? 'bg-gradient-to-r from-pink-500 to-secondary text-white shadow-sm shadow-primary/25'
-                                        : 'bg-slate-100 text-slate-400'
+                                  <span className={`inline-flex items-center gap-1 text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full ${
+                                    examUnlocked ? 'bg-warning/15 text-warning' : 'bg-slate-100 text-slate-400'
                                   }`}>
-                                    {done ? '✓ Completado' : isCurrent ? (kidsDone.length === 0 ? '● Empezar' : '● Continuar') : '🔒 Bloqueado'}
+                                    {examUnlocked ? '🎓 Examen final' : '🔒 Bloqueado'}
                                   </span>
-                                  <p className="mt-3 text-[11px] font-bold text-slate-400 tabular-nums">{String(i + 1).padStart(2, '0')} · {k.category}{k.joint ? ' · 👨‍👩‍👧' : ''}</p>
-                                  <h3 className="mt-1 font-bold text-slate-800 text-[17px] md:text-lg leading-snug">{k.title}</h3>
-                                  <p className="text-sm text-slate-500 leading-relaxed mt-1 line-clamp-2">{k.desc}</p>
+                                  <p className="mt-3 text-[11px] font-bold text-slate-400 tabular-nums">{String(KIDS_TOPICS.length + 1).padStart(2, '0')} · Reto final</p>
+                                  <h4 className="mt-1 font-bold text-slate-800 text-[17px] md:text-lg leading-snug">Examen final</h4>
+                                  <p className="text-sm text-slate-500 leading-relaxed mt-1 line-clamp-2">
+                                    {examUnlocked ? 'Pon a prueba todo lo aprendido y consigue tus insignias.' : `Completa los ${KIDS_TOPICS.length} temas para desbloquearlo.`}
+                                  </p>
                                   <div className="flex items-center justify-center gap-2 mt-3">
-                                    <span className="text-xs font-black text-primary">+50 XP</span>
-                                    <span className={`text-xs font-bold ${isCurrent && !done ? 'text-secondary' : 'text-slate-400'}`}>{done ? '✓ Repasado' : '1 lección'}</span>
+                                    <span className="text-xs font-black text-warning">🏅 Insignias</span>
+                                    <span className={`text-xs font-bold ${examUnlocked ? 'text-warning' : 'text-slate-400'}`}>{examUnlocked ? 'Disponible' : 'Bloqueado'}</span>
                                   </div>
                                 </div>
                               </div>
                             </div>
                           </RoadmapReveal>
-                        )
-                      })}
-                      {/* Nodo EXAMEN FINAL */}
-                      <RoadmapReveal>
-                        <div className="relative py-12 md:py-20">
-                          <div aria-hidden className={`absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[3px] rounded-full transition-colors duration-500 ${
-                            examUnlocked ? 'bg-gradient-to-b from-secondary to-warning' : 'bg-secondary-100'
-                          }`} />
-                          <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 top-1/2 z-10">
-                            <button
-                              onClick={() => { if (examUnlocked) { setActiveKidId(null); setLearnView('exam'); setExamAnswers({}); } }}
-                              disabled={!examUnlocked}
-                              title={examUnlocked ? undefined : 'Completa todos los temas para desbloquearlo.'}
-                              aria-label="Examen final"
-                              className={`relative w-14 h-14 md:w-[68px] md:h-[68px] rounded-full flex items-center justify-center text-2xl md:text-3xl font-black border-2 transition-all duration-300 ${
-                                examUnlocked
-                                  ? 'bg-gradient-to-br from-warning to-orange-400 text-white border-orange-200/60 shadow-[0_8px_24px_rgba(245,158,11,0.4)] hover:scale-105 active:scale-95 cursor-pointer'
-                                  : 'bg-slate-100 text-slate-400 border-slate-200 opacity-70 cursor-not-allowed'
-                              }`}
-                            >
-                              {examUnlocked ? '🏁' : '🔒'}
-                            </button>
-                          </div>
-                          <div className="w-[calc(50%-2.5rem)] md:w-[calc(50%-6rem)] mr-auto">
-                            <div className={`bg-white rounded-[20px] border p-4 md:p-5 text-center shadow-sm transition-all duration-300 ${
-                              examUnlocked ? 'border-warning/30 shadow-md shadow-warning/10' : 'border-slate-100'
-                            }`}>
-                              <span className={`inline-flex items-center justify-center gap-1 text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full ${
-                                examUnlocked ? 'bg-gradient-to-r from-warning to-orange-400 text-white shadow-sm shadow-warning/25' : 'bg-slate-100 text-slate-400'
-                              }`}>
-                                {examUnlocked ? '🎓 Examen final' : '🔒 Bloqueado'}
-                              </span>
-                              <h3 className="mt-3 font-black text-slate-800 text-[17px] md:text-lg leading-snug">Examen final</h3>
-                              <p className="text-sm text-slate-500 leading-relaxed mt-1">
-                                {examUnlocked ? 'Pon a prueba todo lo aprendido y consigue tus insignias.' : `Completa los ${KIDS_TOPICS.length} temas para desbloquearlo.`}
-                              </p>
-                              <div className="flex items-center justify-center gap-2 mt-3">
-                                <span className="text-xs font-black text-warning">🏅 Insignias</span>
-                                <span className="text-xs font-bold text-slate-400">{examUnlocked ? 'Disponible' : 'Bloqueado'}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </RoadmapReveal>
-                    </section>
-                  )
-                })()}
-              </>
-            )}
+                        </section>
+                      )
+                    })()}
+                  </div>
+                </section>
 
-            {/* BIBLIOTECA PADRES */}
-            {learnView === 'parents' && (
-              <>
-                {/* HERO ACADEMY */}
-                <section className="relative overflow-hidden rounded-[28px] border border-secondary/15 bg-gradient-to-br from-secondary via-secondary/90 to-fuchsia-500 shadow-[0_16px_48px_rgba(124,58,237,0.25)] px-6 py-8 md:px-10 md:py-10 text-white text-center">
-                  <div aria-hidden className="pointer-events-none absolute -top-16 -left-16 w-56 h-56 rounded-full bg-white/10 blur-2xl" />
-                  <div aria-hidden className="pointer-events-none absolute -bottom-16 -right-16 w-56 h-56 rounded-full bg-white/10 blur-2xl" />
-                  <div aria-hidden className="pointer-events-none absolute top-6 right-8 text-4xl opacity-30">☁️</div>
-                  <div aria-hidden className="pointer-events-none absolute bottom-6 left-8 text-4xl opacity-30">☁️</div>
-                  <div className="relative flex flex-col items-center gap-3">
-                    <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-4xl shadow-lg">👨‍👩‍👧</div>
-                    <h2 className="text-2xl md:text-3xl font-black leading-tight">Academia para Padres</h2>
-                    <p className="text-white/85 text-sm md:text-base max-w-md leading-relaxed">
-                      Guías cortitas para conversar y acompañar a tus hijos. Revisa las {PARENT_GUIDES.length} guías a tu ritmo.
+                {/* ISLA 2 · ACADEMIA PADRES */}
+                <section className="rounded-[28px] border border-secondary/10 bg-gradient-to-b from-white to-secondary/[0.03] shadow-xl overflow-hidden">
+                  {/* cabecera de la isla */}
+                  <div className="pt-8 px-6 md:px-10 text-center">
+                    <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-secondary/10 text-secondary border border-secondary/10 text-[11px] font-black uppercase tracking-wider">👨‍👩‍👧‍👦 Academia Padres</span>
+                    <h3 className="mt-3 text-2xl md:text-3xl font-black text-secondary">Para Padres y Tutores</h3>
+                    <p className="text-slate-500 text-sm md:text-base max-w-md mx-auto leading-relaxed mt-1">
+                      Guías cortitas para conversar y acompañar a tus hijos. Revisa las {PARENT_GUIDES.length} a tu ritmo.
                     </p>
-                    {/* CHIPS */}
-                    <div className="flex flex-wrap items-center justify-center gap-2 mt-3">
-                      <div className="px-3 py-2 rounded-2xl bg-white/15 backdrop-blur border border-white/20 font-bold text-sm">🔥 {learnStreak}</div>
-                      <div className="px-3 py-2 rounded-2xl bg-white/15 backdrop-blur border border-white/20 font-bold text-sm">⭐ {guidesXp} XP</div>
-                      <div className="px-3 py-2 rounded-2xl bg-white/15 backdrop-blur border border-white/20 font-bold text-sm">🏅 {learnBadge}/{learnBadgeTotal}</div>
-                      <div className="px-3 py-2 rounded-2xl bg-white/15 backdrop-blur border border-white/20 font-bold text-sm">📖 {guidesDone.length}/{PARENT_GUIDES.length}</div>
+                    <div className="flex flex-wrap items-center justify-center gap-2 mt-4">
+                      <div className="px-3 py-2 rounded-2xl bg-slate-100 border border-slate-200 font-bold text-sm">🔥 {learnStreak}</div>
+                      <div className="px-3 py-2 rounded-2xl bg-slate-100 border border-slate-200 font-bold text-sm">⭐ {guidesXp} XP</div>
+                      <div className="px-3 py-2 rounded-2xl bg-slate-100 border border-slate-200 font-bold text-sm">📖 {guidesDone.length}/{PARENT_GUIDES.length}</div>
                     </div>
-                    <div className="w-full max-w-[360px] mt-2">
-                      <div className="h-2 bg-white/25 rounded-full overflow-hidden">
-                        <div className="progress-bar h-full rounded-full bg-white transition-[width] duration-700" style={{ width: `${Math.round((guidesDone.length / PARENT_GUIDES.length) * 100)}%` }}></div>
+                    <div className="w-full max-w-[360px] mx-auto mt-5">
+                      <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="h-full rounded-full progress-bar transition-[width] duration-700" style={{ width: `${(guidesDone.length / PARENT_GUIDES.length) * 100}%`, background: '#7C3AED' }}></div>
                       </div>
+                      <p className="text-sm font-bold text-gray-500 mt-2">{guidesDone.length} de {PARENT_GUIDES.length} guías revisadas</p>
                     </div>
                   </div>
-                </section>
-
-                {/* ROADMAP VERTICAL DE ACOMPAÑAMIENTO */}
-                {(() => {
-                  const firstUndone = PARENT_GUIDES.findIndex(g => !guidesDone.includes(g.id))
-                  const openGuide = (g: ParentGuide) => { setActiveGuideId(g.id); setLearnView('guide'); setShowFeedback(false) }
-                  return (
-                    <section className="relative">
-                      {PARENT_GUIDES.map((g, i) => {
-                        const done = guidesDone.includes(g.id)
-                        const isCurrent = i === firstUndone
-                        const locked = !done && !isCurrent
-                        const even = i % 2 === 0
-                        return (
-                          <RoadmapReveal key={g.id}>
-                            <div className={`relative py-12 md:py-20 ${locked ? 'opacity-75' : ''}`}>
-                              {/* segmento de línea */}
-                              <div aria-hidden className={`absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[3px] rounded-full transition-colors duration-500 ${
-                                done
-                                  ? 'bg-gradient-to-b from-success to-emerald-400'
-                                  : isCurrent
-                                    ? 'bg-gradient-to-b from-secondary to-fuchsia-400'
-                                    : 'bg-secondary-100'
-                              }`} />
-                              {/* nodo */}
-                              <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 top-1/2 z-10">
-                                <button
-                                  onClick={locked ? undefined : () => openGuide(g)}
-                                  disabled={!!locked}
-                                  title={locked ? 'Revisa la guía anterior para desbloquear esta.' : undefined}
-                                  aria-label={g.title}
-                                  className={`relative w-14 h-14 md:w-[68px] md:h-[68px] rounded-full flex items-center justify-center text-2xl md:text-3xl font-black border-2 transition-all duration-300 ${
+                  {/* camino de la isla */}
+                  <div className="px-4 md:px-6 pb-2">
+                    {(() => {
+                      const firstUndone = PARENT_GUIDES.findIndex(g => !guidesDone.includes(g.id))
+                      const openGuide = (g: ParentGuide) => { setActiveGuideId(g.id); setLearnView('guide'); setShowFeedback(false) }
+                      return (
+                        <section className="relative">
+                          {PARENT_GUIDES.map((g, i) => {
+                            const done = guidesDone.includes(g.id)
+                            const isCurrent = i === firstUndone
+                            const locked = !done && !isCurrent
+                            const even = i % 2 === 0
+                            return (
+                              <RoadmapReveal key={g.id}>
+                                <div className={`relative py-12 md:py-20 ${locked ? 'opacity-75' : ''}`}>
+                                  {/* segmento de línea */}
+                                  <div aria-hidden className={`absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[3px] rounded-full transition-colors duration-500 ${
                                     done
-                                      ? 'bg-gradient-to-br from-success to-emerald-400 text-white border-emerald-300/60 shadow-[0_8px_24px_rgba(16,185,129,0.35)] hover:scale-105 active:scale-95 cursor-pointer'
+                                      ? 'bg-gradient-to-b from-success to-emerald-400'
                                       : isCurrent
-                                        ? 'bg-gradient-to-br from-fuchsia-500 to-secondary text-white border-white ring-4 ring-secondary/15 shadow-[0_10px_30px_rgba(217,70,239,0.45)] animate-pulse hover:scale-110 active:scale-95 cursor-pointer'
-                                        : 'bg-slate-100 text-slate-400 border-slate-200 opacity-70 cursor-not-allowed'
-                                  }`}
-                                >
-                                  {done ? '✓' : locked ? '🔒' : g.icon}
-                                  {isCurrent && <span className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-warning text-white text-[11px] font-black flex items-center justify-center shadow-md">👆</span>}
-                                </button>
-                              </div>
-                              {/* contenido */}
-                              <div className={`w-[calc(50%-2.5rem)] md:w-[calc(50%-6rem)] ${even ? 'mr-auto' : 'ml-auto'}`}>
-                                <div className={`bg-white rounded-[20px] border p-4 md:p-5 text-center shadow-sm transition-all duration-300 ${
-                                  done ? 'border-success/20' : isCurrent ? 'border-secondary/30 shadow-md shadow-secondary/10' : 'border-slate-100'
-                                }`}>
-                                  <span className={`inline-flex items-center justify-center gap-1 text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full ${
-                                    done
-                                      ? 'bg-success/15 text-success'
-                                      : isCurrent
-                                        ? 'bg-gradient-to-r from-fuchsia-500 to-secondary text-white shadow-sm shadow-secondary/25'
-                                        : 'bg-slate-100 text-slate-400'
-                                  }`}>
-                                    {done ? '✓ Revisada' : isCurrent ? (guidesDone.length === 0 ? '● Empezar' : '● Continuar') : '🔒 Bloqueado'}
-                                  </span>
-                                  <p className="mt-3 text-[11px] font-bold text-slate-400 tabular-nums">{String(i + 1).padStart(2, '0')} · {g.category}{g.joint ? ' · 👨‍👩‍👧' : ''}</p>
-                                  <h3 className="mt-1 font-bold text-slate-800 text-[17px] md:text-lg leading-snug">{g.title}</h3>
-                                  <p className="text-sm text-slate-500 leading-relaxed mt-1 line-clamp-2">{g.desc}</p>
-                                  <div className="flex items-center justify-center gap-2 mt-3">
-                                    <span className="text-xs font-black text-secondary">+30 XP</span>
-                                    <span className={`text-xs font-bold ${isCurrent && !done ? 'text-secondary' : 'text-slate-400'}`}>{done ? '✓ Repasada' : '1 guía'}</span>
+                                        ? 'bg-gradient-to-b from-secondary to-fuchsia-400'
+                                        : 'bg-secondary-100'
+                                  }`} />
+                                  {/* nodo */}
+                                  <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 top-1/2 z-10">
+                                    <button
+                                      onClick={locked ? undefined : () => openGuide(g)}
+                                      disabled={!!locked}
+                                      title={locked ? 'Revisa la guía anterior para desbloquear esta.' : undefined}
+                                      aria-label={g.title}
+                                      className={`relative w-14 h-14 md:w-[68px] md:h-[68px] rounded-full flex items-center justify-center text-2xl md:text-3xl font-black border-2 transition-all duration-300 ${
+                                        done
+                                          ? 'bg-gradient-to-br from-success to-emerald-400 text-white border-emerald-300/60 shadow-[0_8px_24px_rgba(16,185,129,0.35)] hover:scale-105 active:scale-95 cursor-pointer'
+                                          : isCurrent
+                                            ? 'bg-gradient-to-br from-fuchsia-500 to-secondary text-white border-white ring-4 ring-secondary/15 shadow-[0_10px_30px_rgba(217,70,239,0.45)] animate-pulse hover:scale-110 active:scale-95 cursor-pointer'
+                                            : 'bg-slate-100 text-slate-400 border-slate-200 opacity-70 cursor-not-allowed'
+                                      }`}
+                                    >
+                                      {done ? '✓' : locked ? '🔒' : g.icon}
+                                      {isCurrent && <span className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-warning text-white text-[11px] font-black flex items-center justify-center shadow-md">👆</span>}
+                                    </button>
+                                  </div>
+                                  {/* contenido */}
+                                  <div className={`w-[calc(50%-2.5rem)] md:w-[calc(50%-6rem)] ${even ? 'mr-auto' : 'ml-auto'}`}>
+                                    <div className={`bg-white rounded-[20px] border p-4 md:p-5 text-center shadow-sm transition-all duration-300 ${
+                                      done ? 'border-success/20' : isCurrent ? 'border-secondary/30 shadow-md shadow-secondary/10' : 'border-slate-100'
+                                    }`}>
+                                      <span className={`inline-flex items-center justify-center gap-1 text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full ${
+                                        done
+                                          ? 'bg-success/15 text-success'
+                                          : isCurrent
+                                            ? 'bg-gradient-to-r from-fuchsia-500 to-secondary text-white shadow-sm shadow-secondary/25'
+                                            : 'bg-slate-100 text-slate-400'
+                                      }`}>
+                                        {done ? '✓ Revisada' : isCurrent ? (guidesDone.length === 0 ? '● Empezar' : '● Continuar') : '🔒 Bloqueado'}
+                                      </span>
+                                      <p className="mt-3 text-[11px] font-bold text-slate-400 tabular-nums">{String(i + 1).padStart(2, '0')} · {g.category}{g.joint ? ' · 👨‍👩‍👧' : ''}</p>
+                                      <h4 className="mt-1 font-bold text-slate-800 text-[17px] md:text-lg leading-snug">{g.title}</h4>
+                                      <p className="text-sm text-slate-500 leading-relaxed mt-1 line-clamp-2">{g.desc}</p>
+                                      <div className="flex items-center justify-center gap-2 mt-3">
+                                        <span className="text-xs font-black text-secondary">+30 XP</span>
+                                        <span className={`text-xs font-bold ${isCurrent && !done ? 'text-secondary' : 'text-slate-400'}`}>{done ? '✓ Repasada' : '1 guía'}</span>
+                                      </div>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            </div>
-                          </RoadmapReveal>
-                        )
-                      })}
-                    </section>
-                  )
-                })()}
-              </>
+                              </RoadmapReveal>
+                            )
+                          })}
+                        </section>
+                      )
+                    })()}
+                  </div>
+                </section>
+              </div>
             )}
 
             {/* DETALLE TEMA HIJO */}
@@ -2680,7 +2632,7 @@ case 'about':
                   <div className="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
                     <span className="px-2.5 py-1.5 rounded-xl bg-white shadow-sm border border-slate-100 text-slate-700 font-bold text-xs tabular-nums">{Math.round((kidsDone.length / KIDS_TOPICS.length) * 100)}%</span>
                     <button onClick={() => setCurrentScreen('profile')} className="w-9 h-9 rounded-xl bg-white hover:bg-primary/10 shadow-sm text-base transition-colors" aria-label="Mi progreso" title="Mi progreso">📈</button>
-                    <button onClick={() => setLearnView('kids')} className="px-3 h-9 rounded-xl bg-white hover:bg-primary/10 shadow-sm text-sm font-bold text-slate-600 hover:text-primary transition-colors">← Volver a temas</button>
+                    <button onClick={() => setLearnView('hub')} className="px-3 h-9 rounded-xl bg-white hover:bg-primary/10 shadow-sm text-sm font-bold text-slate-600 hover:text-primary transition-colors">← Volver a temas</button>
                   </div>
                 </div>
 
@@ -2889,7 +2841,7 @@ case 'about':
                           setTopicStep(0)
                           setAnsweredOpt(null)
                         } else {
-                          setLearnView('kids')
+                          setLearnView('hub')
                         }
                       }}
                       className="btn-glow bg-gradient-to-r from-primary to-secondary text-white font-bold py-4 px-6 rounded-full text-lg w-full shadow-lg shadow-primary/25 hover:scale-[1.01] active:scale-[0.99]"
@@ -2912,7 +2864,7 @@ case 'about':
                     ← Anterior
                   </button>
                   <button
-                    onClick={() => setLearnView('kids')}
+                    onClick={() => setLearnView('hub')}
                     className="bg-white text-slate-700 font-bold py-3 px-4 rounded-full shadow-sm border border-slate-100 hover:bg-gray-50 transition-all"
                   >
                     Ver temas
@@ -3021,7 +2973,7 @@ case 'about':
             {/* EXAMEN FINAL */}
             {learnView === 'exam' && examUnlocked && (
               <div className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-8">
-                <button onClick={() => setLearnView('kids')} className="text-gray-500 hover:text-primary text-sm font-medium mb-4">
+                <button onClick={() => setLearnView('hub')} className="text-gray-500 hover:text-primary text-sm font-medium mb-4">
                   ← Biblioteca
                 </button>
                 <h2 className="text-2xl font-bold text-primary mb-3">📝 Examen final</h2>
