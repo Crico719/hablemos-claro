@@ -646,6 +646,18 @@ interface KidTopic {
   category: string
   core: LearningTopic
   summary: string
+  deepen?: string
+  shortTerm?: string
+  longTerm?: string
+  affectsPeople?: string
+  affectsCommunity?: string
+  affectsCountry?: string
+  identify?: { text: string; isCorruption: boolean; why: string }[]
+  reflectMore?: string[]
+  trueFalse?: { text: string; answer: boolean; why: string }[]
+  blanks?: { before: string; answer: string; after: string }[]
+  wordBank?: string[]
+  beyond?: string[]
   problems: string[]
   compareA?: string
   compareB?: string
@@ -672,7 +684,7 @@ const KIDS_TOPICS: KidTopic[] = [
     example: 'Pagar para evitar una multa que sí cometiste es corrupción: rompe las reglas que son para todos.',
     art: 'scale',
     summary: 'La corrupción es usar un poder o una posición para conseguir algo injusto.',
-    problems: ['Rompe reglas que son para todos', 'Da ventajas injustas a algunos', 'Debilita la confianza en las instituciones'],
+    problems: ['Rompe reglas que son para todos: cuando alguien hace trampa, las normas dejan de proteger a quienes sí las cumplen.', 'Da ventajas injustas a algunos: quien hace trampa consigue lugares, premios o servicios que le tocaban a otra persona.', 'Debilita la confianza: si la gente cree que todo está arreglado, deja de participar y de creer en su escuela, su barrio y su país.'],
     observe: 'En el recreo, un grupo paga a otro para usar primero la cancha, aunque no era su turno.',
     reflectQ: '¿A quiénes afecta que unos pocos se salten las reglas?',
     finalTask: 'Cuéntale a alguien de tu familia un ejemplo de corrupción que hayas visto o imaginado.',
@@ -685,6 +697,33 @@ const KIDS_TOPICS: KidTopic[] = [
     ],
     familyPrompt: 'Hoy aprendí qué es la corrupción.',
     familyQuestion: '¿En qué lugares crees que puede aparecer la corrupción?',
+    deepen: 'Ocurre cuando alguien pone su interés personal por encima de lo justo. Muchas veces empieza con algo pequeño, como colarse en una fila, y crece si nadie dice nada.',
+    shortTerm: 'A corto plazo, alguien pierde su turno, su premio o su oportunidad, y se siente triste o enojado por la injusticia.',
+    longTerm: 'A largo plazo, si nadie la frena, la corrupción se vuelve costumbre: los servicios empeoran y la gente deja de confiar.',
+    affectsPeople: 'A ti y a tu familia: pueden quitarte un cupo, un premio o un servicio que te correspondía.',
+    affectsCommunity: 'A tu escuela y tu barrio: las reglas dejan de cumplirse y el ambiente se vuelve injusto para todos.',
+    affectsCountry: 'Al país: se pierden recursos para hospitales, escuelas y caminos, y todos vivimos peor.',
+    identify: [
+      { text: 'Un funcionario pide dinero para agilizar un trámite → ¿es corrupción?', isCorruption: true, why: 'Pedir dinero para hacer su trabajo es usar su puesto para beneficio propio.' },
+      { text: 'Una niña ayuda a su amiga con la tarea sin pedir nada a cambio → ¿es corrupción?', isCorruption: false, why: 'Ayudar sin pedir nada a cambio es solidaridad, no corrupción.' },
+      { text: 'Un árbitro cobra para favorecer a un equipo en la final → ¿es corrupción?', isCorruption: true, why: 'Rompe las reglas del juego para beneficiar a unos y perjudicar a otros.' },
+      { text: 'Un médico atiende a los pacientes en orden de llegada → ¿es corrupción?', isCorruption: false, why: 'Atender por orden es justo: nadie recibe ventajas indebidas.' },
+    ],
+    reflectMore: ['¿Por qué la corrupción rompe la confianza entre las personas?', '¿Qué sentirías si te quitaran algo que te ganaste con esfuerzo?', '¿Qué puedes hacer tú cuando veas algo injusto?'],
+    trueFalse: [
+      { text: 'La corrupción solo la hacen los políticos.', answer: false, why: 'Puede aparecer en la escuela, el barrio o cualquier lugar.' },
+      { text: 'Usar un puesto para conseguir ventajas injustas es corrupción.', answer: true, why: 'Esa es justamente su definición.' },
+      { text: 'Si nadie se entera, no hay daño.', answer: false, why: 'El daño existe aunque nadie lo vea: alguien pierde algo.' },
+      { text: 'Decir la verdad ayuda a frenar la corrupción.', answer: true, why: 'Hablar y reportar es el primer paso para detenerla.' },
+      { text: 'Las reglas están para proteger a todos por igual.', answer: true, why: 'Por eso romperlas para ganar ventaja es injusto.' },
+    ],
+    blanks: [
+      { before: 'La corrupción es usar el', answer: 'poder', after: 'para conseguir algo injusto.' },
+      { before: 'Cuando alguien hace trampa, rompe las', answer: 'reglas', after: 'que son para todos.' },
+      { before: 'La corrupción debilita la', answer: 'confianza', after: 'entre las personas.' },
+    ],
+    wordBank: ['poder', 'reglas', 'confianza', 'dinero'],
+    beyond: ['La transparencia es mostrar con claridad cómo se usan los recursos y se toman las decisiones; así nadie puede hacer trampa a escondidas.', 'La rendición de cuentas significa explicar qué hiciste con lo que te confiaron, como el dinero de un grupo o una tarea encargada.', 'La ética es hacer lo correcto aunque nadie mire; la ley lo exige por escrito. Cuando se juntan, la sociedad funciona mejor.', 'Acción justa: esperar tu turno en la fila. Acción injusta: pagar para pasar primero. La diferencia está en respetar a los demás.'],
     relatedGuide: 'p1',
   },
   {
@@ -693,7 +732,7 @@ const KIDS_TOPICS: KidTopic[] = [
     example: 'Ofrecer dinero para que te atiendan primero, saltándose a todos los que esperaban.',
     art: 'hands',
     summary: 'Una coima es ofrecer o entregar dinero, un regalo o un favor para obtener una ventaja que no corresponde. Aunque parezca una solución rápida, puede ser injusta y afectar a otras personas.',
-    problems: ['Rompe las reglas', 'Da una ventaja injusta', 'Puede perjudicar a otras personas', 'Debilita la confianza'],
+    problems: ['Rompe las reglas: la coima salta las normas que ordenan quién va primero o quién merece algo.', 'Da una ventaja injusta: quien paga pasa adelante aunque no le corresponda.', 'Puede perjudicar a otras personas: cada ventaja indebida le quita algo a alguien que esperaba su turno.', 'Debilita la confianza: cuando pagar se vuelve normal, nadie cree en las reglas.'],
     compareA: 'Corrupción: uso indebido del poder o de una posición para obtener un beneficio personal.',
     compareB: 'Coima: dinero, regalo o favor que se ofrece o entrega para conseguir una ventaja indebida.',
     compareNote: 'La coima es una forma de corrupción, pero no toda corrupción ocurre mediante una coima.',
@@ -710,6 +749,33 @@ const KIDS_TOPICS: KidTopic[] = [
     ],
     familyPrompt: 'Hoy aprendí qué es una coima.',
     familyQuestion: '¿Por qué crees que una coima puede afectar a otras personas?',
+    deepen: 'Ocurre porque alguien quiere algo rápido sin ganárselo, y otra persona acepta a cambio de dinero o favores. Las dos partes rompen las reglas, aunque solo una haya ofrecido.',
+    shortTerm: 'A corto plazo, quienes esperaban su turno pierden tiempo y oportunidades, y se sienten tratados injustamente.',
+    longTerm: 'A largo plazo, si las coimas se vuelven normales, los servicios se reparten por dinero y no por necesidad o mérito.',
+    affectsPeople: 'A ti y a tu familia: pueden atenderte después o negarte algo que te tocaba, solo porque otro pagó.',
+    affectsCommunity: 'A tu comunidad: los trámites y servicios se vuelven lentos e injustos para quienes no pagan.',
+    affectsCountry: 'Al país: el dinero de las coimas se pierde en bolsillos privados en vez de usarse en obras y servicios.',
+    identify: [
+      { text: 'Un conductor ofrece dinero al policía para que no le ponga la multa → ¿es corrupción?', isCorruption: true, why: 'Es una coima: dinero a cambio de evitar una sanción justa.' },
+      { text: 'Una abuela le regala frutas al vecino por ayudarla → ¿es corrupción?', isCorruption: false, why: 'Es agradecimiento sincero, no busca una ventaja indebida.' },
+      { text: 'Un padre paga para que su hijo entre a un equipo sin hacer la prueba → ¿es corrupción?', isCorruption: true, why: 'Compra un lugar que otro niño se habría ganado con esfuerzo.' },
+      { text: 'Un estudiante felicita a su compañero por ganar limpiamente → ¿es corrupción?', isCorruption: false, why: 'Reconocer el mérito ajeno es justo y honesto.' },
+    ],
+    reflectMore: ['¿Por qué una solución rápida e injusta termina dañando a más personas?', '¿Qué diferencia hay entre un regalo sincero y una coima?', '¿Qué harías si alguien te ofrece algo a cambio de romper una regla?'],
+    trueFalse: [
+      { text: 'Una coima siempre es dinero en efectivo.', answer: false, why: 'También puede ser un regalo, un favor o una promesa.' },
+      { text: 'Aceptar una coima también es corrupción.', answer: true, why: 'Quien ofrece y quien acepta rompen las reglas.' },
+      { text: 'Si la coima es pequeña, no afecta a nadie.', answer: false, why: 'Toda ventaja indebida le quita algo a otra persona.' },
+      { text: 'Decir que no a una coima protege a los demás.', answer: true, why: 'Tu negativa mantiene el trato justo para todos.' },
+      { text: 'Pedir ayuda a un adulto ante una coima es de valientes.', answer: true, why: 'Buscar apoyo es la forma segura de actuar bien.' },
+    ],
+    blanks: [
+      { before: 'Una coima es dinero, un regalo o un', answer: 'favor', after: 'para lograr algo indebido.' },
+      { before: 'Quien ofrece y quien', answer: 'acepta', after: 'una coima rompen las reglas.' },
+      { before: 'Decir que no a una coima mantiene el trato', answer: 'justo', after: 'para todos.' },
+    ],
+    wordBank: ['favor', 'acepta', 'justo', 'regalo'],
+    beyond: ['La transparencia importa porque cuando todo se hace a la vista, es mucho más difícil pedir o aceptar coimas.', 'Rendir cuentas es explicar en qué se usó cada recurso: así se nota si algo se desvió por una coima.', 'La ética te dice que no aceptes ventajas indebidas; la ley lo castiga. Las dos te protegen.', 'Acción justa: ganar un puesto con tu esfuerzo. Acción injusta: comprarlo con una coima.'],
     relatedGuide: 'p2',
   },
   {
@@ -718,7 +784,7 @@ const KIDS_TOPICS: KidTopic[] = [
     example: 'Alguien ofrece dinero para no hacer la fila del trámite porque no quiere esperar.',
     art: 'paths',
     summary: 'Algunas personas ofrecen coimas por impaciencia o por querer ganar sin esfuerzo. Ninguna razón lo justifica.',
-    problems: ['Normaliza la trampa como un “atajo”', 'Presiona a otros a hacer lo mismo', 'Esconde lo que cada uno realmente puede lograr'],
+    problems: ['Normaliza la trampa como un “atajo”: si todos pagan, los niños aprenden que hacer trampa es lo normal.', 'Presiona a otros a hacer lo mismo: quien no quiere pagar queda fuera o es criticado.', 'Esconde lo que cada uno realmente puede lograr: el mérito deja de importar y solo cuenta el dinero.'],
     observe: '“Aquí todos pagan para pasar rápido”, dice un señor en la fila del trámite.',
     reflectQ: '¿Por qué crees que algunas personas prefieren pagar en vez de esperar?',
     finalTask: 'Piensa una respuesta firme para decir que no y compártela en familia.',
@@ -731,6 +797,33 @@ const KIDS_TOPICS: KidTopic[] = [
     ],
     familyPrompt: 'Hoy pensé por qué la gente ofrece coimas.',
     familyQuestion: '¿Qué responderías si alguien te dice que “todos lo hacen”?',
+    deepen: 'Ocurre por impaciencia, por flojera o por miedo a perder. Algunos creen que “así funciona el mundo”, pero eso solo es una excusa: entender la causa sirve para no repetirla, no para justificarla.',
+    shortTerm: 'A corto plazo, quien paga consigue lo que quiere rápido, pero enseña a otros que la trampa funciona.',
+    longTerm: 'A largo plazo, esa idea se contagia: cada vez más gente paga y las reglas dejan de valer para todos.',
+    affectsPeople: 'A ti: te presiona a pagar o a quedarte atrás aunque hagas las cosas bien.',
+    affectsCommunity: 'A tu comunidad: se crea la idea de que sin dinero no se avanza, y eso desanima a todos.',
+    affectsCountry: 'Al país: cuando el “todos lo hacen” se vuelve normal, la corrupción crece y frena el desarrollo.',
+    identify: [
+      { text: '“Paga para pasar rápido, aquí todos lo hacen” → ¿es corrupción?', isCorruption: true, why: 'Que sea común no lo vuelve correcto: sigue siendo una ventaja indebida.' },
+      { text: 'Esperar tu turno aunque la fila sea larga → ¿es corrupción?', isCorruption: false, why: 'Respetar la fila es actuar con justicia y paciencia.' },
+      { text: 'Un amigo te presiona para pagar y no quedar mal → ¿es corrupción?', isCorruption: true, why: 'Presionar a otros para romper reglas también es parte del problema.' },
+      { text: 'Decir “no, gracias” y esperar como los demás → ¿es corrupción?', isCorruption: false, why: 'Es la respuesta honesta: ni pagas ni aceptas la trampa.' },
+    ],
+    reflectMore: ['¿Por qué “todos lo hacen” nunca es una buena razón?', '¿Qué pesa más: la impaciencia de hoy o tu tranquilidad de mañana?', '¿Cómo puedes responder con firmeza sin pelear?'],
+    trueFalse: [
+      { text: 'Si todos pagan coimas, entonces está bien hacerlo.', answer: false, why: 'Que algo sea común no lo vuelve correcto ni justo.' },
+      { text: 'La impaciencia es una causa frecuente de las coimas.', answer: true, why: 'Muchos pagan por no querer esperar su turno.' },
+      { text: 'Entender por qué ocurre sirve para no caer en lo mismo.', answer: true, why: 'Conocer la causa te ayuda a reconocerla y frenarla.' },
+      { text: 'Decir que no cuando te presionan es de débiles.', answer: false, why: 'Al contrario: decir que no es una muestra de fuerza.' },
+      { text: 'Una excusa nunca convierte una trampa en algo justo.', answer: true, why: 'Las razones no justifican romper las reglas.' },
+    ],
+    blanks: [
+      { before: 'Muchos ofrecen coimas por impaciencia o por no querer', answer: 'esperar', after: 'su turno.' },
+      { before: 'Que “todos lo hagan” no lo vuelve', answer: 'correcto', after: 'ni justo.' },
+      { before: 'Decir que no ante la presión es una muestra de', answer: 'fuerza', after: 'y valentía.' },
+    ],
+    wordBank: ['esperar', 'correcto', 'fuerza', 'dinero'],
+    beyond: ['La transparencia ayuda porque cuando los trámites son claros y públicos, hay menos espacio para “pagos rápidos”.', 'Rendir cuentas es contar qué se hizo y por qué: quien actúa bien no teme explicarlo.', 'La ética te pide paciencia y respeto; la ley castiga el soborno. Ambas van en la misma dirección.', 'Acción justa: proponer que la fila avance por orden. Acción injusta: pagar para colarte.'],
     relatedGuide: 'p7',
   },
   {
@@ -739,7 +832,7 @@ const KIDS_TOPICS: KidTopic[] = [
     example: 'Te ofrecen un premio por quedarte callado ante algo injusto.',
     art: 'paths',
     summary: 'Cuando veas algo injusto, detente, piensa en las consecuencias y elige lo correcto.',
-    problems: ['Quedarte callado deja que lo injusto continúe', 'Seguir a otros te hace parte del problema', 'Actuar bien protege a los demás y a ti'],
+    problems: ['Quedarte callado deja que lo injusto continúe: el silencio es como darle permiso a la trampa.', 'Seguir a otros te hace parte del problema: copiar una mala acción también es una mala acción.', 'Actuar bien protege a los demás y a ti: una sola persona valiente puede frenar una injusticia.'],
     observe: 'Ves que a un compañero lo favorecen por dinero en un concurso escolar.',
     reflectQ: '¿Qué sentirías si fueras quien merecía ganar?',
     finalTask: 'Dibuja o escribe cómo actuarías tú en esa situación.',
@@ -752,6 +845,33 @@ const KIDS_TOPICS: KidTopic[] = [
     ],
     familyPrompt: 'Hoy practiqué cómo actuar ante situaciones injustas.',
     familyQuestion: 'Si vieras algo injusto, ¿a quién se lo contarías primero?',
+    deepen: 'Ocurre porque a veces es más fácil mirar a otro lado que actuar. Pero cada vez que alguien se queda callado, lo injusto gana fuerza; y cada vez que alguien habla, lo justo gana terreno.',
+    shortTerm: 'A corto plazo, hablar puede dar nervios, pero callar deja una culpa que dura más.',
+    longTerm: 'A largo plazo, las personas que actúan con valentía construyen comunidades donde se puede confiar.',
+    affectsPeople: 'A ti: tus decisiones muestran quién eres y te dan tranquilidad o culpa.',
+    affectsCommunity: 'A tu escuela o barrio: una voz valiente anima a otros a hablar también.',
+    affectsCountry: 'Al país: los ciudadanos que no se callan son el mejor freno contra la corrupción.',
+    identify: [
+      { text: 'Ves que le regalan puntos a un equipo y no dices nada → ¿es corrupción?', isCorruption: true, why: 'Callar ante una trampa que beneficia injustamente también sostiene la corrupción.' },
+      { text: 'Le cuentas a tu profesora que viste copiar en el examen → ¿es corrupción?', isCorruption: false, why: 'Avisar a un adulto de confianza es actuar con honestidad.' },
+      { text: 'Te ofrecen un premio por guardar silencio ante algo injusto → ¿es corrupción?', isCorruption: true, why: 'Comprar tu silencio es una forma de corrupción.' },
+      { text: 'Defiendes a un compañero al que culpan injustamente → ¿es corrupción?', isCorruption: false, why: 'Defender lo justo es lo contrario de la corrupción.' },
+    ],
+    reflectMore: ['¿Por qué cuesta más hablar que quedarse callado?', '¿Qué sentirías si nadie hablara por ti cuando lo necesitas?', '¿A quién admiras por haber actuado con valentía?'],
+    trueFalse: [
+      { text: 'Quedarse callado ante una injusticia ayuda a que se repita.', answer: true, why: 'El silencio deja que lo injusto continúe sin freno.' },
+      { text: 'Si no participas en la trampa, no es tu problema.', answer: false, why: 'Mirar a otro lado también deja que el daño siga.' },
+      { text: 'Contarle a un adulto de confianza es un buen primer paso.', answer: true, why: 'Pedir ayuda es actuar con responsabilidad.' },
+      { text: 'Una sola persona no puede cambiar nada.', answer: false, why: 'Una voz valiente anima a muchas más.' },
+      { text: 'Pensar antes de actuar lleva a mejores decisiones.', answer: true, why: 'Detenerte y pensar evita arrepentimientos.' },
+    ],
+    blanks: [
+      { before: 'Ante algo injusto, primero me detengo y', answer: 'pienso', after: 'en las consecuencias.' },
+      { before: 'Quedarse callado deja que lo injusto', answer: 'continúe', after: 'y se repita.' },
+      { before: 'Contar lo que vi a un adulto de', answer: 'confianza', after: 'es actuar con valentía.' },
+    ],
+    wordBank: ['pienso', 'continúe', 'confianza', 'silencio'],
+    beyond: ['La transparencia empieza contigo: contar lo que viste con claridad ayuda a que todo se aclare.', 'Rendir cuentas también es personal: explicar por qué actuaste como actuaste.', 'La ética te invita a defender lo justo; la ley protege a quien denuncia de buena fe.', 'Acción justa: avisar cuando ves trampa. Acción injusta: aprovecharte de la trampa ajena.'],
     relatedGuide: 'p6',
   },
   {
@@ -760,7 +880,7 @@ const KIDS_TOPICS: KidTopic[] = [
     example: 'Tus amigos te presionan para copiar en un examen y te dicen que si no lo haces eres un traidor.',
     art: 'shield',
     summary: 'Decir que no cuando te presionan es una muestra de fuerza, no de debilidad.',
-    problems: ['Ceder una vez facilita ceder la próxima', 'Puedes meterte en problemas serios', 'Pierdes la confianza de quienes te quieren'],
+    problems: ['Ceder una vez facilita ceder la próxima: cada “sí” hace más difícil el siguiente “no”.', 'Puedes meterte en problemas serios: lo que empieza como juego puede terminar en castigo o daño real.', 'Pierdes la confianza de quienes te quieren: tu familia y tus verdaderos amigos valoran tu honestidad.'],
     observe: 'Tus amigos insisten en copiar y te dicen traidor si no aceptas.',
     reflectQ: '¿Qué pesa más: quedar bien un momento o tu tranquilidad?',
     finalTask: 'Practica en voz alta una frase para decir que no.',
@@ -773,6 +893,33 @@ const KIDS_TOPICS: KidTopic[] = [
     ],
     familyPrompt: 'Hoy aprendí a enfrentar la presión de grupo.',
     familyQuestion: '¿Qué podrías decir si alguien te presiona a hacer algo malo?',
+    deepen: 'Ocurre porque queremos encajar y tememos que se burlen de nosotros. Los grupos que te exigen hacer algo malo no son buenos amigos: un verdadero amigo respeta tu “no”.',
+    shortTerm: 'A corto plazo, ceder te evita una burla, pero te deja intranquilo y con miedo a que se repita.',
+    longTerm: 'A largo plazo, aprender a decir que no te protege de presiones cada vez más peligrosas.',
+    affectsPeople: 'A ti: ceder te mete en problemas y te aleja de lo que realmente quieres ser.',
+    affectsCommunity: 'A tu grupo: si todos ceden, el grupo entero entra en conductas de riesgo.',
+    affectsCountry: 'Al país: los jóvenes que resisten la presión de hoy serán los adultos íntegros de mañana.',
+    identify: [
+      { text: 'Tus amigos te dicen traidor si no copias en el examen → ¿es corrupción?', isCorruption: true, why: 'Presionarte para hacer trampa es obligarte a ser deshonesto.' },
+      { text: 'Tus amigos respetan que no quieras copiar → ¿es corrupción?', isCorruption: false, why: 'Respetar tu decisión es amistad de verdad.' },
+      { text: 'Te piden dinero para comprar las respuestas del examen → ¿es corrupción?', isCorruption: true, why: 'Comprar respuestas es trampa y rompe las reglas para todos.' },
+      { text: 'Propones estudiar juntos en vez de copiar → ¿es corrupción?', isCorruption: false, why: 'Proponer algo bueno es liderar con el ejemplo.' },
+    ],
+    reflectMore: ['¿Qué pesa más: quedar bien un momento o tu tranquilidad?', '¿Cómo sabes si un grupo de amigos es bueno para ti?', '¿Qué frase firme puedes usar para decir que no?'],
+    trueFalse: [
+      { text: 'Decir que no cuando te presionan es de valientes.', answer: true, why: 'Resistir la presión es una muestra de fuerza.' },
+      { text: '“Solo una vez” nunca trae consecuencias.', answer: false, why: 'Una vez suele ser el inicio de muchas veces.' },
+      { text: 'Un buen amigo respeta tu decisión de no hacer trampa.', answer: true, why: 'La amistad de verdad no exige hacer lo incorrecto.' },
+      { text: 'Alejarse y pedir ayuda también es una buena respuesta.', answer: true, why: 'No tienes que enfrentar la presión a solas.' },
+      { text: 'Si todo el grupo lo hace, no hay nada malo.', answer: false, why: 'Que muchos lo hagan no lo vuelve correcto.' },
+    ],
+    blanks: [
+      { before: 'Decir que no ante la presión es una muestra de', answer: 'fuerza', after: 'y valentía.' },
+      { before: '“Solo una vez” suele ser el inicio de', answer: 'muchas', after: 'veces.' },
+      { before: 'Un verdadero amigo respeta tu', answer: 'decisión', after: 'de actuar bien.' },
+    ],
+    wordBank: ['fuerza', 'muchas', 'decisión', 'miedo'],
+    beyond: ['La transparencia con tus amigos es decir lo que piensas sin miedo: “yo no copio”.', 'Rendir cuentas es contarle a tu familia cuando te presionan, para que te apoyen.', 'La ética te dice que tu conciencia vale más que encajar; la ley protege tu derecho a decidir.', 'Acción justa: proponer estudiar juntos. Acción injusta: copiar para que te acepten.'],
     relatedGuide: 'p7',
   },
   {
@@ -781,7 +928,7 @@ const KIDS_TOPICS: KidTopic[] = [
     example: 'Aceptar un beneficio injusto puede dejar sin oportunidad a alguien que sí se lo merecía.',
     art: 'scale',
     summary: 'Cada decisión deja huella: piensa a quién afecta antes de elegir.',
-    problems: ['Una mala decisión puede quitarle algo a otro', 'Los efectos duran más de lo que crees', 'Tus decisiones hablan de quién eres'],
+    problems: ['Una mala decisión puede quitarle algo a otro: un cupo, un premio o una oportunidad que no vuelve.', 'Los efectos duran más de lo que crees: una trampa de hoy puede cerrar puertas mañana.', 'Tus decisiones hablan de quién eres: la gente confía en ti según cómo actúas.'],
     observe: 'Alguien acepta un beneficio injusto y otro se queda sin su oportunidad.',
     reflectQ: '¿Qué consecuencias puede tener una decisión así para los demás?',
     finalTask: 'Recuerda una decisión tuya y escribe a quién afectó.',
@@ -794,6 +941,33 @@ const KIDS_TOPICS: KidTopic[] = [
     ],
     familyPrompt: 'Hoy aprendí que mis decisiones afectan a otros.',
     familyQuestion: '¿Recuerdas una decisión tuya que haya afectado a alguien?',
+    deepen: 'Ocurre porque solemos pensar solo en lo que ganamos nosotros, sin ver a quién afecta. Hacerte dos preguntas —“¿a quién afecta?” y “¿sería justo para todos?”— cambia por completo tu decisión.',
+    shortTerm: 'A corto plazo, una mala decisión puede darte algo rápido, pero deja a alguien triste o enojado.',
+    longTerm: 'A largo plazo, tus decisiones forman tu reputación: la gente recuerda si fuiste justo o no.',
+    affectsPeople: 'A ti y a otros: cada elección tuya toca la vida de alguien, para bien o para mal.',
+    affectsCommunity: 'A tu comunidad: muchas decisiones injustas juntas crean un ambiente de desconfianza.',
+    affectsCountry: 'Al país: las decisiones de hoy (votar, pagar impuestos, respetar reglas) construyen el país de mañana.',
+    identify: [
+      { text: 'Aceptas un premio que sabes que ganó otro compañero → ¿es corrupción?', isCorruption: true, why: 'Quedarte con lo ajeno es injusto aunque nadie reclame.' },
+      { text: 'Devuelves el premio explicando que no era tuyo → ¿es corrupción?', isCorruption: false, why: 'Reconocer el mérito ajeno es honestidad.' },
+      { text: 'Eliges no copiar aunque eso signifique menor nota → ¿es corrupción?', isCorruption: false, why: 'Elegir lo correcto aunque cueste es integridad.' },
+      { text: 'Votas por tu amigo en un concurso aunque otro lo hizo mejor → ¿es corrupción?', isCorruption: true, why: 'Favorecer injustamente quita el premio a quien lo merecía.' },
+    ],
+    reflectMore: ['¿Qué consecuencias puede tener una decisión así para los demás?', '¿Te sentirías orgulloso si todos supieran lo que decidiste?', '¿Qué pregunta te ayuda a decidir bien antes de actuar?'],
+    trueFalse: [
+      { text: 'Cada decisión deja una huella en los demás.', answer: true, why: 'Lo que eliges toca la vida de otras personas.' },
+      { text: 'Si solo me beneficia a mí, igual es buena decisión.', answer: false, why: 'Hay que pensar también en si es justo para todos.' },
+      { text: 'Los efectos de una mala decisión se olvidan rápido.', answer: false, why: 'Pueden durar mucho más de lo que crees.' },
+      { text: 'Preguntarte “¿a quién afecta?” ayuda a decidir bien.', answer: true, why: 'Esa pregunta te pone en los zapatos de los demás.' },
+      { text: 'Tus decisiones muestran quién eres.', answer: true, why: 'La confianza se gana con actos justos.' },
+    ],
+    blanks: [
+      { before: 'Antes de decidir, pregúntate a quién', answer: 'afecta', after: 'tu elección.' },
+      { before: 'Una decisión injusta puede quitarle algo a', answer: 'otro', after: 'que sí lo merecía.' },
+      { before: 'Tus decisiones hablan de', answer: 'quién', after: 'eres realmente.' },
+    ],
+    wordBank: ['afecta', 'otro', 'quién', 'siempre'],
+    beyond: ['La transparencia en tus decisiones es poder explicar por qué elegiste algo sin esconder nada.', 'Rendir cuentas es asumir las consecuencias de lo que decidiste, bueno o malo.', 'La ética guía tus decisiones diarias; la ley marca los límites que nadie debe cruzar.', 'Acción justa: elegir por mérito. Acción injusta: elegir por favoritismo.'],
     relatedGuide: 'p5',
   },
   {
@@ -802,7 +976,7 @@ const KIDS_TOPICS: KidTopic[] = [
     example: 'Un comerciante cobra de más a quien no conoce y le hace “precio especial” solo a sus amigos en un servicio público.',
     art: 'hands',
     summary: 'La corrupción también aparece en lo cotidiano: reconocerla te protege.',
-    problems: ['Se esconde en favores y “precios especiales”', 'Afecta servicios que usas a diario', 'Si la ignoras, crece'],
+    problems: ['Se esconde en favores y “precios especiales”: lo cotidiano la disfraza de algo normal.', 'Afecta servicios que usas a diario: el mercado, el transporte, la escuela.', 'Si la ignoras, crece: lo pequeño de hoy es lo grande de mañana.'],
     observe: 'En el mercado, a unos les cobran de más por no conocer los precios.',
     reflectQ: '¿Qué situaciones injustas has visto en tu escuela o barrio?',
     finalTask: 'Anota una situación injusta que veas esta semana.',
@@ -815,6 +989,33 @@ const KIDS_TOPICS: KidTopic[] = [
     ],
     familyPrompt: 'Hoy descubrí la corrupción en la vida diaria.',
     familyQuestion: '¿Has visto alguna situación injusta en tu escuela o barrio?',
+    deepen: 'Ocurre porque estamos acostumbrados a verla y dejamos de notarla: el “precio especial”, el favorcito, la fila que se salta. Nombrarla es el primer paso para frenarla.',
+    shortTerm: 'A corto plazo, alguien paga de más o espera más por culpa de un trato injusto.',
+    longTerm: 'A largo plazo, lo cotidiano injusto se vuelve sistema: todos pierden un poco cada día.',
+    affectsPeople: 'A ti: pagas de más, esperas más o recibes peor servicio sin merecerlo.',
+    affectsCommunity: 'A tu barrio: los comercios y servicios injustos empobrecen la convivencia.',
+    affectsCountry: 'Al país: millones de pequeñas injusticias suman un gran daño nacional.',
+    identify: [
+      { text: 'En el mercado cobran de más a quien no conoce los precios → ¿es corrupción?', isCorruption: true, why: 'Aprovecharse del desconocimiento para cobrar más es injusto.' },
+      { text: 'El vendedor muestra los precios claros para todos → ¿es corrupción?', isCorruption: false, why: 'La claridad y el trato igual son honestidad.' },
+      { text: 'Un chofer cobra lo justo aunque podría cobrar más → ¿es corrupción?', isCorruption: false, why: 'Cobrar lo correcto es actuar con justicia.' },
+      { text: 'Te cuelan en la fila a cambio de guardarles el puesto después → ¿es corrupción?', isCorruption: true, why: 'Es un intercambio de favores que rompe el orden justo de la fila.' },
+    ],
+    reflectMore: ['¿Qué situaciones injustas has visto en tu escuela o barrio?', '¿Por qué lo cotidiano injusto cuesta más reconocer?', '¿Qué detalle pequeño podrías cambiar desde hoy?'],
+    trueFalse: [
+      { text: 'La corrupción solo pasa en las noticias.', answer: false, why: 'También aparece en el mercado, la escuela y el barrio.' },
+      { text: 'Cobrar de más a quien no sabe es una injusticia.', answer: true, why: 'Aprovecharse del otro rompe el trato justo.' },
+      { text: 'Si es algo pequeño, no vale la pena decir nada.', answer: false, why: 'Lo pequeño de hoy es lo grande de mañana.' },
+      { text: 'Reconocer la corrupción cotidiana te protege.', answer: true, why: 'Verla es el primer paso para no caer en ella.' },
+      { text: 'Pedir precios claros es un acto de honestidad.', answer: true, why: 'La claridad protege a todos por igual.' },
+    ],
+    blanks: [
+      { before: 'La corrupción también aparece en lo', answer: 'cotidiano', after: 'y hay que saber verla.' },
+      { before: 'Cobrar de más a quien no conoce es una', answer: 'injusticia', after: 'que daña a todos.' },
+      { before: 'Si ignoramos lo injusto, con el tiempo', answer: 'crece', after: 'y se vuelve costumbre.' },
+    ],
+    wordBank: ['cotidiano', 'injusticia', 'crece', 'escuela'],
+    beyond: ['La transparencia en lo cotidiano es pedir y dar precios claros, turnos visibles y reglas parejas.', 'Rendir cuentas en casa es explicar en qué se gastó el dinero del hogar.', 'La ética diaria está en los detalles: la fila, el vuelto, el trato. La ley castiga cuando esos detalles se vuelven delito.', 'Acción justa: cobrar lo mismo a todos. Acción injusta: cobrar según la cara.'],
     relatedGuide: 'p4',
   },
   {
@@ -823,7 +1024,7 @@ const KIDS_TOPICS: KidTopic[] = [
     example: 'Devuelves el vuelto de más aunque nadie se haya dado cuenta.',
     art: 'shield',
     summary: 'Actuar bien es un hábito: pequeños actos honestos todos los días.',
-    problems: ['La honestidad se nota aunque nadie mire', 'Tu ejemplo inspira a otros', 'Lo correcto casi siempre es lo más simple'],
+    problems: ['La honestidad se nota aunque nadie mire: tu conciencia siempre sabe lo que hiciste.', 'Tu ejemplo inspira a otros: cuando actúas bien, animas a tus amigos a hacerlo.', 'Lo correcto casi siempre es lo más simple: no necesitas excusas ni mentiras.'],
     observe: 'Alguien devuelve el vuelto de más sin que nadie se dé cuenta.',
     reflectQ: '¿Por qué cuesta hacer lo correcto cuando nadie mira?',
     finalTask: 'Haz una acción honesta hoy y cuéntala en familia.',
@@ -836,6 +1037,33 @@ const KIDS_TOPICS: KidTopic[] = [
     ],
     familyPrompt: 'Hoy aprendí acciones para actuar correctamente.',
     familyQuestion: '¿Qué acción honesta hiciste esta semana?',
+    deepen: 'Ocurre porque la honestidad es como un músculo: cada vez que la usas se fortalece. Empezar con actos pequeños —devolver el vuelto, decir la verdad— te prepara para decisiones grandes.',
+    shortTerm: 'A corto plazo, actuar bien te da tranquilidad inmediata y la confianza de tu familia.',
+    longTerm: 'A largo plazo, los hábitos honestos construyen tu reputación y te abren puertas toda la vida.',
+    affectsPeople: 'A ti: cada acto honesto te hace más fuerte y más libre.',
+    affectsCommunity: 'A tu comunidad: un barrio con gente honesta es un lugar donde se puede confiar.',
+    affectsCountry: 'Al país: millones de actos honestos diarios sostienen la convivencia de todos.',
+    identify: [
+      { text: 'Devuelves el vuelto de más aunque nadie lo notó → ¿es corrupción?', isCorruption: false, why: 'Es honestidad: devuelves lo que no es tuyo.' },
+      { text: 'Te quedas con el vuelto de más porque nadie mira → ¿es corrupción?', isCorruption: true, why: 'Quedarte con lo ajeno rompe la confianza.' },
+      { text: 'Dices la verdad aunque te cueste un castigo → ¿es corrupción?', isCorruption: false, why: 'La verdad aunque duela es integridad.' },
+      { text: 'Encuentras dinero perdido y lo gastas sin buscar al dueño → ¿es corrupción?', isCorruption: true, why: 'Usar lo ajeno sin intentar devolverlo es injusto.' },
+    ],
+    reflectMore: ['¿Por qué cuesta hacer lo correcto cuando nadie mira?', '¿Qué acto honesto pequeño puedes hacer hoy?', '¿A quién admiras por su honestidad y por qué?'],
+    trueFalse: [
+      { text: 'Devolver lo que no es tuyo es honestidad.', answer: true, why: 'Lo ajeno se devuelve, se mire o no.' },
+      { text: 'Si nadie se da cuenta, quedarse con algo ajeno está bien.', answer: false, why: 'Tu conciencia sí se da cuenta siempre.' },
+      { text: 'Los actos honestos pequeños también cuentan.', answer: true, why: 'La honestidad se entrena todos los días.' },
+      { text: 'Ser honesto te hace perder siempre.', answer: false, why: 'Te da confianza, reputación y tranquilidad.' },
+      { text: 'Tu ejemplo puede inspirar a otros a actuar bien.', answer: true, why: 'Lo bueno también se contagia.' },
+    ],
+    blanks: [
+      { before: 'Actuar bien es un', answer: 'hábito', after: 'que se entrena cada día.' },
+      { before: 'La honestidad se demuestra cuando nadie está', answer: 'mirando', after: 'y aun así eliges bien.' },
+      { before: 'Devolver lo que no es', answer: 'mío', after: 'es actuar con justicia.' },
+    ],
+    wordBank: ['hábito', 'mirando', 'mío', 'siempre'],
+    beyond: ['La transparencia personal es no tener nada que esconder: tus actos resisten cualquier mirada.', 'Rendir cuentas es reconocer tus errores y corregirlos sin que te obliguen.', 'La ética diaria y la ley apuntan al mismo lugar: respetar lo ajeno y decir la verdad.', 'Acción justa: devolver el vuelto de más. Acción injusta: gastarlo en silencio.'],
     relatedGuide: 'p5',
   },
   {
@@ -844,7 +1072,7 @@ const KIDS_TOPICS: KidTopic[] = [
     example: 'Decir “es solo un poquito” no lo vuelve correcto.',
     art: 'chat',
     summary: 'Muchas frases sobre coimas son mitos: aquí descubres la verdad.',
-    problems: ['“Es solo un poquito” no lo vuelve correcto', '“Nadie se entera” no evita el daño', '“Así son las cosas” se puede cambiar'],
+    problems: ['“Es solo un poquito” no lo vuelve correcto: el tamaño no cambia que sea trampa.', '“Nadie se entera” no evita el daño: alguien pierde aunque nadie lo vea.', '“Así son las cosas” se puede cambiar: cada persona honesta rompe esa idea.'],
     observe: 'Escuchas decir: “es solo un poquito, no hace daño”.',
     reflectQ: '¿Un daño pequeño deja de ser daño?',
     finalTask: 'Explica a alguien por qué “un poquito” también cuenta.',
@@ -856,6 +1084,33 @@ const KIDS_TOPICS: KidTopic[] = [
     ],
     familyPrompt: 'Hoy descubrí los mitos de las coimas.',
     familyQuestion: '¿Qué frase has escuchado que normalice las coimas?',
+    deepen: 'Ocurren porque las frases hechas suenan a verdad cuando se repiten mucho. Pero cada mito se cae con una pregunta simple: “¿sería justo si me lo hicieran a mí?”.',
+    shortTerm: 'A corto plazo, creer un mito te hace justificar trampas pequeñas sin culpa.',
+    longTerm: 'A largo plazo, vivir de mitos normaliza la corrupción en todo un país.',
+    affectsPeople: 'A ti: los mitos te engañan para aceptar lo inaceptable.',
+    affectsCommunity: 'A tu comunidad: cuando todos repiten el mito, nadie frena la trampa.',
+    affectsCountry: 'Al país: los mitos son el escudo favorito de la corrupción.',
+    identify: [
+      { text: '“Es solo un poquito, no hace daño” → ¿es corrupción?', isCorruption: true, why: 'Es el mito más común: lo pequeño también rompe reglas.' },
+      { text: '“La honestidad siempre es lo mejor” → ¿es corrupción?', isCorruption: false, why: 'Es verdad: actuar bien protege a todos.' },
+      { text: '“Si nadie se entera no pasa nada” → ¿es corrupción?', isCorruption: true, why: 'Otro mito: el daño existe aunque nadie lo vea.' },
+      { text: '“Pagar coimas es la única forma de avanzar” → ¿es corrupción?', isCorruption: true, why: 'Mito peligroso: se avanza mejor con mérito y honestidad.' },
+    ],
+    reflectMore: ['¿Un daño pequeño deja de ser daño?', '¿Qué frases has escuchado que normalicen las coimas?', '¿Cómo responderías a alguien que dice “así son las cosas”?'],
+    trueFalse: [
+      { text: '“Una coima pequeña no hace daño” es un mito.', answer: true, why: 'Toda coima rompe reglas y quita recursos.' },
+      { text: '“Si nadie se entera no pasa nada” es verdad.', answer: false, why: 'El daño existe aunque nadie lo vea.' },
+      { text: '“Así funcionan las cosas” se puede cambiar.', answer: true, why: 'Cada persona honesta rompe esa idea.' },
+      { text: 'Preguntarte “¿sería justo si me lo hicieran a mí?” desenmascara mitos.', answer: true, why: 'Ponerte en el lugar del otro revela la injusticia.' },
+      { text: 'Repetir una frase muchas veces la vuelve verdad.', answer: false, why: 'La repetición no convierte lo falso en verdadero.' },
+    ],
+    blanks: [
+      { before: '“Es solo un poquito” es un', answer: 'mito', after: 'que esconde una trampa.' },
+      { before: 'Aunque nadie se entere, el', answer: 'daño', after: 'sí existe.' },
+      { before: 'Cada persona honesta ayuda a', answer: 'cambiar', after: 'las cosas.' },
+    ],
+    wordBank: ['mito', 'daño', 'cambiar', 'verdad'],
+    beyond: ['La transparencia desarma mitos: cuando todo se ve claro, las excusas se caen.', 'Rendir cuentas es demostrar con hechos que no necesitas trampas ni mitos.', 'La ética piensa por sí misma; la ley castiga aunque “todos lo hagan”.', 'Acción justa: cuestionar las frases hechas. Acción injusta: repetirlas para justificar trampas.'],
     relatedGuide: 'p8',
   },
   {
@@ -864,7 +1119,7 @@ const KIDS_TOPICS: KidTopic[] = [
     example: 'Compromiso: “En nuestra familia hablamos con la verdad y no aceptamos atajos injustos”.',
     art: 'chat',
     summary: 'Un reto para hacer en equipo con tu familia y conversar de verdad.',
-    problems: ['Conversar une a la familia', 'Un compromiso escrito se cumple mejor', 'Aprender juntos es más divertido'],
+    problems: ['Conversar une a la familia: hablar de lo difícil acerca a las personas.', 'Un compromiso escrito se cumple mejor: lo que se firma se recuerda y se respeta.', 'Aprender juntos es más divertido: en equipo todo se entiende mejor.'],
     observe: 'Tu familia conversa sobre un problema del barrio.',
     reflectQ: '¿Qué compromiso puede asumir tu familia?',
     finalTask: 'Escriban juntos su compromiso familiar y péguenlo en un lugar visible.',
@@ -876,6 +1131,33 @@ const KIDS_TOPICS: KidTopic[] = [
     ],
     familyPrompt: 'Hoy hicimos el reto familiar juntos.',
     familyQuestion: '¿Cuál es el compromiso de nuestra familia?',
+    deepen: 'Ocurre porque en familia se aprenden los valores más importantes: lo que conversan y acuerdan juntos se vuelve regla del hogar. Un compromiso familiar es como una pequeña ley hecha con amor.',
+    shortTerm: 'A corto plazo, conversar une y deja acuerdos claros para la semana.',
+    longTerm: 'A largo plazo, las familias que conversan forman personas íntegras toda la vida.',
+    affectsPeople: 'A ti: sentir el apoyo de tu familia te da fuerza para decir que no.',
+    affectsCommunity: 'A tu comunidad: familias unidas crean barrios más justos.',
+    affectsCountry: 'Al país: los valores se aprenden en casa antes que en la escuela.',
+    identify: [
+      { text: 'En casa acuerdan decir siempre la verdad → ¿es corrupción?', isCorruption: false, why: 'Es un compromiso de honestidad familiar.' },
+      { text: 'La familia paga para evitar una multa justa → ¿es corrupción?', isCorruption: true, why: 'En familia tampoco se justifican las trampas.' },
+      { text: 'Padres e hijos conversan sobre un problema del barrio → ¿es corrupción?', isCorruption: false, why: 'Conversar y buscar soluciones justas es ciudadanía.' },
+      { text: 'Toda la familia guarda silencio ante una injusticia del vecino → ¿es corrupción?', isCorruption: true, why: 'El silencio familiar también deja que lo injusto siga.' },
+    ],
+    reflectMore: ['¿Qué compromiso puede asumir tu familia?', '¿Por qué un compromiso escrito se cumple mejor?', '¿Cómo puede tu familia ayudar al barrio a ser más justo?'],
+    trueFalse: [
+      { text: 'Conversar en familia une y protege contra las trampas.', answer: true, why: 'Hablar de lo difícil acerca y fortalece.' },
+      { text: 'Un compromiso escrito se recuerda y se respeta más.', answer: true, why: 'Lo firmado queda como acuerdo visible.' },
+      { text: 'Los valores se aprenden primero en casa.', answer: true, why: 'La familia es la primera escuela.' },
+      { text: 'En familia sí se justifican las trampas pequeñas.', answer: false, why: 'La honestidad empieza en casa, sin excepciones.' },
+      { text: 'Aprender juntos es más divertido y efectivo.', answer: true, why: 'En equipo todo se entiende mejor.' },
+    ],
+    blanks: [
+      { before: 'En nuestra familia hablamos con la', answer: 'verdad', after: 'y no aceptamos atajos injustos.' },
+      { before: 'Un compromiso escrito se cumple', answer: 'mejor', after: 'porque se recuerda.' },
+      { before: 'Conversar en familia nos hace más', answer: 'fuertes', after: 'ante las trampas.' },
+    ],
+    wordBank: ['verdad', 'mejor', 'fuertes', 'unidos'],
+    beyond: ['La transparencia en casa es hablar claro del dinero y las decisiones familiares.', 'Rendir cuentas en familia es cumplir lo que se promete a los demás miembros.', 'La ética del hogar y las leyes del país apuntan a lo mismo: respeto y justicia.', 'Acción justa: firmar juntos un compromiso. Acción injusta: pactar guardar silencio.'],
     relatedGuide: 'p10',
   },
 ]
@@ -1173,6 +1455,12 @@ export default function App() {
   const [activeGuideId, setActiveGuideId] = useState<string | null>(BOOT_HASH && BOOT_HASH.view === 'guia' ? BOOT_HASH.id : null)
   const [topicStep, setTopicStep] = useState(0)
   const [answeredOpt, setAnsweredOpt] = useState<number | null>(null)
+  const [revealedCases, setRevealedCases] = useState<number[]>([])
+  const [reflectNote, setReflectNote] = useState('')
+  const [tfAnswers, setTfAnswers] = useState<Record<number, boolean>>({})
+  const [tfRevealed, setTfRevealed] = useState(false)
+  const [blankInputs, setBlankInputs] = useState<Record<number, string>>({})
+  const [blanksChecked, setBlanksChecked] = useState(false)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [familyActivityIndex, setFamilyActivityIndex] = useState(0)
   const [familyDoneList, setFamilyDoneList] = useState<number[]>([])
@@ -2508,7 +2796,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                   <div className="px-4 md:px-6 pb-2">
                     {(() => {
                       const firstUndone = KIDS_TOPICS.findIndex(k => !kidsDone.includes(k.id))
-                      const openTopic = (k: KidTopic) => { setActiveKidId(k.id); setLearnView('kid'); setShowFeedback(false); setTopicStep(0); setAnsweredOpt(null) }
+                      const openTopic = (k: KidTopic) => { setActiveKidId(k.id); setLearnView('kid'); setShowFeedback(false); setTopicStep(0); setAnsweredOpt(null); setRevealedCases([]); setReflectNote(''); setTfAnswers({}); setTfRevealed(false); setBlankInputs({}); setBlanksChecked(false) }
                       return (
                         <section className="relative">
                           {KIDS_TOPICS.map((k, i) => {
@@ -2769,7 +3057,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                   {['Aprende', 'Observa', 'Reflexiona', 'Elige', 'Conversa', 'Completa'].map((s, i) => (
                     <button
                       key={s}
-                      onClick={() => { setTopicStep(i); setShowFeedback(false); }}
+                      onClick={() => { setTopicStep(i); setShowFeedback(false); setRevealedCases([]); setReflectNote(''); setTfAnswers({}); setTfRevealed(false); setBlankInputs({}); setBlanksChecked(false); }}
                       className={`px-3 py-1.5 rounded-full text-xs font-bold shadow-sm transition-all ${
                         topicStep === i
                           ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-primary/25'
@@ -2795,6 +3083,9 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                 <div className="bg-white rounded-[20px] p-6 md:p-8 border border-slate-100 shadow-[0_4px_20px_rgba(30,41,82,0.05)]">
                   <span className="inline-flex items-center gap-1.5 w-max px-3 py-[5px] rounded-full bg-primary-50 text-primary text-[11px] font-bold uppercase tracking-wider mb-3">1 · EN POCAS PALABRAS</span>
                   <p className="text-slate-700 text-lg leading-loose">{activeKid.summary}</p>
+                  {activeKid.deepen && (
+                    <p className="text-slate-700 text-lg leading-loose mt-4 pt-4 border-t border-slate-100">{activeKid.deepen}</p>
+                  )}
                 </div>
 
                 {/* 3. Por qué es un problema */}
@@ -2809,6 +3100,59 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                     ))}
                   </ul>
                 </div>
+
+                {/* Corto y largo plazo */}
+                {activeKid.shortTerm && (
+                <div className="bg-white rounded-[20px] p-6 md:p-8 border border-slate-100 shadow-[0_4px_20px_rgba(30,41,82,0.05)]">
+                  <span className="inline-flex items-center gap-1.5 w-max px-3 py-[5px] rounded-full bg-primary-50 text-primary text-[11px] font-bold uppercase tracking-wider mb-4">⏳ CORTO Y LARGO PLAZO</span>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="rounded-xl p-5 bg-primary-50 border border-primary/15">
+                      <p className="font-black text-primary text-sm mb-2">⚡ A CORTO PLAZO</p>
+                      <p className="text-slate-700 leading-relaxed">{activeKid.shortTerm}</p>
+                    </div>
+                    <div className="rounded-xl p-5 bg-warning-50 border border-warning/25">
+                      <p className="font-black text-warning text-sm mb-2">🕰️ A LARGO PLAZO</p>
+                      <p className="text-slate-700 leading-relaxed">{activeKid.longTerm}</p>
+                    </div>
+                  </div>
+                </div>
+                )}
+
+                {/* A quién afecta */}
+                {activeKid.affectsPeople && (
+                <div className="bg-white rounded-[20px] p-6 md:p-8 border border-slate-100 shadow-[0_4px_20px_rgba(30,41,82,0.05)]">
+                  <span className="inline-flex items-center gap-1.5 w-max px-3 py-[5px] rounded-full bg-primary-50 text-primary text-[11px] font-bold uppercase tracking-wider mb-4">👥 ¿A QUIÉN AFECTA?</span>
+                  <ul className="space-y-4">
+                    <li className="flex items-start gap-3">
+                      <span className="text-2xl shrink-0">🧒</span>
+                      <p className="text-slate-700 text-lg leading-relaxed"><strong>Personas:</strong> {activeKid.affectsPeople}</p>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-2xl shrink-0">🏘️</span>
+                      <p className="text-slate-700 text-lg leading-relaxed"><strong>Comunidad:</strong> {activeKid.affectsCommunity}</p>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="text-2xl shrink-0">🌎</span>
+                      <p className="text-slate-700 text-lg leading-relaxed"><strong>País:</strong> {activeKid.affectsCountry}</p>
+                    </li>
+                  </ul>
+                </div>
+                )}
+
+                {/* Mira más allá */}
+                {activeKid.beyond && (
+                <div className="bg-white rounded-[20px] p-6 md:p-8 border border-slate-100 shadow-[0_4px_20px_rgba(30,41,82,0.05)]">
+                  <span className="inline-flex items-center gap-1.5 w-max px-3 py-[5px] rounded-full bg-primary-50 text-primary text-[11px] font-bold uppercase tracking-wider mb-4">🔭 MIRA MÁS ALLÁ</span>
+                  <ul className="space-y-4">
+                    {activeKid.beyond.map((b, i) => (
+                      <li key={i} className="flex items-start gap-3">
+                        <span className="w-7 h-7 rounded-full bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm shadow-primary/25">{i + 1}</span>
+                        <p className="text-slate-700 text-lg leading-relaxed">{b}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                )}
 
                 {/* Corrupción vs coima */}
                 {activeKid.compareA && (
@@ -2838,6 +3182,32 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                       <p className="font-bold text-slate-800 mb-2">💡 Ejemplo cotidiano</p>
                       <p className="text-slate-700 text-lg leading-loose italic">“{activeKid.example}”</p>
                     </div>
+                    {activeKid.identify && (
+                    <div className="bg-white rounded-[20px] p-6 md:p-8 border border-slate-100 shadow-[0_4px_20px_rgba(30,41,82,0.05)]">
+                      <span className="inline-flex items-center gap-1.5 w-max px-3 py-[5px] rounded-full bg-warning-50 text-warning text-[11px] font-bold uppercase tracking-wider mb-3">🔍 IDENTIFICA LA SITUACIÓN</span>
+                      <p className="text-slate-500 mb-4">Lee cada caso y decide: ¿es corrupción o no? Toca la tarjeta para ver la respuesta.</p>
+                      <div className="space-y-4">
+                        {activeKid.identify.map((cs, ci) => {
+                          const open = revealedCases.includes(ci)
+                          return (
+                            <button
+                              key={ci}
+                              onClick={() => setRevealedCases(open ? revealedCases.filter(x => x !== ci) : [...revealedCases, ci])}
+                              className={`w-full text-left rounded-[18px] border-2 p-5 transition-all ${open ? 'bg-white border-primary/40' : 'bg-white border-gray-200 hover:border-primary/60'}`}
+                            >
+                              <p className="text-slate-800 text-lg leading-relaxed">{cs.text}</p>
+                              {open && (
+                                <div className={`mt-3 p-4 rounded-xl border ${cs.isCorruption ? 'bg-warning-50 border-warning/25' : 'bg-success/10 border-success/30'}`}>
+                                  <p className="font-black text-sm mb-1">{cs.isCorruption ? '⛔ Sí es corrupción' : '✅ No es corrupción'}</p>
+                                  <p className="text-slate-700 leading-relaxed">{cs.why}</p>
+                                </div>
+                              )}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                    )}
                   </>
                 )}
                 {/* 3. REFLEXIONA */}
@@ -2847,6 +3217,26 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                     <div className="text-5xl mb-4 mt-3">🤔</div>
                     <p className="text-slate-800 text-xl leading-relaxed font-medium">{activeKid.reflectQ}</p>
                     <p className="text-slate-500 mt-4">Tómate un momento para pensarlo antes de continuar.</p>
+                    {activeKid.reflectMore && (
+                    <div className="mt-6 pt-6 border-t border-slate-100 text-left">
+                      <p className="font-black text-primary text-sm tracking-widest mb-4">🧠 REFLEXIONA Y EXPLICA</p>
+                      <ul className="space-y-3 mb-5">
+                        {activeKid.reflectMore.map((q, qi) => (
+                          <li key={qi} className="flex items-start gap-3">
+                            <span className="w-7 h-7 rounded-full bg-primary-50 text-primary flex items-center justify-center font-bold text-sm shrink-0">?</span>
+                            <p className="text-slate-800 text-lg leading-relaxed font-medium">{q}</p>
+                          </li>
+                        ))}
+                      </ul>
+                      <textarea
+                        value={reflectNote}
+                        onChange={e => setReflectNote(e.target.value)}
+                        rows={3}
+                        placeholder="Escribe tu reflexión aquí con tus propias palabras..."
+                        className="w-full p-4 rounded-[18px] border-2 border-slate-200 focus:border-primary/60 outline-none text-slate-700 text-lg leading-relaxed"
+                      />
+                    </div>
+                    )}
                   </div>
                 )}
                 {/* 4. ELIGE */}
@@ -2880,6 +3270,65 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                       <p className="text-[11px] font-black tracking-widest text-primary mb-2">💡 PARA PENSAR</p>
                       <p className="text-slate-800 text-lg leading-relaxed">{feedbackMessage}</p>
                     </div>
+                  )}
+                  {activeKid.trueFalse && (
+                  <div className="mt-6 pt-6 border-t border-slate-100">
+                    <span className="inline-flex items-center gap-1.5 w-max px-3 py-[5px] rounded-full bg-primary-50 text-primary text-[11px] font-bold uppercase tracking-wider mb-3">✅ VERDADERO O FALSO</span>
+                    <p className="text-slate-500 mb-4">Marca V o F en cada afirmación y luego comprueba tus respuestas.</p>
+                    <div className="space-y-4">
+                      {activeKid.trueFalse.map((tf, ti) => {
+                        const ans = tfAnswers[ti]
+                        const graded = tfRevealed && ans !== undefined
+                        const ok = ans === tf.answer
+                        return (
+                          <div key={ti} className={`rounded-[18px] border-2 p-5 transition-all ${graded ? (ok ? 'bg-success/10 border-success/40' : 'bg-warning-50 border-warning/40') : 'bg-white border-gray-200'}`}>
+                            <p className="text-slate-800 text-lg leading-relaxed mb-3">{ti + 1}. {tf.text}</p>
+                            <div className="flex gap-3">
+                              {([true, false] as boolean[]).map(v => (
+                                <button
+                                  key={String(v)}
+                                  disabled={tfRevealed}
+                                  onClick={() => setTfAnswers({ ...tfAnswers, [ti]: v })}
+                                  className={`flex-1 py-2.5 rounded-full font-black transition-all ${
+                                    ans === v
+                                      ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-lg shadow-primary/25'
+                                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                  } ${tfRevealed ? 'opacity-60 cursor-default' : ''}`}
+                                >
+                                  {v ? 'V' : 'F'}
+                                </button>
+                              ))}
+                            </div>
+                            {graded && (
+                              <div className="mt-3">
+                                <p className="font-black text-sm mb-1">{ok ? '✅ ¡Correcto!' : `❌ La respuesta es: ${tf.answer ? 'Verdadero' : 'Falso'}`}</p>
+                                <p className="text-slate-700 leading-relaxed">{tf.why}</p>
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                    <div className="flex gap-3 mt-5">
+                      <button
+                        onClick={() => setTfRevealed(true)}
+                        className="flex-1 btn-glow bg-gradient-to-r from-primary to-secondary text-white font-bold py-3 px-6 rounded-full"
+                      >
+                        Comprobar ✅
+                      </button>
+                      <button
+                        onClick={() => { setTfAnswers({}); setTfRevealed(false); }}
+                        className="flex-1 bg-white border-2 border-slate-200 text-slate-600 font-bold py-3 px-6 rounded-full hover:bg-slate-50"
+                      >
+                        Intentar de nuevo
+                      </button>
+                    </div>
+                    {tfRevealed && (
+                      <p className="text-center font-black text-primary mt-4">
+                        Acertaste {activeKid.trueFalse.filter((tf, ti) => tfAnswers[ti] === tf.answer).length} de {activeKid.trueFalse.length} 🎯
+                      </p>
+                    )}
+                  </div>
                   )}
                   {activeKid.id === 'k4' && (
                     <button
@@ -2922,6 +3371,73 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                   <div className="text-5xl mb-3 mt-3">🎯</div>
                   <p className="text-slate-800 text-lg leading-relaxed mb-2">{activeKid.finalTask}</p>
                 </div>
+                {activeKid.blanks && (
+                <div className="bg-white rounded-[20px] p-6 md:p-8 border border-slate-100 shadow-[0_4px_20px_rgba(30,41,82,0.05)] text-left">
+                  <span className="inline-flex items-center gap-1.5 w-max px-3 py-[5px] rounded-full bg-primary-50 text-primary text-[11px] font-bold uppercase tracking-wider mb-3">📝 COMPLETA LO QUE FALTA</span>
+                  <p className="text-slate-500 mb-4">Rellena los espacios con palabras del banco y luego comprueba.</p>
+                  {activeKid.wordBank && (
+                  <div className="flex flex-wrap gap-2 mb-5">
+                    {activeKid.wordBank.map((w, wi) => (
+                      <button
+                        key={wi}
+                        disabled={blanksChecked}
+                        onClick={() => {
+                          const idx = activeKid.blanks!.findIndex((b, bi) => !(blankInputs[bi] ?? '').trim() || (blanksChecked && blankInputs[bi].trim().toLowerCase() !== b.answer.toLowerCase()))
+                          if (idx >= 0) setBlankInputs({ ...blankInputs, [idx]: w })
+                        }}
+                        className="px-4 py-2 rounded-full bg-primary-50 border border-primary/20 text-primary font-bold hover:bg-primary hover:text-white transition-all disabled:opacity-50"
+                      >
+                        {w}
+                      </button>
+                    ))}
+                  </div>
+                  )}
+                  <div className="space-y-4">
+                    {activeKid.blanks.map((b, bi) => {
+                      const val = blankInputs[bi] ?? ''
+                      const graded = blanksChecked && val.trim() !== ''
+                      const ok = val.trim().toLowerCase() === b.answer.toLowerCase()
+                      return (
+                        <p key={bi} className="text-slate-800 text-lg leading-loose">
+                          {b.before}{' '}
+                          <input
+                            value={val}
+                            disabled={blanksChecked}
+                            onChange={e => setBlankInputs({ ...blankInputs, [bi]: e.target.value })}
+                            size={Math.max(b.answer.length + 2, 8)}
+                            placeholder="..."
+                            className={`inline-block px-3 py-1 rounded-xl border-2 outline-none font-bold text-center transition-all ${
+                              graded
+                                ? ok
+                                  ? 'bg-success/10 border-success/50 text-success'
+                                  : 'bg-warning-50 border-warning/50 text-slate-800'
+                                : 'bg-white border-slate-200 focus:border-primary/60 text-slate-800'
+                            }`}
+                          />{' '}
+                          {b.after}
+                          {graded && !ok && (
+                            <span className="block text-sm font-bold text-warning mt-1">Respuesta: {b.answer}</span>
+                          )}
+                        </p>
+                      )
+                    })}
+                  </div>
+                  <div className="flex gap-3 mt-5">
+                    <button
+                      onClick={() => setBlanksChecked(true)}
+                      className="flex-1 btn-glow bg-gradient-to-r from-primary to-secondary text-white font-bold py-3 px-6 rounded-full"
+                    >
+                      Comprobar ✅
+                    </button>
+                    <button
+                      onClick={() => { setBlankInputs({}); setBlanksChecked(false); }}
+                      className="flex-1 bg-white border-2 border-slate-200 text-slate-600 font-bold py-3 px-6 rounded-full hover:bg-slate-50"
+                    >
+                      Intentar de nuevo
+                    </button>
+                  </div>
+                </div>
+                )}
                 <button
                   onClick={() => completeKidTopic(activeKid.id)}
                   disabled={kidsDone.includes(activeKid.id) || answeredOpt === null}
@@ -2949,6 +3465,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                           setShowFeedback(false)
                           setTopicStep(0)
                           setAnsweredOpt(null)
+                          setRevealedCases([]); setReflectNote(''); setTfAnswers({}); setTfRevealed(false); setBlankInputs({}); setBlanksChecked(false)
                         } else {
                           setLearnView('hub')
                         }
@@ -2964,7 +3481,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                 {/* Navegación entre pasos */}
                 <div className="grid grid-cols-3 gap-4">
                   <button
-                    onClick={() => { setTopicStep(Math.max(0, topicStep - 1)); setShowFeedback(false); }}
+                    onClick={() => { setTopicStep(Math.max(0, topicStep - 1)); setShowFeedback(false); setRevealedCases([]); setReflectNote(''); setTfAnswers({}); setTfRevealed(false); setBlankInputs({}); setBlanksChecked(false); }}
                     disabled={topicStep === 0}
                     className={`font-bold py-3 px-4 rounded-full transition-all ${
                       topicStep === 0 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-slate-700 shadow-sm border border-slate-100 hover:bg-gray-50'
@@ -2979,7 +3496,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                     Ver temas
                   </button>
                   <button
-                    onClick={() => { setTopicStep(Math.min(5, topicStep + 1)); setShowFeedback(false); }}
+                    onClick={() => { setTopicStep(Math.min(5, topicStep + 1)); setShowFeedback(false); setRevealedCases([]); setReflectNote(''); setTfAnswers({}); setTfRevealed(false); setBlankInputs({}); setBlanksChecked(false); }}
                     disabled={topicStep === 5}
                     className={`font-bold py-3 px-4 rounded-full transition-all text-white ${
                       topicStep === 5
@@ -3070,7 +3587,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                   <h3 className="font-bold text-primary text-xl mb-2">👦 Actividad relacionada</h3>
                   <p className="text-gray-600 mb-6">Tu hijo puede trabajar este tema desde su biblioteca.</p>
                   <button
-                    onClick={() => { setActiveKidId(activeGuide.relatedKid); setLearnView('kid'); setShowFeedback(false); setTopicStep(0); setAnsweredOpt(null); }}
+                    onClick={() => { setActiveKidId(activeGuide.relatedKid); setLearnView('kid'); setShowFeedback(false); setTopicStep(0); setAnsweredOpt(null); setRevealedCases([]); setReflectNote(''); setTfAnswers({}); setTfRevealed(false); setBlankInputs({}); setBlanksChecked(false); }}
                     className="btn-glow bg-primary text-white font-bold py-4 px-6 rounded-xl w-full"
                   >
                     Ver tema relacionado →
