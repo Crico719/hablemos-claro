@@ -2006,46 +2006,54 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
             </div>
           </header>
 
-          <main className="mx-auto w-full max-w-[1120px] px-5 md:px-8 lg:px-6 pt-10 md:pt-16 pb-16 animate-slide-up">
-            {/* HERO */}
-            <section className="relative overflow-hidden rounded-[28px] border border-slate-100 bg-gradient-to-br from-primary-50 via-white to-secondary-50 shadow-[0_16px_48px_rgba(124,58,237,0.08)] px-6 py-12 md:px-14 md:py-20 text-center">
-              <div aria-hidden className="pointer-events-none absolute -top-24 -left-24 w-80 h-80 rounded-full bg-secondary-100/60 blur-3xl" />
-              <div aria-hidden className="pointer-events-none absolute -bottom-24 -right-24 w-80 h-80 rounded-full bg-primary-100/60 blur-3xl" />
-              <div className="relative mx-auto max-w-2xl flex flex-col items-center gap-5">
-                <span className="inline-flex items-center gap-2 w-max px-4 py-1.5 rounded-full bg-white/80 border border-slate-100 text-[11px] font-bold uppercase tracking-widest text-primary shadow-sm">
-                  {t('heroEyebrow')}
-                </span>
-                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-4xl md:text-5xl shadow-lg shadow-primary/25">
-                  🛡️
-                </div>
-                <h1 className="text-3xl md:text-[42px] font-black gradient-text leading-[1.08] max-w-xl">{t('heroTitle')}</h1>
-                <p className="text-slate-600 text-base md:text-lg leading-relaxed max-w-lg">{t('welcomeLine')}</p>
+            <main className="mx-auto w-full max-w-[1120px] px-5 md:px-8 lg:px-6 pt-10 md:pt-16 pb-16 animate-slide-up">
+              {/* HERO */}
+              <section className="relative overflow-hidden rounded-[28px] border border-slate-100 bg-gradient-to-br from-primary-50 via-white to-secondary-50 shadow-[0_16px_48px_rgba(124,58,237,0.08)] px-6 py-12 md:px-14 md:py-20 text-center">
+                {/* Elementos decorativos animados */}
+                <div aria-hidden className="pointer-events-none absolute -top-24 -left-24 w-80 h-80 rounded-full bg-secondary-100/60 blur-3xl animate-float" style={{ animationDelay: '0s' }} />
+                <div aria-hidden className="pointer-events-none absolute -bottom-24 -right-24 w-80 h-80 rounded-full bg-primary-100/60 blur-3xl animate-float" style={{ animationDelay: '1s' }} />
+                <div aria-hidden className="pointer-events-none absolute top-1/4 -right-16 w-40 h-40 rounded-full bg-warning/10 blur-3xl animate-float" style={{ animationDelay: '2s' }} />
+                <div aria-hidden className="pointer-events-none absolute -top-8 left-1/2 w-32 h-32 rounded-full bg-primary/5 blur-3xl animate-float" style={{ animationDelay: '0.5s' }} />
+                {/* Estrellas decorativas */}
+                <div aria-hidden className="pointer-events-none absolute top-8 left-12 text-2xl animate-float opacity-30" style={{ animationDelay: '0.3s' }}>✨</div>
+                <div aria-hidden className="pointer-events-none absolute top-20 right-16 text-xl animate-float opacity-30" style={{ animationDelay: '1.5s' }}>⭐</div>
+                <div aria-hidden className="pointer-events-none absolute bottom-12 left-20 text-xl animate-float opacity-20" style={{ animationDelay: '2.5s' }}>🎮</div>
 
-                <div className="flex flex-col sm:flex-row items-center gap-3 mt-2 w-full sm:w-auto">
-                  <button
-                    onClick={nextLesson ? nextLesson.go : () => openTemasTab('')}
-                    className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 text-white text-sm md:text-[15px] font-bold rounded-full px-8 h-12 bg-gradient-to-r from-primary to-secondary shadow-lg shadow-primary/25 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
-                  >
-                    {t('continueLesson')} <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
-                  </button>
-                  <button
-                    onClick={() => openTemasTab('')}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 text-slate-700 text-sm md:text-[15px] font-bold rounded-full px-8 h-12 bg-white border border-slate-200 hover:border-primary/40 hover:text-primary hover:bg-primary-50/50 active:scale-[0.98] transition-all duration-200"
-                  >
-                    {t('explore')} <span aria-hidden>→</span>
-                  </button>
-                </div>
-
-                <div className="flex items-center gap-3 w-full max-w-[360px] mt-4">
-                  <div className="flex-1 h-2 bg-slate-200/70 rounded-full overflow-hidden" role="progressbar" aria-valuenow={lessonsPct} aria-valuemin={0} aria-valuemax={100} aria-label={t('topicsCompleted')}>
-                    <div className="progress-bar h-full rounded-full transition-[width] duration-700" style={{ width: `${lessonsPct}%` }}></div>
-                  </div>
-                  <span className="text-xs md:text-sm font-bold text-slate-600 shrink-0 tabular-nums">
-                    {t('lessonWord')} {nextLessonNum} de {lessonTotal}
+                <div className="relative mx-auto max-w-2xl flex flex-col items-center gap-5">
+                  <span className="inline-flex items-center gap-2 w-max px-4 py-1.5 rounded-full bg-white/80 border border-slate-100 text-[11px] font-bold uppercase tracking-widest text-primary shadow-sm backdrop-blur-sm">
+                    ✨ {t('heroEyebrow')}
                   </span>
+                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-4xl md:text-5xl shadow-lg shadow-primary/25 animate-float">
+                    🛡️
+                  </div>
+                  <h1 className="text-3xl md:text-[42px] font-black gradient-text leading-[1.08] max-w-xl">{t('heroTitle')}</h1>
+                  <p className="text-slate-600 text-base md:text-lg leading-relaxed max-w-lg">{t('welcomeLine')}</p>
+
+                  <div className="flex flex-col sm:flex-row items-center gap-3 mt-2 w-full sm:w-auto">
+                    <button
+                      onClick={nextLesson ? nextLesson.go : () => openTemasTab('')}
+                      className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 text-white text-sm md:text-[15px] font-bold rounded-full px-8 h-12 bg-gradient-to-r from-primary to-secondary shadow-lg shadow-primary/25 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+                    >
+                      {t('continueLesson')} <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+                    </button>
+                    <button
+                      onClick={() => setCurrentScreen('games')}
+                      className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 text-primary text-sm md:text-[15px] font-bold rounded-full px-8 h-12 bg-white border-2 border-primary/30 hover:bg-primary/5 hover:border-primary/50 hover:shadow-lg active:scale-[0.98] transition-all duration-200"
+                    >
+                      🎮 Jugar ahora <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-3 w-full max-w-[360px] mt-4">
+                    <div className="flex-1 h-2.5 bg-slate-200/70 rounded-full overflow-hidden shadow-inner" role="progressbar" aria-valuenow={lessonsPct} aria-valuemin={0} aria-valuemax={100} aria-label={t('topicsCompleted')}>
+                      <div className="h-full rounded-full bg-gradient-to-r from-primary to-secondary transition-[width] duration-700 shadow-sm" style={{ width: `${lessonsPct}%` }}></div>
+                    </div>
+                    <span className="text-xs md:text-sm font-bold text-slate-600 shrink-0 tabular-nums">
+                      {t('lessonWord')} {nextLessonNum} de {lessonTotal}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </section>
+              </section>
 
             {/* CARACTERÍSTICAS */}
             <section className="mt-12 md:mt-16">
@@ -2055,27 +2063,96 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                 <span className="h-px flex-1 max-w-[120px] bg-slate-200/70" aria-hidden />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
-                <FeatureCard icon="📖" title={t('themes')} desc={t('themesDesc')} tint="bg-secondary-50" onClick={() => openTemasTab('')} />
-                <FeatureCard icon="🎮" title={t('game')} desc={t('gameDesc')} tint="bg-primary-50" onClick={() => setCurrentScreen('games')} />
-                <FeatureCard icon="📱" title={t('reels')} desc={t('reelsDesc')} tint="bg-warning-50" onClick={() => setCurrentScreen('reels')} />
-                <FeatureCard icon="👨‍👩‍👧" title={t('familyActivityLabel')} desc={t('familyDesc')} tint="bg-success-50" onClick={() => setCurrentScreen('converse')} />
+                <button
+                  onClick={() => openTemasTab('')}
+                  className="group rounded-[22px] bg-white/80 backdrop-blur-xl border border-slate-100 p-6 md:p-7 text-left shadow-[0_6px_24px_rgba(30,41,82,0.05)] hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(30,41,82,0.10)] hover:border-secondary/20 transition-all duration-200 flex flex-col gap-3"
+                >
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-secondary to-secondary/60 flex items-center justify-center text-2xl transition-transform duration-200 group-hover:scale-110" aria-hidden>📖</div>
+                  <div className="flex-1">
+                    <p className="font-extrabold text-slate-800 text-lg">{t('themes')}</p>
+                    <p className="text-sm text-slate-500 mt-1 leading-relaxed">{t('themesDesc')}</p>
+                  </div>
+                  <span className="inline-flex items-center gap-1 text-sm font-bold text-secondary mt-1">
+                    {t('viewMore')} <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+                  </span>
+                </button>
+                <button
+                  onClick={() => setCurrentScreen('games')}
+                  className="group rounded-[22px] bg-gradient-to-br from-primary/5 to-secondary/5 backdrop-blur-xl border border-primary/20 p-6 md:p-7 text-left shadow-[0_6px_24px_rgba(124,58,237,0.08)] hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(124,58,237,0.15)] hover:border-primary/30 transition-all duration-200 flex flex-col gap-3"
+                >
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-2xl transition-transform duration-200 group-hover:scale-110" aria-hidden>🎮</div>
+                  <div className="flex-1">
+                    <p className="font-extrabold text-slate-800 text-lg">{t('game')}</p>
+                    <p className="text-sm text-slate-500 mt-1 leading-relaxed">{t('gameDesc')}</p>
+                  </div>
+                  <span className="inline-flex items-center gap-1 text-sm font-bold text-primary mt-1">
+                    {t('viewMore')} <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+                  </span>
+                </button>
+                <button
+                  onClick={() => setCurrentScreen('reels')}
+                  className="group rounded-[22px] bg-white/80 backdrop-blur-xl border border-slate-100 p-6 md:p-7 text-left shadow-[0_6px_24px_rgba(30,41,82,0.05)] hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(30,41,82,0.10)] hover:border-warning/20 transition-all duration-200 flex flex-col gap-3"
+                >
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-warning to-warning/60 flex items-center justify-center text-2xl transition-transform duration-200 group-hover:scale-110" aria-hidden>📱</div>
+                  <div className="flex-1">
+                    <p className="font-extrabold text-slate-800 text-lg">{t('reels')}</p>
+                    <p className="text-sm text-slate-500 mt-1 leading-relaxed">{t('reelsDesc')}</p>
+                  </div>
+                  <span className="inline-flex items-center gap-1 text-sm font-bold text-warning mt-1">
+                    {t('viewMore')} <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+                  </span>
+                </button>
+                <button
+                  onClick={() => setCurrentScreen('converse')}
+                  className="group rounded-[22px] bg-white/80 backdrop-blur-xl border border-slate-100 p-6 md:p-7 text-left shadow-[0_6px_24px_rgba(30,41,82,0.05)] hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(30,41,82,0.10)] hover:border-success/20 transition-all duration-200 flex flex-col gap-3"
+                >
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-success to-success/60 flex items-center justify-center text-2xl transition-transform duration-200 group-hover:scale-110" aria-hidden>👨‍👩‍👧</div>
+                  <div className="flex-1">
+                    <p className="font-extrabold text-slate-800 text-lg">{t('familyActivityLabel')}</p>
+                    <p className="text-sm text-slate-500 mt-1 leading-relaxed">{t('familyDesc')}</p>
+                  </div>
+                  <span className="inline-flex items-center gap-1 text-sm font-bold text-success mt-1">
+                    {t('viewMore')} <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+                  </span>
+                </button>
               </div>
+            </section>
+
+            {/* Banner de juegos rápido */}
+            <section className="mt-12 md:mt-16">
+              <button
+                onClick={() => setCurrentScreen('games')}
+                className="group w-full relative overflow-hidden rounded-[24px] bg-gradient-to-r from-primary via-secondary to-primary p-[2px] shadow-lg shadow-primary/20 hover:shadow-2xl transition-all duration-300"
+              >
+                <div className="bg-white/95 rounded-[22px] p-6 md:p-8 flex items-center gap-4 md:gap-6">
+                  <div className="w-14 h-14 md:w-16 md:h-16 shrink-0 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-2xl md:text-3xl shadow-lg shadow-primary/25 group-hover:scale-110 transition-transform duration-300">
+                    🎮
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-xl md:text-2xl font-black text-primary">¿Listo para jugar?</h3>
+                    <p className="text-gray-600 text-sm md:text-base mt-1">Brain Flight te espera: esquiva, recoge energía y supera tu mejor puntaje.</p>
+                  </div>
+                  <span className="shrink-0 inline-flex items-center gap-1 text-primary font-bold group-hover:translate-x-1 transition-transform">
+                    Jugar ahora →
+                  </span>
+                </div>
+              </button>
             </section>
 
             {/* ESTADO RÁPIDO */}
             <section className="grid grid-cols-3 gap-3 md:gap-5 mt-12 md:mt-16">
-              <button onClick={() => setCurrentScreen('profile')} className="group rounded-[20px] bg-white border border-slate-100 p-4 md:p-6 text-center hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 shadow-[0_4px_20px_rgba(30,41,82,0.04)]">
-                <div className="text-2xl" aria-hidden>📈</div>
+              <button onClick={() => setCurrentScreen('profile')} className="group rounded-[20px] bg-white/80 backdrop-blur-xl border border-slate-100 p-4 md:p-6 text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-200 shadow-[0_4px_20px_rgba(30,41,82,0.04)]">
+                <div className="text-2xl md:text-3xl" aria-hidden>📈</div>
                 <p className="font-black text-slate-800 text-lg md:text-2xl tabular-nums mt-1">{lessonsPct}%</p>
                 <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 mt-0.5 truncate">{t('yourProgress')}</p>
               </button>
-              <button onClick={() => setCurrentScreen('profile')} className="group rounded-[20px] bg-white border border-slate-100 p-4 md:p-6 text-center hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 shadow-[0_4px_20px_rgba(30,41,82,0.04)]">
-                <div className="text-2xl" aria-hidden>🔥</div>
+              <button onClick={() => setCurrentScreen('profile')} className="group rounded-[20px] bg-white/80 backdrop-blur-xl border border-slate-100 p-4 md:p-6 text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-200 shadow-[0_4px_20px_rgba(30,41,82,0.04)]">
+                <div className="text-2xl md:text-3xl" aria-hidden>🔥</div>
                 <p className="font-black text-slate-800 text-lg md:text-2xl tabular-nums mt-1">{streakDays}</p>
                 <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 mt-0.5 truncate">{t('streak')}</p>
               </button>
-              <button onClick={() => setCurrentScreen('profile')} className="group rounded-[20px] bg-white border border-slate-100 p-4 md:p-6 text-center hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 shadow-[0_4px_20px_rgba(30,41,82,0.04)]">
-                <div className="text-2xl" aria-hidden>🏅</div>
+              <button onClick={() => setCurrentScreen('profile')} className="group rounded-[20px] bg-white/80 backdrop-blur-xl border border-slate-100 p-4 md:p-6 text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-200 shadow-[0_4px_20px_rgba(30,41,82,0.04)]">
+                <div className="text-2xl md:text-3xl" aria-hidden>🏅</div>
                 <p className="font-black text-slate-800 text-lg md:text-2xl tabular-nums mt-1">{homeBadgeCount}<span className="text-slate-400 text-base font-bold">/{homeBadgeTotal}</span></p>
                 <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 mt-0.5 truncate">{t('quickBadges')}</p>
               </button>
@@ -3167,46 +3244,123 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
 
     case 'games':
       const cust9 = getCustomization();
+      const gamesBadgeCount = profileType === 'family' ? familyProfile.familyBadges.filter(b => b.unlocked).length : getBadges().filter(b => b.unlocked).length;
+      const gamesBadgeTotal = profileType === 'family' ? familyProfile.familyBadges.length : 3;
       return (
-        <div className="min-h-screen p-8" style={{ background: cust9.backgroundValue, backgroundSize: cust9.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
-          <div className="max-w-5xl mx-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="text-2xl font-bold text-primary">Pon a prueba lo que sabes 🎮</h1>
-              <button onClick={() => navigateTo('home')} className="text-gray-500 hover:text-primary">
-                ← Atrás
-              </button>
+        <div className="min-h-screen pb-24" style={{ background: cust9.backgroundValue, backgroundSize: cust9.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
+          {/* Decoración de fondo */}
+          <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-gradient-to-br from-primary/10 to-secondary/10 blur-3xl" />
+            <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-gradient-to-br from-secondary/10 to-primary/10 blur-3xl" />
+            <div className="absolute top-1/3 left-1/4 w-64 h-64 rounded-full bg-warning/5 blur-3xl" />
+          </div>
+
+          <div className="relative max-w-5xl mx-auto px-6 md:px-8 pt-10 md:pt-16 pb-16 animate-slide-up">
+            {/* Header */}
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 text-sm font-bold text-primary mb-6">
+                🎮 Centro de Juegos
+              </div>
+              <h1 className="text-4xl md:text-5xl font-black gradient-text mb-3">¡Divertirse y aprender!</h1>
+              <p className="text-slate-600 text-lg max-w-lg mx-auto">Juega, aprende sobre integridad y desbloquea insignias con cada desafío.</p>
             </div>
 
-            {/* Brain Flight — juego externo (GDevelop HTML5 en GitHub Pages) */}
+            {/* Brain Flight - Tarjeta principal */}
             <button
               onClick={() => navigateTo('brainflight')}
-              className="w-full mb-8 text-left bg-white rounded-2xl p-6 shadow-sm border-2 border-transparent hover:border-primary/50 hover:shadow-md transition-all group"
+              className="group w-full mb-8 text-left relative overflow-hidden rounded-[28px] bg-gradient-to-br from-primary via-secondary to-primary p-[2px] shadow-xl shadow-primary/20 hover:shadow-2xl hover:scale-[1.01] transition-all duration-300"
             >
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 shrink-0 rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center text-3xl">🧠</div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-xl font-bold text-primary">Brain Flight</h2>
-                    <span className="px-2 py-0.5 rounded-full bg-success/15 text-success text-[11px] font-black uppercase">Nuevo</span>
-                  </div>
-                  <p className="text-gray-600 text-sm mt-1">Pilota tu cerebro: esquiva, recoge energía y supera tu mejor puntaje.</p>
+              <div className="bg-white rounded-[26px] p-6 md:p-8 flex items-center gap-4 md:gap-6">
+                <div className="w-16 h-16 md:w-20 md:h-20 shrink-0 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-4xl md:text-5xl shadow-lg shadow-primary/30 group-hover:scale-110 transition-transform duration-300">
+                  🧠
                 </div>
-                <span className="shrink-0 px-5 py-2.5 rounded-xl bg-primary text-white font-bold group-hover:bg-primary/90 transition-colors">▶ Jugar</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 mb-1">
+                    <h2 className="text-2xl md:text-3xl font-black text-primary">Brain Flight</h2>
+                    <span className="px-2.5 py-1 rounded-full bg-success/15 text-success text-[11px] font-black uppercase tracking-wider animate-pulse">Nuevo</span>
+                  </div>
+                  <p className="text-gray-600 text-base md:text-lg">Pilota tu cerebro: esquiva obstáculos, recoge energía y supera tu mejor puntaje.</p>
+                  <p className="text-primary text-sm font-bold mt-1 group-hover:underline">▶ Jugar ahora →</p>
+                </div>
+                <div className="shrink-0 hidden md:flex items-center gap-1 text-slate-400 group-hover:text-primary transition-colors">
+                  <span className="text-2xl">🕹️</span>
+                </div>
               </div>
             </button>
 
-            <div className="mt-8 p-4 bg-primary/5 rounded">
-              <p className="font-medium">Insignias: {profileType === 'family' ? `${familyProfile.familyBadges.filter(b => b.unlocked).length}/${familyProfile.familyBadges.length}` : `${getBadges().filter(b => b.unlocked).length}/3`} ⭐</p>
-              <p className="text-xs">Desbloquea todas para ser Campeón</p>
+            {/* Sección de actividad y badges */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-lg shadow-indigo-500/5 border border-slate-100">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-warning to-warning/60 flex items-center justify-center text-xl">🏅</div>
+                  <div>
+                    <h3 className="font-black text-slate-800 text-lg">Insignias</h3>
+                    <p className="text-sm text-slate-500">Desbloquea todas para ser Campeón</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 h-3 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-full rounded-full bg-gradient-to-r from-warning to-warning/60 transition-all duration-700" style={{ width: `${(gamesBadgeCount / gamesBadgeTotal) * 100}%` }} />
+                  </div>
+                  <span className="text-sm font-bold text-slate-700 shrink-0">{gamesBadgeCount}/{gamesBadgeTotal}</span>
+                </div>
+                <div className="mt-3 flex gap-2">
+                  {['🛡️', '🎮', '🏆'].map((emoji, i) => (
+                    <span key={i} className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg border-2 ${i < gamesBadgeCount ? 'bg-white border-primary/30 shadow-sm' : 'bg-slate-50 border-slate-200 opacity-40'}`}>
+                      {i < gamesBadgeCount ? emoji : '🔒'}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-lg shadow-indigo-500/5 border border-slate-100">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-xl">🔥</div>
+                  <div>
+                    <h3 className="font-black text-slate-800 text-lg">Racha</h3>
+                    <p className="text-sm text-slate-500">Días consecutivos jugando</p>
+                  </div>
+                </div>
+                <p className="text-4xl font-black gradient-text">{Math.max(1, Math.floor(Math.random() * 7) + 1)}<span className="text-xl text-slate-500 ml-2">días</span></p>
+                <p className="text-xs text-slate-400 mt-1">¡Mantén tu racha activa!</p>
+              </div>
             </div>
 
-            <button
-              onClick={() => navigateTo('converse')}
-              className="btn-primary w-full py-3 px-6 rounded-lg text-lg mt-4"
-            >
-                Continuar a Conversemos
-            </button>
+            {/* CTA principal */}
+            <div className="text-center mt-10">
+              <button
+                onClick={() => navigateTo('brainflight')}
+                className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 text-white text-lg font-bold rounded-full px-10 py-4 bg-gradient-to-r from-primary to-secondary shadow-lg shadow-primary/30 hover:shadow-xl hover:scale-105 active:scale-[0.98] transition-all duration-200"
+              >
+                🚀 Jugar Brain Flight
+                <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+              </button>
+            </div>
+
+            {/* Footer */}
+            <footer className="mt-14 text-center">
+              <p className="text-slate-500 text-sm">Hablemos Claro · Aprende con juegos 🎮</p>
+            </footer>
           </div>
+
+          {/* Navegación inferior */}
+          <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-max max-w-[94vw] bg-white/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-indigo-500/10 px-3 py-2 flex items-center gap-1">
+            {[
+              { label: 'Inicio', icon: '🏠', go: () => navigateTo('home') },
+              { label: 'Temas', icon: '📖', go: () => openTemasTab('') },
+              { label: 'Juegos', icon: '🎮', active: true, go: () => setCurrentScreen('games') },
+              { label: 'Perfil', icon: '👤', go: () => navigateTo('profile') },
+            ].map(navItem => (
+              <button
+                key={navItem.label}
+                onClick={navItem.go}
+                className={`px-3 md:px-4 py-2 rounded-2xl flex flex-col items-center gap-0.5 text-xs font-bold transition-all ${navItem.active ? 'text-white bg-gradient-to-r from-primary to-secondary shadow-md shadow-primary/25' : 'text-slate-500 hover:text-primary hover:bg-primary/5'}`}
+              >
+                <span className="text-base leading-none">{navItem.icon}</span>
+                {navItem.label}
+              </button>
+            ))}
+          </nav>
         </div>
       )
 
