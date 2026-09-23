@@ -233,6 +233,8 @@ const translations = {
     child: 'Hijo / Hija',
     deviceQuestion: '¿Qué dispositivo estás usando?',
     deviceSub: 'Elige cómo quieres ver la app',
+    mobileView: '📱 Vista móvil',
+    fullView: '💻 Vista completa',
     languageTitle: '🗣️ Idioma',
     spanish: '🇪🇸 Español',
     quechua: '🦙 Quechua',
@@ -386,6 +388,8 @@ const translations = {
     child: 'Wawa',
     deviceQuestion: '¿Imaykanatam llamkachkanki?',
     deviceSub: 'Aqllay imaynatam kayta rikuchiy',
+    mobileView: '📱 Kuyuq rikchay',
+    fullView: '💻 Tukuy rikchay',
     languageTitle: '🗣️ Simi',
     spanish: '🇪🇸 Castellano',
     quechua: '🦙 Runa Simi',
@@ -1477,6 +1481,7 @@ export default function App() {
   const [userAge, setUserAge] = useState<string>(() => localStorage.getItem('hablemos-claro-age') || '')
   const [userDistrict, setUserDistrict] = useState<string>(() => localStorage.getItem('hablemos-claro-district') || '')
   const [language, setLanguage] = useState<'es' | 'qu'>(() => (localStorage.getItem('hablemos-claro-lang') as 'es' | 'qu') || 'es')
+  const [viewMode, setViewMode] = useState<'mobile' | 'pc'>(() => (localStorage.getItem('hablemos-claro-view') as 'mobile' | 'pc') || 'pc')
   const [profileType, setProfileType] = useState<ProfileType>('student')
   const [editPhotoModal, setEditPhotoModal] = useState(false)
   const [photoUrl, setPhotoUrl] = useState('')
@@ -1546,6 +1551,12 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
   const changeLanguage = (value: 'es' | 'qu') => {
     setLanguage(value)
     localStorage.setItem('hablemos-claro-lang', value)
+  }
+
+  // Cambiar vista móvil / completa
+  const changeView = (value: 'mobile' | 'pc') => {
+    setViewMode(value)
+    localStorage.setItem('hablemos-claro-view', value)
   }
 
   // Ir al inicio marcando la app como configurada
@@ -2204,6 +2215,25 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
           <div className="max-w-4xl mx-auto animate-slide-up">
             <div className="bg-white rounded-2xl p-6 mb-10 shadow-sm text-center">
               <h2 className="text-3xl font-bold gradient-text">{t('configTitle')}</h2>
+            </div>
+
+            <div className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-8 mb-6 text-center">
+              <p className="text-black font-bold text-center text-lg">{t('deviceQuestion')}</p>
+              <p className="text-gray-600 mt-1 mb-4">{t('deviceSub')}</p>
+              <div className="grid grid-cols-2 gap-5 mt-3">
+                <button
+                  onClick={() => changeView('mobile')}
+                  className={viewMode === 'mobile' ? 'bg-primary text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'bg-white font-bold py-5 px-6 rounded-xl text-black border-2 border-gray-200 shadow-sm hover:bg-primary/20 transition-all text-lg'}
+                >
+                  {t('mobileView')}
+                </button>
+                <button
+                  onClick={() => changeView('pc')}
+                  className={viewMode === 'pc' ? 'bg-secondary text-white font-bold py-5 px-6 rounded-xl shadow-lg text-lg' : 'bg-white font-bold py-5 px-6 rounded-xl text-black border-2 border-gray-200 shadow-sm hover:bg-secondary/20 transition-all text-lg'}
+                >
+                  {t('fullView')}
+                </button>
+              </div>
             </div>
             
             <div className="space-y-8">
@@ -5277,7 +5307,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
     ) : null
 
   return (
-    <div className="pc-mode">
+    <div className={viewMode === 'pc' ? 'pc-mode' : 'mobile-mode'}>
       {renderScreen()}
 {showBadgeCelebration && earnedBadge && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">

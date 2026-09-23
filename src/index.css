@@ -220,6 +220,58 @@ body {
   padding-right: 2rem;
 }
 
+/* ===== Vista móvil: columna angosta tipo teléfono ===== */
+.mobile-mode [class~="max-w-sm"],
+.mobile-mode [class~="max-w-md"],
+.mobile-mode [class~="max-w-lg"],
+.mobile-mode [class~="max-w-xl"],
+.mobile-mode [class~="max-w-2xl"],
+.mobile-mode [class~="max-w-3xl"],
+.mobile-mode [class~="max-w-4xl"],
+.mobile-mode [class~="max-w-5xl"],
+.mobile-mode [class~="max-w-6xl"],
+.mobile-mode [class~="max-w-7xl"] {
+  max-width: 480px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  width: 100% !important;
+}
+
+.mobile-mode [class~="max-w-[1120px]"] {
+  max-width: 480px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.mobile-mode .min-h-screen {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.mobile-mode [class~="grid-cols-2"] {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+/* ===== Pulido en pantallas pequeñas: nada pegado ni cortado ===== */
+@media (max-width: 640px) {
+  html, body {
+    overflow-x: clip;
+  }
+  img, canvas, video, iframe {
+    max-width: 100%;
+  }
+  .min-h-screen {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  [class~="grid-cols-2"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+  button {
+    min-height: 44px;
+  }
+}
+
 /* ===== Pulido global ===== */
 html {
   scroll-behavior: smooth;
