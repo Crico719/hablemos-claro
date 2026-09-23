@@ -502,10 +502,35 @@ const defaultStudentProgress: UserProgress = {
   guidesDone: [],
 }
 
+// Acceso seguro al almacenamiento: en algunos celulares el acceso directo
+// lanza excepción (modo privado o almacenamiento bloqueado) y dejaba la app en blanco
+const safeGet = (key: string): string | null => {
+  try {
+    return localStorage.getItem(key)
+  } catch {
+    return null
+  }
+}
+const safeSet = (key: string, value: string): void => {
+  try {
+    localStorage.setItem(key, value)
+  } catch {
+    /* almacenamiento no disponible: la app sigue funcionando en memoria */
+  }
+}
+const safeParse = (raw: string | null): any => {
+  if (!raw) return null
+  try {
+    return JSON.parse(raw)
+  } catch {
+    return null
+  }
+}
+
 const getStoredStudentProfile = (): StudentProfile => {
-  const stored = localStorage.getItem('hablemos-claro-student-profile')
-  if (stored) {
-    const parsed = JSON.parse(stored)
+  const stored = safeGet('hablemos-claro-student-profile')
+  const parsed = safeParse(stored)
+  if (parsed && typeof parsed === 'object') {
     return {
       name: parsed.name ?? '',
       age: parsed.age ?? '',
@@ -573,9 +598,9 @@ const normalizeFamilyBadges = (raw: unknown): FamilyBadge[] => {
 }
 
 const getStoredFamilyProfile = (): FamilyProfile => {
-  const stored = localStorage.getItem('hablemos-claro-family-profile')
-  if (stored) {
-    const parsed = JSON.parse(stored)
+  const stored = safeGet('hablemos-claro-family-profile')
+  const parsed = safeParse(stored)
+  if (parsed && typeof parsed === 'object') {
     return {
       name: typeof parsed.name === 'string' && parsed.name !== '' ? parsed.name : 'Mi familia',
       members: normalizeMembers(parsed.members),
@@ -605,11 +630,11 @@ const getStoredFamilyProfile = (): FamilyProfile => {
 }
 
 const saveStudentProfile = (profile: StudentProfile) => {
-  localStorage.setItem('hablemos-claro-student-profile', JSON.stringify(profile))
+  safeSet('hablemos-claro-student-profile', JSON.stringify(profile))
 }
 
 const saveFamilyProfile = (profile: FamilyProfile) => {
-  localStorage.setItem('hablemos-claro-family-profile', JSON.stringify(profile))
+  safeSet('hablemos-claro-family-profile', JSON.stringify(profile))
 }
 
 // Banco del examen final: cubre todos los temas
@@ -1477,11 +1502,11 @@ export default function App() {
   const [examAnswers, setExamAnswers] = useState<Record<number, number>>({})
   const [showBadgeCelebration, setShowBadgeCelebration] = useState(false)
   const [earnedBadge, setEarnedBadge] = useState<Badge | null>(null)
-  const [userName, setUserName] = useState<string>(() => localStorage.getItem('hablemos-claro-name') || '')
-  const [userAge, setUserAge] = useState<string>(() => localStorage.getItem('hablemos-claro-age') || '')
-  const [userDistrict, setUserDistrict] = useState<string>(() => localStorage.getItem('hablemos-claro-district') || '')
-  const [language, setLanguage] = useState<'es' | 'qu'>(() => (localStorage.getItem('hablemos-claro-lang') as 'es' | 'qu') || 'es')
-  const [viewMode, setViewMode] = useState<'mobile' | 'pc'>(() => (localStorage.getItem('hablemos-claro-view') as 'mobile' | 'pc') || 'pc')
+  const [userName, setUserName] = useState<string>(() => safeGet('hablemos-claro-name') || '')
+  const [userAge, setUserAge] = useState<string>(() => safeGet('hablemos-claro-age') || '')
+  const [userDistrict, setUserDistrict] = useState<string>(() => safeGet('hablemos-claro-district') || '')
+  const [language, setLanguage] = useState<'es' | 'qu'>(() => (safeGet('hablemos-claro-lang') as 'es' | 'qu') || 'es')
+  const [viewMode, setViewMode] = useState<'mobile' | 'pc'>(() => (safeGet('hablemos-claro-view') as 'mobile' | 'pc') || 'pc')
   const [profileType, setProfileType] = useState<ProfileType>('student')
   const [editPhotoModal, setEditPhotoModal] = useState(false)
   const [photoUrl, setPhotoUrl] = useState('')
@@ -1513,9 +1538,9 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
   }, [studentProfile])
 
   useEffect(() => {
-    localStorage.setItem('hablemos-claro-name', studentProfile.name)
-    localStorage.setItem('hablemos-claro-age', studentProfile.age)
-    localStorage.setItem('hablemos-claro-district', studentProfile.district)
+    safeSet('hablemos-claro-name', studentProfile.name)
+    safeSet('hablemos-claro-age', studentProfile.age)
+    safeSet('hablemos-claro-district', studentProfile.district)
   }, [studentProfile.name, studentProfile.age, studentProfile.district])
 
   // Al cambiar de perfil: volver al inicio de Temas y limpiar respuestas (no mezclar datos)
@@ -1550,18 +1575,18 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
   // Cambiar idioma
   const changeLanguage = (value: 'es' | 'qu') => {
     setLanguage(value)
-    localStorage.setItem('hablemos-claro-lang', value)
+    safeSet('hablemos-claro-lang', value)
   }
 
   // Cambiar vista móvil / completa
   const changeView = (value: 'mobile' | 'pc') => {
     setViewMode(value)
-    localStorage.setItem('hablemos-claro-view', value)
+    safeSet('hablemos-claro-view', value)
   }
 
   // Ir al inicio marcando la app como configurada
   const goHome = () => {
-    localStorage.setItem('hablemos-claro-configured', 'true')
+    safeSet('hablemos-claro-configured', 'true')
     setCurrentScreen('home')
   }
 
