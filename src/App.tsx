@@ -2546,7 +2546,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
               <div
                 className="block bg-gradient-to-r from-primary to-secondary rounded-3xl shadow-lg shadow-primary/25 p-6 text-white text-center card-hover animate-slide-up"
               >
-                <p className="font-black text-xl mb-1">🔗 SÍGUENOS EN TIKTOK 🔗</p>
+                <p className="font-black text-xl mb-1">🎬 VIDEOS DE NUESTRO CANAL 🎬</p>
                 <p className="text-white/90 mb-4">Entra y conoce más de nuestro trabajo</p>
                 <div className="flex flex-col gap-2.5">
                   <a
@@ -2555,7 +2555,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                     rel="noopener noreferrer"
                     className="inline-block bg-white text-primary font-black px-6 py-2.5 rounded-full hover:scale-[1.02] active:scale-[0.99] transition-all"
                   >
-                    👉 ¡Te esperamos! 💙
+                    🎬 Video 1
                   </a>
                   <a
                     href="https://vt.tiktok.com/ZSbeaqdRp/"
@@ -2563,7 +2563,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                     rel="noopener noreferrer"
                     className="inline-block bg-white/20 border border-white/40 text-white font-black px-6 py-2.5 rounded-full hover:bg-white/30 active:scale-[0.99] transition-all"
                   >
-                    🎬 Video de nuestro canal
+                    🎬 Video 2
                   </a>
                   <a
                     href="https://vt.tiktok.com/ZSbeavVC7/"
@@ -2571,7 +2571,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                     rel="noopener noreferrer"
                     className="inline-block bg-white/20 border border-white/40 text-white font-black px-6 py-2.5 rounded-full hover:bg-white/30 active:scale-[0.99] transition-all"
                   >
-                    🎬 Video de nuestro canal
+                    🎬 Video 3
                   </a>
                 </div>
               </div>
