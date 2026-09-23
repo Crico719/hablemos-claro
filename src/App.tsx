@@ -159,8 +159,6 @@ const reelsMessages = [
 ]
 
  const backgrounds: Array<{ name: string; type: 'gradient' | 'pattern' | 'solid'; value: string }> = [
-   { name: 'Enfoque Azul', type: 'gradient', value: 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #3b82f6 100%)' },
-   { name: 'Enfoque Verde', type: 'gradient', value: 'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #10b981 100%)' },
    { name: 'Enfoque Neutro', type: 'gradient', value: 'linear-gradient(135deg, #374151 0%, #4b5563 50%, #6b7280 100%)' },
    { name: 'Enfoque Suave', type: 'gradient', value: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%)' },
    { name: 'Zen Claro', type: 'solid', value: '#f1f5f9' },
@@ -1383,7 +1381,6 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
   const completeTest = () => {
     const currentProfile = profileType === 'student' ? studentProfile : familyProfile
     const alreadyDone = (currentProfile.progress.topicProgress['test'] ?? 0) >= 100
-    const topicsCompleted = mainTopics.filter(t => (currentProfile.progress.topicProgress[t] ?? 0) >= 100).length
 
     if (profileType === 'student') {
       const checked = checkStudentBadges({ ...studentProfile, progress: { ...studentProfile.progress, topicProgress: { ...studentProfile.progress.topicProgress, test: 100 } } })
@@ -1497,6 +1494,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
         case 'united-family': return profile.members.length > 0 && profile.members.every(m => m.activities >= 1)
         case 'great-conversationalists': return conv >= 5
         case 'against-corruption': return corruptionTopics.filter(t => (tp[t] ?? 0) >= 100).length >= 3
+        case 'committed-family': return acts >= 3 && conv >= 3
       }
     }
     let updated = profile
@@ -1540,7 +1538,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
    const celebrateFamilyBadges = (unlocked: FamilyBadge[]) => {
     if (unlocked.length === 0) return
     const last = unlocked[unlocked.length - 1]
-    setEarnedBadge({ id: last.id, name: last.name, emoji: last.emoji, color: last.color ?? '#F59E0B', unlocked: true })
+    setEarnedBadge({ id: last.id as unknown as BadgeType, name: last.name, emoji: last.emoji, color: '#F59E0B', unlocked: true })
     setShowBadgeCelebration(true)
   }
 
@@ -1602,7 +1600,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
          // Verificar si completaron todas las preguntas
          if (userAnswers.length >= 3) {
            // Guardar puntaje del quiz
-           const correctCount = userAnswers.filter((a, i) => a === 1).length
+           const correctCount = userAnswers.filter(a => a === 1).length
            const score = Math.round((correctCount / userAnswers.length) * 100)
            const currentProf = profileType === 'student' ? studentProfile : familyProfile
            const newQuizScores = [...currentProf.progress.quizScores, score]
@@ -2028,21 +2026,6 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
       const lessonTotal = nextKid ? kidsTotal : nextGuide ? PARENT_GUIDES.length : kidsTotal
       const nextLessonNum = nextKid ? KIDS_TOPICS.indexOf(nextKid) + 1 : nextGuide ? PARENT_GUIDES.indexOf(nextGuide) + 1 : kidsDoneCount
 
-      const FeatureCard = ({ icon, title, desc, tint, onClick }: { icon: string; title: string; desc: string; tint: string; onClick: () => void }) => (
-        <button
-          onClick={onClick}
-          className="group rounded-[22px] bg-white border border-slate-100 p-6 md:p-7 text-left shadow-[0_6px_24px_rgba(30,41,82,0.05)] hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(30,41,82,0.10)] hover:border-primary/20 transition-all duration-200 flex flex-col gap-3"
-        >
-          <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl transition-transform duration-200 group-hover:scale-110 ${tint}`} aria-hidden>{icon}</div>
-          <div className="flex-1">
-            <p className="font-extrabold text-slate-800 text-lg">{title}</p>
-            <p className="text-sm text-slate-500 mt-1 leading-relaxed">{desc}</p>
-          </div>
-          <span className="inline-flex items-center gap-1 text-sm font-bold text-secondary mt-1">
-            {t('viewMore')} <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
-          </span>
-        </button>
-      )
 
       const custHome = getCustomization()
       const textColors = getTextColorForTheme(custHome.backgroundValue)
@@ -3436,7 +3419,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
 
     case 'converse':
       const cust10 = getCustomization()
-      const textColors = getTextColorForTheme(cust10.backgroundValue)
+      const convTextColors = getTextColorForTheme(cust10.backgroundValue)
       const prompt = conversationPrompts[currentQuestionIndex]
       const isLastQ = currentQuestionIndex >= conversationPrompts.length
       const turnIsKid = conversationTurn === 'kid'
@@ -3458,8 +3441,8 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
               <div className="w-14 h-14 mx-auto mb-3 rounded-3xl shadow-lg flex items-center justify-center text-3xl animate-float" style={{ background: 'linear-gradient(135deg, #10b981, #2563EB)' }}>
                 💬
               </div>
-              <h1 className="text-2xl md:text-4xl font-black mb-2" style={{ color: textColors.primary }}>Conversemos en familia</h1>
-              <p className="text-sm md:text-base max-w-lg mx-auto" style={{ color: textColors.secondary }}>
+              <h1 className="text-2xl md:text-4xl font-black mb-2" style={{ color: convTextColors.primary }}>Conversemos en familia</h1>
+              <p className="text-sm md:text-base max-w-lg mx-auto" style={{ color: convTextColors.secondary }}>
                 Respondan por turnos: primero 👦 y luego 👨. ¡Aquí no hay respuestas malas!
               </p>
             </div>
@@ -3468,11 +3451,11 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
               <>
                 {/* Progreso */}
                 <div className="mb-5">
-                  <div className="flex justify-between mb-1.5 text-xs font-black" style={{ color: textColors.secondary }}>
+                  <div className="flex justify-between mb-1.5 text-xs font-black" style={{ color: convTextColors.secondary }}>
                     <span>Pregunta {currentQuestionIndex + 1} de {conversationPrompts.length}</span>
                     <span>{convPct}%</span>
                   </div>
-                  <div className="h-2.5 rounded-full overflow-hidden" style={{ backgroundColor: textColors.border }}>
+                  <div className="h-2.5 rounded-full overflow-hidden" style={{ backgroundColor: convTextColors.border }}>
                     <div className="h-full rounded-full transition-all duration-500" style={{ width: `${convPct}%`, background: 'linear-gradient(90deg, #10b981, #2563EB)' }} />
                   </div>
                 </div>
@@ -3574,7 +3557,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                   <button
                     onClick={() => navigateTo('home')}
                     className="py-2.5 px-5 rounded-full text-sm font-bold transition-all"
-                    style={{ backgroundColor: textColors.cardBg, color: textColors.label, border: `1.5px solid ${textColors.border}` }}
+                    style={{ backgroundColor: convTextColors.cardBg, color: convTextColors.label, border: `1.5px solid ${convTextColors.border}` }}
                   >
                     🏠 Inicio
                   </button>
