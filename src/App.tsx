@@ -158,29 +158,39 @@ const reelsMessages = [
   { id: '6', author: 'Transparencia Total', message: 'La información es un derecho, no un privilegio. La luz es la mejor herramienta contra la corrupción. 💡', time: 'Hace 2d' },
 ]
 
-const backgrounds: Array<{ name: string; type: 'gradient' | 'pattern' | 'solid'; value: string }> = [
-  { name: 'Enfoque Azul', type: 'gradient', value: 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #3b82f6 100%)' },
-  { name: 'Enfoque Verde', type: 'gradient', value: 'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #10b981 100%)' },
-  { name: 'Enfoque Neutro', type: 'gradient', value: 'linear-gradient(135deg, #374151 0%, #4b5563 50%, #6b7280 100%)' },
-  { name: 'Enfoque Suave', type: 'gradient', value: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%)' },
-  { name: 'Zen Claro', type: 'solid', value: '#f1f5f9' },
-  { name: 'Zen Oscuro', type: 'solid', value: '#1e293b' },
-  { name: 'Papel', type: 'solid', value: '#fefce8' },
-  { name: 'Menta', type: 'solid', value: '#f0fdf4' },
-  { name: 'Lavanda', type: 'solid', value: '#faf5ff' },
-]
+ const backgrounds: Array<{ name: string; type: 'gradient' | 'pattern' | 'solid'; value: string }> = [
+   { name: 'Enfoque Azul', type: 'gradient', value: 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #3b82f6 100%)' },
+   { name: 'Enfoque Verde', type: 'gradient', value: 'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #10b981 100%)' },
+   { name: 'Enfoque Neutro', type: 'gradient', value: 'linear-gradient(135deg, #374151 0%, #4b5563 50%, #6b7280 100%)' },
+   { name: 'Enfoque Suave', type: 'gradient', value: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%)' },
+   { name: 'Zen Claro', type: 'solid', value: '#f1f5f9' },
+   { name: 'Zen Oscuro', type: 'solid', value: '#1e293b' },
+   { name: 'Papel', type: 'solid', value: '#fefce8' },
+   { name: 'Menta', type: 'solid', value: '#f0fdf4' },
+   { name: 'Lavanda', type: 'solid', value: '#faf5ff' },
+   { name: 'Amanecer', type: 'gradient', value: 'linear-gradient(135deg, #fce7f3 0%, #fbcfe8 50%, #faf5ff 100%)' },
+   { name: 'Ocre', type: 'gradient', value: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fef9e7 100%)' },
+   { name: 'Noche', type: 'gradient', value: 'linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #0f172a 100%)' },
+   { name: 'Tierra', type: 'gradient', value: 'linear-gradient(135deg, #7c2d12 0%, #9a3412 50%, #3b1500 100%)' },
+   { name: 'Cereza', type: 'gradient', value: 'linear-gradient(135deg, #fce7f3 0%, #f9a8d4 50%, #faf5ff 100%)' },
+   { name: 'Melocotón', type: 'gradient', value: 'linear-gradient(135deg, #ffedd5 0%, #fdba74 50%, #fefce8 100%)' },
+   { name: 'Hielo', type: 'solid', value: '#f8fafc' },
+   { name: 'Nieve', type: 'solid', value: '#ffffff' },
+   { name: 'Loto', type: 'solid', value: '#fdf4ff' },
+ ]
 
 // Determina colores de texto según el fondo del tema (oscuro = blanco, claro = oscuro)
-const getTextColorForTheme = (backgroundValue: string): { primary: string; secondary: string; cardBg: string; label: string; border: string } => {
-  const isLight = ['#f1f5f9', '#fefce8', '#f0fdf4', '#faf5ff', '#f8fafc', '#e2e8f0', '#cbd5e1'].some(c => backgroundValue.includes(c)) ||
-    backgroundValue.includes('#f8fafc') || backgroundValue.includes('#f1f5f9') || backgroundValue.includes('#fefce8') ||
-    backgroundValue.includes('#f0fdf4') || backgroundValue.includes('#faf5ff') || backgroundValue.includes('white') ||
-    backgroundValue.includes('#cbd5e1') || backgroundValue.includes('#e2e8f0')
-  if (isLight) {
-    return { primary: '#1e293b', secondary: '#475569', cardBg: '#ffffff', label: '#334155', border: '#cbd5e1' }
-  }
-  return { primary: '#ffffff', secondary: '#cbd5e1', cardBg: 'rgba(255,255,255,0.15)', label: '#f1f5f9', border: 'rgba(255,255,255,0.2)' }
-}
+ const getTextColorForTheme = (backgroundValue: string): { primary: string; secondary: string; cardBg: string; label: string; border: string } => {
+   const isLight = ['#f1f5f9', '#fefce8', '#f0fdf4', '#faf5ff', '#f8fafc', '#e2e8f0', '#cbd5e1', '#fef9e7', '#fef3c7', '#fdf4ff'].some(c => backgroundValue.includes(c)) ||
+     backgroundValue.includes('#f8fafc') || backgroundValue.includes('#f1f5f9') || backgroundValue.includes('#fefce8') ||
+     backgroundValue.includes('#f0fdf4') || backgroundValue.includes('#faf5ff') || backgroundValue.includes('white') ||
+     backgroundValue.includes('#cbd5e1') || backgroundValue.includes('#e2e8f0') || backgroundValue.includes('#fef9e7') ||
+     backgroundValue.includes('#fdf4ff')
+   if (isLight) {
+     return { primary: '#1e293b', secondary: '#475569', cardBg: '#ffffff', label: '#334155', border: '#cbd5e1' }
+   }
+   return { primary: '#ffffff', secondary: '#cbd5e1', cardBg: 'rgba(255,255,255,0.15)', label: '#f1f5f9', border: 'rgba(255,255,255,0.2)' }
+ }
 
 const translations = {
   es: {
