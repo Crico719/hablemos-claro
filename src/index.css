@@ -272,6 +272,39 @@ body {
   }
 }
 
+/* ===== Página de TEMAS en celular: solo espacios y separación ===== */
+@media (max-width: 640px) {
+  .temas-page .temas-hero {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    padding: 2.75rem 1.5rem;
+  }
+  .temas-page .temas-hero h2 {
+    line-height: 1.35;
+    margin-top: 0.5rem;
+  }
+  .temas-page .temas-stepline {
+    margin-top: 1.75rem;
+  }
+  .temas-page .temas-progress {
+    margin-top: 1.75rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  .temas-page .temas-count {
+    margin-top: 0.85rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  .temas-page .temas-tip {
+    bottom: 6rem;
+    right: 0.75rem;
+  }
+  .temas-page .temas-tip > div:first-child {
+    max-width: 240px;
+  }
+}
+
 /* ===== Pulido global ===== */
 html {
   scroll-behavior: smooth;

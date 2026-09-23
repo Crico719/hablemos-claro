@@ -2805,7 +2805,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
       }
 
       return (
-        <div className="min-h-screen p-8" style={{ background: cust7.backgroundValue, backgroundSize: cust7.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
+        <div className="min-h-screen p-8 temas-page" style={{ background: cust7.backgroundValue, backgroundSize: cust7.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           <div className="max-w-4xl mx-auto animate-slide-up space-y-14">
             
             {/* Header */}
@@ -2881,11 +2881,11 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                       <div className="px-3 py-2 rounded-2xl bg-slate-100 border border-slate-200 font-bold text-sm">🏅 {learnBadge}/{learnBadgeTotal}</div>
                       <div className="px-3 py-2 rounded-2xl bg-slate-100 border border-slate-200 font-bold text-sm">📖 {kidsDone.length}/{KIDS_TOPICS.length}</div>
                     </div>
-                    <div className="w-full max-w-[360px] mx-auto mt-5">
+                    <div className="w-full max-w-[360px] mx-auto mt-5 temas-progress">
                       <div className="h-2.5 bg-gray-200 rounded-full overflow-hidden">
                         <div className="h-full rounded-full progress-bar bg-primary transition-[width] duration-700" style={{ width: `${(kidsDone.length / KIDS_TOPICS.length) * 100}%` }}></div>
                       </div>
-                      <p className="text-sm font-bold text-gray-500 mt-2">{kidsDone.length} de {KIDS_TOPICS.length} temas completados</p>
+                      <p className="text-sm font-bold text-gray-500 mt-2 temas-count">{kidsDone.length} de {KIDS_TOPICS.length} temas completados</p>
                     </div>
                   </div>
                   {/* camino de la isla */}
@@ -3126,7 +3126,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                 </div>
 
                 {/* HERO */}
-                <section className="relative overflow-hidden rounded-[28px] border border-slate-100 bg-gradient-to-br from-primary-50 via-white to-secondary-50 shadow-[0_16px_48px_rgba(124,58,237,0.08)] px-6 py-10 md:px-10 md:py-12 text-center">
+                <section className="relative overflow-hidden rounded-[28px] border border-slate-100 bg-gradient-to-br from-primary-50 via-white to-secondary-50 shadow-[0_16px_48px_rgba(124,58,237,0.08)] px-6 py-10 md:px-10 md:py-12 text-center temas-hero">
                   <div aria-hidden className="pointer-events-none absolute -top-24 -right-24 w-72 h-72 rounded-full bg-secondary-100/60 blur-3xl" />
                   <div aria-hidden className="pointer-events-none absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-primary-100/60 blur-3xl" />
                   <div className="relative flex flex-col items-center gap-4">
@@ -3139,7 +3139,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                       <DuliMascot className="w-8 h-8 animate-float" />
                       <span className="text-xs font-black text-slate-600">¡Tú puedes! Aprende y gana XP 💪</span>
                     </div>
-                    <div className="flex items-center gap-3 w-full max-w-[360px] mt-2">
+                    <div className="flex items-center gap-3 w-full max-w-[360px] mt-2 temas-stepline">
                       <div className="flex-1 h-2 bg-slate-200/70 rounded-full overflow-hidden" role="progressbar" aria-valuenow={Math.round((kidsDone.length / KIDS_TOPICS.length) * 100)} aria-valuemin={0} aria-valuemax={100} aria-label="Progreso de temas">
                         <div className="progress-bar h-full rounded-full transition-[width] duration-700" style={{ width: `${Math.round((kidsDone.length / KIDS_TOPICS.length) * 100)}%`, background: 'linear-gradient(90deg, #10B981, #2563EB)' }}></div>
                       </div>
@@ -3774,7 +3774,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
 
           {/* MASCOTA DULI — compañera flotante del mapa de Temas */}
           {learnView === 'hub' && (
-            <div className="fixed bottom-5 right-5 z-40 flex items-end gap-2 pointer-events-none">
+            <div className="fixed bottom-5 right-5 z-40 flex items-end gap-2 pointer-events-none temas-tip">
               <div className="relative bg-white rounded-2xl rounded-br-sm border border-slate-100 shadow-xl px-3.5 py-2.5 max-w-[210px] pointer-events-auto">
                 <p className="text-[11px] font-black text-slate-700 leading-snug">{duliTip}</p>
                 <span className="absolute -bottom-1.5 -right-1.5 w-4 h-4 bg-white border-r border-b border-slate-100 rotate-45" aria-hidden />
