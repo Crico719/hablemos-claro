@@ -1161,7 +1161,7 @@ const openTemasTab = (deep = '') => {
 }
 
 // Brain Flight — juego HTML5 (GDevelop export) hosteado en GitHub Pages
-const BRAIN_FLIGHT_URL = 'https://crico719.github.io/brain-flight/?v=13'
+const BRAIN_FLIGHT_URL = 'https://crico719.github.io/brain-flight/?v=14'
 
 export default function App() {
   const [studentProfile, setStudentProfile] = useState<StudentProfile>(initialStudentProfile)
