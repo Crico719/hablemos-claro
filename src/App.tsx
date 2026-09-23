@@ -2546,7 +2546,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
               <div
                 className="block bg-gradient-to-r from-primary to-secondary rounded-3xl shadow-lg shadow-primary/25 p-6 text-white text-center card-hover animate-slide-up"
               >
-                <p className="font-black text-xl mb-1">🎬 VIDEOS DE NUESTRO CANAL 🎬</p>
+                <p className="font-black text-xl mb-1">🔗 SÍGUENOS EN TIKTOK 🔗</p>
                 <p className="text-white/90 mb-4">Entra y conoce más de nuestro trabajo</p>
                 <div className="flex flex-col gap-2.5">
                   <a
