@@ -468,13 +468,13 @@ const translations = {
   },
 }
 
-const defaultCustomization: ProfileCustomization = {
-  themeColor: '#2563EB',
-  backgroundType: 'gradient',
-  backgroundValue: 'linear-gradient(135deg, #2563EB, #7C3AED)',
-  cardStyle: 'glass',
-  decorations: [],
-}
+ const defaultCustomization: ProfileCustomization = {
+   themeColor: '#2563EB',
+   backgroundType: 'solid',
+   backgroundValue: '#ffffff',
+   cardStyle: 'glass',
+   decorations: [],
+ }
 
 const defaultStudentProgress: UserProgress = {
   totalActivities: 0,
