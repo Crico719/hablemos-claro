@@ -3932,25 +3932,35 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
             {profileType === 'student' ? (
               // STUDENT PROFILE
               <>
-                {/* Header with editable photo */}
+                {/* Header con avatar mejorado */}
                 <div className="text-center mb-10 relative">
                   <div className="relative inline-block">
-                    <div className="w-32 h-32 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg animate-float text-7xl overflow-hidden border-4 border-white">
-                      {studentProfile.photo ? (
-                        <img
-                          src={studentProfile.photo}
-                          alt="Perfil"
-                          className="w-full h-full object-cover rounded-full"
-                          style={{
-                            objectPosition: `${studentProfile.photoPos?.x ?? 50}% ${studentProfile.photoPos?.y ?? 50}%`,
-                            transform: `scale(${studentProfile.photoPos?.zoom ?? 1})`,
-                          }}
-                        />
-                      ) : (
-                        '👤'
-                      )}
+                    <div className="relative w-36 h-36 mx-auto mb-6">
+                      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary to-secondary p-[3px] shadow-lg shadow-primary/30 animate-float">
+                        <div className="w-full h-full rounded-full overflow-hidden border-4 border-white">
+                          {studentProfile.photo ? (
+                            <img
+                              src={studentProfile.photo}
+                              alt="Perfil"
+                              className="w-full h-full object-cover"
+                              style={{
+                                objectPosition: `${studentProfile.photoPos?.x ?? 50}% ${studentProfile.photoPos?.y ?? 50}%`,
+                                transform: `scale(${studentProfile.photoPos?.zoom ?? 1})`,
+                              }}
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-6xl">
+                              👤
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      {/* Badge de nivel */}
+                      <div className="absolute -bottom-2 -right-2 w-12 h-12 rounded-full bg-gradient-to-br from-warning to-secondary flex items-center justify-center text-lg shadow-lg border-4 border-white font-black text-white">
+                        {currentUnlockedCount >= 3 ? '🏆' : currentUnlockedCount >= 1 ? '🥇' : currentUnlockedCount >= 1 ? '🥈' : '🥉'}
+                      </div>
                     </div>
-                    {/* Edit photo button - pencil icon */}
+                    {/* Edit photo button */}
                     <button
                       onClick={() => {
                         setTempPhoto(studentProfile.photo)
@@ -3958,24 +3968,24 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                         setPosDraft(studentProfile.photoPos ?? defaultPhotoPos)
                         setEditPhotoModal(true)
                       }}
-                      className="absolute bottom-2 right-2 w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:bg-primary/90 transition-all text-xl"
+                      className="absolute bottom-0 right-0 w-11 h-11 rounded-full bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center shadow-lg hover:scale-110 transition-all text-xl"
                       aria-label={t('editPhoto')}
                     >
                       ✏️
                     </button>
                   </div>
-                  <div className="bg-white rounded-2xl px-6 py-5 shadow-sm">
-                    <h2 className="text-4xl font-bold gradient-text">{studentProfile.name || 'Estudiante'}</h2>
-                    <p className="text-gray-600 mt-2 text-lg">{t('profileSub')}</p>
+                  <div className="bg-white/85 backdrop-blur-xl rounded-3xl px-6 py-5 shadow-lg shadow-indigo-500/5 inline-block">
+                    <h2 className="text-4xl font-black gradient-text mb-1">{studentProfile.name || 'Estudiante'}</h2>
+                    <p className="text-gray-500 mt-1 text-sm">{t('profileSub')}</p>
                     {(studentProfile.age || studentProfile.district) && (
-                      <div className="flex justify-center gap-3 mt-4 flex-wrap">
+                      <div className="flex justify-center gap-2 mt-3 flex-wrap">
                         {studentProfile.age && (
-                          <span className="px-5 py-2 rounded-full bg-primary/10 text-primary text-base font-medium">
+                          <span className="px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-bold">
                             🎂 {studentProfile.age} {t('ageYears')}
                           </span>
                         )}
                         {studentProfile.district && (
-                          <span className="px-5 py-2 rounded-full bg-secondary/10 text-secondary text-base font-medium">
+                          <span className="px-4 py-1.5 rounded-full bg-secondary/10 text-secondary text-sm font-bold">
                             📍 {studentProfile.district}
                           </span>
                         )}
@@ -3984,39 +3994,60 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                   </div>
                 </div>
 
-                {/* Stats Cards */}
-                <div className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-8 shadow-custom-lg mb-8">
-                  <div className="grid grid-cols-4 gap-6">
-                    <div className="text-center p-5 bg-primary/5 rounded-xl">
-                      <div className="text-4xl font-bold gradient-text">{currentUnlockedCount}/3</div>
-                      <div className="text-base text-gray-500 mt-2">{t('myBadges')}</div>
+                {/* XP Level Bar */}
+                <div className="bg-white/85 backdrop-blur-xl rounded-2xl p-4 mb-6 flex items-center gap-4 shadow-lg shadow-indigo-500/5">
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-2xl shadow-md">
+                    {currentUnlockedCount >= 3 ? '🏆' : '⭐'}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex justify-between mb-1">
+                      <span className="text-sm font-bold text-slate-800">Nivel {currentUnlockedCount >= 3 ? 'Campeón' : currentUnlockedCount >= 1 ? 'En camino' : 'Aprendiz'}</span>
+                      <span className="text-sm font-bold text-primary">{currentUnlockedCount}/3 insignias</span>
                     </div>
-                    <div className="text-center p-5 bg-secondary/5 rounded-xl">
-                      <div className="text-4xl font-bold text-secondary">{getProgress().completedActivities}</div>
-                      <div className="text-base text-gray-500 mt-2">{t('activities')}</div>
-                    </div>
-                    <div className="text-center p-5 bg-warning/5 rounded-xl">
-                      <div className="text-4xl font-bold text-warning">{getProgress().conversations}</div>
-                      <div className="text-base text-gray-500 mt-2">{t('conversations')}</div>
-                    </div>
-                    <div className="text-center p-5 bg-success/5 rounded-xl">
-                      <div className="text-2xl font-bold text-primary">{getProgress().streakDays}</div>
-                      <div className="text-base text-gray-500 mt-2">{t('streak')}</div>
+                    <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-full rounded-full bg-gradient-to-r from-primary to-secondary transition-all duration-700 shadow-sm" style={{ width: `${(currentUnlockedCount / 3) * 100}%` }} />
                     </div>
                   </div>
                 </div>
 
-                {/* Badges or Stats when no badges */}
-                <div className="bg-white/85 backdrop-blur-xl rounded-3xl p-7 md:p-8 mb-8 shadow-lg shadow-indigo-500/5">
+                {/* Stats Cards mejoradas */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-8">
+                  <button onClick={() => setCurrentScreen('profile')} className="group rounded-[20px] bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 p-4 md:p-6 text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
+                    <div className="text-3xl md:text-4xl mb-1 group-hover:scale-110 transition-transform">🏅</div>
+                    <div className="text-xl md:text-2xl font-black gradient-text">{currentUnlockedCount}/3</div>
+                    <div className="text-xs md:text-sm font-bold text-primary/80 mt-1">{t('myBadges')}</div>
+                  </button>
+                  <button onClick={() => setCurrentScreen('profile')} className="group rounded-[20px] bg-gradient-to-br from-secondary/10 to-secondary/5 border border-secondary/20 p-4 md:p-6 text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
+                    <div className="text-3xl md:text-4xl mb-1 group-hover:scale-110 transition-transform">📚</div>
+                    <div className="text-xl md:text-2xl font-black text-secondary">{getProgress().completedActivities}</div>
+                    <div className="text-xs md:text-sm font-bold text-secondary/80 mt-1">{t('activities')}</div>
+                  </button>
+                  <button onClick={() => setCurrentScreen('profile')} className="group rounded-[20px] bg-gradient-to-br from-warning/10 to-warning/5 border border-warning/20 p-4 md:p-6 text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
+                    <div className="text-3xl md:text-4xl mb-1 group-hover:scale-110 transition-transform">💬</div>
+                    <div className="text-xl md:text-2xl font-black text-warning">{getProgress().conversations}</div>
+                    <div className="text-xs md:text-sm font-bold text-warning/80 mt-1">{t('conversations')}</div>
+                  </button>
+                  <button onClick={() => setCurrentScreen('profile')} className="group rounded-[20px] bg-gradient-to-br from-success/10 to-success/5 border border-success/20 p-4 md:p-6 text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
+                    <div className="text-3xl md:text-4xl mb-1 group-hover:scale-110 transition-transform">🔥</div>
+                    <div className="text-xl md:text-2xl font-black text-success">{getProgress().streakDays}</div>
+                    <div className="text-xs md:text-sm font-bold text-success/80 mt-1">{t('streak')}</div>
+                  </button>
+                </div>
+
+                {/* Badges o Stats */}
+                <div className="bg-white/85 backdrop-blur-xl rounded-3xl p-6 md:p-8 mb-8 shadow-lg shadow-indigo-500/5">
                   {currentUnlockedCount > 0 ? (
                     <>
-                      <h3 className="font-bold text-dark mb-6 text-lg">{t('myBadges')}</h3>
+                      <div className="flex items-center justify-between mb-6">
+                        <h3 className="font-black text-dark text-lg">{t('myBadges')}</h3>
+                        <span className="text-sm font-bold text-primary">{currentUnlockedCount}/3</span>
+                      </div>
                       <div className="flex flex-wrap gap-4 md:gap-6 justify-center">
                         {currentBadges.map(badge => (
-                          <div key={badge.id} className={`flex-1 min-w-[140px] max-w-[220px] text-center p-5 md:p-6 rounded-2xl transition-all ${badge.unlocked ? 'bg-gradient-to-br from-warning/10 to-primary/10 border-2 border-warning/30 animate-float' : 'bg-gray-50 border-2 border-dashed border-gray-200 opacity-60'}`}>
-                            <div className="text-5xl mb-3">{badge.emoji}</div>
-                            <div className="text-sm font-bold mt-2" style={{ color: badge.color }}>{badge.name}</div>
-                            <div className="text-xs mt-2" style={{ color: badge.unlocked ? '#059669' : '#94a3b8' }}>
+                          <div key={badge.id} className={`flex-1 min-w-[130px] max-w-[200px] text-center p-5 rounded-2xl transition-all hover:-translate-y-1 ${badge.unlocked ? 'bg-gradient-to-br from-warning/10 to-primary/10 border-2 border-warning/30 shadow-md animate-float' : 'bg-gray-50 border-2 border-dashed border-gray-200 opacity-60'}`}>
+                            <div className="text-5xl mb-2">{badge.emoji}</div>
+                            <div className="text-sm font-bold mt-1" style={{ color: badge.color }}>{badge.name}</div>
+                            <div className="text-xs mt-1" style={{ color: badge.unlocked ? '#059669' : '#94a3b8' }}>
                               {badge.unlocked ? '✓ Desbloqueada' : '🔒 Bloqueada'}
                             </div>
                           </div>
@@ -4024,42 +4055,32 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                       </div>
                     </>
                   ) : (
-                    // Stats/Graphs when no badges
                     <>
-                      <h3 className="font-bold text-dark mb-6 text-lg">{t('noBadgesYet')} - {t('yourStats')}</h3>
+                      <h3 className="font-black text-dark text-lg mb-6">{t('noBadgesYet')} - {t('yourStats')}</h3>
                       <div className="space-y-6">
-                        {/* Progress bars per topic */}
                         <div>
                           <h4 className="font-bold text-primary mb-3">{t('topicProgress')}</h4>
                           <div className="space-y-3">
                             {Object.entries(getProgress().topicProgress).map(([topic, value]) => (
                               <div key={topic} className="space-y-1">
                                 <div className="flex justify-between text-sm">
-                                  <span className="capitalize">{topic}</span>
+                                  <span className="capitalize font-medium text-slate-700">{topic}</span>
                                   <span className="font-bold text-primary">{value}%</span>
                                 </div>
-                                <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                                  <div 
-                                    className="h-full bg-gradient-to-r from-primary to-secondary rounded-full transition-all"
-                                    style={{ width: `${value}%` }}
-                                  ></div>
+                                <div className="h-3 bg-gray-100 rounded-full overflow-hidden shadow-inner">
+                                  <div className="h-full rounded-full bg-gradient-to-r from-primary to-secondary transition-all duration-700 shadow-sm" style={{ width: `${value}%` }} />
                                 </div>
                               </div>
                             ))}
                           </div>
                         </div>
-                        
-                        {/* Quiz scores chart */}
                         {getProgress().quizScores.length > 0 && (
                           <div>
                             <h4 className="font-bold text-secondary mb-3">{t('avgQuizScore')}</h4>
-                            <div className="h-32 flex items-end justify-around gap-2">
+                            <div className="h-36 flex items-end justify-around gap-2">
                               {getProgress().quizScores.slice(-6).map((score, i) => (
                                 <div key={i} className="flex-1 flex flex-col items-center">
-                                  <div 
-                                    className="w-full bg-gradient-to-t from-secondary to-primary rounded-t transition-all"
-                                    style={{ height: `${score}%` }}
-                                  ></div>
+                                  <div className="w-full bg-gradient-to-t from-secondary to-primary rounded-t transition-all shadow-sm" style={{ height: `${score}%` }} />
                                   <span className="text-xs text-gray-500 mt-1">Q{i + 1}</span>
                                 </div>
                               ))}
@@ -4069,22 +4090,20 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                             </p>
                           </div>
                         )}
-                        
-                        {/* Summary stats */}
                         <div className="grid grid-cols-2 gap-4 pt-4 border-t">
-                          <div className="text-center p-3 bg-primary/5 rounded-xl">
+                          <div className="text-center p-4 bg-primary/5 rounded-xl">
                             <div className="text-2xl font-bold text-primary">{getProgress().completedActivities}</div>
                             <div className="text-xs text-gray-500">{t('activitiesDone')}</div>
                           </div>
-                          <div className="text-center p-3 bg-secondary/5 rounded-xl">
+                          <div className="text-center p-4 bg-secondary/5 rounded-xl">
                             <div className="text-2xl font-bold text-secondary">{getProgress().conversations}</div>
                             <div className="text-xs text-gray-500">{t('conversations')}</div>
                           </div>
-                          <div className="text-center p-3 bg-warning/5 rounded-xl">
+                          <div className="text-center p-4 bg-warning/5 rounded-xl">
                             <div className="text-2xl font-bold text-warning">{getProgress().streakDays}</div>
                             <div className="text-xs text-gray-500">{t('streak')}</div>
                           </div>
-                          <div className="text-center p-3 bg-success/5 rounded-xl">
+                          <div className="text-center p-4 bg-success/5 rounded-xl">
                             <div className="text-2xl font-bold text-success">{Object.values(getProgress().topicProgress).filter(v => v >= 100).length}</div>
                             <div className="text-xs text-gray-500">{t('topicsCompleted')}</div>
                           </div>
@@ -4095,67 +4114,54 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                 </div>
 
                 {/* General Progress */}
-                <div className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-6 mb-6">
-                  <h3 className="font-bold text-dark mb-3">{t('generalProgress')}</h3>
-                  <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
-                    <div 
-                      className="progress-bar h-full"
-                      style={{ width: `${getProgress().totalActivities > 0 ? (getProgress().completedActivities / getProgress().totalActivities) * 100 : 0}%` }}
-                    ></div>
-                  </div>
-                  <div className="flex justify-between mt-2">
-                    <span className="text-sm text-gray-500">{getProgress().completedActivities} de {getProgress().totalActivities}</span>
-                    <span className="text-sm font-bold text-primary">{getProgress().totalActivities > 0 ? Math.round((getProgress().completedActivities / getProgress().totalActivities) * 100) : 0}%</span>
+                <div className="bg-white/85 backdrop-blur-xl rounded-3xl p-6 mb-6 shadow-lg shadow-indigo-500/5">
+                  <h3 className="font-black text-dark mb-4">{t('generalProgress')}</h3>
+                  <div className="flex items-center gap-4">
+                    <div className="flex-1 h-4 bg-gray-200 rounded-full overflow-hidden shadow-inner">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-primary to-secondary transition-all duration-700 shadow-sm"
+                        style={{ width: `${getProgress().totalActivities > 0 ? (getProgress().completedActivities / getProgress().totalActivities) * 100 : 0}%` }}
+                      />
+                    </div>
+                    <span className="text-sm font-bold text-primary whitespace-nowrap">
+                      {getProgress().completedActivities}/{getProgress().totalActivities}
+                    </span>
                   </div>
                 </div>
 
-                {/* Customization Panel - Solo Fondos */}
-                <div className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-8 mb-8">
-                  <h3 className="font-bold text-dark mb-6 flex items-center gap-2">{t('customization')}</h3>
-                  
-                  {/* Backgrounds */}
+                {/* Customization Panel */}
+                <div className="bg-white/85 backdrop-blur-xl rounded-3xl p-8 mb-8 shadow-lg shadow-indigo-500/5">
+                  <h3 className="font-black text-dark mb-6 flex items-center gap-2">🎨 {t('customization')}</h3>
                   <div className="mb-8">
-                    <h4 className="font-medium text-gray-700 mb-4">{t('backgrounds')}</h4>
-                    <div className="grid grid-cols-3 gap-5">
+                    <h4 className="font-bold text-gray-700 mb-4">{t('backgrounds')}</h4>
+                    <div className="grid grid-cols-3 gap-4">
                       {backgrounds.map(bg => (
                         <button
                           key={bg.name}
                           onClick={() => {
-                            const updated = { 
-                              ...studentProfile, 
-                              customization: { 
-                                ...studentProfile.customization, 
-                                backgroundType: bg.type,
-                                backgroundValue: bg.value 
-                              } 
-                            }
+                            const updated = { ...studentProfile, customization: { ...studentProfile.customization, backgroundType: bg.type, backgroundValue: bg.value } }
                             setStudentProfile(updated)
                             saveStudentProfile(updated)
                           }}
-                          className={`p-5 rounded-xl border-3 transition-all text-center ${
-                            studentProfile.customization.backgroundType === bg.type && studentProfile.customization.backgroundValue === bg.value 
-                              ? 'ring-4 ring-secondary' 
-                              : 'border-transparent hover:border-gray-300'
+                          className={`p-4 rounded-xl border-3 transition-all text-center ${
+                            studentProfile.customization.backgroundType === bg.type && studentProfile.customization.backgroundValue === bg.value
+                              ? 'ring-4 ring-secondary shadow-md'
+                              : 'border-transparent hover:border-gray-300 hover:shadow-sm'
                           }`}
-                          style={{ 
-                            background: bg.value,
-                            backgroundSize: bg.type === 'pattern' ? '50px 50px' : 'cover'
-                          }}
+                          style={{ background: bg.value, backgroundSize: bg.type === 'pattern' ? '50px 50px' : 'cover' }}
                         >
-                          <span className="block text-sm font-medium text-gray-700 mt-3">{bg.name}</span>
+                          <span className="block text-sm font-bold text-gray-700 mt-2">{bg.name}</span>
                         </button>
                       ))}
                     </div>
                   </div>
-
-                  {/* Reset button */}
                   <button
                     onClick={() => {
                       const updated = { ...studentProfile, customization: defaultCustomization }
                       setStudentProfile(updated)
                       saveStudentProfile(updated)
                     }}
-                    className="w-full py-3 px-5 rounded-xl text-base text-gray-500 hover:text-primary hover:bg-gray-100 transition-all"
+                    className="w-full py-3 px-5 rounded-xl text-base text-gray-500 hover:text-primary hover:bg-gray-100 transition-all font-bold"
                   >
                     {t('resetCustomization')}
                   </button>
@@ -4168,152 +4174,156 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                   </button>
                 </div>
               </>
-            ) : (
+             ) : (
               // FAMILY PROFILE
               <>
-                <div className="text-center mb-8 relative">
+                {/* Header con avatar mejorado */}
+                <div className="text-center mb-10 relative">
                   <div className="relative inline-block">
-                    <div className="w-28 h-28 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg text-6xl overflow-hidden border-4 border-white bg-gradient-to-br from-secondary to-warning">
-                      <span className="leading-none">{avatarOrFallback(familyProfile.familyAvatar)}</span>
+                    <div className="relative w-36 h-36 mx-auto mb-6">
+                      <div className="absolute inset-0 rounded-full bg-gradient-to-br from-secondary to-warning p-[3px] shadow-lg shadow-secondary/30 animate-float">
+                        <div className="w-full h-full rounded-full overflow-hidden border-4 border-white flex items-center justify-center text-5xl bg-white">
+                          {familyProfile.familyAvatar ? (
+                            <span className="leading-none">{familyProfile.familyAvatar}</span>
+                          ) : (
+                            <span className="leading-none text-5xl">👨‍👩‍👧</span>
+                          )}
+                        </div>
+                      </div>
+                      {/* Badge de progreso */}
+                      <div className="absolute -bottom-2 -right-2 w-14 h-14 rounded-full bg-gradient-to-br from-secondary to-warning flex items-center justify-center text-xl shadow-lg border-4 border-white font-black text-white">
+                        {famUnlocked >= 4 ? '🏆' : famUnlocked >= 2 ? '🥇' : '🥉'}
+                      </div>
                     </div>
+                    {/* Edit avatar button */}
                     <button
                       onClick={() => setEditingFamAvatar(v => !v)}
-                      className="absolute bottom-3 right-0 w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
+                      className="absolute bottom-0 right-0 w-11 h-11 rounded-full bg-gradient-to-br from-secondary to-warning text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform text-xl"
                       aria-label={t('editName')}
                     >
                       ✏️
                     </button>
-                  </div>
-                  {editingFamAvatar && (
-                    <div className="bg-white rounded-2xl px-4 py-4 shadow-sm mb-4 animate-fade-in">
-                      <p className="text-sm font-bold text-dark mb-3">Elige el avatar de la familia</p>
-                      <div className="flex gap-2 justify-center flex-wrap">
-                        {familyAvatarOptions.map(a => (
-                          <button
-                            key={a}
-                            onClick={() => {
-                              const updated = { ...familyProfile, familyAvatar: a }
-                              setFamilyProfile(updated)
-                              saveFamilyProfile(updated)
-                              setEditingFamAvatar(false)
-                            }}
-                            className={`relative w-14 h-14 rounded-full text-3xl flex items-center justify-center transition-all hover:scale-110 ${
-                              familyProfile.familyAvatar === a
-                                ? 'bg-primary/15 ring-2 ring-primary scale-105'
-                                : 'bg-gray-100 hover:bg-gray-200'
-                            }`}
-                          >
-                            <span className="leading-none">{a}</span>
-                            {familyProfile.familyAvatar === a && <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-success text-white text-[10px] flex items-center justify-center font-bold">✓</span>}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  <div className="bg-white rounded-2xl px-6 py-5 shadow-sm">
-                    {editingFamName ? (
-                      <div className="flex gap-2 justify-center">
-                        <input
-                          type="text"
-                          value={famNameDraft}
-                          onChange={e => setFamNameDraft(e.target.value)}
-                          placeholder="Nombre de la familia"
-                          className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-dark focus:outline-none focus:ring-2 focus:ring-primary font-bold text-xl text-center max-w-xs"
-                        />
-                        <button onClick={saveFamilyName} className="bg-success text-white font-bold px-4 py-2 rounded-xl">✓</button>
-                        <button onClick={() => setEditingFamName(false)} className="bg-gray-200 text-gray-600 font-bold px-4 py-2 rounded-xl">✕</button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center gap-2">
-                        <h2 className="text-3xl font-bold gradient-text">{familyProfile.name}</h2>
-                        <button
-                          onClick={() => { setFamNameDraft(familyProfile.name); setEditingFamName(true) }}
-                          className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all"
-                          aria-label={t('editName')}
-                        >
-                          ✏️
-                        </button>
+                    {editingFamAvatar && (
+                      <div className="bg-white rounded-2xl px-4 py-4 shadow-lg shadow-indigo-500/5 mb-4 animate-fade-in">
+                        <p className="text-sm font-bold text-dark mb-3">Elige el avatar de la familia</p>
+                        <div className="flex gap-2 justify-center flex-wrap">
+                          {familyAvatarOptions.map(a => (
+                            <button
+                              key={a}
+                              onClick={() => {
+                                const updated = { ...familyProfile, familyAvatar: a }
+                                setFamilyProfile(updated)
+                                saveFamilyProfile(updated)
+                                setEditingFamAvatar(false)
+                              }}
+                              className={`relative w-14 h-14 rounded-full text-3xl flex items-center justify-center transition-all hover:scale-110 ${
+                                familyProfile.familyAvatar === a
+                                  ? 'bg-primary/15 ring-2 ring-primary scale-105'
+                                  : 'bg-gray-100 hover:bg-gray-200'
+                              }`}
+                            >
+                              <span className="leading-none">{a}</span>
+                              {familyProfile.familyAvatar === a && <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-success text-white text-[10px] flex items-center justify-center font-bold">✓</span>}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     )}
-                    <p className="text-gray-600 mt-2">{t('familyTagline')}</p>
+                    <div className="bg-white/85 backdrop-blur-xl rounded-3xl px-6 py-5 shadow-lg shadow-indigo-500/5 inline-block">
+                      {editingFamName ? (
+                        <div className="flex gap-2 justify-center">
+                          <input type="text" value={famNameDraft} onChange={e => setFamNameDraft(e.target.value)} placeholder="Nombre de la familia" className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-dark focus:outline-none focus:ring-2 focus:ring-primary font-bold text-xl text-center max-w-xs" />
+                          <button onClick={saveFamilyName} className="bg-success text-white font-bold px-4 py-2 rounded-xl">✓</button>
+                          <button onClick={() => setEditingFamName(false)} className="bg-gray-200 text-gray-600 font-bold px-4 py-2 rounded-xl">✕</button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center gap-2">
+                          <h2 className="text-3xl font-black gradient-text">{familyProfile.name}</h2>
+                          <button onClick={() => { setFamNameDraft(familyProfile.name); setEditingFamName(true) }} className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all" aria-label={t('editName')}>✏️</button>
+                        </div>
+                      )}
+                      <p className="text-gray-500 mt-1">{t('familyTagline')}</p>
+                    </div>
                   </div>
                 </div>
 
-                {/* Accesos rápidos */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                  <button onClick={() => setCurrentScreen('learn')} className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-4 font-bold text-primary card-hover">
-                    📚 {t('quickActivities')}
+                {/* Accesos rápidos mejorados */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-8">
+                  <button onClick={() => setCurrentScreen('learn')} className="group rounded-[20px] bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 p-4 md:p-6 text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
+                    <div className="text-3xl mb-1 group-hover:scale-110 transition-transform">📚</div>
+                    <div className="text-sm font-bold text-primary">{t('quickActivities')}</div>
                   </button>
-                  <button onClick={() => setCurrentScreen('converse')} className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-4 font-bold text-warning card-hover">
-                    💬 {t('quickConvos')}
+                  <button onClick={() => setCurrentScreen('converse')} className="group rounded-[20px] bg-gradient-to-br from-warning/10 to-warning/5 border border-warning/20 p-4 md:p-6 text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
+                    <div className="text-3xl mb-1 group-hover:scale-110 transition-transform">💬</div>
+                    <div className="text-sm font-bold text-warning">{t('quickConvos')}</div>
                   </button>
-                  <button onClick={() => scrollToRef(badgesRef)} className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-4 font-bold text-secondary card-hover">
-                    🏅 {t('quickBadges')}
+                  <button onClick={() => scrollToRef(badgesRef)} className="group rounded-[20px] bg-gradient-to-br from-secondary/10 to-secondary/5 border border-secondary/20 p-4 md:p-6 text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
+                    <div className="text-3xl mb-1 group-hover:scale-110 transition-transform">🏅</div>
+                    <div className="text-sm font-bold text-secondary">{t('quickBadges')}</div>
                   </button>
-                  <button onClick={() => scrollToRef(membersRef)} className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-4 font-bold text-success card-hover">
-                    👨‍👩‍👧 {t('quickMembers')}
-                  </button>
-                </div>
-
-                {/* Estadísticas */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                  <button onClick={() => scrollToRef(badgesRef)} className="bg-white rounded-2xl p-5 shadow-sm text-center card-hover">
-                    <div className="text-3xl mb-1">🏅</div>
-                    <div className="text-3xl font-black text-dark">{famUnlocked}/6</div>
-                    <div className="text-sm text-gray-500 mt-1">{t('myBadges')}</div>
-                  </button>
-                  <button onClick={() => setCurrentScreen('learn')} className="bg-white rounded-2xl p-5 shadow-sm text-center card-hover">
-                    <div className="text-3xl mb-1">📚</div>
-                    <div className="text-3xl font-black text-secondary">{familyProfile.progress.completedActivities}</div>
-                    <div className="text-sm text-gray-500 mt-1">{t('activities')}</div>
-                  </button>
-                  <button onClick={() => setCurrentScreen('converse')} className="bg-white rounded-2xl p-5 shadow-sm text-center card-hover">
-                    <div className="text-3xl mb-1">💬</div>
-                    <div className="text-3xl font-black text-warning">{familyProfile.progress.conversations}</div>
-                    <div className="text-sm text-gray-500 mt-1">{t('conversations')}</div>
-                  </button>
-                  <button onClick={() => scrollToRef(membersRef)} className="bg-white rounded-2xl p-5 shadow-sm text-center card-hover">
-                    <div className="text-3xl mb-1">👨‍👩‍👧</div>
-                    <div className="text-3xl font-black text-success">{familyProfile.members.length}</div>
-                    <div className="text-sm text-gray-500 mt-1">{t('statMembers')}</div>
+                  <button onClick={() => scrollToRef(membersRef)} className="group rounded-[20px] bg-gradient-to-br from-success/10 to-success/5 border border-success/20 p-4 md:p-6 text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
+                    <div className="text-3xl mb-1 group-hover:scale-110 transition-transform">👨‍👩‍👧</div>
+                    <div className="text-sm font-bold text-success">{t('quickMembers')}</div>
                   </button>
                 </div>
 
-                {/* Progreso general */}
-                <div className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-8 mb-8 text-center">
-                  <h3 className="font-bold text-dark text-xl mb-4">{t('generalProgress')}</h3>
+                {/* Estadísticas mejoradas */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-8">
+                  <button onClick={() => scrollToRef(badgesRef)} className="group rounded-[20px] bg-gradient-to-br from-warning/10 to-warning/5 border border-warning/20 p-4 md:p-6 text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
+                    <div className="text-3xl mb-1 group-hover:scale-110 transition-transform">🏅</div>
+                    <div className="text-2xl md:text-3xl font-black text-warning">{famUnlocked}<span className="text-sm text-gray-400">/6</span></div>
+                    <div className="text-xs font-bold text-warning/80 mt-1">{t('myBadges')}</div>
+                  </button>
+                  <button onClick={() => setCurrentScreen('learn')} className="group rounded-[20px] bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 p-4 md:p-6 text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
+                    <div className="text-3xl mb-1 group-hover:scale-110 transition-transform">📚</div>
+                    <div className="text-2xl md:text-3xl font-black text-primary">{familyProfile.progress.completedActivities}</div>
+                    <div className="text-xs font-bold text-primary/80 mt-1">{t('activities')}</div>
+                  </button>
+                  <button onClick={() => setCurrentScreen('converse')} className="group rounded-[20px] bg-gradient-to-br from-warning/10 to-warning/5 border border-warning/20 p-4 md:p-6 text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
+                    <div className="text-3xl mb-1 group-hover:scale-110 transition-transform">💬</div>
+                    <div className="text-2xl md:text-3xl font-black text-warning">{familyProfile.progress.conversations}</div>
+                    <div className="text-xs font-bold text-warning/80 mt-1">{t('conversations')}</div>
+                  </button>
+                  <button onClick={() => scrollToRef(membersRef)} className="group rounded-[20px] bg-gradient-to-br from-success/10 to-success/5 border border-success/20 p-4 md:p-6 text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
+                    <div className="text-3xl mb-1 group-hover:scale-110 transition-transform">👨‍👩‍👧</div>
+                    <div className="text-2xl md:text-3xl font-black text-success">{familyProfile.members.length}</div>
+                    <div className="text-xs font-bold text-success/80 mt-1">{t('statMembers')}</div>
+                  </button>
+                </div>
+
+                {/* Progreso circular mejorado */}
+                <div className="bg-white/85 backdrop-blur-xl rounded-3xl p-8 mb-8 shadow-lg shadow-indigo-500/5 text-center relative overflow-hidden">
+                  <span aria-hidden className="pointer-events-none absolute top-4 right-4 text-3xl opacity-20 animate-float">✨</span>
+                  <h3 className="font-black text-dark text-xl mb-6">{t('generalProgress')}</h3>
                   <div className="flex justify-center">
-                    <svg width="150" height="150" viewBox="0 0 140 140">
-                      <circle cx="70" cy="70" r="54" fill="none" stroke="#E5E7EB" strokeWidth="14" />
-                      <circle
-                        cx="70" cy="70" r="54" fill="none" stroke="#8B5CF6" strokeWidth="14" strokeLinecap="round"
-                        strokeDasharray={ringC}
-                        strokeDashoffset={ringC - (ringC * famPct) / 100}
-                        transform="rotate(-90 70 70)"
-                        style={{ transition: 'stroke-dashoffset 0.6s ease' }}
-                      />
-                      <text x="70" y="80" textAnchor="middle" fontSize="28" fontWeight="900" fill="#1F2937">{famPct}%</text>
-                    </svg>
+                    <div className="relative">
+                      <svg width="160" height="160" viewBox="0 0 140 140">
+                        <circle cx="70" cy="70" r="54" fill="none" stroke="#E5E7EB" strokeWidth="14" />
+                        <circle cx="70" cy="70" r="54" fill="none" stroke="url(#familyProgressGrad)" strokeWidth="14" strokeLinecap="round" strokeDasharray={ringC} strokeDashoffset={ringC - (ringC * famPct) / 100} transform="rotate(-90 70 70)" style={{ transition: 'stroke-dashoffset 0.6s ease' }} />
+                        <defs>
+                          <linearGradient id="familyProgressGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#8B5CF6" />
+                            <stop offset="100%" stopColor="#10B981" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-4xl font-black gradient-text">{famPct}%</span>
+                      </div>
+                    </div>
                   </div>
                   <p className="text-gray-500 mt-4">{t('progressHint')}</p>
                 </div>
 
-                {/* Mis insignias */}
+                {/* Insignias mejoradas */}
                 <div ref={badgesRef} className="bg-white/85 backdrop-blur-xl rounded-3xl p-7 md:p-8 mb-8 scroll-mt-4 relative overflow-hidden shadow-lg shadow-indigo-500/5">
-                  <span aria-hidden className="pointer-events-none absolute top-3 right-5 text-xl opacity-30 animate-float">✨</span>
-                  <span aria-hidden className="pointer-events-none absolute top-3 left-5 text-xl opacity-30">🌟</span>
-                  <h3 className="font-bold text-dark text-xl mb-1">🏅 {t('myBadges')}</h3>
+                  <span aria-hidden className="pointer-events-none absolute top-4 right-5 text-xl opacity-30 animate-float">✨</span>
+                  <span aria-hidden className="pointer-events-none absolute top-4 left-5 text-xl opacity-30">🌟</span>
+                  <h3 className="font-black text-dark text-xl mb-1">🏅 {t('myBadges')}</h3>
                   <p className="text-gray-500 mb-6">{famUnlocked} de 6 desbloqueadas</p>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5">
                     {famBadges.map(b => (
-                      <div
-                        key={b.id}
-                        className={`rounded-2xl p-5 text-center border-2 card-hover ${
-                          b.unlocked
-                            ? 'bg-gradient-to-br from-warning/10 to-primary/10 border-warning/30 shadow-lg'
-                            : 'bg-gray-50 border-dashed border-gray-200'
-                        }`}
-                      >
+                      <div key={b.id} className={`rounded-2xl p-5 text-center border-2 card-hover ${b.unlocked ? 'bg-gradient-to-br from-warning/10 to-primary/10 border-warning/30 shadow-lg' : 'bg-gray-50 border-dashed border-gray-200'}`}>
                         <div className="relative inline-block">
                           <div className={`text-5xl mb-2 ${b.unlocked ? 'animate-float' : 'grayscale opacity-50'}`}>{b.emoji}</div>
                           {!b.unlocked && <div className="absolute -top-1 -right-1 text-lg">🔒</div>}
@@ -4328,60 +4338,50 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                   </div>
                 </div>
 
-                {/* Actividad reciente */}
-                <div className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-8 mb-8">
-                  <h3 className="font-bold text-dark text-xl mb-4">🕘 {t('recentActivity')}</h3>
+                {/* Actividad reciente con timeline */}
+                <div className="bg-white/85 backdrop-blur-xl rounded-3xl p-8 mb-8 shadow-lg shadow-indigo-500/5">
+                  <h3 className="font-black text-dark text-xl mb-6">🕘 {t('recentActivity')}</h3>
                   {familyProfile.activityLog.length === 0 ? (
                     <p className="text-gray-500">{t('noActivity')}</p>
                   ) : (
-                    <ul className="space-y-3">
+                    <div className="space-y-3 relative">
+                      <div className="absolute left-4 top-2 bottom-2 w-0.5 bg-gradient-to-b from-secondary/30 to-transparent" />
                       {familyProfile.activityLog.slice(0, 6).map(e => (
-                        <li key={e.id} className="bg-white rounded-xl px-4 py-3 shadow-sm">
-                          <p className="text-dark font-medium">{e.text}</p>
-                          <p className="text-xs text-gray-400">{e.date}</p>
-                        </li>
+                        <div key={e.id} className="relative flex items-start gap-4 pl-8 animate-slide-up">
+                          <div className="absolute left-1.5 top-2 w-3 h-3 rounded-full bg-secondary border-2 border-white shadow-sm" />
+                          <div className="bg-white rounded-xl px-4 py-3 shadow-sm flex-1 border border-gray-50">
+                            <p className="text-dark font-medium text-sm">{e.text}</p>
+                            <p className="text-xs text-gray-400 mt-0.5">{e.date}</p>
+                          </div>
+                        </div>
                       ))}
-                    </ul>
+                    </div>
                   )}
                 </div>
 
-                {/* Integrantes */}
-                <div ref={membersRef} className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-8 mb-8 scroll-mt-4">
-                  <h3 className="font-bold text-dark text-xl mb-6">👨‍👩‍👧 {t('membersTitle')} ({familyProfile.members.length})</h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-5 mb-8">
+                {/* Integrantes mejorados */}
+                <div ref={membersRef} className="bg-white/85 backdrop-blur-xl rounded-3xl p-8 mb-8 scroll-mt-4">
+                  <h3 className="font-black text-dark text-xl mb-6">👨‍👩‍👧 {t('membersTitle')} ({familyProfile.members.length})</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
                     {familyProfile.members.map(m => (
-                      <div key={m.id} className="bg-white rounded-2xl p-5 shadow-sm text-center border border-gray-100 transition-transform hover:-translate-y-1">
+                      <div key={m.id} className="bg-white rounded-2xl p-5 shadow-sm text-center border border-gray-100 transition-all hover:-translate-y-1 hover:shadow-md">
                         <div className="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center text-4xl bg-gradient-to-br from-primary/15 to-secondary/15 border-2 border-white shadow overflow-hidden">
                           <span className="leading-none">{avatarOrFallback(m.avatar)}</span>
                         </div>
                         {editingMemberId === m.id ? (
                           <div className="flex gap-1 justify-center mb-2">
-                            <input
-                              type="text"
-                              value={memberNameDraft}
-                              onChange={e => setMemberNameDraft(e.target.value)}
-                              className="w-full px-2 py-1 rounded-lg border border-gray-200 text-dark font-bold text-center"
-                            />
+                            <input type="text" value={memberNameDraft} onChange={e => setMemberNameDraft(e.target.value)} className="w-full px-2 py-1 rounded-lg border border-gray-200 text-dark font-bold text-center" />
                             <button onClick={() => saveMemberName(m.id)} className="bg-success text-white font-bold px-3 py-1 rounded-lg">✓</button>
                           </div>
                         ) : (
                           <div className="flex items-center justify-center gap-1">
-                            <p className="font-bold text-dark">{m.name}</p>
-                            <button
-                              onClick={() => { setEditingMemberId(m.id); setMemberNameDraft(m.name) }}
-                              className="text-xs text-gray-400 hover:text-primary"
-                              aria-label={t('editName')}
-                            >
-                              ✏️
-                            </button>
+                            <p className="font-bold text-dark text-sm">{m.name}</p>
+                            <button onClick={() => { setEditingMemberId(m.id); setMemberNameDraft(m.name) }} className="text-xs text-gray-400 hover:text-primary" aria-label={t('editName')}>✏️</button>
                           </div>
                         )}
                         <span className="inline-block px-3 py-1 rounded-full bg-secondary/10 text-secondary text-xs font-bold mt-2">{m.role}</span>
                         <p className="text-sm text-gray-500 mt-2">{m.activities} actividades</p>
-                        <button
-                          onClick={() => registerMemberActivity(m.id)}
-                          className="mt-3 w-full bg-success text-white font-bold py-2 px-4 rounded-xl text-sm"
-                        >
+                        <button onClick={() => registerMemberActivity(m.id)} className="mt-3 w-full bg-gradient-to-r from-success to-success/80 text-white font-bold py-2 px-4 rounded-xl text-sm hover:shadow-md transition-all">
                           {t('registerActivity')}
                         </button>
                       </div>
@@ -4389,43 +4389,19 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                   </div>
                   <div className="bg-white rounded-2xl p-5 border-2 border-dashed border-gray-300">
                     <h4 className="font-bold text-dark mb-4">{t('addMember')}</h4>
-                    <input
-                      type="text"
-                      value={newMemberName}
-                      onChange={e => setNewMemberName(e.target.value)}
-                      placeholder={t('memberNamePh')}
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-dark focus:outline-none focus:ring-2 focus:ring-primary font-medium mb-3"
-                    />
+                    <input type="text" value={newMemberName} onChange={e => setNewMemberName(e.target.value)} placeholder={t('memberNamePh')} className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-dark focus:outline-none focus:ring-2 focus:ring-primary font-medium mb-3" />
                     <div className="grid grid-cols-2 gap-3 mb-3">
                       <div>
                         <p className="text-sm font-medium text-dark mb-2">{t('memberRole')}</p>
-                        <select
-                          value={newMemberRole}
-                          onChange={e => {
-                            const role = e.target.value as FamilyRole
-                            setNewMemberRole(role)
-                            setNewMemberAvatar(roleAvatar[role])
-                          }}
-                          className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-dark font-medium"
-                        >
-                          {familyRoles.map(r => (
-                            <option key={r} value={r}>{roleAvatar[r]} {r}</option>
-                          ))}
+                        <select value={newMemberRole} onChange={e => { const role = e.target.value as FamilyRole; setNewMemberRole(role); setNewMemberAvatar(roleAvatar[role]) }} className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-dark font-medium">
+                          {familyRoles.map(r => <option key={r} value={r}>{roleAvatar[r]} {r}</option>)}
                         </select>
                       </div>
                       <div>
                         <p className="text-sm font-medium text-dark mb-2">{t('memberAvatar')}</p>
                         <div className="flex gap-2 flex-wrap">
                           {memberAvatars.map(a => (
-                            <button
-                              key={a}
-                              onClick={() => setNewMemberAvatar(a)}
-                              className={`relative w-11 h-11 rounded-full text-2xl flex items-center justify-center transition-all hover:scale-110 ${
-                                newMemberAvatar === a
-                                  ? 'bg-primary/15 ring-2 ring-primary scale-105'
-                                  : 'bg-gray-100 hover:bg-gray-200'
-                              }`}
-                            >
+                            <button key={a} onClick={() => setNewMemberAvatar(a)} className={`relative w-11 h-11 rounded-full text-2xl flex items-center justify-center transition-all hover:scale-110 ${newMemberAvatar === a ? 'bg-primary/15 ring-2 ring-primary scale-105' : 'bg-gray-100 hover:bg-gray-200'}`}>
                               <span className="leading-none">{a}</span>
                               {newMemberAvatar === a && <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-success text-white text-[9px] flex items-center justify-center font-bold">✓</span>}
                             </button>
@@ -4433,15 +4409,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                         </div>
                       </div>
                     </div>
-                    <button
-                      onClick={addFamilyMember}
-                      disabled={newMemberName.trim() === ''}
-                      className={`font-bold py-3 px-6 rounded-xl w-full ${
-                        newMemberName.trim() === ''
-                          ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                          : 'btn-glow bg-primary text-white'
-                      }`}
-                    >
+                    <button onClick={addFamilyMember} disabled={newMemberName.trim() === ''} className={`font-bold py-3 px-6 rounded-xl w-full ${newMemberName.trim() === '' ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'btn-glow bg-primary text-white'}`}>
                       {t('add')}
                     </button>
                   </div>
