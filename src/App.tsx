@@ -1374,41 +1374,38 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
     const currentProfile = profileType === 'student' ? studentProfile : familyProfile
     const alreadyDone = (currentProfile.progress.topicProgress['test'] ?? 0) >= 100
     const topicsCompleted = mainTopics.filter(t => (currentProfile.progress.topicProgress[t] ?? 0) >= 100).length
-    const quizPlayed = currentProfile.progress.quizScores.length > 0
 
-     let newProgress: any
-     if (profileType === 'student') {
-       const checked = checkStudentBadges({ ...studentProfile, progress: { ...studentProfile.progress, topicProgress: { ...studentProfile.progress.topicProgress, test: 100 } } })
-       const completedActivities = studentProfile.progress.completedActivities + (alreadyDone ? 0 : 1)
-       newProgress = {
-         ...studentProfile.progress,
-         completedActivities,
-         totalActivities: Math.max(studentProfile.progress.totalActivities, completedActivities),
-         topicProgress: { ...studentProfile.progress.topicProgress, test: 100 },
-         badges: checked.profile.progress.badges,
-       }
-       setStudentProfile({ ...studentProfile, progress: newProgress })
-       saveStudentProfile({ ...studentProfile, progress: newProgress })
-       if (checked.unlocked.length > 0) {
-         setEarnedBadge({ ...checked.unlocked[0] })
-         setShowBadgeCelebration(true)
-       }
-     } else {
-       const completedActivities = familyProfile.progress.completedActivities + (alreadyDone ? 0 : 1)
-       newProgress = {
-         ...familyProfile.progress,
-         completedActivities,
-         totalActivities: Math.max(familyProfile.progress.totalActivities, completedActivities),
-         topicProgress: { ...familyProfile.progress.topicProgress, test: 100 },
-         badges: familyProfile.progress.badges,
-       }
-       let updated: FamilyProfile = { ...familyProfile, progress: newProgress }
-       updated = pushFamilyLog(updated, '🏅 ¡Examen final completado!')
-       const checked = checkFamilyBadges(updated)
-       setFamilyProfile(checked.profile)
-       saveFamilyProfile(checked.profile)
-        celebrateFamilyBadges(checked.unlocked)
+    if (profileType === 'student') {
+      const checked = checkStudentBadges({ ...studentProfile, progress: { ...studentProfile.progress, topicProgress: { ...studentProfile.progress.topicProgress, test: 100 } } })
+      const completedActivities = studentProfile.progress.completedActivities + (alreadyDone ? 0 : 1)
+      const newProgress = {
+        ...studentProfile.progress,
+        completedActivities,
+        totalActivities: Math.max(studentProfile.progress.totalActivities, completedActivities),
+        topicProgress: { ...studentProfile.progress.topicProgress, test: 100 },
+        badges: checked.profile.progress.badges,
       }
+      setStudentProfile({ ...studentProfile, progress: newProgress })
+      saveStudentProfile({ ...studentProfile, progress: newProgress })
+      if (checked.unlocked.length > 0) {
+        setEarnedBadge({ ...checked.unlocked[0] })
+        setShowBadgeCelebration(true)
+      }
+    } else {
+      const completedActivities = familyProfile.progress.completedActivities + (alreadyDone ? 0 : 1)
+      const newProgress = {
+        ...familyProfile.progress,
+        completedActivities,
+        totalActivities: Math.max(familyProfile.progress.totalActivities, completedActivities),
+        topicProgress: { ...familyProfile.progress.topicProgress, test: 100 },
+        badges: familyProfile.progress.badges,
+      }
+      let updated: FamilyProfile = { ...familyProfile, progress: newProgress }
+      updated = pushFamilyLog(updated, '🏅 ¡Examen final completado!')
+      const checked = checkFamilyBadges(updated)
+      setFamilyProfile(checked.profile)
+      saveFamilyProfile(checked.profile)
+      celebrateFamilyBadges(checked.unlocked)
     }
   }
 
