@@ -2550,6 +2550,14 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                 <p className="text-white/90 mb-4">Entra y conoce más de nuestro trabajo</p>
                 <div className="flex flex-col gap-2.5">
                   <a
+                    href="https://www.tiktok.com/@proyectoshumanidades_"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block bg-white text-primary font-black px-6 py-2.5 rounded-full hover:scale-[1.02] active:scale-[0.99] transition-all"
+                  >
+                    👉 ¡Síguenos! 💙
+                  </a>
+                  <a
                     href="https://vt.tiktok.com/ZSbePoGYT/"
                     target="_blank"
                     rel="noopener noreferrer"
