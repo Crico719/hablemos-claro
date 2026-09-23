@@ -2543,6 +2543,16 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
             </div>
 
             <div className="space-y-4">
+              <a
+                href="https://vt.tiktok.com/ZSbePoGYT/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block bg-gradient-to-r from-primary to-secondary rounded-3xl shadow-lg shadow-primary/25 p-6 text-white text-center card-hover animate-slide-up hover:scale-[1.01] active:scale-[0.99] transition-all"
+              >
+                <p className="font-black text-xl mb-1">🔗 SÍGUENOS EN TIKTOK 🔗</p>
+                <p className="text-white/90 mb-3">Entra y conoce más de nuestro trabajo</p>
+                <span className="inline-block bg-white text-primary font-black px-6 py-2.5 rounded-full">👉 ¡Te esperamos! 💙</span>
+              </a>
               {reelsMessages.map((reel, index) => (
                 <div key={reel.id} className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-6 shadow-custom-lg card-hover animate-slide-up" style={{ animationDelay: `${index * 80}ms` }}>
                   <div className="flex items-center gap-3 mb-3">
