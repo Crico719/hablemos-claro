@@ -2581,6 +2581,14 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                   >
                     🎬 Video 3
                   </a>
+                  <a
+                    href="https://www.tiktok.com/@proyectoshumanidades_/video/7688869627883048199"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block bg-white/20 border border-white/40 text-white font-black px-6 py-2.5 rounded-full hover:bg-white/30 active:scale-[0.99] transition-all"
+                  >
+                    🎬 Video 4
+                  </a>
                 </div>
               </div>
               {reelsMessages.map((reel, index) => (
