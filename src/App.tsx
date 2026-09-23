@@ -3438,23 +3438,50 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                   </div>
                 </div>
                 )}
+                {(() => {
+                  const scenarioOK = answeredOpt === activeKid.scenarioCorrect
+                  const tfList = activeKid.trueFalse ?? []
+                  const tfScore = tfList.filter((tf, ti) => tfAnswers[ti] === tf.answer).length
+                  const tfOK = tfList.length > 0 && tfScore === tfList.length
+                  const blankList = activeKid.blanks ?? []
+                  const blanksOK = blankList.length > 0 && blankList.every((b, bi) => (blankInputs[bi] ?? '').trim().toLowerCase() === b.answer.toLowerCase())
+                  const mastered = scenarioOK && tfOK && blanksOK
+                  return (
+                <>
+                <div className="bg-white rounded-[20px] p-5 md:p-6 border border-slate-100 shadow-[0_4px_20px_rgba(30,41,82,0.05)]">
+                  <p className="font-black text-primary text-sm tracking-widest mb-3">🎓 PARA COMPLETAR EL TEMA RESPONDE TODO BIEN</p>
+                  <ul className="space-y-2">
+                    <li className={`flex items-center gap-2 font-bold ${scenarioOK ? 'text-success' : 'text-slate-500'}`}>
+                      <span>{scenarioOK ? '✓' : '○'}</span> Elige bien en “¿Qué harías tú?” (paso 4)
+                    </li>
+                    <li className={`flex items-center gap-2 font-bold ${tfOK ? 'text-success' : 'text-slate-500'}`}>
+                      <span>{tfOK ? '✓' : '○'}</span> Verdadero o falso: {tfScore}/{tfList.length} correctas
+                    </li>
+                    <li className={`flex items-center gap-2 font-bold ${blanksOK ? 'text-success' : 'text-slate-500'}`}>
+                      <span>{blanksOK ? '✓' : '○'}</span> Completa lo que falta sin errores
+                    </li>
+                  </ul>
+                </div>
                 <button
                   onClick={() => completeKidTopic(activeKid.id)}
-                  disabled={kidsDone.includes(activeKid.id) || answeredOpt === null}
+                  disabled={kidsDone.includes(activeKid.id) || !mastered}
                   className={`font-bold py-4 px-6 rounded-full text-lg w-full transition-all ${
                     kidsDone.includes(activeKid.id)
                       ? 'bg-success/15 text-success cursor-default'
-                      : answeredOpt === null
+                      : !mastered
                         ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                         : 'btn-glow bg-gradient-to-r from-primary to-secondary text-white shadow-lg shadow-primary/25 hover:scale-[1.01] active:scale-[0.99]'
                   }`}
                 >
                   {kidsDone.includes(activeKid.id)
                     ? '✓ Tema completado'
-                    : answeredOpt === null
-                      ? 'Responde el paso 4 para completar'
+                    : !mastered
+                      ? 'Responde todo correctamente para completar'
                       : 'Marcar como terminado ✓'}
                 </button>
+                </>
+                  )
+                })()}
                 {kidsDone.includes(activeKid.id) && (() => {
                   const next = KIDS_TOPICS.find(k => !kidsDone.includes(k.id))
                   return (
