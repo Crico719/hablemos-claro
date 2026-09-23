@@ -104,7 +104,6 @@ const defaultPhotoPos: PhotoPos = { x: 50, y: 50, zoom: 1 }
 const allBadges: Badge[] = [
   { id: 'topics-explorer', name: 'Explorador de Temas', emoji: '📚', color: '#3B82F6', unlocked: false },
   { id: 'game-master', name: 'Maestro del Juego', emoji: '🎮', color: '#8B5CF6', unlocked: false },
-  { id: 'integrity-champion', name: 'Campeón de la Integridad', emoji: '🏆', color: '#F59E0B', unlocked: false },
 ]
 
 const defaultFamilyBadges: FamilyBadge[] = [
@@ -113,7 +112,6 @@ const defaultFamilyBadges: FamilyBadge[] = [
   { id: 'united-family', name: 'Familia unida', emoji: '👨‍👩‍👧‍👦', desc: 'Todos los integrantes participan en una actividad', unlocked: false },
   { id: 'great-conversationalists', name: 'Grandes conversadores', emoji: '💬', desc: 'Completa 5 conversaciones familiares', unlocked: false },
   { id: 'against-corruption', name: 'Contra la corrupción', emoji: '🛡️', desc: 'Completa 3 actividades sobre coimas y corrupción', unlocked: false },
-  { id: 'committed-family', name: 'Familia comprometida', emoji: '⭐', desc: 'Completa todas las actividades principales', unlocked: false },
 ]
 
 const corruptionTopics: LearningTopic[] = ['coima', 'recognition', 'impact', 'consequences', 'prevention']
@@ -1273,11 +1271,20 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
     newProgress.totalActivities = Math.max(newProgress.totalActivities, newProgress.completedActivities)
 
     if (profileType === 'student') {
-      setStudentProfile({ ...studentProfile, progress: newProgress })
-      saveStudentProfile({ ...studentProfile, progress: newProgress })
+      const checked = checkStudentBadges({ ...studentProfile, progress: newProgress })
+      setStudentProfile({ ...studentProfile, progress: checked.profile.progress })
+      saveStudentProfile({ ...studentProfile, progress: checked.profile.progress })
+      if (checked.unlocked.length > 0) {
+        setEarnedBadge({ ...checked.unlocked[0] })
+        setShowBadgeCelebration(true)
+      }
     } else {
-      setFamilyProfile({ ...familyProfile, progress: newProgress })
-      saveFamilyProfile({ ...familyProfile, progress: newProgress })
+      let updated: FamilyProfile = { ...familyProfile, progress: newProgress }
+      updated = pushFamilyLog(updated, '📖 Actividad completada.')
+      const checked = checkFamilyBadges(updated)
+      setFamilyProfile(checked.profile)
+      saveFamilyProfile(checked.profile)
+      celebrateFamilyBadges(checked.unlocked)
     }
   }
 
@@ -1300,8 +1307,13 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
       },
     }
     if (profileType === 'student') {
-      setStudentProfile({ ...studentProfile, progress: newProgress })
-      saveStudentProfile({ ...studentProfile, progress: newProgress })
+      const checked = checkStudentBadges({ ...studentProfile, progress: newProgress })
+      setStudentProfile({ ...studentProfile, progress: checked.profile.progress })
+      saveStudentProfile({ ...studentProfile, progress: checked.profile.progress })
+      if (checked.unlocked.length > 0) {
+        setEarnedBadge({ ...checked.unlocked[0] })
+        setShowBadgeCelebration(true)
+      }
     } else {
       let updated: FamilyProfile = { ...familyProfile, progress: newProgress }
       updated = pushFamilyLog(updated, `📚 Tema completado: ${topicTitles[topic]}.`)
@@ -1340,8 +1352,13 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
       totalActivities: Math.max(cur.progress.totalActivities, completedActivities),
     }
     if (profileType === 'student') {
-      setStudentProfile({ ...studentProfile, progress: newProgress })
-      saveStudentProfile({ ...studentProfile, progress: newProgress })
+      const checked = checkStudentBadges({ ...studentProfile, progress: newProgress })
+      setStudentProfile({ ...studentProfile, progress: checked.profile.progress })
+      saveStudentProfile({ ...studentProfile, progress: checked.profile.progress })
+      if (checked.unlocked.length > 0) {
+        setEarnedBadge({ ...checked.unlocked[0] })
+        setShowBadgeCelebration(true)
+      }
     } else {
       let updated: FamilyProfile = { ...familyProfile, progress: newProgress }
       updated = pushFamilyLog(updated, `📖 Guía revisada: ${g.title}.`)
@@ -1359,45 +1376,39 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
     const topicsCompleted = mainTopics.filter(t => (currentProfile.progress.topicProgress[t] ?? 0) >= 100).length
     const quizPlayed = currentProfile.progress.quizScores.length > 0
 
-    let newBadges: Badge[]
-    if (profileType === 'student') {
-      newBadges = currentProfile.progress.badges.map(b => ({
-        ...b,
-        unlocked: b.id === 'topics-explorer' ? topicsCompleted >= 3 :
-                   b.id === 'game-master' ? quizPlayed :
-                   b.id === 'integrity-champion' ? true :
-                   b.unlocked
-      }))
-    } else {
-      newBadges = currentProfile.progress.badges
-    }
-
-    const completedActivities = currentProfile.progress.completedActivities + (alreadyDone ? 0 : 1)
-    const newProgress = {
-      ...currentProfile.progress,
-      completedActivities,
-      totalActivities: Math.max(currentProfile.progress.totalActivities, completedActivities),
-      topicProgress: {
-        ...currentProfile.progress.topicProgress,
-        test: 100,
-      },
-      badges: newBadges,
-    }
-    if (profileType === 'student') {
-      setStudentProfile({ ...studentProfile, progress: newProgress })
-      saveStudentProfile({ ...studentProfile, progress: newProgress })
-      const unlockedStudent = newBadges.filter((b, i) => b.unlocked && !currentProfile.progress.badges[i].unlocked)
-      if (unlockedStudent.length > 0) {
-        setEarnedBadge({ ...unlockedStudent[0] })
-        setShowBadgeCelebration(true)
+     let newProgress: any
+     if (profileType === 'student') {
+       const checked = checkStudentBadges({ ...studentProfile, progress: { ...studentProfile.progress, topicProgress: { ...studentProfile.progress.topicProgress, test: 100 } } })
+       const completedActivities = studentProfile.progress.completedActivities + (alreadyDone ? 0 : 1)
+       newProgress = {
+         ...studentProfile.progress,
+         completedActivities,
+         totalActivities: Math.max(studentProfile.progress.totalActivities, completedActivities),
+         topicProgress: { ...studentProfile.progress.topicProgress, test: 100 },
+         badges: checked.profile.progress.badges,
+       }
+       setStudentProfile({ ...studentProfile, progress: newProgress })
+       saveStudentProfile({ ...studentProfile, progress: newProgress })
+       if (checked.unlocked.length > 0) {
+         setEarnedBadge({ ...checked.unlocked[0] })
+         setShowBadgeCelebration(true)
+       }
+     } else {
+       const completedActivities = familyProfile.progress.completedActivities + (alreadyDone ? 0 : 1)
+       newProgress = {
+         ...familyProfile.progress,
+         completedActivities,
+         totalActivities: Math.max(familyProfile.progress.totalActivities, completedActivities),
+         topicProgress: { ...familyProfile.progress.topicProgress, test: 100 },
+         badges: familyProfile.progress.badges,
+       }
+       let updated: FamilyProfile = { ...familyProfile, progress: newProgress }
+       updated = pushFamilyLog(updated, '🏅 ¡Examen final completado!')
+       const checked = checkFamilyBadges(updated)
+       setFamilyProfile(checked.profile)
+       saveFamilyProfile(checked.profile)
+        celebrateFamilyBadges(checked.unlocked)
       }
-    } else {
-      let updated: FamilyProfile = { ...familyProfile, progress: newProgress }
-      updated = pushFamilyLog(updated, '🏅 ¡Examen final completado!')
-      const checked = checkFamilyBadges(updated)
-      setFamilyProfile(checked.profile)
-      saveFamilyProfile(checked.profile)
-      celebrateFamilyBadges(checked.unlocked)
     }
   }
 
@@ -1479,7 +1490,6 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
         case 'united-family': return profile.members.length > 0 && profile.members.every(m => m.activities >= 1)
         case 'great-conversationalists': return conv >= 5
         case 'against-corruption': return corruptionTopics.filter(t => (tp[t] ?? 0) >= 100).length >= 3
-        case 'committed-family': return mainTopics.every(t => (tp[t] ?? 0) >= 100)
       }
     }
     let updated = profile
@@ -1493,13 +1503,37 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
         updated = pushFamilyLog(updated, `🏅 Se desbloqueó la insignia ${nb.name}.`)
       }
     })
-    return { profile: updated, unlocked }
-  }
+     return { profile: updated, unlocked }
+   }
 
-  const celebrateFamilyBadges = (unlocked: FamilyBadge[]) => {
+   const checkStudentBadges = (profile: StudentProfile): { profile: StudentProfile; unlocked: Badge[] } => {
+     const tp = profile.progress.topicProgress
+     const quizPlayed = profile.progress.quizScores.length > 0
+     const topicsCompleted = mainTopics.filter(t => (tp[t] ?? 0) >= 100).length
+     const shouldUnlock = (id: string): boolean => {
+       switch (id) {
+         case 'topics-explorer': return topicsCompleted >= 3
+         case 'game-master': return quizPlayed
+       }
+       return false
+     }
+     let updated = profile
+     const unlocked: Badge[] = []
+     allBadges.forEach(def => {
+       const current = updated.progress.badges.find(b => b.id === def.id)!
+       if (!current.unlocked && shouldUnlock(def.id)) {
+         const nb = { ...current, unlocked: true }
+         updated = { ...updated, progress: { ...updated.progress, badges: updated.progress.badges.map(b => (b.id === def.id ? nb : b)) } }
+         unlocked.push(nb)
+       }
+     })
+     return { profile: updated, unlocked }
+   }
+
+   const celebrateFamilyBadges = (unlocked: FamilyBadge[]) => {
     if (unlocked.length === 0) return
     const last = unlocked[unlocked.length - 1]
-    setEarnedBadge({ id: 'integrity-champion', name: last.name, emoji: last.emoji, color: '#F59E0B', unlocked: true })
+    setEarnedBadge({ id: last.id, name: last.name, emoji: last.emoji, color: last.color ?? '#F59E0B', unlocked: true })
     setShowBadgeCelebration(true)
   }
 
@@ -1511,21 +1545,26 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
     return Math.round(topicsPart + convPart + badgePart)
   }
 
-  const completeConversation = () => {
-    const currentProfile = profileType === 'student' ? studentProfile : familyProfile
-    const newProgress = { ...currentProfile.progress, conversations: currentProfile.progress.conversations + 1 }
-    if (profileType === 'student') {
-      setStudentProfile({ ...studentProfile, progress: newProgress })
-      saveStudentProfile({ ...studentProfile, progress: newProgress })
-    } else {
-      let updated: FamilyProfile = { ...familyProfile, progress: newProgress }
-      updated = pushFamilyLog(updated, '💬 La familia inició una conversación.')
-      const checked = checkFamilyBadges(updated)
-      setFamilyProfile(checked.profile)
-      saveFamilyProfile(checked.profile)
-      celebrateFamilyBadges(checked.unlocked)
-    }
-  }
+   const completeConversation = () => {
+     const currentProfile = profileType === 'student' ? studentProfile : familyProfile
+     const newProgress = { ...currentProfile.progress, conversations: currentProfile.progress.conversations + 1 }
+     if (profileType === 'student') {
+       const checked = checkStudentBadges({ ...studentProfile, progress: newProgress })
+       setStudentProfile({ ...studentProfile, progress: checked.profile.progress })
+       saveStudentProfile({ ...studentProfile, progress: checked.profile.progress })
+       if (checked.unlocked.length > 0) {
+         setEarnedBadge({ ...checked.unlocked[0] })
+         setShowBadgeCelebration(true)
+       }
+     } else {
+       let updated: FamilyProfile = { ...familyProfile, progress: newProgress }
+       updated = pushFamilyLog(updated, '💬 La familia inició una conversación.')
+       const checked = checkFamilyBadges(updated)
+       setFamilyProfile(checked.profile)
+       saveFamilyProfile(checked.profile)
+       celebrateFamilyBadges(checked.unlocked)
+     }
+   }
 
   // Responder pregunta del quiz
   const handleAnswer = (selected: number) => {
@@ -1545,29 +1584,44 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
     }
   }
 
-  // Continuar después del feedback
-  const continueAfterFeedback = () => {
-    setShowFeedback(false)
-    setUserAnswers([])
-    
-    // Avanzar según la pantalla actual
-    switch (currentScreen) {
-      case 'quiz':
-        // Verificar si completaron todas las preguntas
-        if (userAnswers.length >= 3) {
-          navigateTo('result')
-        }
-        break
-      case 'games':
-        navigateTo('converse')
-        break
-      case 'activity':
-        navigateTo('cases')
-        break
-      default:
-        // Ya no hacer nada, solo cerrar feedback
-    }
-  }
+   // Continuar después del feedback
+   const continueAfterFeedback = () => {
+     setShowFeedback(false)
+     setUserAnswers([])
+     
+     // Avanzar según la pantalla actual
+     switch (currentScreen) {
+       case 'quiz':
+         // Verificar si completaron todas las preguntas
+         if (userAnswers.length >= 3) {
+           // Guardar puntaje del quiz
+           const correctCount = userAnswers.filter((a, i) => a === 1).length
+           const score = Math.round((correctCount / userAnswers.length) * 100)
+           const currentProf = profileType === 'student' ? studentProfile : familyProfile
+           const newQuizScores = [...currentProf.progress.quizScores, score]
+           if (profileType === 'student') {
+             const newProgress = { ...studentProfile.progress, quizScores: newQuizScores }
+             const checked = checkStudentBadges({ ...studentProfile, progress: newProgress })
+             setStudentProfile({ ...studentProfile, progress: checked.profile.progress })
+             saveStudentProfile({ ...studentProfile, progress: checked.profile.progress })
+             if (checked.unlocked.length > 0) {
+               setEarnedBadge({ ...checked.unlocked[0] })
+               setShowBadgeCelebration(true)
+             }
+           }
+           navigateTo('result')
+         }
+         break
+       case 'games':
+         navigateTo('converse')
+         break
+       case 'activity':
+         navigateTo('cases')
+         break
+       default:
+         // Ya no hacer nada, solo cerrar feedback
+     }
+   }
 
   // Completar conversación
   // (ya definida arriba)
@@ -1951,7 +2005,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
       const unlockedCount = currentProgress.badges.filter(b => b.unlocked).length
       const isFamHome = profileType === 'family'
       const homeBadgeCount = isFamHome ? familyProfile.familyBadges.filter(b => b.unlocked).length : unlockedCount
-      const homeBadgeTotal = isFamHome ? familyProfile.familyBadges.length : 3
+       const homeBadgeTotal = isFamHome ? familyProfile.familyBadges.length : getBadges().length
       const kidsDoneArr = currentProgress.kidsDone ?? []
       const kidsDoneCount = kidsDoneArr.length
       const kidsTotal = KIDS_TOPICS.length
@@ -3245,7 +3299,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
     case 'games':
       const cust9 = getCustomization();
       const gamesBadgeCount = profileType === 'family' ? familyProfile.familyBadges.filter(b => b.unlocked).length : getBadges().filter(b => b.unlocked).length;
-      const gamesBadgeTotal = profileType === 'family' ? familyProfile.familyBadges.length : 3;
+       const gamesBadgeTotal = profileType === 'family' ? familyProfile.familyBadges.length : getBadges().length;
       return (
         <div className="min-h-screen pb-24" style={{ background: cust9.backgroundValue, backgroundSize: cust9.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           {/* Decoración de fondo */}
