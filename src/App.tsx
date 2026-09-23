@@ -2037,8 +2037,10 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
         </button>
       )
 
+      const custHome = getCustomization()
+      const textColors = getTextColorForTheme(custHome.backgroundValue)
       return (
-        <div className="min-h-screen pb-36" style={{ background: 'linear-gradient(180deg, #F8FAFF 0%, #EDF1F9 100%)' }}>
+        <div className="min-h-screen pb-36" style={{ background: custHome.backgroundValue, backgroundSize: custHome.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           {/* NAVBAR */}
           <header className="h-16 md:h-[68px] bg-white/80 backdrop-blur-xl border-b border-slate-200/60 sticky top-0 z-30">
             <div className="mx-auto w-full max-w-[1120px] px-5 md:px-8 lg:px-6 h-full flex items-center justify-between gap-3">
@@ -2061,156 +2063,162 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
           </header>
 
             <main className="mx-auto w-full max-w-[1120px] px-5 md:px-8 lg:px-6 pt-10 md:pt-16 pb-16 animate-slide-up">
-              {/* HERO */}
-              <section className="relative overflow-hidden rounded-[28px] border border-slate-100 bg-gradient-to-br from-primary-50 via-white to-secondary-50 shadow-[0_16px_48px_rgba(124,58,237,0.08)] px-6 py-12 md:px-14 md:py-20 text-center">
-                {/* Elementos decorativos animados */}
-                <div aria-hidden className="pointer-events-none absolute -top-24 -left-24 w-80 h-80 rounded-full bg-secondary-100/60 blur-3xl animate-float" style={{ animationDelay: '0s' }} />
-                <div aria-hidden className="pointer-events-none absolute -bottom-24 -right-24 w-80 h-80 rounded-full bg-primary-100/60 blur-3xl animate-float" style={{ animationDelay: '1s' }} />
-                <div aria-hidden className="pointer-events-none absolute top-1/4 -right-16 w-40 h-40 rounded-full bg-warning/10 blur-3xl animate-float" style={{ animationDelay: '2s' }} />
-                <div aria-hidden className="pointer-events-none absolute -top-8 left-1/2 w-32 h-32 rounded-full bg-primary/5 blur-3xl animate-float" style={{ animationDelay: '0.5s' }} />
-                {/* Estrellas decorativas */}
-                <div aria-hidden className="pointer-events-none absolute top-8 left-12 text-2xl animate-float opacity-30" style={{ animationDelay: '0.3s' }}>✨</div>
-                <div aria-hidden className="pointer-events-none absolute top-20 right-16 text-xl animate-float opacity-30" style={{ animationDelay: '1.5s' }}>⭐</div>
-                <div aria-hidden className="pointer-events-none absolute bottom-12 left-20 text-xl animate-float opacity-20" style={{ animationDelay: '2.5s' }}>🎮</div>
+               {/* HERO */}
+               <section className="relative overflow-hidden rounded-[28px] border shadow-[0_16px_48px_rgba(124,58,237,0.08)] px-6 py-12 md:px-14 md:py-20 text-center" style={{ background: textColors.cardBg, borderColor: textColors.border }}>
+                 {/* Elementos decorativos animados */}
+                 <div aria-hidden className="pointer-events-none absolute -top-24 -left-24 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float" style={{ animationDelay: '0s', background: `rgba(124,58,237,0.1)` }} />
+                 <div aria-hidden className="pointer-events-none absolute -bottom-24 -right-24 w-80 h-80 rounded-full blur-3xl opacity-20 animate-float" style={{ animationDelay: '1s', background: `rgba(59,130,246,0.1)` }} />
+                 <div aria-hidden className="pointer-events-none absolute top-1/4 -right-16 w-40 h-40 rounded-full blur-3xl opacity-20 animate-float" style={{ animationDelay: '2s', background: `rgba(245,158,11,0.1)` }} />
+                 <div aria-hidden className="pointer-events-none absolute -top-8 left-1/2 w-32 h-32 rounded-full blur-3xl opacity-20 animate-float" style={{ animationDelay: '0.5s', background: `rgba(16,185,129,0.1)` }} />
+                 {/* Estrellas decorativas */}
+                 <div aria-hidden className="pointer-events-none absolute top-8 left-12 text-2xl animate-float opacity-30" style={{ animationDelay: '0.3s' }}>✨</div>
+                 <div aria-hidden className="pointer-events-none absolute top-20 right-16 text-xl animate-float opacity-30" style={{ animationDelay: '1.5s' }}>⭐</div>
+                 <div aria-hidden className="pointer-events-none absolute bottom-12 left-20 text-xl animate-float opacity-20" style={{ animationDelay: '2.5s' }}>🎮</div>
 
-                <div className="relative mx-auto max-w-2xl flex flex-col items-center gap-5">
-                  <span className="inline-flex items-center gap-2 w-max px-4 py-1.5 rounded-full bg-white/80 border border-slate-100 text-[11px] font-bold uppercase tracking-widest text-primary shadow-sm backdrop-blur-sm">
-                    ✨ {t('heroEyebrow')}
-                  </span>
-                  <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-4xl md:text-5xl shadow-lg shadow-primary/25 animate-float">
-                    🛡️
-                  </div>
-                  <h1 className="text-3xl md:text-[42px] font-black gradient-text leading-[1.08] max-w-xl">{t('heroTitle')}</h1>
-                  <p className="text-slate-600 text-base md:text-lg leading-relaxed max-w-lg">{t('welcomeLine')}</p>
+                 <div className="relative mx-auto max-w-2xl flex flex-col items-center gap-5">
+                   <span className="inline-flex items-center gap-2 w-max px-4 py-1.5 rounded-full border text-[11px] font-bold uppercase tracking-widest shadow-sm backdrop-blur-sm" style={{ background: `${textColors.cardBg}80`, borderColor: textColors.border, color: textColors.primary }}>
+                     ✨ {t('heroEyebrow')}
+                   </span>
+                   <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-4xl md:text-5xl shadow-lg shadow-primary/25 animate-float">
+                     🛡️
+                   </div>
+                   <h1 className="text-3xl md:text-[42px] font-black leading-[1.08] max-w-xl" style={{ color: textColors.primary}}>{t('heroTitle')}</h1>
+                   <p className="text-base md:text-lg leading-relaxed max-w-lg" style={{ color: textColors.secondary}}>{t('welcomeLine')}</p>
 
-                  <div className="flex flex-col sm:flex-row items-center gap-3 mt-2 w-full sm:w-auto">
-                    <button
-                      onClick={nextLesson ? nextLesson.go : () => openTemasTab('')}
-                      className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 text-white text-sm md:text-[15px] font-bold rounded-full px-8 h-12 bg-gradient-to-r from-primary to-secondary shadow-lg shadow-primary/25 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
-                    >
-                      {t('continueLesson')} <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
-                    </button>
-                    <button
-                      onClick={() => setCurrentScreen('games')}
-                      className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 text-primary text-sm md:text-[15px] font-bold rounded-full px-8 h-12 bg-white border-2 border-primary/30 hover:bg-primary/5 hover:border-primary/50 hover:shadow-lg active:scale-[0.98] transition-all duration-200"
-                    >
-                      🎮 Jugar ahora <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
-                    </button>
-                  </div>
+                   <div className="flex flex-col sm:flex-row items-center gap-3 mt-2 w-full sm:w-auto">
+                     <button
+                       onClick={nextLesson ? nextLesson.go : () => openTemasTab('')}
+                       className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 text-white text-sm md:text-[15px] font-bold rounded-full px-8 h-12 bg-gradient-to-r from-primary to-secondary shadow-lg shadow-primary/25 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+                     >
+                       {t('continueLesson')} <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+                     </button>
+                     <button
+                       onClick={() => setCurrentScreen('games')}
+                       className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 text-sm md:text-[15px] font-bold rounded-full px-8 h-12 border-2 hover:bg-primary/5 hover:border-primary/50 hover:shadow-lg active:scale-[0.98] transition-all duration-200"
+                       style={{ color: textColors.primary, borderColor: `${textColors.primary}40`, backgroundColor: `${textColors.cardBg}80` }}
+                     >
+                       🎮 Jugar ahora <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+                     </button>
+                   </div>
 
-                  <div className="flex items-center gap-3 w-full max-w-[360px] mt-4">
-                    <div className="flex-1 h-2.5 bg-slate-200/70 rounded-full overflow-hidden shadow-inner" role="progressbar" aria-valuenow={lessonsPct} aria-valuemin={0} aria-valuemax={100} aria-label={t('topicsCompleted')}>
-                      <div className="h-full rounded-full bg-gradient-to-r from-primary to-secondary transition-[width] duration-700 shadow-sm" style={{ width: `${lessonsPct}%` }}></div>
-                    </div>
-                    <span className="text-xs md:text-sm font-bold text-slate-600 shrink-0 tabular-nums">
-                      {t('lessonWord')} {nextLessonNum} de {lessonTotal}
-                    </span>
-                  </div>
-                </div>
-              </section>
+                   <div className="flex items-center gap-3 w-full max-w-[360px] mt-4">
+                     <div className="flex-1 h-2.5 rounded-full overflow-hidden shadow-inner" style={{ background: `${textColors.border}80` }} role="progressbar" aria-valuenow={lessonsPct} aria-valuemin={0} aria-valuemax={100} aria-label={t('topicsCompleted')}>
+                       <div className="h-full rounded-full bg-gradient-to-r from-primary to-secondary transition-[width] duration-700 shadow-sm" style={{ width: `${lessonsPct}%` }}></div>
+                     </div>
+                     <span className="text-xs md:text-sm font-bold shrink-0 tabular-nums" style={{ color: textColors.secondary }}>
+                       {t('lessonWord')} {nextLessonNum} de {lessonTotal}
+                     </span>
+                   </div>
+                 </div>
+               </section>
 
-            {/* CARACTERÍSTICAS */}
-            <section className="mt-12 md:mt-16">
-              <div className="flex items-center gap-3 mb-6 justify-center">
-                <span className="h-px flex-1 max-w-[120px] bg-slate-200/70" aria-hidden />
-                <h2 className="text-[11px] md:text-xs font-black uppercase tracking-widest text-slate-500">✨ {t('learnSection')}</h2>
-                <span className="h-px flex-1 max-w-[120px] bg-slate-200/70" aria-hidden />
+             {/* CARACTERÍSTICAS */}
+             <section className="mt-12 md:mt-16">
+               <div className="flex items-center gap-3 mb-6 justify-center">
+                 <span className="h-px flex-1 max-w-[120px]" style={{ background: `${textColors.border}80` }} aria-hidden />
+                 <h2 className="text-[11px] md:text-xs font-black uppercase tracking-widest" style={{ color: textColors.secondary}}>✨ {t('learnSection')}</h2>
+                 <span className="h-px flex-1 max-w-[120px]" style={{ background: `${textColors.border}80` }} aria-hidden />
+               </div>
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+                 <button
+                   onClick={() => openTemasTab('')}
+                   className="group rounded-[22px] backdrop-blur-xl border p-6 md:p-7 text-left shadow-[0_6px_24px_rgba(30,41,82,0.05)] hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(30,41,82,0.10)] hover:border-secondary/30 transition-all duration-200 flex flex-col gap-3"
+                   style={{ background: `${textColors.cardBg}cc`, borderColor: textColors.border }}
+                 >
+                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-secondary to-secondary/60 flex items-center justify-center text-2xl transition-transform duration-200 group-hover:scale-110" aria-hidden>📖</div>
+                   <div className="flex-1">
+                     <p className="font-extrabold text-lg" style={{ color: textColors.primary}}>{t('themes')}</p>
+                     <p className="text-sm mt-1 leading-relaxed" style={{ color: textColors.secondary}}>{t('themesDesc')}</p>
+                   </div>
+                   <span className="inline-flex items-center gap-1 text-sm font-bold mt-1" style={{ color: textColors.secondary}}>
+                     {t('viewMore')} <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+                   </span>
+                 </button>
+                 <button
+                   onClick={() => setCurrentScreen('games')}
+                   className="group rounded-[22px] backdrop-blur-xl border p-6 md:p-7 text-left shadow-[0_6px_24px_rgba(124,58,237,0.08)] hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(124,58,237,0.15)] hover:border-primary/30 transition-all duration-200 flex flex-col gap-3"
+                   style={{ background: `${textColors.cardBg}cc`, borderColor: textColors.border }}
+                  >
+                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-2xl transition-transform duration-200 group-hover:scale-110" aria-hidden>🎮</div>
+                   <div className="flex-1">
+                     <p className="font-extrabold text-lg" style={{ color: textColors.primary}}>{t('game')}</p>
+                     <p className="text-sm mt-1 leading-relaxed" style={{ color: textColors.secondary}}>{t('gameDesc')}</p>
+                   </div>
+                   <span className="inline-flex items-center gap-1 text-sm font-bold mt-1" style={{ color: textColors.primary}}>
+                     {t('viewMore')} <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+                   </span>
+                 </button>
+                 <button
+                   onClick={() => setCurrentScreen('reels')}
+                   className="group rounded-[22px] backdrop-blur-xl border p-6 md:p-7 text-left shadow-[0_6px_24px_rgba(30,41,82,0.05)] hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(30,41,82,0.10)] hover:border-warning/30 transition-all duration-200 flex flex-col gap-3"
+                   style={{ background: `${textColors.cardBg}cc`, borderColor: textColors.border }}
+                 >
+                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-warning to-warning/60 flex items-center justify-center text-2xl transition-transform duration-200 group-hover:scale-110" aria-hidden>📱</div>
+                   <div className="flex-1">
+                     <p className="font-extrabold text-lg" style={{ color: textColors.primary}}>{t('reels')}</p>
+                     <p className="text-sm mt-1 leading-relaxed" style={{ color: textColors.secondary}}>{t('reelsDesc')}</p>
+                   </div>
+                   <span className="inline-flex items-center gap-1 text-sm font-bold mt-1" style={{ color: textColors.secondary}}>
+                     {t('viewMore')} <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+                   </span>
+                 </button>
+                 <button
+                   onClick={() => setCurrentScreen('converse')}
+                   className="group rounded-[22px] backdrop-blur-xl border p-6 md:p-7 text-left shadow-[0_6px_24px_rgba(30,41,82,0.05)] hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(30,41,82,0.10)] hover:border-success/30 transition-all duration-200 flex flex-col gap-3"
+                   style={{ background: `${textColors.cardBg}cc`, borderColor: textColors.border }}
+                 >
+                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-success to-success/60 flex items-center justify-center text-2xl transition-transform duration-200 group-hover:scale-110" aria-hidden>👨‍👩‍👧</div>
+                   <div className="flex-1">
+                     <p className="font-extrabold text-lg" style={{ color: textColors.primary}}>{t('familyActivityLabel')}</p>
+                     <p className="text-sm mt-1 leading-relaxed" style={{ color: textColors.secondary}}>{t('familyDesc')}</p>
+                   </div>
+                   <span className="inline-flex items-center gap-1 text-sm font-bold mt-1" style={{ color: textColors.secondary}}>
+                     {t('viewMore')} <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+                   </span>
+                 </button>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
-                <button
-                  onClick={() => openTemasTab('')}
-                  className="group rounded-[22px] bg-white/80 backdrop-blur-xl border border-slate-100 p-6 md:p-7 text-left shadow-[0_6px_24px_rgba(30,41,82,0.05)] hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(30,41,82,0.10)] hover:border-secondary/20 transition-all duration-200 flex flex-col gap-3"
-                >
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-secondary to-secondary/60 flex items-center justify-center text-2xl transition-transform duration-200 group-hover:scale-110" aria-hidden>📖</div>
-                  <div className="flex-1">
-                    <p className="font-extrabold text-slate-800 text-lg">{t('themes')}</p>
-                    <p className="text-sm text-slate-500 mt-1 leading-relaxed">{t('themesDesc')}</p>
-                  </div>
-                  <span className="inline-flex items-center gap-1 text-sm font-bold text-secondary mt-1">
-                    {t('viewMore')} <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
-                  </span>
-                </button>
-                <button
-                  onClick={() => setCurrentScreen('games')}
-                  className="group rounded-[22px] bg-gradient-to-br from-primary/5 to-secondary/5 backdrop-blur-xl border border-primary/20 p-6 md:p-7 text-left shadow-[0_6px_24px_rgba(124,58,237,0.08)] hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(124,58,237,0.15)] hover:border-primary/30 transition-all duration-200 flex flex-col gap-3"
-                >
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-2xl transition-transform duration-200 group-hover:scale-110" aria-hidden>🎮</div>
-                  <div className="flex-1">
-                    <p className="font-extrabold text-slate-800 text-lg">{t('game')}</p>
-                    <p className="text-sm text-slate-500 mt-1 leading-relaxed">{t('gameDesc')}</p>
-                  </div>
-                  <span className="inline-flex items-center gap-1 text-sm font-bold text-primary mt-1">
-                    {t('viewMore')} <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
-                  </span>
-                </button>
-                <button
-                  onClick={() => setCurrentScreen('reels')}
-                  className="group rounded-[22px] bg-white/80 backdrop-blur-xl border border-slate-100 p-6 md:p-7 text-left shadow-[0_6px_24px_rgba(30,41,82,0.05)] hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(30,41,82,0.10)] hover:border-warning/20 transition-all duration-200 flex flex-col gap-3"
-                >
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-warning to-warning/60 flex items-center justify-center text-2xl transition-transform duration-200 group-hover:scale-110" aria-hidden>📱</div>
-                  <div className="flex-1">
-                    <p className="font-extrabold text-slate-800 text-lg">{t('reels')}</p>
-                    <p className="text-sm text-slate-500 mt-1 leading-relaxed">{t('reelsDesc')}</p>
-                  </div>
-                  <span className="inline-flex items-center gap-1 text-sm font-bold text-warning mt-1">
-                    {t('viewMore')} <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
-                  </span>
-                </button>
-                <button
-                  onClick={() => setCurrentScreen('converse')}
-                  className="group rounded-[22px] bg-white/80 backdrop-blur-xl border border-slate-100 p-6 md:p-7 text-left shadow-[0_6px_24px_rgba(30,41,82,0.05)] hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(30,41,82,0.10)] hover:border-success/20 transition-all duration-200 flex flex-col gap-3"
-                >
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-success to-success/60 flex items-center justify-center text-2xl transition-transform duration-200 group-hover:scale-110" aria-hidden>👨‍👩‍👧</div>
-                  <div className="flex-1">
-                    <p className="font-extrabold text-slate-800 text-lg">{t('familyActivityLabel')}</p>
-                    <p className="text-sm text-slate-500 mt-1 leading-relaxed">{t('familyDesc')}</p>
-                  </div>
-                  <span className="inline-flex items-center gap-1 text-sm font-bold text-success mt-1">
-                    {t('viewMore')} <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-1">→</span>
-                  </span>
-                </button>
-              </div>
             </section>
 
-            {/* Banner de juegos rápido */}
-            <section className="mt-12 md:mt-16">
-              <button
-                onClick={() => setCurrentScreen('games')}
-                className="group w-full relative overflow-hidden rounded-[24px] bg-gradient-to-r from-primary via-secondary to-primary p-[2px] shadow-lg shadow-primary/20 hover:shadow-2xl transition-all duration-300"
-              >
-                <div className="bg-white/95 rounded-[22px] p-6 md:p-8 flex items-center gap-4 md:gap-6">
-                  <div className="w-14 h-14 md:w-16 md:h-16 shrink-0 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-2xl md:text-3xl shadow-lg shadow-primary/25 group-hover:scale-110 transition-transform duration-300">
-                    🎮
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-xl md:text-2xl font-black text-primary">¿Listo para jugar?</h3>
-                    <p className="text-gray-600 text-sm md:text-base mt-1">Brain Flight te espera: esquiva, recoge energía y supera tu mejor puntaje.</p>
-                  </div>
-                  <span className="shrink-0 inline-flex items-center gap-1 text-primary font-bold group-hover:translate-x-1 transition-transform">
-                    Jugar ahora →
-                  </span>
-                </div>
-              </button>
-            </section>
+             {/* Banner de juegos rápido */}
+             <section className="mt-12 md:mt-16">
+               <button
+                 onClick={() => setCurrentScreen('games')}
+                 className="group w-full relative overflow-hidden rounded-[24px] shadow-lg hover:shadow-2xl transition-all duration-300"
+                 style={{ background: `linear-gradient(135deg, ${textColors.primary}20, ${textColors.secondary}20)`, border: `2px solid ${textColors.primary}40` }}
+               >
+                 <div className="rounded-[22px] p-6 md:p-8 flex items-center gap-4 md:gap-6" style={{ background: `${textColors.cardBg}cc` }}>
+                   <div className="w-14 h-14 md:w-16 md:h-16 shrink-0 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-2xl md:text-3xl shadow-lg shadow-primary/25 group-hover:scale-110 transition-transform duration-300">
+                     🎮
+                   </div>
+                   <div className="flex-1 min-w-0">
+                     <h3 className="text-xl md:text-2xl font-black" style={{ color: textColors.primary}}>¿Listo para jugar?</h3>
+                     <p className="text-sm md:text-base mt-1" style={{ color: textColors.secondary}}>Brain Flight te espera: esquiva, recoge energía y supera tu mejor puntaje.</p>
+                   </div>
+                   <span className="shrink-0 inline-flex items-center gap-1 font-bold group-hover:translate-x-1 transition-transform" style={{ color: textColors.primary}}>
+                     Jugar ahora →
+                   </span>
+                 </div>
+               </button>
+             </section>
 
-            {/* ESTADO RÁPIDO */}
-            <section className="grid grid-cols-3 gap-3 md:gap-5 mt-12 md:mt-16">
-              <button onClick={() => setCurrentScreen('profile')} className="group rounded-[20px] bg-white/80 backdrop-blur-xl border border-slate-100 p-4 md:p-6 text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-200 shadow-[0_4px_20px_rgba(30,41,82,0.04)]">
-                <div className="text-2xl md:text-3xl" aria-hidden>📈</div>
-                <p className="font-black text-slate-800 text-lg md:text-2xl tabular-nums mt-1">{lessonsPct}%</p>
-                <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 mt-0.5 truncate">{t('yourProgress')}</p>
-              </button>
-              <button onClick={() => setCurrentScreen('profile')} className="group rounded-[20px] bg-white/80 backdrop-blur-xl border border-slate-100 p-4 md:p-6 text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-200 shadow-[0_4px_20px_rgba(30,41,82,0.04)]">
-                <div className="text-2xl md:text-3xl" aria-hidden>🔥</div>
-                <p className="font-black text-slate-800 text-lg md:text-2xl tabular-nums mt-1">{streakDays}</p>
-                <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 mt-0.5 truncate">{t('streak')}</p>
-              </button>
-              <button onClick={() => setCurrentScreen('profile')} className="group rounded-[20px] bg-white/80 backdrop-blur-xl border border-slate-100 p-4 md:p-6 text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-200 shadow-[0_4px_20px_rgba(30,41,82,0.04)]">
-                <div className="text-2xl md:text-3xl" aria-hidden>🏅</div>
-                <p className="font-black text-slate-800 text-lg md:text-2xl tabular-nums mt-1">{homeBadgeCount}<span className="text-slate-400 text-base font-bold">/{homeBadgeTotal}</span></p>
-                <p className="text-[11px] font-bold uppercase tracking-wide text-slate-500 mt-0.5 truncate">{t('quickBadges')}</p>
-              </button>
-            </section>
+             {/* ESTADO RÁPIDO */}
+             <section className="grid grid-cols-3 gap-3 md:gap-5 mt-12 md:mt-16">
+               <button onClick={() => setCurrentScreen('profile')} className="group rounded-[20px] backdrop-blur-xl border p-4 md:p-6 text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-200 shadow-[0_4px_20px_rgba(30,41,82,0.04)]" style={{ background: `${textColors.cardBg}cc`, borderColor: textColors.border }}>
+                 <div className="text-2xl md:text-3xl" aria-hidden>📈</div>
+                 <p className="font-black text-lg md:text-2xl tabular-nums mt-1" style={{ color: textColors.primary}}>{lessonsPct}%</p>
+                 <p className="text-[11px] font-bold uppercase tracking-wide mt-0.5 truncate" style={{ color: textColors.secondary}}>{t('yourProgress')}</p>
+               </button>
+               <button onClick={() => setCurrentScreen('profile')} className="group rounded-[20px] backdrop-blur-xl border p-4 md:p-6 text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-200 shadow-[0_4px_20px_rgba(30,41,82,0.04)]" style={{ background: `${textColors.cardBg}cc`, borderColor: textColors.border }}>
+                 <div className="text-2xl md:text-3xl" aria-hidden>🔥</div>
+                 <p className="font-black text-lg md:text-2xl tabular-nums mt-1" style={{ color: textColors.primary}}>{streakDays}</p>
+                 <p className="text-[11px] font-bold uppercase tracking-wide mt-0.5 truncate" style={{ color: textColors.secondary}}>{t('streak')}</p>
+               </button>
+               <button onClick={() => setCurrentScreen('profile')} className="group rounded-[20px] backdrop-blur-xl border p-4 md:p-6 text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-200 shadow-[0_4px_20px_rgba(30,41,82,0.04)]" style={{ background: `${textColors.cardBg}cc`, borderColor: textColors.border }}>
+                 <div className="text-2xl md:text-3xl" aria-hidden>🏅</div>
+                 <p className="font-black text-lg md:text-2xl tabular-nums mt-1" style={{ color: textColors.primary}}>{homeBadgeCount}<span className="text-sm font-bold">/{homeBadgeTotal}</span></p>
+                 <p className="text-[11px] font-bold uppercase tracking-wide mt-0.5 truncate" style={{ color: textColors.secondary}}>{t('quickBadges')}</p>
+               </button>
+             </section>
 
             {/* PIE DEL LANDING */}
             <footer className="mt-14 md:mt-16 text-center">
@@ -2219,24 +2227,25 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
             </footer>
           </main>
 
-          {/* Navegación principal */}
-          <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-max max-w-[94vw] bg-white/95 backdrop-blur-xl rounded-3xl shadow-xl shadow-indigo-500/10 px-3 py-2 flex items-center gap-1">
-            {[
-              { label: t('homeNav'), icon: '🏠', active: true, go: () => setCurrentScreen('home') },
-              { label: t('themes'), icon: '📖', active: false, go: () => openTemasTab('') },
-              { label: t('reels'), icon: '📱', active: false, go: () => setCurrentScreen('reels') },
-              { label: t('profile'), icon: '👤', active: false, go: () => setCurrentScreen('profile') },
-            ].map(navItem => (
-              <button
-                key={navItem.label}
-                onClick={navItem.go}
-                className={`px-3 md:px-4 py-2 rounded-2xl flex flex-col items-center gap-0.5 text-xs font-bold transition-all ${navItem.active ? 'text-white bg-gradient-to-r from-primary to-secondary shadow-md shadow-primary/25' : 'text-slate-500 hover:text-primary hover:bg-primary/5'}`}
-              >
-                <span className="text-base leading-none">{navItem.icon}</span>
-                {navItem.label}
-              </button>
-            ))}
-          </nav>
+           {/* Navegación principal */}
+           <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-max max-w-[94vw] backdrop-blur-xl rounded-3xl shadow-xl shadow-indigo-500/10 px-3 py-2 flex items-center gap-1" style={{ background: `${textColors.cardBg}ee`, border: `1px solid ${textColors.border}` }}>
+             {[
+               { label: t('homeNav'), icon: '🏠', active: true, go: () => setCurrentScreen('home') },
+               { label: t('themes'), icon: '📖', active: false, go: () => openTemasTab('') },
+               { label: t('reels'), icon: '📱', active: false, go: () => setCurrentScreen('reels') },
+               { label: t('profile'), icon: '👤', active: false, go: () => setCurrentScreen('profile') },
+             ].map(navItem => (
+               <button
+                 key={navItem.label}
+                 onClick={navItem.go}
+                 className={`px-3 md:px-4 py-2 rounded-2xl flex flex-col items-center gap-0.5 text-xs font-bold transition-all ${navItem.active ? 'text-white bg-gradient-to-r from-primary to-secondary shadow-md shadow-primary/25' : ''}`}
+                 style={{ color: navItem.active ? '#ffffff' : textColors.secondary, backgroundColor: navItem.active ? undefined : `${textColors.border}20` }}
+               >
+                 <span className="text-base leading-none">{navItem.icon}</span>
+                 {navItem.label}
+               </button>
+             ))}
+           </nav>
         </div>
       )
 
