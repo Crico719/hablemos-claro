@@ -2664,6 +2664,24 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                   </a>
                 </div>
               </div>
+              <div
+                className="block rounded-3xl shadow-lg p-6 text-white text-center card-hover animate-slide-up"
+                style={{ background: 'linear-gradient(135deg, #833AB4 0%, #FD1D1D 50%, #FCB045 100%)', boxShadow: '0 10px 30px rgba(253,29,29,0.35)' }}
+              >
+                <p className="font-black text-xl mb-1">📸 SÍGUENOS EN INSTAGRAM 📸</p>
+                <p className="text-white/90 mb-4">Entra y conoce más de nuestro trabajo</p>
+                <div className="flex flex-col gap-2.5">
+                  <a
+                    href="https://www.instagram.com/p/Ddpe90VgYok/?stkn=MWV0a3ZqNDZvczZ4dw=="
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block bg-white font-black px-6 py-2.5 rounded-full hover:scale-[1.02] active:scale-[0.99] transition-all"
+                    style={{ color: '#C13584' }}
+                  >
+                    👉 ¡Míranos! 💜
+                  </a>
+                </div>
+              </div>
               {reelsMessages.map((reel, index) => (
                 <div key={reel.id} className="bg-white/85 backdrop-blur-xl rounded-3xl shadow-lg shadow-indigo-500/5 p-6 shadow-custom-lg card-hover animate-slide-up" style={{ animationDelay: `${index * 80}ms` }}>
                   <div className="flex items-center gap-3 mb-3">
