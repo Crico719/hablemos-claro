@@ -1844,13 +1844,429 @@ function SnakeGame() {
   )
 }
 
+// Flappy Bird con las mejoras de Brain Flight: física suave, vidas, XP y preguntas
+const FLAPPY_W = 480
+const FLAPPY_H = 600
+const FLAPPY_GRAV = 2100
+const FLAPPY_JUMP = -620
+const FLAPPY_MAXFALL = 950
+const FLAPPY_MAXRISE = -680
+const FLAPPY_BIRD_X = 130
+const FLAPPY_BIRD_R = 15
+const FLAPPY_TOWER_W = 76
+const FLAPPY_GAP = 175
+const FLAPPY_GROUND = 26
+
+type FlappyPhase = 'idle' | 'playing' | 'question' | 'over'
+type FlappyTower = { x: number; gapY: number; counted: boolean }
+type FlappyCloud = { x: number; y: number; s: number; v: number }
+
+function flappyBeep(freq: number, dur = 0.09) {
+  try {
+    const AC = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
+    if (!AC) return
+    const ctx = new AC()
+    const o = ctx.createOscillator()
+    const g = ctx.createGain()
+    o.type = 'sine'
+    o.frequency.value = freq
+    g.gain.setValueAtTime(0.12, ctx.currentTime)
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur)
+    o.connect(g)
+    g.connect(ctx.destination)
+    o.start()
+    o.stop(ctx.currentTime + dur)
+    o.onended = () => { try { ctx.close() } catch { /* noop */ } }
+  } catch { /* noop */ }
+}
+
+function FlappyGame() {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const [score, setScore] = useState(0)
+  const [best, setBest] = useState<number>(() => {
+    const n = parseInt(safeGet('hablemos-claro-flappy-best') ?? '0', 10)
+    return Number.isFinite(n) && n > 0 ? n : 0
+  })
+  const [lives, setLives] = useState(3)
+  const [xp, setXp] = useState(0)
+  const [phase, setPhase] = useState<FlappyPhase>('idle')
+  const [quiz, setQuiz] = useState<ExamQuestion | null>(null)
+  const [quizPick, setQuizPick] = useState<number | null>(null)
+  const birdYRef = useRef(300)
+  const vyRef = useRef(0)
+  const towersRef = useRef<FlappyTower[]>([])
+  const cloudsRef = useRef<FlappyCloud[]>([
+    { x: 60, y: 110, s: 1, v: 14 },
+    { x: 300, y: 200, s: 1.4, v: 10 },
+    { x: 200, y: 70, s: 0.8, v: 18 },
+  ])
+  const spawnRef = useRef(1.2)
+  const invulnRef = useRef(0)
+  const askedRef = useRef(-1)
+  const quizCountRef = useRef(0)
+  const quizErrorsRef = useRef(0)
+  const scoreRef = useRef(0)
+  const livesRef = useRef(3)
+  const xpRef = useRef(0)
+  const phaseRef = useRef<FlappyPhase>('idle')
+
+  useEffect(() => {
+    phaseRef.current = phase
+  })
+
+  const resetRun = (toPlaying: boolean) => {
+    birdYRef.current = 300
+    vyRef.current = 0
+    towersRef.current = []
+    spawnRef.current = 1.2
+    invulnRef.current = 0
+    askedRef.current = -1
+    quizErrorsRef.current = 0
+    scoreRef.current = 0
+    livesRef.current = 3
+    xpRef.current = 0
+    setScore(0)
+    setLives(3)
+    setXp(0)
+    setQuiz(null)
+    setQuizPick(null)
+    setPhase(toPlaying ? 'playing' : 'idle')
+  }
+
+  const endGame = () => {
+    setPhase('over')
+    setBest(prev => {
+      if (scoreRef.current > prev) {
+        safeSet('hablemos-claro-flappy-best', String(scoreRef.current))
+        return scoreRef.current
+      }
+      return prev
+    })
+  }
+
+  const loseLife = () => {
+    livesRef.current -= 1
+    setLives(livesRef.current)
+    flappyBeep(160, 0.25)
+    if (livesRef.current <= 0) {
+      endGame()
+      return
+    }
+    birdYRef.current = 300
+    vyRef.current = 0
+    invulnRef.current = 1.4
+  }
+
+  const triggerQuestion = () => {
+    const q = examQuestions[quizCountRef.current % examQuestions.length]
+    if (!q) return
+    quizCountRef.current += 1
+    quizErrorsRef.current = 0
+    setQuizPick(null)
+    setQuiz(q)
+    setPhase('question')
+  }
+
+  const answerQuiz = (oi: number) => {
+    const q = quiz
+    if (!q || phaseRef.current !== 'question') return
+    if (quizPick !== null && quizPick === q.correct) return
+    setQuizPick(oi)
+    if (oi === q.correct) {
+      xpRef.current += 10
+      setXp(xpRef.current)
+      quizErrorsRef.current = 0
+      flappyBeep(660, 0.12)
+    } else {
+      quizErrorsRef.current += 1
+      flappyBeep(200, 0.15)
+      if (quizErrorsRef.current >= 2) {
+        resetRun(true)
+      }
+    }
+  }
+
+  const flap = () => {
+    if (phaseRef.current !== 'playing') return
+    vyRef.current = FLAPPY_JUMP
+    flappyBeep(520, 0.08)
+  }
+
+  const circleHitsRect = (cx: number, cy: number, r: number, rx: number, ry: number, rw: number, rh: number) => {
+    const nx = Math.max(rx, Math.min(cx, rx + rw))
+    const ny = Math.max(ry, Math.min(cy, ry + rh))
+    const dx = cx - nx
+    const dy = cy - ny
+    return dx * dx + dy * dy < r * r
+  }
+
+  const draw = () => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    const sky = ctx.createLinearGradient(0, 0, 0, FLAPPY_H)
+    sky.addColorStop(0, '#BFE8FF')
+    sky.addColorStop(1, '#9FD4F5')
+    ctx.fillStyle = sky
+    ctx.fillRect(0, 0, FLAPPY_W, FLAPPY_H)
+    ctx.fillStyle = 'rgba(255,255,255,0.85)'
+    cloudsRef.current.forEach(c => {
+      ctx.beginPath()
+      ctx.ellipse(c.x, c.y, 34 * c.s, 13 * c.s, 0, 0, Math.PI * 2)
+      ctx.ellipse(c.x - 22 * c.s, c.y + 5 * c.s, 20 * c.s, 9 * c.s, 0, 0, Math.PI * 2)
+      ctx.ellipse(c.x + 22 * c.s, c.y + 5 * c.s, 20 * c.s, 9 * c.s, 0, 0, Math.PI * 2)
+      ctx.fill()
+    })
+    towersRef.current.forEach(t => {
+      const topH = t.gapY - FLAPPY_GAP / 2
+      const botY = t.gapY + FLAPPY_GAP / 2
+      ctx.fillStyle = '#4a4038'
+      ctx.strokeStyle = '#14100d'
+      ctx.lineWidth = 3
+      ctx.beginPath()
+      ctx.rect(t.x, 0, FLAPPY_TOWER_W, Math.max(0, topH))
+      ctx.rect(t.x, botY, FLAPPY_TOWER_W, FLAPPY_H - botY)
+      ctx.fill()
+      ctx.stroke()
+      ctx.fillStyle = 'rgba(255,255,255,0.12)'
+      ctx.fillRect(t.x + 6, 4, 8, Math.max(0, topH - 8))
+      ctx.fillRect(t.x + 6, botY + 4, 8, Math.max(0, FLAPPY_H - botY - 8))
+    })
+    ctx.fillStyle = '#69c24a'
+    ctx.fillRect(0, 0, FLAPPY_W, FLAPPY_GROUND)
+    ctx.fillRect(0, FLAPPY_H - FLAPPY_GROUND, FLAPPY_W, FLAPPY_GROUND)
+    ctx.fillStyle = '#2f6b2f'
+    ctx.fillRect(0, FLAPPY_GROUND - 5, FLAPPY_W, 5)
+    ctx.fillRect(0, FLAPPY_H - FLAPPY_GROUND, FLAPPY_W, 5)
+    const bx = FLAPPY_BIRD_X
+    const by = birdYRef.current
+    const vy = vyRef.current
+    const ang = Math.max(-25, Math.min(35, vy / 40)) * (Math.PI / 180)
+    ctx.save()
+    if (invulnRef.current > 0 && Math.floor(performance.now() / 120) % 2 === 0) ctx.globalAlpha = 0.4
+    ctx.translate(bx, by)
+    ctx.rotate(ang)
+    ctx.shadowColor = 'rgba(255,140,0,0.7)'
+    ctx.shadowBlur = 18
+    ctx.fillStyle = '#FF8A00'
+    ctx.beginPath()
+    if (typeof ctx.roundRect === 'function') ctx.roundRect(-16, -14, 32, 28, 8)
+    else ctx.rect(-16, -14, 32, 28)
+    ctx.fill()
+    ctx.shadowBlur = 0
+    ctx.fillStyle = 'rgba(255,255,255,0.5)'
+    ctx.beginPath()
+    ctx.ellipse(-5, -7, 9, 5, -0.4, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.fillStyle = '#ffffff'
+    ctx.beginPath()
+    ctx.arc(7, -4, 5.5, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.fillStyle = '#1f2937'
+    ctx.beginPath()
+    ctx.arc(8.5, -4, 2.6, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.restore()
+  }
+
+  useEffect(() => {
+    draw()
+  }, [])
+
+  useEffect(() => {
+    let raf = 0
+    let last = performance.now()
+    const loop = (t: number) => {
+      const dt = Math.min(0.033, Math.max(0.001, (t - last) / 1000))
+      last = t
+      cloudsRef.current.forEach(c => {
+        c.x -= c.v * dt
+        if (c.x < -70) c.x = FLAPPY_W + 70
+      })
+      if (phaseRef.current === 'playing') {
+        let vy = vyRef.current + FLAPPY_GRAV * dt
+        if (vy > FLAPPY_MAXFALL) vy = FLAPPY_MAXFALL
+        if (vy < FLAPPY_MAXRISE) vy = FLAPPY_MAXRISE
+        vyRef.current = vy
+        let y = birdYRef.current + vy * dt
+        if (y < 44) {
+          y = 44
+          if (vyRef.current < 0) vyRef.current = 0
+        }
+        birdYRef.current = y
+        const speed = Math.min(190 + scoreRef.current * 5, 340)
+        spawnRef.current -= dt
+        if (spawnRef.current <= 0) {
+          spawnRef.current = 1.55
+          const gapY = 130 + Math.random() * (FLAPPY_H - 260)
+          towersRef.current.push({ x: FLAPPY_W + 40, gapY, counted: false })
+        }
+        towersRef.current.forEach(t => { t.x -= speed * dt })
+        towersRef.current = towersRef.current.filter(t => t.x > -120)
+        towersRef.current.forEach(t => {
+          if (!t.counted && t.x + FLAPPY_TOWER_W < FLAPPY_BIRD_X) {
+            t.counted = true
+            scoreRef.current += 1
+            setScore(scoreRef.current)
+            flappyBeep(880, 0.07)
+            if (scoreRef.current % 5 === 0 && scoreRef.current !== askedRef.current) {
+              askedRef.current = scoreRef.current
+              triggerQuestion()
+            }
+          }
+        })
+        if (invulnRef.current > 0) {
+          invulnRef.current -= dt
+        } else {
+          const by = birdYRef.current
+          const r = FLAPPY_BIRD_R
+          let hit = by + r > FLAPPY_H - FLAPPY_GROUND || by - r < FLAPPY_GROUND
+          if (!hit) {
+            for (const t of towersRef.current) {
+              const topH = t.gapY - FLAPPY_GAP / 2
+              const botY = t.gapY + FLAPPY_GAP / 2
+              if (
+                circleHitsRect(FLAPPY_BIRD_X, by, r, t.x, 0, FLAPPY_TOWER_W, Math.max(0, topH)) ||
+                circleHitsRect(FLAPPY_BIRD_X, by, r, t.x, botY, FLAPPY_TOWER_W, Math.max(0, FLAPPY_H - botY))
+              ) {
+                hit = true
+                break
+              }
+            }
+          }
+          if (hit) loseLife()
+        }
+      }
+      draw()
+      raf = requestAnimationFrame(loop)
+    }
+    raf = requestAnimationFrame(loop)
+    return () => cancelAnimationFrame(raf)
+  }, [])
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const k = e.key.toLowerCase()
+      if (k === 'arrowup' || k === 'arrowdown' || k === ' ' ) e.preventDefault()
+      if (k === 'arrowup' || k === 'w' || k === ' ') flap()
+      else if (k === 'enter') {
+        if (phaseRef.current === 'idle') resetRun(true)
+        else if (phaseRef.current === 'over') resetRun(true)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
+  const quizDone = quiz !== null && quizPick !== null && quizPick === quiz.correct
+
+  return (
+    <div className="w-full max-w-[520px] mx-auto">
+      <div className="flex items-center justify-center gap-2 md:gap-3 mb-4 flex-wrap">
+        <div className="px-4 py-2 rounded-2xl bg-white/80 border border-slate-200 font-black text-slate-800">❤️ {lives}</div>
+        <div className="px-4 py-2 rounded-2xl bg-white/80 border border-slate-200 font-black text-slate-800">⭐ {score}</div>
+        <div className="px-4 py-2 rounded-2xl bg-white/80 border border-slate-200 font-black text-slate-800">✨ {xp} XP</div>
+      </div>
+      <div className="relative">
+        <canvas
+          ref={canvasRef}
+          width={FLAPPY_W}
+          height={FLAPPY_H}
+          className="w-full h-auto rounded-[20px] border-4 border-white shadow-xl shadow-indigo-500/10 touch-none select-none"
+          onPointerDown={() => {
+            if (phaseRef.current === 'idle') resetRun(true)
+            else flap()
+          }}
+        />
+        {phase === 'idle' && (
+          <div className="absolute inset-0 rounded-[20px] bg-black/60 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3 p-6 text-center">
+            <div className="text-5xl">🐦</div>
+            <p className="text-white text-2xl font-black">Flappy</p>
+            <p className="text-white/80 text-sm font-bold">Esquiva las torres · Responde y gana XP</p>
+            <button
+              onClick={() => resetRun(true)}
+              className="btn-glow bg-gradient-to-r from-primary to-secondary text-white font-bold py-3 px-8 rounded-full text-lg"
+            >
+              COMENZAR
+            </button>
+            <p className="text-white/60 text-xs font-bold">Espacio / clic / toque para volar</p>
+          </div>
+        )}
+        {phase === 'question' && quiz && (
+          <div className="absolute inset-0 rounded-[20px] bg-black/70 backdrop-blur-[2px] flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl p-5 md:p-6 w-full max-w-[380px] text-center max-h-full overflow-y-auto">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-black uppercase tracking-wider">🧠 Pregunta de integridad</span>
+              <p className="text-slate-800 text-lg font-bold leading-snug mt-3">{quiz.question}</p>
+              <div className="space-y-2 mt-4 text-left">
+                {quiz.options.map((op, oi) => {
+                  const picked = quizPick === oi
+                  const showRight = quizDone && oi === quiz.correct
+                  const showWrong = picked && oi !== quiz.correct
+                  return (
+                    <button
+                      key={oi}
+                      disabled={quizDone}
+                      onClick={() => answerQuiz(oi)}
+                      className={`w-full py-3 px-4 rounded-xl text-left font-bold border-2 transition-all ${
+                        showRight
+                          ? 'bg-success/15 border-success text-success'
+                          : showWrong
+                            ? 'bg-warning/10 border-warning text-slate-800'
+                            : picked
+                              ? 'bg-primary/10 border-primary text-slate-800'
+                              : 'bg-white border-slate-200 text-slate-800 hover:border-primary/60'
+                      } ${quizDone ? 'cursor-default' : ''}`}
+                    >
+                      {op}
+                    </button>
+                  )
+                })}
+              </div>
+              {quizPick !== null && quizPick !== quiz.correct && (
+                <p className="font-black text-warning mt-3">❌ Incorrecto. ¡Te queda 1 intento!</p>
+              )}
+              {quizDone && (
+                <div className="mt-4">
+                  <p className="font-black text-success mb-3">✅ ¡Correcto! +10 XP</p>
+                  <button
+                    onClick={() => { setQuiz(null); setQuizPick(null); setPhase('playing') }}
+                    className="btn-glow bg-gradient-to-r from-primary to-secondary text-white font-bold py-3 px-8 rounded-full text-lg w-full"
+                  >
+                    Continuar ▶
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        {phase === 'over' && (
+          <div className="absolute inset-0 rounded-[20px] bg-black/60 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3 p-6 text-center">
+            <div className="text-5xl">💀</div>
+            <p className="text-white text-2xl font-black">¡Fin del juego!</p>
+            <p className="text-white/90 font-bold">Puntaje: {score} · XP: {xp} · Récord: {Math.max(best, score)}</p>
+            <button
+              onClick={() => resetRun(true)}
+              className="btn-glow bg-gradient-to-r from-primary to-secondary text-white font-bold py-3 px-8 rounded-full text-lg"
+            >
+              ↻ Jugar de nuevo
+            </button>
+            <p className="text-white/60 text-xs font-bold">Espacio / Enter para reintentar</p>
+          </div>
+        )}
+      </div>
+      <p className="text-center text-xs font-bold text-slate-400 mt-3">Espacio / W / clic / toque para volar</p>
+    </div>
+  )
+}
+
 // Brain Flight — juego HTML5 (GDevelop export) hosteado en GitHub Pages
 const BRAIN_FLIGHT_URL = 'https://crico719.github.io/brain-flight/?v=15'
 
 export default function App() {
   const [studentProfile, setStudentProfile] = useState<StudentProfile>(initialStudentProfile)
   const [familyProfile, setFamilyProfile] = useState<FamilyProfile>(initialFamilyProfile)
-  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'brainflight' | 'snake' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents' | 'profile-type'>(BOOT_HASH ? 'learn' : 'welcome')
+  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'brainflight' | 'snake' | 'flappy' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents' | 'profile-type'>(BOOT_HASH ? 'learn' : 'welcome')
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null)
   const [learnView, setLearnView] = useState<'hub' | 'kid' | 'guide' | 'exam'>(BOOT_HASH ? (BOOT_HASH.view === 'tema' ? 'kid' : BOOT_HASH.view === 'guia' ? 'guide' : BOOT_HASH.view === 'examen' ? 'exam' : 'hub') : 'hub')
   const [activeKidId, setActiveKidId] = useState<string | null>(BOOT_HASH && BOOT_HASH.view === 'tema' ? BOOT_HASH.id : null)
@@ -4382,6 +4798,38 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
       )
     }
 
+    case 'flappy': {
+      const custFlappy = getCustomization();
+      const flappyColors = getTextColorForTheme(custFlappy.backgroundValue)
+      return (
+        <div className="min-h-screen pb-16" style={{ background: custFlappy.backgroundValue, backgroundSize: custFlappy.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
+          <div className="max-w-5xl mx-auto px-6 md:px-8 pt-10 md:pt-14 pb-10 animate-slide-up">
+            <div className="flex items-center justify-between gap-3 mb-6">
+              <button
+                onClick={() => navigateTo('games')}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-primary/10 text-slate-600 hover:text-primary text-sm font-bold shadow-sm transition-colors shrink-0"
+              >
+                ← Juegos
+              </button>
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="text-xl">🐦</span>
+                <span className="font-black text-sm md:text-base truncate" style={{ color: flappyColors.primary }}>Flappy</span>
+              </div>
+              <span className="px-3 py-1.5 rounded-full bg-sky-100 text-sky-700 text-xs font-black uppercase tracking-wider shrink-0">Nuevo</span>
+            </div>
+            <div className="text-center mb-6">
+              <h1 className="text-3xl md:text-4xl font-black gradient-text mb-2">Flappy 🐦</h1>
+              <p className="font-bold" style={{ color: flappyColors.secondary }}>Vuela, esquiva y responde.</p>
+            </div>
+            <FlappyGame />
+            <footer className="mt-10 text-center">
+              <p className="text-slate-500 text-sm">Hablemos Claro · Aprende con juegos 🎮</p>
+            </footer>
+          </div>
+        </div>
+      )
+    }
+
     case 'games':
       const cust9 = getCustomization();
       const gamesBadgeCount = profileType === 'family' ? familyProfile.familyBadges.filter(b => b.unlocked).length : getBadges().filter(b => b.unlocked).length;
@@ -4447,6 +4895,29 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                 </div>
                 <div className="shrink-0 hidden md:flex items-center gap-1 text-slate-400 group-hover:text-success transition-colors">
                   <span className="text-2xl">🍎</span>
+                </div>
+              </div>
+            </button>
+
+            {/* Flappy - Vuela y responde */}
+            <button
+              onClick={() => navigateTo('flappy')}
+              className="group w-full mb-8 text-left relative overflow-hidden rounded-[28px] bg-gradient-to-br from-sky-400 via-primary to-secondary p-[2px] shadow-xl shadow-primary/20 hover:shadow-2xl hover:scale-[1.01] transition-all duration-300"
+            >
+              <div className="bg-white rounded-[26px] p-6 md:p-8 flex items-center gap-4 md:gap-6">
+                <div className="w-16 h-16 md:w-20 md:h-20 shrink-0 rounded-2xl bg-gradient-to-br from-sky-400 to-primary flex items-center justify-center text-4xl md:text-5xl shadow-lg shadow-sky-500/30 group-hover:scale-110 transition-transform duration-300">
+                  🐦
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 mb-1">
+                    <h2 className="text-2xl md:text-3xl font-black text-primary">Flappy</h2>
+                    <span className="px-2.5 py-1 rounded-full bg-sky-100 text-sky-700 text-[11px] font-black uppercase tracking-wider animate-pulse">Nuevo</span>
+                  </div>
+                  <p className="text-gray-600 text-base md:text-lg">Vuela entre torres, suma puntos y responde preguntas de integridad.</p>
+                  <p className="text-primary text-sm font-bold mt-1 group-hover:underline">▶ Jugar ahora →</p>
+                </div>
+                <div className="shrink-0 hidden md:flex items-center gap-1 text-slate-400 group-hover:text-primary transition-colors">
+                  <span className="text-2xl">🕹️</span>
                 </div>
               </div>
             </button>
