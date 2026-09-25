@@ -1463,13 +1463,260 @@ const openTemasTab = (deep = '') => {
   window.open(url, '_blank', 'noopener,noreferrer')
 }
 
+// Juego Snake clásico en canvas (teclado + táctil, puntaje y récord)
+type SnakePoint = { x: number; y: number }
+const SNAKE_COLS = 20
+const SNAKE_ROWS = 20
+const SNAKE_SIZE = 400
+
+function SnakeGame() {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const [score, setScore] = useState(0)
+  const [best, setBest] = useState<number>(() => {
+    const n = parseInt(safeGet('hablemos-claro-snake-best') ?? '0', 10)
+    return Number.isFinite(n) && n > 0 ? n : 0
+  })
+  const [running, setRunning] = useState(false)
+  const [gameOver, setGameOver] = useState(false)
+  const [started, setStarted] = useState(false)
+  const snakeRef = useRef<SnakePoint[]>([{ x: 10, y: 10 }, { x: 9, y: 10 }, { x: 8, y: 10 }])
+  const dirRef = useRef<SnakePoint>({ x: 1, y: 0 })
+  const queueRef = useRef<SnakePoint[]>([])
+  const foodRef = useRef<SnakePoint>({ x: 14, y: 10 })
+  const scoreRef = useRef(0)
+  const speedRef = useRef(150)
+  const runningRef = useRef(false)
+  const touchRef = useRef<{ x: number; y: number } | null>(null)
+
+  const randomFood = (snake: SnakePoint[]): SnakePoint => {
+    const free: SnakePoint[] = []
+    for (let y = 0; y < SNAKE_ROWS; y++) {
+      for (let x = 0; x < SNAKE_COLS; x++) {
+        if (!snake.some(s => s.x === x && s.y === y)) free.push({ x, y })
+      }
+    }
+    if (free.length === 0) return { x: 0, y: 0 }
+    return free[Math.floor(Math.random() * free.length)] ?? { x: 0, y: 0 }
+  }
+
+  const draw = () => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    const cell = SNAKE_SIZE / SNAKE_COLS
+    const bg = ctx.createLinearGradient(0, 0, 0, SNAKE_SIZE)
+    bg.addColorStop(0, '#0f2a1a')
+    bg.addColorStop(1, '#0a1f12')
+    ctx.fillStyle = bg
+    ctx.fillRect(0, 0, SNAKE_SIZE, SNAKE_SIZE)
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)'
+    ctx.lineWidth = 1
+    for (let i = 1; i < SNAKE_COLS; i++) {
+      ctx.beginPath(); ctx.moveTo(i * cell, 0); ctx.lineTo(i * cell, SNAKE_SIZE); ctx.stroke()
+      ctx.beginPath(); ctx.moveTo(0, i * cell); ctx.lineTo(SNAKE_SIZE, i * cell); ctx.stroke()
+    }
+    const f = foodRef.current
+    ctx.fillStyle = '#ef4444'
+    ctx.beginPath()
+    ctx.arc(f.x * cell + cell / 2, f.y * cell + cell / 2, cell * 0.38, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.fillStyle = 'rgba(255,255,255,0.55)'
+    ctx.beginPath()
+    ctx.arc(f.x * cell + cell * 0.36, f.y * cell + cell * 0.34, cell * 0.1, 0, Math.PI * 2)
+    ctx.fill()
+    const snake = snakeRef.current
+    const d = dirRef.current
+    snake.forEach((s, i) => {
+      const isHead = i === 0
+      ctx.fillStyle = isHead ? '#4ade80' : '#22c55e'
+      const pad = isHead ? 1 : 2
+      const x = s.x * cell + pad
+      const y = s.y * cell + pad
+      const w = cell - pad * 2
+      ctx.beginPath()
+      if (typeof ctx.roundRect === 'function') ctx.roundRect(x, y, w, w, isHead ? 5 : 4)
+      else ctx.rect(x, y, w, w)
+      ctx.fill()
+      if (isHead) {
+        ctx.fillStyle = '#052e16'
+        const ex = x + w / 2
+        const ey = y + w / 2
+        const off = w * 0.18
+        const px = -d.y
+        const py = d.x
+        ctx.beginPath()
+        ctx.arc(ex + d.x * off * 0.6 + px * off, ey + d.y * off * 0.6 + py * off, 2.2, 0, Math.PI * 2)
+        ctx.arc(ex + d.x * off * 0.6 - px * off, ey + d.y * off * 0.6 - py * off, 2.2, 0, Math.PI * 2)
+        ctx.fill()
+      }
+    })
+  }
+
+  const startGame = () => {
+    const init = [{ x: 10, y: 10 }, { x: 9, y: 10 }, { x: 8, y: 10 }]
+    snakeRef.current = init
+    dirRef.current = { x: 1, y: 0 }
+    queueRef.current = []
+    foodRef.current = randomFood(init)
+    scoreRef.current = 0
+    speedRef.current = 150
+    setScore(0)
+    setGameOver(false)
+    setStarted(true)
+    setRunning(true)
+  }
+
+  const endGame = () => {
+    setRunning(false)
+    setGameOver(true)
+    setBest(prev => {
+      if (scoreRef.current > prev) {
+        safeSet('hablemos-claro-snake-best', String(scoreRef.current))
+        return scoreRef.current
+      }
+      return prev
+    })
+  }
+
+  const setDir = (x: number, y: number) => {
+    const q = queueRef.current
+    const last = q.length > 0 ? q[q.length - 1] : dirRef.current
+    if (!last) return
+    if ((x !== -last.x || y !== -last.y) && (x !== last.x || y !== last.y)) {
+      if (q.length < 3) q.push({ x, y })
+    }
+  }
+
+  useEffect(() => {
+    runningRef.current = running
+  })
+
+  useEffect(() => {
+    snakeRef.current = [{ x: 10, y: 10 }, { x: 9, y: 10 }, { x: 8, y: 10 }]
+    foodRef.current = randomFood(snakeRef.current)
+    draw()
+  }, [])
+
+  useEffect(() => {
+    if (!running) return
+    const id = window.setInterval(() => {
+      const q = queueRef.current
+      const next = q.shift()
+      if (next) dirRef.current = next
+      const d = dirRef.current
+      const snake = snakeRef.current
+      const head0 = snake[0]
+      if (!head0) {
+        endGame()
+        return
+      }
+      const head = { x: head0.x + d.x, y: head0.y + d.y }
+      if (head.x < 0 || head.y < 0 || head.x >= SNAKE_COLS || head.y >= SNAKE_ROWS || snake.some(s => s.x === head.x && s.y === head.y)) {
+        endGame()
+        return
+      }
+      snake.unshift(head)
+      if (head.x === foodRef.current.x && head.y === foodRef.current.y) {
+        scoreRef.current += 1
+        setScore(scoreRef.current)
+        speedRef.current = Math.max(70, speedRef.current - 4)
+        foodRef.current = randomFood(snake)
+      } else {
+        snake.pop()
+      }
+      draw()
+    }, speedRef.current)
+    return () => window.clearInterval(id)
+  })
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const k = e.key.toLowerCase()
+      if (k === 'arrowup' || k === 'arrowdown' || k === 'arrowleft' || k === 'arrowright' || k === ' ') e.preventDefault()
+      if (k === 'arrowup' || k === 'w') setDir(0, -1)
+      else if (k === 'arrowdown' || k === 's') setDir(0, 1)
+      else if (k === 'arrowleft' || k === 'a') setDir(-1, 0)
+      else if (k === 'arrowright' || k === 'd') setDir(1, 0)
+      else if (k === ' ' || k === 'enter') {
+        if (!runningRef.current) startGame()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
+
+  return (
+    <div className="w-full max-w-[440px] mx-auto">
+      <div className="flex items-center justify-center gap-3 mb-4">
+        <div className="px-4 py-2 rounded-2xl bg-white/80 border border-slate-200 font-black text-slate-800">🍎 {score}</div>
+        <div className="px-4 py-2 rounded-2xl bg-white/80 border border-slate-200 font-black text-slate-800">🏆 {best}</div>
+      </div>
+      <div className="relative">
+        <canvas
+          ref={canvasRef}
+          width={SNAKE_SIZE}
+          height={SNAKE_SIZE}
+          className="w-full h-auto rounded-[20px] border-4 border-white shadow-xl shadow-indigo-500/10 touch-none select-none"
+          onClick={() => { if (!running) startGame() }}
+          onTouchStart={e => {
+            const t = e.touches[0]
+            touchRef.current = t ? { x: t.clientX, y: t.clientY } : null
+          }}
+          onTouchEnd={e => {
+            const s = touchRef.current
+            const t = e.changedTouches[0]
+            touchRef.current = null
+            if (!s || !t) return
+            const dx = t.clientX - s.x
+            const dy = t.clientY - s.y
+            if (Math.abs(dx) < 24 && Math.abs(dy) < 24) return
+            if (Math.abs(dx) > Math.abs(dy)) setDir(dx > 0 ? 1 : -1, 0)
+            else setDir(0, dy > 0 ? 1 : -1)
+          }}
+        />
+        {(!started || gameOver) && (
+          <div className="absolute inset-0 rounded-[20px] bg-black/60 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3 p-6 text-center">
+            <div className="text-5xl">{gameOver ? '💀' : '🐍'}</div>
+            <p className="text-white text-2xl font-black">{gameOver ? '¡Fin del juego!' : 'Snake'}</p>
+            {gameOver && (
+              <p className="text-white/90 font-bold">Puntaje: {score} · Récord: {Math.max(best, score)}</p>
+            )}
+            {!gameOver && (
+              <p className="text-white/80 text-sm font-bold">Come las manzanas 🍎 · No choques 🧱</p>
+            )}
+            <button
+              onClick={startGame}
+              className="btn-glow bg-gradient-to-r from-primary to-secondary text-white font-bold py-3 px-8 rounded-full text-lg"
+            >
+              {gameOver ? '↻ Jugar de nuevo' : '▶ Jugar'}
+            </button>
+            {!gameOver && (
+              <p className="text-white/60 text-xs font-bold">Flechas o WASD · Espacio para empezar · Desliza en celular</p>
+            )}
+          </div>
+        )}
+      </div>
+      <div className="grid grid-cols-3 gap-2 mt-4 max-w-[240px] mx-auto">
+        <span />
+        <button onClick={() => setDir(0, -1)} aria-label="Arriba" className="py-3 rounded-2xl bg-white border-2 border-slate-200 text-xl font-black text-slate-700 active:bg-primary/10">▲</button>
+        <span />
+        <button onClick={() => setDir(-1, 0)} aria-label="Izquierda" className="py-3 rounded-2xl bg-white border-2 border-slate-200 text-xl font-black text-slate-700 active:bg-primary/10">◀</button>
+        <button onClick={() => setDir(0, 1)} aria-label="Abajo" className="py-3 rounded-2xl bg-white border-2 border-slate-200 text-xl font-black text-slate-700 active:bg-primary/10">▼</button>
+        <button onClick={() => setDir(1, 0)} aria-label="Derecha" className="py-3 rounded-2xl bg-white border-2 border-slate-200 text-xl font-black text-slate-700 active:bg-primary/10">▶</button>
+      </div>
+      <p className="text-center text-xs font-bold text-slate-400 mt-3">Flechas / WASD · Espacio · Botones o deslizar en celular</p>
+    </div>
+  )
+}
+
 // Brain Flight — juego HTML5 (GDevelop export) hosteado en GitHub Pages
 const BRAIN_FLIGHT_URL = 'https://crico719.github.io/brain-flight/?v=15'
 
 export default function App() {
   const [studentProfile, setStudentProfile] = useState<StudentProfile>(initialStudentProfile)
   const [familyProfile, setFamilyProfile] = useState<FamilyProfile>(initialFamilyProfile)
-  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'brainflight' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents' | 'profile-type'>(BOOT_HASH ? 'learn' : 'welcome')
+  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'brainflight' | 'snake' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents' | 'profile-type'>(BOOT_HASH ? 'learn' : 'welcome')
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null)
   const [learnView, setLearnView] = useState<'hub' | 'kid' | 'guide' | 'exam'>(BOOT_HASH ? (BOOT_HASH.view === 'tema' ? 'kid' : BOOT_HASH.view === 'guia' ? 'guide' : BOOT_HASH.view === 'examen' ? 'exam' : 'hub') : 'hub')
   const [activeKidId, setActiveKidId] = useState<string | null>(BOOT_HASH && BOOT_HASH.view === 'tema' ? BOOT_HASH.id : null)
@@ -3970,6 +4217,37 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
         </div>
       )
 
+    case 'snake': {
+      const custSnake = getCustomization();
+      return (
+        <div className="min-h-screen pb-16" style={{ background: custSnake.backgroundValue, backgroundSize: custSnake.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
+          <div className="max-w-5xl mx-auto px-6 md:px-8 pt-10 md:pt-14 pb-10 animate-slide-up">
+            <div className="flex items-center justify-between gap-3 mb-6">
+              <button
+                onClick={() => navigateTo('games')}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-success/10 text-slate-600 hover:text-success text-sm font-bold shadow-sm transition-colors shrink-0"
+              >
+                ← Juegos
+              </button>
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="text-xl">🐍</span>
+                <span className="font-black text-sm md:text-base truncate" style={{ color: getTextColorForTheme(custSnake.backgroundValue).primary }}>Snake</span>
+              </div>
+              <span className="px-3 py-1.5 rounded-full bg-success/15 text-success text-xs font-black uppercase tracking-wider shrink-0">Clásico</span>
+            </div>
+            <div className="text-center mb-6">
+              <h1 className="text-3xl md:text-4xl font-black gradient-text mb-2">Snake 🐍</h1>
+              <p className="font-bold" style={{ color: getTextColorForTheme(custSnake.backgroundValue).secondary }}>Come, crece y no choques.</p>
+            </div>
+            <SnakeGame />
+            <footer className="mt-10 text-center">
+              <p className="text-slate-500 text-sm">Hablemos Claro · Aprende con juegos 🎮</p>
+            </footer>
+          </div>
+        </div>
+      )
+    }
+
     case 'games':
       const cust9 = getCustomization();
       const gamesBadgeCount = profileType === 'family' ? familyProfile.familyBadges.filter(b => b.unlocked).length : getBadges().filter(b => b.unlocked).length;
@@ -4012,6 +4290,29 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                 </div>
                 <div className="shrink-0 hidden md:flex items-center gap-1 text-slate-400 group-hover:text-primary transition-colors">
                   <span className="text-2xl">🕹️</span>
+                </div>
+              </div>
+            </button>
+
+            {/* Snake - Juego clásico */}
+            <button
+              onClick={() => navigateTo('snake')}
+              className="group w-full mb-8 text-left relative overflow-hidden rounded-[28px] bg-gradient-to-br from-success via-success/80 to-emerald-600 p-[2px] shadow-xl shadow-success/20 hover:shadow-2xl hover:scale-[1.01] transition-all duration-300"
+            >
+              <div className="bg-white rounded-[26px] p-6 md:p-8 flex items-center gap-4 md:gap-6">
+                <div className="w-16 h-16 md:w-20 md:h-20 shrink-0 rounded-2xl bg-gradient-to-br from-success to-emerald-600 flex items-center justify-center text-4xl md:text-5xl shadow-lg shadow-success/30 group-hover:scale-110 transition-transform duration-300">
+                  🐍
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 mb-1">
+                    <h2 className="text-2xl md:text-3xl font-black text-success">Snake</h2>
+                    <span className="px-2.5 py-1 rounded-full bg-success/15 text-success text-[11px] font-black uppercase tracking-wider animate-pulse">Clásico</span>
+                  </div>
+                  <p className="text-gray-600 text-base md:text-lg">Come manzanas, crece y no choques con los bordes ni contigo mismo.</p>
+                  <p className="text-success text-sm font-bold mt-1 group-hover:underline">▶ Jugar ahora →</p>
+                </div>
+                <div className="shrink-0 hidden md:flex items-center gap-1 text-slate-400 group-hover:text-success transition-colors">
+                  <span className="text-2xl">🍎</span>
                 </div>
               </div>
             </button>
