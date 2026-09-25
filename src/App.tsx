@@ -4797,6 +4797,8 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
       const cust9 = getCustomization();
       const gamesBadgeCount = profileType === 'family' ? familyProfile.familyBadges.filter(b => b.unlocked).length : getBadges().filter(b => b.unlocked).length;
        const gamesBadgeTotal = profileType === 'family' ? familyProfile.familyBadges.length : getBadges().length;
+       const snakeBestHub = parseInt(safeGet('hablemos-claro-snake-best') ?? '0', 10) || 0
+       const flappyBestHub = parseInt(safeGet('hablemos-claro-flappy-best') ?? '0', 10) || 0
       return (
         <div className="min-h-screen pb-24" style={{ background: cust9.backgroundValue, backgroundSize: cust9.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           {/* Decoración de fondo */}
@@ -4831,6 +4833,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                     <span className="px-2.5 py-1 rounded-full bg-success/15 text-success text-[11px] font-black uppercase tracking-wider animate-pulse">Clásico</span>
                   </div>
                   <p className="text-gray-600 text-base md:text-lg">Come manzanas, crece y no choques con los bordes ni contigo mismo.</p>
+                  <p className="text-slate-500 text-sm font-black mt-1">{snakeBestHub > 0 ? `🏆 Récord: ${snakeBestHub}` : '🎮 Juega y marca tu récord'}</p>
                   <p className="text-success text-sm font-bold mt-1 group-hover:underline">▶ Jugar ahora →</p>
                 </div>
                 <div className="shrink-0 hidden md:flex items-center gap-1 text-slate-400 group-hover:text-success transition-colors">
@@ -4854,6 +4857,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                     <span className="px-2.5 py-1 rounded-full bg-sky-100 text-sky-700 text-[11px] font-black uppercase tracking-wider animate-pulse">Nuevo</span>
                   </div>
                   <p className="text-gray-600 text-base md:text-lg">Vuela entre torres, suma puntos y responde preguntas de integridad.</p>
+                  <p className="text-slate-500 text-sm font-black mt-1">{flappyBestHub > 0 ? `🏆 Récord: ${flappyBestHub}` : '🎮 Juega y marca tu récord'}</p>
                   <p className="text-primary text-sm font-bold mt-1 group-hover:underline">▶ Jugar ahora →</p>
                 </div>
                 <div className="shrink-0 hidden md:flex items-center gap-1 text-slate-400 group-hover:text-primary transition-colors">
