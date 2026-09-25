@@ -1703,7 +1703,7 @@ function SnakeGame() {
       <div className="flex items-center justify-center gap-3 mb-4">
         <div className="px-4 py-2 rounded-2xl bg-white/80 border border-slate-200 font-black text-slate-800">🍎 {score}</div>
         <div className="px-4 py-2 rounded-2xl bg-white/80 border border-slate-200 font-black text-slate-800">🏆 {best}</div>
-        <button onClick={toggleFs} aria-label="Pantalla completa" className="px-4 py-2 rounded-2xl bg-white/80 border border-slate-200 font-black text-slate-800 hover:bg-white active:scale-95 transition-all">
+        <button onClick={toggleFs} aria-label="Pantalla completa" className="md:hidden px-4 py-2 rounded-2xl bg-white/80 border border-slate-200 font-black text-slate-800 hover:bg-white active:scale-95 transition-all">
           {isFs ? '🗗 Salir' : '⛶ Completa'}
         </button>
       </div>
