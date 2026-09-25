@@ -5,7 +5,7 @@ import './index.css'
 // Tipos para la aplicación
 type UserRole = 'parent' | 'child'
 type LearningTopic = 'coima' | 'recognition' | 'impact' | 'consequences' | 'prevention' | 'ethics' | 'citizen' | 'test'
-type BadgeType = 'topics-explorer' | 'game-master' | 'integrity-champion'
+type BadgeType = 'topics-explorer' | 'game-master' | 'flappy-star'
 type ProfileType = 'student' | 'family'
 
 interface Badge {
@@ -104,6 +104,7 @@ const defaultPhotoPos: PhotoPos = { x: 50, y: 50, zoom: 1 }
 const allBadges: Badge[] = [
   { id: 'topics-explorer', name: 'Explorador de Temas', emoji: '📚', color: '#3B82F6', unlocked: false },
   { id: 'game-master', name: 'Maestro del Juego', emoji: '🎮', color: '#8B5CF6', unlocked: false },
+  { id: 'flappy-star', name: 'Estrella Flappy', emoji: '⭐', color: '#F59E0B', unlocked: false },
 ]
 
 const defaultFamilyBadges: FamilyBadge[] = [
@@ -536,7 +537,7 @@ const getStoredStudentProfile = (): StudentProfile => {
           ...defaultStudentProgress.topicProgress,
           ...(parsed.progress?.topicProgress ?? {}),
         },
-        badges: parsed.progress?.badges ?? [...allBadges],
+        badges: normalizeStudentBadges(parsed.progress?.badges),
         quizScores: parsed.progress?.quizScores ?? [],
       },
       customization: {
@@ -589,6 +590,14 @@ const normalizeFamilyBadges = (raw: unknown): FamilyBadge[] => {
   })
 }
 
+const normalizeStudentBadges = (raw: unknown): Badge[] => {
+  const arr = Array.isArray(raw) ? (raw as Array<Partial<Badge>>) : []
+  return allBadges.map(def => {
+    const found = arr.find(b => b.id === def.id)
+    return found ? { ...def, unlocked: found.unlocked === true } : { ...def }
+  })
+}
+
 const getStoredFamilyProfile = (): FamilyProfile => {
   const stored = safeGet('hablemos-claro-family-profile')
   const parsed = safeParse(stored)
@@ -604,7 +613,7 @@ const getStoredFamilyProfile = (): FamilyProfile => {
           ...defaultStudentProgress.topicProgress,
           ...(parsed.progress?.topicProgress ?? {}),
         },
-        badges: parsed.progress?.badges ?? [...allBadges],
+        badges: normalizeStudentBadges(parsed.progress?.badges),
         quizScores: parsed.progress?.quizScores ?? [],
       },
       familyBadges: normalizeFamilyBadges(parsed.familyBadges),
@@ -654,6 +663,210 @@ const examQuestions: ExamQuestion[] = [
   { topic: 'Ciudadanía', icon: '🗳️', question: 'Ser un ciudadano activo es…', options: ['Vigilar, participar y exigir cuentas', 'Votar y olvidar el tema', 'Dejar todo a los políticos'], correct: 0 },
   { topic: 'Ciudadanía', icon: '🗳️', question: 'Un comité vecinal detecta sobreprecio en una obra. ¿Qué puede hacer?', options: ['Pedir su parte', 'No meterse', 'Exigir el expediente y denunciar'], correct: 2 },
 ]
+
+// Banco Flappy: 200 preguntas de corrupción en orden aleatorio (no se repiten por partida)
+const FLAPPY_QUESTIONS: ExamQuestion[] = [
+  { topic: 'Coima', icon: '💰', question: '¿Qué es una coima?', options: ['Un regalo entre amigos', 'Dinero o favores para lograr algo indebido', 'Una multa de tránsito'], correct: 1 },
+  { topic: 'Coima', icon: '💰', question: '¿Cuál es un ejemplo de coima?', options: ['Devolver una billetera', 'Pagar el precio justo', 'Un policía pide dinero para no multar'], correct: 2 },
+  { topic: 'Coima', icon: '💰', question: '¿Quiénes participan en una coima?', options: ['Quien ofrece y quien acepta', 'Nadie en realidad', 'Solo un fantasma'], correct: 0 },
+  { topic: 'Coima', icon: '💰', question: 'Un inspector dice “págame y cierro los ojos”. ¿Qué es?', options: ['Un trámite normal', 'Una coima', 'Una propina'], correct: 1 },
+  { topic: 'Coima', icon: '💰', question: '¿Una coima puede ser un favor y no dinero?', options: ['No, solo es dinero', 'Solo los lunes', 'Sí, también favores o regalos'], correct: 2 },
+  { topic: 'Coima', icon: '💰', question: 'Si te ofrecen una coima, ¿qué debes hacer?', options: ['Rechazarla y contarle a un adulto', 'Aceptarla rápido', 'Pedir más dinero'], correct: 0 },
+  { topic: 'Coima', icon: '💰', question: '¿Por qué la gente ofrece coimas?', options: ['Por generosidad', 'Para saltarse reglas y ganar rápido', 'Por amor al arte'], correct: 1 },
+  { topic: 'Coima', icon: '💰', question: '“Todos pagan para pasar”. ¿Qué respondes?', options: ['Pago también', 'Me voy sin decir nada', 'No pago y respeto la fila'], correct: 2 },
+  { topic: 'Coima', icon: '💰', question: '¿Qué siente quien pierde su turno por una coima?', options: ['Tristeza e injusticia', 'Alegría', 'Nada en especial'], correct: 0 },
+  { topic: 'Coima', icon: '💰', question: '¿Aceptar una coima también es corrupción?', options: ['Solo el que ofrece', 'Sí, quien acepta también rompe reglas', 'Solo a veces'], correct: 1 },
+  { topic: 'Soborno', icon: '🤝', question: 'Un vendedor regala algo caro al inspector para que no revise. Es…', options: ['Amabilidad', 'Un descuento', 'Un soborno'], correct: 2 },
+  { topic: 'Soborno', icon: '🤝', question: '¿Qué busca quien soborna?', options: ['Una ventaja indebida', 'Ayudar a todos', 'Hacer amigos'], correct: 0 },
+  { topic: 'Soborno', icon: '🤝', question: '¿El soborno afecta a otras personas?', options: ['No, solo a quien paga', 'Sí, quita oportunidades a otros', 'Solo al inspector'], correct: 1 },
+  { topic: 'Soborno', icon: '🤝', question: 'Te ofrecen un premio por callar una trampa. ¿Qué haces?', options: ['Lo acepto', 'Pido dos premios', 'Lo rechazo y lo cuento'], correct: 2 },
+  { topic: 'Soborno', icon: '🤝', question: '¿Cuál es la diferencia entre propina y soborno?', options: ['La propina agradece; el soborno compra favores', 'No hay diferencia', 'La propina es más cara'], correct: 0 },
+  { topic: 'Reconocerla', icon: '🔍', question: '¿Cuál es una señal de alerta?', options: ['Te dan comprobante', 'Te piden decidir rápido y en secreto', 'Te explican con calma'], correct: 1 },
+  { topic: 'Reconocerla', icon: '🔍', question: 'Te piden dinero “sin recibo”. ¿Qué sospechas?', options: ['Es un descuento', 'Es un sorteo', 'Es una coima'], correct: 2 },
+  { topic: 'Reconocerla', icon: '🔍', question: '¿Qué frase es típica de una coima?', options: ['“Arreglemos entre nosotros”', '“Todo queda registrado”', '“Pasa mañana con cita”'], correct: 0 },
+  { topic: 'Reconocerla', icon: '🔍', question: 'Un trámite sin fila a cambio de dinero es…', options: ['Eficiencia', 'Corrupción', 'Suerte'], correct: 1 },
+  { topic: 'Reconocerla', icon: '🔍', question: '¿Qué debes pedir siempre en un trámite?', options: ['Un atajo', 'Un favor', 'Comprobante o recibo'], correct: 2 },
+  { topic: 'El daño', icon: '💔', question: '¿A quién dañan las coimas?', options: ['A toda la sociedad', 'Solo a quien paga', 'A nadie'], correct: 0 },
+  { topic: 'El daño', icon: '💔', question: 'El dinero de coimas en obras podría usarse en…', options: ['Fiestas privadas', 'Escuelas y hospitales', 'Nada importante'], correct: 1 },
+  { topic: 'El daño', icon: '💔', question: '¿Qué pierde un niño cuando otro compra su lugar?', options: ['Nada', 'Un juguete', 'Su oportunidad ganada con esfuerzo'], correct: 2 },
+  { topic: 'El daño', icon: '💔', question: 'Las coimas en hospitales provocan…', options: ['Menos medicinas para todos', 'Mejor atención', 'Más médicos'], correct: 0 },
+  { topic: 'El daño', icon: '💔', question: '¿Por qué una coima pequeña también daña?', options: ['No daña', 'Porque rompe reglas y quita recursos', 'Porque es barata'], correct: 1 },
+  { topic: 'Coima', icon: '💰', question: '¿Qué es “mordida” en otros países?', options: ['Un dulce', 'Un impuesto', 'Otro nombre para la coima'], correct: 2 },
+  { topic: 'Coima', icon: '💰', question: 'Un chofer paga para evitar una multa justa. ¿Qué es?', options: ['Coima', 'Viveza', 'Ahorro'], correct: 0 },
+  { topic: 'Coima', icon: '💰', question: '¿La coima existe solo en el gobierno?', options: ['Sí, solo ahí', 'No, en escuelas y barrios también', 'Solo en otros países'], correct: 1 },
+  { topic: 'Coima', icon: '💰', question: 'Pagar para entrar a un equipo sin prueba es…', options: ['Mérito', 'Suerte', 'Trampa corrupta'], correct: 2 },
+  { topic: 'Coima', icon: '💰', question: '¿Qué protege decir que no a una coima?', options: ['El trato justo para todos', 'Nada', 'Al que ofreció'], correct: 0 },
+  { topic: 'Soborno', icon: '🤝', question: '¿Sobornar para ganar un concurso es justo?', options: ['Sí, si ganas', 'No, roba el premio al mejor', 'Solo si nadie ve'], correct: 1 },
+  { topic: 'Soborno', icon: '🤝', question: 'Un juez recibe regalos de una parte. ¿Qué pasa?', options: ['Nada malo', 'Mejor juicio', 'Justicia vendida e injusta'], correct: 2 },
+  { topic: 'Soborno', icon: '🤝', question: '¿Cómo se llama pagar para obtener algo indebido?', options: ['Soborno', 'Impuesto', 'Sueldo'], correct: 0 },
+  { topic: 'Soborno', icon: '🤝', question: 'Si ves un soborno, ¿qué haces?', options: ['Te unes', 'Lo cuentas a un adulto de confianza', 'Lo grabas y lo vendes'], correct: 1 },
+  { topic: 'Soborno', icon: '🤝', question: '¿El que recibe el soborno es inocente?', options: ['Sí, totalmente', 'Solo si es mucho', 'No, también es responsable'], correct: 2 },
+  { topic: 'Reconocerla', icon: '🔍', question: '“Sin testigos, mejor”. ¿Qué indica?', options: ['Que algo indebido se esconde', 'Profesionalismo', 'Rapidez'], correct: 0 },
+  { topic: 'Reconocerla', icon: '🔍', question: '¿Dónde NO hay corrupción?', options: ['Donde se paga en secreto', 'Donde todo es claro y con reglas', 'Donde nadie pregunta'], correct: 1 },
+  { topic: 'Reconocerla', icon: '🔍', question: 'Un precio distinto según la cara del cliente es…', options: ['Marketing', 'Suerte', 'Abuso e injusticia'], correct: 2 },
+  { topic: 'Reconocerla', icon: '🔍', question: '¿Qué te protege de las coimas?', options: ['Conocer tus derechos y hablar', 'Llevar mucho dinero', 'No salir de casa'], correct: 0 },
+  { topic: 'Reconocerla', icon: '🔍', question: 'Piden “colaboración” para darte tu certificado. ¿Qué es?', options: ['Una donación', 'Una coima disfrazada', 'Un impuesto'], correct: 1 },
+  { topic: 'El daño', icon: '💔', question: 'Sin coimas, las filas serían…', options: ['Más lentas', 'Iguales', 'Más justas para todos'], correct: 2 },
+  { topic: 'El daño', icon: '💔', question: '¿Qué se rompe con cada coima?', options: ['La confianza entre personas', 'Nada', 'El dinero'], correct: 0 },
+  { topic: 'El daño', icon: '💔', question: 'Un hospital sin medicinas por desvíos muestra…', options: ['Mala suerte', 'El daño real de la corrupción', 'Falta de médicos'], correct: 1 },
+  { topic: 'El daño', icon: '💔', question: '¿Quiénes sufren más la corrupción?', options: ['Los más ricos', 'Nadie', 'Los más vulnerables'], correct: 2 },
+  { topic: 'El daño', icon: '💔', question: 'Cada coima aceptada enseña que…', options: ['La trampa funciona', 'Ser honesto paga', 'Nada'], correct: 0 },
+  { topic: 'Coima', icon: '💰', question: '¿Rechazar una coima es…?', options: ['Mala educación', 'Valiente honestidad', 'Un problema'], correct: 1 },
+  { topic: 'Coima', icon: '💰', question: 'Decir “no, gracias” ante dinero indebido demuestra…', options: ['Miedo', 'Debilidad', 'Integridad'], correct: 2 },
+  { topic: 'Coima', icon: '💰', question: '¿Qué gana quien rechaza coimas?', options: ['Tranquilidad y respeto', 'Nada', 'Enemigos'], correct: 0 },
+  { topic: 'Coima', icon: '💰', question: 'Contar sobre una coima a un adulto es…', options: ['Chismear', 'Denunciar con valentía', 'Meterse en líos'], correct: 1 },
+  { topic: 'Coima', icon: '💰', question: '¿La honestidad frente a coimas te protege?', options: ['No sirve', 'Solo un rato', 'Sí, toda la vida'], correct: 2 },
+  { topic: 'Nepotismo', icon: '👨‍👩‍👧', question: 'Un funcionario le da un trabajo público a su familiar sin concurso. ¿Qué ocurrió?', options: ['Nepotismo, una forma de corrupción', 'Nada malo', 'Un sorteo'], correct: 0 },
+  { topic: 'Nepotismo', icon: '👨‍👩‍👧', question: '¿Qué es el nepotismo?', options: ['Un deporte', 'Dar puestos a familiares sin concurso', 'Un sorteo'], correct: 1 },
+  { topic: 'Nepotismo', icon: '👨‍👩‍👧', question: '¿Por qué el nepotismo es injusto?', options: ['No lo es', 'Es tradición', 'Quita oportunidades a los más capaces'], correct: 2 },
+  { topic: 'Nepotismo', icon: '👨‍👩‍👧', question: 'Si tu familiar es el mejor y gana el concurso, ¿es nepotismo?', options: ['No, ganó con mérito', 'Sí, siempre', 'Depende del día'], correct: 0 },
+  { topic: 'Impuestos', icon: '🏛️', question: '¿Quién debe pagar impuestos?', options: ['Solo los ricos', 'Todos los que la ley indica', 'Nadie'], correct: 1 },
+  { topic: 'Impuestos', icon: '🏛️', question: '¿Para qué sirven los impuestos?', options: ['Para fiestas privadas', 'Para nada', 'Para escuelas, hospitales y caminos'], correct: 2 },
+  { topic: 'Impuestos', icon: '🏛️', question: 'No pagar impuestos que te tocan es…', options: ['Una falta contra todos', 'Viveza', 'Ahorro'], correct: 0 },
+  { topic: 'Impuestos', icon: '🏛️', question: '¿Qué pasa si nadie paga impuestos?', options: ['Todo mejora', 'No habría escuelas ni hospitales', 'Nada'], correct: 1 },
+  { topic: 'Impuestos', icon: '🏛️', question: 'Pedir comprobante al pagar ayuda a…', options: ['Nada', 'Perder tiempo', 'Que los impuestos lleguen a su destino'], correct: 2 },
+  { topic: 'Impuestos', icon: '🏛️', question: 'Los impuestos son…', options: ['El aporte de todos para todos', 'Un castigo', 'Un regalo'], correct: 0 },
+  { topic: 'Transparencia', icon: '🔍', question: '¿Qué es la transparencia?', options: ['Esconder información', 'Mostrar cómo se gasta el dinero público', 'Hablar mucho'], correct: 1 },
+  { topic: 'Transparencia', icon: '🔍', question: '¿Por qué importa la transparencia?', options: ['No importa', 'Es aburrida', 'Evita trampas a escondidas'], correct: 2 },
+  { topic: 'Transparencia', icon: '🔍', question: 'Un alcalde publica todos los gastos en internet. Eso es…', options: ['Transparencia', 'Pérdida de tiempo', 'Presumir'], correct: 0 },
+  { topic: 'Transparencia', icon: '🔍', question: '¿Qué frase pide transparencia?', options: ['“Confía y no preguntes”', '“Muéstrame las cuentas, por favor”', '“Mejor no saber”'], correct: 1 },
+  { topic: 'Transparencia', icon: '🔍', question: 'Sin transparencia, es más fácil…', options: ['Ser justo', 'Ahorrar', 'Esconder corrupción'], correct: 2 },
+  { topic: 'Rendición', icon: '🧾', question: '¿Qué es rendir cuentas?', options: ['Explicar en qué se usó lo confiado', 'Contar chistes', 'Esconderse'], correct: 0 },
+  { topic: 'Rendición', icon: '🧾', question: '¿Quién debe rendir cuentas?', options: ['Nadie', 'Quien administra algo de otros', 'Solo los niños'], correct: 1 },
+  { topic: 'Rendición', icon: '🧾', question: 'Un tesorero muestra todos los recibos del grupo. ¿Qué hace?', options: ['Pierde tiempo', 'Presume', 'Rinde cuentas'], correct: 2 },
+  { topic: 'Rendición', icon: '🧾', question: 'Rendir cuentas genera…', options: ['Confianza', 'Desconfianza', 'Pleitos'], correct: 0 },
+  { topic: 'Rendición', icon: '🧾', question: 'Si administras dinero del salón, debes…', options: ['Gastarlo en secreto', 'Anotar y mostrar cada gasto', 'Regalarlo'], correct: 1 },
+  { topic: 'Nepotismo', icon: '👨‍👩‍👧', question: '¿El nepotismo daña a otros?', options: ['No', 'Solo un poco', 'Sí, roba oportunidades'], correct: 2 },
+  { topic: 'Nepotismo', icon: '👨‍👩‍👧', question: 'Elegir a un amigo para un cargo sin evaluar a nadie es…', options: ['Nepotismo', 'Amistad', 'Suerte'], correct: 0 },
+  { topic: 'Nepotismo', icon: '👨‍👩‍👧', question: '¿Cómo se evita el nepotismo?', options: ['Con más amigos', 'Con concursos justos y abiertos', 'Con secretos'], correct: 1 },
+  { topic: 'Nepotismo', icon: '👨‍👩‍👧', question: 'Un concurso abierto con jurado es…', options: ['Lento e inútil', 'Injusto', 'Justo y transparente'], correct: 2 },
+  { topic: 'Nepotismo', icon: '👨‍👩‍👧', question: 'El mérito significa…', options: ['Que te elijan por capacidad y esfuerzo', 'Tener contactos', 'Tener suerte'], correct: 0 },
+  { topic: 'Impuestos', icon: '🏛️', question: '¿De quién es el dinero de los impuestos?', options: ['Del alcalde', 'De todos los ciudadanos', 'De nadie'], correct: 1 },
+  { topic: 'Impuestos', icon: '🏛️', question: 'Evadir impuestos es…', options: ['Inteligente', 'Normal', 'Quitarle recursos a todos'], correct: 2 },
+  { topic: 'Impuestos', icon: '🏛️', question: '¿Qué financian los impuestos?', options: ['Escuelas, salud y caminos', 'Viajes de funcionarios', 'Fiestas'], correct: 0 },
+  { topic: 'Impuestos', icon: '🏛️', question: 'Pagar impuestos es…', options: ['Un castigo', 'Un deber ciudadano', 'Opcional'], correct: 1 },
+  { topic: 'Impuestos', icon: '🏛️', question: 'Si una obra cuesta el triple por sobreprecios, eso es…', options: ['Inflación', 'Calidad', 'Corrupción'], correct: 2 },
+  { topic: 'Transparencia', icon: '🔍', question: 'El acceso a la información pública es…', options: ['Un derecho', 'Un privilegio', 'Un favor'], correct: 0 },
+  { topic: 'Transparencia', icon: '🔍', question: '¿Qué herramienta frena la corrupción?', options: ['El secreto', 'La transparencia y la denuncia', 'La paciencia sola'], correct: 1 },
+  { topic: 'Transparencia', icon: '🔍', question: 'Ocultar gastos públicos genera…', options: ['Confianza', 'Ahorro', 'Desconfianza'], correct: 2 },
+  { topic: 'Transparencia', icon: '🔍', question: 'Publicar las decisiones ayuda a…', options: ['Vigilar que todo sea justo', 'Confundir', 'Aburrir'], correct: 0 },
+  { topic: 'Transparencia', icon: '🔍', question: 'La luz es enemiga de…', options: ['Las plantas', 'La corrupción', 'El día'], correct: 1 },
+  { topic: 'Rendición', icon: '🧾', question: '¿Qué muestra quien rinde cuentas?', options: ['Honestidad', 'Miedo', 'Culpa'], correct: 0 },
+  { topic: 'Rendición', icon: '🧾', question: 'No rendir cuentas permite…', options: ['El orden', 'La confianza', 'Esconder desvíos'], correct: 2 },
+  { topic: 'Rendición', icon: '🧾', question: 'Tu grupo te eligió tesorero. ¿Qué haces?', options: ['Guardo el dinero en secreto', 'Muestro cada gasto al grupo', 'Lo presto a amigos'], correct: 1 },
+  { topic: 'Rendición', icon: '🧾', question: '¿Cada cuánto se debe rendir cuentas?', options: ['Nunca', 'Una vez y ya', 'Siempre que se maneje algo ajeno'], correct: 2 },
+  { topic: 'Rendición', icon: '🧾', question: 'Rendir cuentas protege…', options: ['Los recursos de todos', 'Al tesorero corrupto', 'A nadie'], correct: 0 },
+  { topic: 'Mixto', icon: '🌱', question: 'Un dirigente se queda con dinero de la escuela. ¿Qué es?', options: ['Ahorro', 'Corrupción', 'Préstamo'], correct: 1 },
+  { topic: 'Mixto', icon: '🌱', question: '¿Qué debe hacer quien administra dinero del grupo?', options: ['Gastarlo', 'Esconderlo', 'Rendir cuentas y usarlo para el fin acordado'], correct: 2 },
+  { topic: 'Mixto', icon: '🌱', question: 'Las leyes son iguales para…', options: ['Todas las personas por igual', 'Los ricos', 'Los políticos'], correct: 0 },
+  { topic: 'Mixto', icon: '🌱', question: '¿Qué promueve rechazar coimas?', options: ['La viveza', 'La integridad', 'El miedo'], correct: 1 },
+  { topic: 'Mixto', icon: '🌱', question: 'Un pueblo que vigila a sus autoridades…', options: ['Pierde tiempo', 'Se mete en líos', 'Frena la corrupción'], correct: 2 },
+  { topic: 'Mixto', icon: '🌱', question: 'Denunciar por canales seguros es…', options: ['Valentía ciudadana', 'Peligroso siempre', 'Chisme'], correct: 0 },
+  { topic: 'Mixto', icon: '🌱', question: '¿Qué necesita un país contra la corrupción?', options: ['Más secretos', 'Ciudadanos honestos e instituciones fuertes', 'Más dinero'], correct: 1 },
+  { topic: 'Mixto', icon: '🌱', question: 'El silencio ante la corrupción…', options: ['Ayuda', 'No afecta', 'La deja crecer'], correct: 2 },
+  { topic: 'Mixto', icon: '🌱', question: 'Hablar y denunciar es…', options: ['El primer paso para detenerla', 'Inútil', 'Peligroso'], correct: 0 },
+  { topic: 'Mixto', icon: '🌱', question: '¿Cuál es el mensaje de este juego?', options: ['Paga para ganar', 'La integridad siempre gana', 'Gana como sea'], correct: 1 },
+  { topic: 'Honestidad', icon: '💎', question: '¿Es honesto decir la verdad aunque cueste?', options: ['Nunca', 'Depende', 'Sí, la honestidad es un valor'], correct: 2 },
+  { topic: 'Honestidad', icon: '💎', question: 'Encuentras dinero perdido. ¿Qué muestra integridad?', options: ['Devolverlo con todo su contenido', 'Gastarlo', 'Quedarte la mitad'], correct: 0 },
+  { topic: 'Honestidad', icon: '💎', question: '¿Qué es hacer trampa en un examen?', options: ['Estudiar mucho', 'Copiar o hacer trampa', 'Preguntar al profesor'], correct: 1 },
+  { topic: 'Honestidad', icon: '💎', question: 'Copiar la tarea y firmarla es…', options: ['Ayuda', 'Trabajo en equipo', 'Plagio deshonesto'], correct: 2 },
+  { topic: 'Honestidad', icon: '💎', question: 'La honestidad se demuestra cuando…', options: ['Cuando nadie mira', 'Cuando todos miran', 'Cuando hay premio'], correct: 0 },
+  { topic: 'Honestidad', icon: '💎', question: '¿Por qué cuesta ser honesto a veces?', options: ['Porque no conviene', 'Porque exige valentía', 'Porque es aburrido'], correct: 1 },
+  { topic: 'Honestidad', icon: '💎', question: 'Un amigo te pide copiar. ¿Qué propones?', options: ['Copiar', 'Nada', 'Estudiar juntos'], correct: 2 },
+  { topic: 'Honestidad', icon: '💎', question: 'Decir la verdad aunque traiga problemas es…', options: ['De valientes', 'Tonto', 'Inútil'], correct: 0 },
+  { topic: 'Honestidad', icon: '💎', question: '¿La honestidad se entrena?', options: ['No se puede', 'Sí, con actos pequeños diarios', 'Solo de mayor'], correct: 1 },
+  { topic: 'Honestidad', icon: '💎', question: '¿Qué gana una persona honesta?', options: ['Nada', 'Enemigos', 'Confianza y respeto'], correct: 2 },
+  { topic: 'Consecuencias', icon: '⚖️', question: '¿Qué le puede pasar a quien ofrece coimas?', options: ['Prisión, multas e inhabilitación', 'Nada', 'Un premio'], correct: 0 },
+  { topic: 'Consecuencias', icon: '⚖️', question: 'Además de lo legal, la corrupción destruye…', options: ['Los semáforos', 'La confianza entre ciudadanos', 'Los feriados'], correct: 1 },
+  { topic: 'Consecuencias', icon: '⚖️', question: '¿La corrupción tiene castigo?', options: ['No', 'Solo retos', 'Sí, la ley la sanciona'], correct: 2 },
+  { topic: 'Consecuencias', icon: '⚖️', question: 'Quien roba dinero público deberá…', options: ['Devolverlo y responder ante la ley', 'Quedárselo', 'Esconderlo mejor'], correct: 0 },
+  { topic: 'Consecuencias', icon: '⚖️', question: '¿Por qué existen castigos contra la corrupción?', options: ['Por venganza', 'Para proteger a todos y desanimar trampas', 'Por tradición'], correct: 1 },
+  { topic: 'Consecuencias', icon: '⚖️', question: 'Una mala fama por corrupto dura…', options: ['Un día', 'Nada', 'Mucho tiempo'], correct: 2 },
+  { topic: 'Consecuencias', icon: '⚖️', question: '¿Qué pierde un corrupto descubierto?', options: ['Confianza y reputación', 'Nada', 'Dinero y premios'], correct: 0 },
+  { topic: 'Consecuencias', icon: '⚖️', question: 'Las consecuencias llegan…', options: ['Nunca', 'Tarde o temprano', 'Solo a otros'], correct: 1 },
+  { topic: 'Consecuencias', icon: '⚖️', question: '¿A quién castiga la ley anticorrupción?', options: ['A los honestos', 'A los testigos', 'A quien ofrece y a quien acepta'], correct: 2 },
+  { topic: 'Consecuencias', icon: '⚖️', question: 'Evitar la corrupción te evita…', options: ['Problemas legales y culpa', 'Amigos', 'Dinero'], correct: 0 },
+  { topic: 'Prevención', icon: '🛡️', question: '¿Cómo se previene la corrupción?', options: ['Exigiendo transparencia y denunciando', 'Ignorando todo', 'Pagando más rápido'], correct: 1 },
+  { topic: 'Prevención', icon: '🛡️', question: 'Si ves algo incorrecto en tu municipio, puedes…', options: ['Callar', 'Participar', 'Denunciar por canales seguros'], correct: 2 },
+  { topic: 'Prevención', icon: '🛡️', question: 'Prevenir es mejor porque…', options: ['Evita el daño antes de que ocurra', 'Es más caro', 'Es aburrido'], correct: 0 },
+  { topic: 'Prevención', icon: '🛡️', question: '¿Qué frena las coimas en un trámite?', options: ['Pagar más', 'Trámites claros y comprobantes', 'Ir de noche'], correct: 1 },
+  { topic: 'Prevención', icon: '🛡️', question: 'En tu escuela, ¿cómo previenes trampas?', options: ['Copiando', 'No mirando', 'Reglas claras y honestidad'], correct: 2 },
+  { topic: 'Prevención', icon: '🛡️', question: '¿A quién avisas si ofrecen coimas en tu barrio?', options: ['A un adulto de confianza o autoridad', 'A nadie', 'A un amigo cómplice'], correct: 0 },
+  { topic: 'Prevención', icon: '🛡️', question: 'Educar en valores desde niños…', options: ['No sirve', 'Forma adultos íntegros', 'Es aburrido'], correct: 1 },
+  { topic: 'Prevención', icon: '🛡️', question: '¿Qué hace fuerte a una comunidad?', options: ['El silencio', 'El dinero', 'La honestidad de todos'], correct: 2 },
+  { topic: 'Prevención', icon: '🛡️', question: 'Vigilar y participar es…', options: ['Ciudadanía activa', 'Meterse en líos', 'Pérdida de tiempo'], correct: 0 },
+  { topic: 'Prevención', icon: '🛡️', question: '¿Cuál es tu papel contra la corrupción?', options: ['Ninguno', 'No hacer trampa y denunciar', 'Esperar a crecer'], correct: 1 },
+  { topic: 'Honestidad', icon: '💎', question: 'Devolver el vuelto de más es…', options: ['Tonto', 'Innecesario', 'Honestidad'], correct: 2 },
+  { topic: 'Honestidad', icon: '💎', question: '¿La integridad se muestra cuando…?', options: ['Cuando nadie mira', 'Cuando hay cámaras', 'Cuando hay recompensa'], correct: 0 },
+  { topic: 'Honestidad', icon: '💎', question: 'Un error admitido a tiempo…', options: ['Empeora todo', 'Se puede corregir y enseña', 'No importa'], correct: 1 },
+  { topic: 'Honestidad', icon: '💎', question: '¿Qué admiras en una persona íntegra?', options: ['Su dinero', 'Su ropa', 'Su coherencia'], correct: 2 },
+  { topic: 'Honestidad', icon: '💎', question: 'Ser coherente es…', options: ['Decir y hacer lo mismo', 'Cambiar según convenga', 'Callar siempre'], correct: 0 },
+  { topic: 'Consecuencias', icon: '⚖️', question: 'El dinero robado deja sin…', options: ['Nada', 'Fiestas', 'Escuelas y hospitales'], correct: 1 },
+  { topic: 'Consecuencias', icon: '⚖️', question: '¿Qué deja la corrupción a los jóvenes?', options: ['Oportunidades', 'Riqueza', 'Menos futuro'], correct: 2 },
+  { topic: 'Consecuencias', icon: '⚖️', question: 'Un país corrupto…', options: ['Crece menos y con desconfianza', 'Avanza más', 'Progresa igual'], correct: 0 },
+  { topic: 'Consecuencias', icon: '⚖️', question: '¿Por qué castigar la corrupción?', options: ['Por odio', 'Para que no se repita y reparar el daño', 'Por costumbre'], correct: 1 },
+  { topic: 'Consecuencias', icon: '⚖️', question: 'La culpa de participar en trampas…', options: ['No existe', 'Pasa rápido', 'Persigue mucho tiempo'], correct: 2 },
+  { topic: 'Prevención', icon: '🛡️', question: 'Pedir comprobantes siempre…', options: ['Deja huella contra trampas', 'Es grosero', 'Es lento'], correct: 0 },
+  { topic: 'Prevención', icon: '🛡️', question: '¿Qué le pides a un candidato?', options: ['Regalos', 'Propuestas claras y cuentas claras', 'Favores'], correct: 1 },
+  { topic: 'Prevención', icon: '🛡️', question: 'Observar y anotar irregularidades sirve para…', options: ['Nada', 'Chismear', 'Denunciar con pruebas'], correct: 2 },
+  { topic: 'Prevención', icon: '🛡️', question: 'La mejor vacuna contra la corrupción es…', options: ['La educación en valores', 'El miedo', 'El castigo solo'], correct: 0 },
+  { topic: 'Prevención', icon: '🛡️', question: '¿Cuándo empezar a ser íntegro?', options: ['De mayor', 'Nunca', 'Desde hoy mismo'], correct: 1 },
+  { topic: 'Mixto', icon: '🌱', question: '¿Qué es el bien común?', options: ['Lo mío', 'Lo de nadie', 'Lo que beneficia a todos'], correct: 2 },
+  { topic: 'Mixto', icon: '🌱', question: 'Cuidar lo público es tarea de…', options: ['Todos los ciudadanos', 'Solo autoridades', 'Nadie'], correct: 0 },
+  { topic: 'Mixto', icon: '🌱', question: 'Un parque limpio gracias a vecinos muestra…', options: ['Suerte', 'Ciudadanía activa', 'Dinero'], correct: 1 },
+  { topic: 'Mixto', icon: '🌱', question: '¿Qué rompe el bien común?', options: ['Cuidarlo', 'Ignorarlo', 'Usarlo para beneficio propio'], correct: 2 },
+  { topic: 'Mixto', icon: '🌱', question: 'Pensar en los demás al decidir es…', options: ['Justicia', 'Debilidad', 'Tontería'], correct: 0 },
+  { topic: 'Ciudadanía', icon: '🗳️', question: 'Ser un ciudadano activo es…', options: ['Votar y olvidar', 'Vigilar, participar y exigir cuentas', 'Dejar todo a otros'], correct: 1 },
+  { topic: 'Ciudadanía', icon: '🗳️', question: 'Un comité detecta sobreprecio en una obra. ¿Qué hace?', options: ['Pide su parte', 'No se mete', 'Exige el expediente y denuncia'], correct: 2 },
+  { topic: 'Ciudadanía', icon: '🗳️', question: 'Votar con información es…', options: ['Un deber ciudadano', 'Inútil', 'Aburrido'], correct: 0 },
+  { topic: 'Ciudadanía', icon: '🗳️', question: '¿Para qué sirve participar en tu barrio?', options: ['Para nada', 'Para mejorar juntos', 'Para pelear'], correct: 1 },
+  { topic: 'Ciudadanía', icon: '🗳️', question: 'Ignorar los problemas del barrio…', options: ['Ayuda', 'Es cómodo', 'Los deja crecer'], correct: 2 },
+  { topic: 'Ciudadanía', icon: '🗳️', question: 'Un buen vecino…', options: ['Cuida lo común y avisa', 'Solo mira lo suyo', 'Se muda'], correct: 0 },
+  { topic: 'Ética', icon: '🧭', question: 'La integridad significa…', options: ['Seguir a la mayoría', 'Hacer lo correcto aunque nadie mire', 'Hacer lo que conviene'], correct: 1 },
+  { topic: 'Ética', icon: '🧭', question: '¿Ética y ley se parecen en…?', options: ['Nada', 'Letras', 'Buscar lo justo'], correct: 2 },
+  { topic: 'Ética', icon: '🧭', question: 'Actuar bien cuando nadie mira se llama…', options: ['Ética', 'Suerte', 'Miedo'], correct: 0 },
+  { topic: 'Ética', icon: '🧭', question: '¿Qué guía tus decisiones diarias?', options: ['La moda', 'Tus valores', 'La tele'], correct: 1 },
+  { topic: 'Ética', icon: '🧭', question: 'Copiar fama ajena como propia es…', options: ['Homenaje', 'Necesario', 'Falta de ética'], correct: 2 },
+  { topic: 'Valores', icon: '🌱', question: '¿Qué valor te hace devolver lo ajeno?', options: ['La honestidad', 'La viveza', 'El miedo'], correct: 0 },
+  { topic: 'Valores', icon: '🌱', question: 'El respeto significa…', options: ['Burlarse', 'Tratar bien a todos', 'Obedecer siempre'], correct: 1 },
+  { topic: 'Valores', icon: '🌱', question: '¿Qué valor falta al hacer trampa?', options: ['Alegría', 'Fuerza', 'Honestidad'], correct: 2 },
+  { topic: 'Valores', icon: '🌱', question: 'Ser solidario es…', options: ['Ayudar sin esperar ventaja', 'Dar lo que sobra sin amor', 'Prestar con intereses'], correct: 0 },
+  { topic: 'Valores', icon: '🌱', question: '¿Qué une a una familia honesta?', options: ['El dinero', 'La confianza', 'El silencio'], correct: 1 },
+  { topic: 'Mixto', icon: '🌱', question: 'Un líder justo…', options: ['Favorece amigos', 'Se esconde', 'Escucha y decide parejo'], correct: 2 },
+  { topic: 'Mixto', icon: '🌱', question: '¿Qué hace grande a una escuela?', options: ['Sus valores y su gente', 'Su edificio', 'Su dinero'], correct: 0 },
+  { topic: 'Mixto', icon: '🌱', question: 'El ejemplo de los mayores…', options: ['No importa', 'Enseña más que mil palabras', 'Aburre'], correct: 1 },
+  { topic: 'Mixto', icon: '🌱', question: '¿Qué dejas a otros con honestidad?', options: ['Nada', 'Deudas', 'Buen ejemplo'], correct: 2 },
+  { topic: 'Ciudadanía', icon: '🗳️', question: 'Cuidar el parque del barrio es…', options: ['Ciudadanía', 'Tarea de otros', 'Pérdida de tiempo'], correct: 0 },
+  { topic: 'Ciudadanía', icon: '🗳️', question: '¿Por qué importan las elecciones limpias?', options: ['No importan', 'Deciden el futuro de todos', 'Son fiesta'], correct: 1 },
+  { topic: 'Ciudadanía', icon: '🗳️', question: 'Comprar votos es…', options: ['Democracia', 'Ayuda', 'Corrupción electoral'], correct: 2 },
+  { topic: 'Ciudadanía', icon: '🗳️', question: 'Informarte antes de opinar es…', options: ['Responsabilidad', 'Aburrido', 'Innecesario'], correct: 0 },
+  { topic: 'Ciudadanía', icon: '🗳️', question: '¿Qué hace un observador electoral?', options: ['Vota dos veces', 'Vigila que todo sea limpio', 'Duerme'], correct: 1 },
+  { topic: 'Ética', icon: '🧭', question: '¿Miente quien calla una verdad importante?', options: ['No', 'A veces sí, por omisión', 'Solo escribe'], correct: 2 },
+  { topic: 'Ética', icon: '🧭', question: 'Prometer y no cumplir es…', options: ['Falta de palabra', 'Normal', 'Inteligente'], correct: 0 },
+  { topic: 'Ética', icon: '🧭', question: '¿Qué vale más que el dinero?', options: ['Nada', 'La fama', 'La integridad'], correct: 1 },
+  { topic: 'Ética', icon: '🧭', question: 'Elegir lo correcto aunque pierdas es…', options: ['Tontería', 'Debilidad', 'Carácter'], correct: 2 },
+  { topic: 'Ética', icon: '🧭', question: '¿Quién te evalúa cuando nadie mira?', options: ['Tu conciencia', 'Nadie', 'Tus amigos'], correct: 0 },
+  { topic: 'Valores', icon: '🌱', question: 'Compartir lo que sabes…', options: ['Te empobrece', 'Multiplica el bien', 'Es tonto'], correct: 1 },
+  { topic: 'Valores', icon: '🌱', question: 'Agradecer un favor…', options: ['Humilla', 'Debilita', 'Fortalece vínculos'], correct: 2 },
+  { topic: 'Valores', icon: '🌱', question: 'Pedir perdón sincero demuestra…', options: ['Valentía', 'Debilidad', 'Miedo'], correct: 0 },
+  { topic: 'Valores', icon: '🌱', question: '¿Qué construye la confianza?', options: ['Promesas vacías', 'Actos justos repetidos', 'Regalos caros'], correct: 1 },
+  { topic: 'Valores', icon: '🌱', question: 'Perdonar sin olvidar la lección es…', options: ['Tonto', 'Injusto', 'Sabio'], correct: 2 },
+  { topic: 'Mixto', icon: '🌱', question: 'Ver corrupción y actuar es…', options: ['Deber ciudadano', 'Peligroso siempre', 'Imposible'], correct: 0 },
+  { topic: 'Mixto', icon: '🌱', question: '¿Qué frena más la corrupción?', options: ['Más leyes solas', 'Gente honesta más leyes justas', 'Más dinero'], correct: 1 },
+  { topic: 'Mixto', icon: '🌱', question: 'Un país honesto…', options: ['Es pobre', 'Es aburrido', 'Avanza unido'], correct: 2 },
+  { topic: 'Mixto', icon: '🌱', question: 'Tu granito de arena importa porque…', options: ['Suma con el de todos', 'No importa', 'Molesta'], correct: 0 },
+  { topic: 'Mixto', icon: '🌱', question: '¿El final de este juego qué enseña?', options: ['A volar', 'Que la integridad siempre gana', 'A esquivar'], correct: 1 },
+  { topic: 'Mixto', icon: '🌱', question: '¿Qué aprendiste hoy?', options: ['Nada', 'Trampas', 'A reconocer y frenar corrupción'], correct: 2 },
+  { topic: 'Mixto', icon: '🌱', question: '¿A quién contarás lo aprendido?', options: ['A tu familia y amigos', 'A nadie', 'Al espejo'], correct: 0 },
+  { topic: 'Mixto', icon: '🌱', question: 'Practicar honestidad cada día…', options: ['Cansa', 'Te hace íntegro', 'Aburre'], correct: 1 },
+  { topic: 'Mixto', icon: '🌱', question: '¿Volverías a jugar para repasar?', options: ['No', 'Tal vez', 'Sí, aprender es divertido'], correct: 2 },
+  { topic: 'Mixto', icon: '🌱', question: 'La mejor victoria del juego es…', options: ['Ser íntegro de verdad', 'El puntaje', 'El récord'], correct: 0 },
+  { topic: 'Ciudadanía', icon: '🗳️', question: '¿Qué es rendir cuentas?', options: ['Esconderse', 'Explicar en qué se usó lo confiado', 'Callar'], correct: 1 },
+  { topic: 'Ciudadanía', icon: '🗳️', question: '¿Quién vigila al gobierno?', options: ['Nadie', 'Solo él', 'El pueblo y sus instituciones'], correct: 2 },
+  { topic: 'Ciudadanía', icon: '🗳️', question: 'La prensa libre ayuda porque…', options: ['Investiga y revela', 'Entretiene', 'Vende'], correct: 0 },
+  { topic: 'Ciudadanía', icon: '🗳️', question: '¿Qué es un derecho ciudadano?', options: ['Un regalo', 'Algo que nadie te puede quitar sin razón', 'Un premio'], correct: 1 },
+  { topic: 'Ciudadanía', icon: '🗳️', question: 'Cuidar lo de todos…', options: ['Es de tontos', 'No sirve', 'Es de todos'], correct: 2 },
+];
 
 
 
@@ -1880,7 +2093,19 @@ function flappyBeep(freq: number, dur = 0.09) {
   } catch { /* noop */ }
 }
 
-function FlappyGame() {
+function shuffledFlappyOrder() {
+  const a: number[] = []
+  for (let i = 0; i < FLAPPY_QUESTIONS.length; i++) a.push(i)
+  for (let k = a.length - 1; k > 0; k--) {
+    const j = Math.floor(Math.random() * (k + 1))
+    const t = a[k] as number
+    a[k] = a[j] as number
+    a[j] = t
+  }
+  return a
+}
+
+function FlappyGame({ onFlappyXpTotal }: { onFlappyXpTotal?: (total: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const [score, setScore] = useState(0)
   const [best, setBest] = useState<number>(() => {
@@ -1889,6 +2114,10 @@ function FlappyGame() {
   })
   const [lives, setLives] = useState(3)
   const [xp, setXp] = useState(0)
+  const [totalXp, setTotalXp] = useState<number>(() => {
+    const n = parseInt(safeGet('hablemos-claro-flappy-total-xp') ?? '0', 10)
+    return Number.isFinite(n) && n > 0 ? n : 0
+  })
   const [phase, setPhase] = useState<FlappyPhase>('idle')
   const [quiz, setQuiz] = useState<ExamQuestion | null>(null)
   const [quizPick, setQuizPick] = useState<number | null>(null)
@@ -1903,8 +2132,10 @@ function FlappyGame() {
   const spawnRef = useRef(1.2)
   const invulnRef = useRef(0)
   const askedRef = useRef(-1)
-  const quizCountRef = useRef(0)
   const quizErrorsRef = useRef(0)
+  const orderRef = useRef<number[]>([])
+  const orderPosRef = useRef(0)
+  const totalXpRef = useRef(0)
   const scoreRef = useRef(0)
   const livesRef = useRef(3)
   const xpRef = useRef(0)
@@ -1922,6 +2153,8 @@ function FlappyGame() {
     invulnRef.current = 0
     askedRef.current = -1
     quizErrorsRef.current = 0
+    orderRef.current = shuffledFlappyOrder()
+    orderPosRef.current = 0
     scoreRef.current = 0
     livesRef.current = 3
     xpRef.current = 0
@@ -1958,9 +2191,14 @@ function FlappyGame() {
   }
 
   const triggerQuestion = () => {
-    const q = examQuestions[quizCountRef.current % examQuestions.length]
+    if (orderPosRef.current >= orderRef.current.length) {
+      orderRef.current = shuffledFlappyOrder()
+      orderPosRef.current = 0
+    }
+    const qi = orderRef.current[orderPosRef.current] ?? 0
+    const q = FLAPPY_QUESTIONS[qi] ?? FLAPPY_QUESTIONS[0]
     if (!q) return
-    quizCountRef.current += 1
+    orderPosRef.current += 1
     quizErrorsRef.current = 0
     setQuizPick(null)
     setQuiz(q)
@@ -1972,9 +2210,13 @@ function FlappyGame() {
     if (!q || phaseRef.current !== 'question') return
     if (quizPick !== null && quizPick === q.correct) return
     setQuizPick(oi)
-    if (oi === q.correct) {
+    if (oi === quiz.correct) {
       xpRef.current += 10
       setXp(xpRef.current)
+      totalXpRef.current += 10
+      setTotalXp(totalXpRef.current)
+      safeSet('hablemos-claro-flappy-total-xp', String(totalXpRef.current))
+      onFlappyXpTotal?.(totalXpRef.current)
       quizErrorsRef.current = 0
       flappyBeep(660, 0.12)
     } else {
@@ -2071,6 +2313,7 @@ function FlappyGame() {
   }
 
   useEffect(() => {
+    totalXpRef.current = totalXp
     draw()
   }, [])
 
@@ -2245,6 +2488,7 @@ function FlappyGame() {
             <div className="text-5xl">💀</div>
             <p className="text-white text-2xl font-black">¡Fin del juego!</p>
             <p className="text-white/90 font-bold">Puntaje: {score} · XP: {xp} · Récord: {Math.max(best, score)}</p>
+            <p className="text-white/80 text-sm font-bold">⭐ Total: {totalXp} / 500</p>
             <button
               onClick={() => resetRun(true)}
               className="btn-glow bg-gradient-to-r from-primary to-secondary text-white font-bold py-3 px-8 rounded-full text-lg"
@@ -2642,10 +2886,30 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
          unlocked.push(nb)
        }
      })
-     return { profile: updated, unlocked }
-   }
+      return { profile: updated, unlocked }
+    }
 
-   const celebrateFamilyBadges = (unlocked: FamilyBadge[]) => {
+    // Insignia Estrella Flappy: 500 XP acumuladas respondiendo en Flappy
+    const awardFlappyStar = (totalXp: number) => {
+      if (profileType !== 'student') return
+      if (totalXp < 500) return
+      const current = studentProfile.progress.badges
+      const withStar = current.some(b => b.id === 'flappy-star')
+        ? current
+        : [...current, { id: 'flappy-star', name: 'Estrella Flappy', emoji: '⭐', color: '#F59E0B', unlocked: false } as Badge]
+      if (withStar.some(b => b.id === 'flappy-star' && b.unlocked)) return
+      const badges = withStar.map(b => (b.id === 'flappy-star' ? { ...b, unlocked: true } : b))
+      const updated = { ...studentProfile, progress: { ...studentProfile.progress, badges } }
+      setStudentProfile(updated)
+      saveStudentProfile(updated)
+      const nb = badges.find(b => b.id === 'flappy-star')
+      if (nb) {
+        setEarnedBadge({ ...nb })
+        setShowBadgeCelebration(true)
+      }
+    }
+
+    const celebrateFamilyBadges = (unlocked: FamilyBadge[]) => {
     if (unlocked.length === 0) return
     const last = unlocked[unlocked.length - 1]
     setEarnedBadge({ id: last.id as unknown as BadgeType, name: last.name, emoji: last.emoji, color: '#F59E0B', unlocked: true })
@@ -4784,7 +5048,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
               <h1 className="text-3xl md:text-4xl font-black gradient-text mb-2">Flappy 🐦</h1>
               <p className="font-bold" style={{ color: flappyColors.secondary }}>Vuela, esquiva y responde.</p>
             </div>
-            <FlappyGame />
+            <FlappyGame onFlappyXpTotal={awardFlappyStar} />
             <footer className="mt-10 text-center">
               <p className="text-slate-500 text-sm">Hablemos Claro · Aprende con juegos 🎮</p>
             </footer>
@@ -5535,7 +5799,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                       </div>
                       {/* Badge de nivel */}
                       <div className="absolute -bottom-2 -right-2 w-12 h-12 rounded-full bg-gradient-to-br from-warning to-secondary flex items-center justify-center text-lg shadow-lg border-4 border-white font-black text-white">
-                        {currentUnlockedCount >= 3 ? '🏆' : currentUnlockedCount >= 1 ? '🥇' : currentUnlockedCount >= 1 ? '🥈' : '🥉'}
+                        {currentUnlockedCount >= currentBadges.length && currentBadges.length > 0 ? '🏆' : currentUnlockedCount >= 1 ? '🥇' : currentUnlockedCount >= 1 ? '🥈' : '🥉'}
                       </div>
                     </div>
                     {/* Edit photo button */}
@@ -5575,15 +5839,15 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                 {/* XP Level Bar */}
                 <div className="bg-white/85 backdrop-blur-xl rounded-2xl p-4 mb-6 flex items-center gap-4 shadow-lg shadow-indigo-500/5">
                   <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-2xl shadow-md">
-                    {currentUnlockedCount >= 3 ? '🏆' : '⭐'}
+                    {currentUnlockedCount >= currentBadges.length && currentBadges.length > 0 ? '🏆' : '⭐'}
                   </div>
                   <div className="flex-1">
                     <div className="flex justify-between mb-1">
-                      <span className="text-sm font-bold text-slate-800">Nivel {currentUnlockedCount >= 3 ? 'Campeón' : currentUnlockedCount >= 1 ? 'En camino' : 'Aprendiz'}</span>
-                      <span className="text-sm font-bold text-primary">{currentUnlockedCount}/3 insignias</span>
+                      <span className="text-sm font-bold text-slate-800">Nivel {currentUnlockedCount >= currentBadges.length && currentBadges.length > 0 ? 'Campeón' : currentUnlockedCount >= 1 ? 'En camino' : 'Aprendiz'}</span>
+                      <span className="text-sm font-bold text-primary">{currentUnlockedCount}/{currentBadges.length} insignias</span>
                     </div>
                     <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
-                      <div className="h-full rounded-full bg-gradient-to-r from-primary to-secondary transition-all duration-700 shadow-sm" style={{ width: `${(currentUnlockedCount / 3) * 100}%` }} />
+                      <div className="h-full rounded-full bg-gradient-to-r from-primary to-secondary transition-all duration-700 shadow-sm" style={{ width: `${currentBadges.length > 0 ? (currentUnlockedCount / currentBadges.length) * 100 : 0}%` }} />
                     </div>
                   </div>
                 </div>
@@ -5592,7 +5856,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-8">
                   <button onClick={() => setCurrentScreen('profile')} className="group rounded-[20px] bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 p-4 md:p-6 text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
                     <div className="text-3xl md:text-4xl mb-1 group-hover:scale-110 transition-transform">🏅</div>
-                    <div className="text-xl md:text-2xl font-black gradient-text">{currentUnlockedCount}/3</div>
+                    <div className="text-xl md:text-2xl font-black gradient-text">{currentUnlockedCount}/{currentBadges.length}</div>
                     <div className="text-xs md:text-sm font-bold text-primary/80 mt-1">{t('myBadges')}</div>
                   </button>
                   <button onClick={() => setCurrentScreen('profile')} className="group rounded-[20px] bg-gradient-to-br from-secondary/10 to-secondary/5 border border-secondary/20 p-4 md:p-6 text-center hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
@@ -5618,7 +5882,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                     <>
                       <div className="flex items-center justify-between mb-6">
                         <h3 className="font-black text-dark text-lg">{t('myBadges')}</h3>
-                        <span className="text-sm font-bold text-primary">{currentUnlockedCount}/3</span>
+                        <span className="text-sm font-bold text-primary">{currentUnlockedCount}/{currentBadges.length}</span>
                       </div>
                       <div className="flex flex-wrap gap-4 md:gap-6 justify-center">
                         {currentBadges.map(badge => (
