@@ -2764,10 +2764,152 @@ function CatchGame() {
   )
 }
 
+// Juego de Memoria: encuentra las parejas de valores con menos movimientos
+const MEMORY_EMOJIS = ['⭐', '❤️', '🤝', '📚', '⚖️', '🛡️', '🌱', '🕊️']
+type MemoryCard = { uid: number; emoji: string }
+
+function MemoryGame() {
+  const [deck, setDeck] = useState<MemoryCard[]>([])
+  const [flipped, setFlipped] = useState<number[]>([])
+  const [matched, setMatched] = useState<number[]>([])
+  const [moves, setMoves] = useState(0)
+  const [best, setBest] = useState<number>(() => {
+    const n = parseInt(safeGet('hablemos-claro-memory-best') ?? '0', 10)
+    return Number.isFinite(n) && n > 0 ? n : 0
+  })
+  const [started, setStarted] = useState(false)
+  const [won, setWon] = useState(false)
+  const lockRef = useRef(false)
+  const timeoutRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current)
+    }
+  }, [])
+
+  const startGame = () => {
+    const cards: MemoryCard[] = []
+    MEMORY_EMOJIS.forEach(emoji => {
+      cards.push({ uid: cards.length, emoji })
+      cards.push({ uid: cards.length, emoji })
+    })
+    for (let k = cards.length - 1; k > 0; k--) {
+      const j = Math.floor(Math.random() * (k + 1))
+      const a = cards[k]
+      const b = cards[j]
+      if (a && b) {
+        cards[k] = b
+        cards[j] = a
+      }
+    }
+    setDeck(cards)
+    setFlipped([])
+    setMatched([])
+    setMoves(0)
+    setWon(false)
+    lockRef.current = false
+    if (timeoutRef.current !== null) {
+      window.clearTimeout(timeoutRef.current)
+      timeoutRef.current = null
+    }
+    setStarted(true)
+  }
+
+  const flipCard = (idx: number) => {
+    if (!started || won || lockRef.current) return
+    if (flipped.includes(idx) || matched.includes(idx)) return
+    const next = [...flipped, idx]
+    setFlipped(next)
+    if (next.length === 2) {
+      const [a, b] = next
+      const ca = deck[a]
+      const cb = deck[b]
+      const newMoves = moves + 1
+      setMoves(newMoves)
+      if (ca && cb && ca.emoji === cb.emoji) {
+        const nm = [...matched, a, b]
+        setMatched(nm)
+        setFlipped([])
+        if (nm.length === deck.length && deck.length > 0) {
+          setWon(true)
+          setBest(prev => {
+            if (prev === 0 || newMoves < prev) {
+              safeSet('hablemos-claro-memory-best', String(newMoves))
+              return newMoves
+            }
+            return prev
+          })
+        }
+      } else {
+        lockRef.current = true
+        timeoutRef.current = window.setTimeout(() => {
+          setFlipped([])
+          lockRef.current = false
+          timeoutRef.current = null
+        }, 700)
+      }
+    }
+  }
+
+  return (
+    <div className="w-full max-w-[520px] mx-auto">
+      <div className="flex items-center justify-center gap-2 md:gap-3 mb-4 flex-wrap">
+        <div className="px-4 py-2 rounded-2xl bg-white/80 border border-slate-200 font-black text-slate-800">👣 {moves}</div>
+        <div className="px-4 py-2 rounded-2xl bg-white/80 border border-slate-200 font-black text-slate-800">✅ {matched.length / 2}/{MEMORY_EMOJIS.length}</div>
+        <div className="px-4 py-2 rounded-2xl bg-white/80 border border-slate-200 font-black text-slate-800">🏆 {best > 0 ? best : '–'}</div>
+      </div>
+      <div className="relative">
+        <div className="grid grid-cols-4 gap-2 md:gap-3">
+          {(started ? deck : []).map((card, idx) => {
+            const faceUp = flipped.includes(idx) || matched.includes(idx)
+            const done = matched.includes(idx)
+            return (
+              <button
+                key={card.uid}
+                onClick={() => flipCard(idx)}
+                aria-label={faceUp ? card.emoji : 'Carta tapada'}
+                className={`aspect-square rounded-2xl text-3xl md:text-4xl flex items-center justify-center transition-all duration-300 border-2 relative ${
+                  faceUp
+                    ? done
+                      ? 'bg-success/15 border-success shadow-md scale-[1.02]'
+                      : 'bg-white border-primary/40 shadow-md'
+                    : 'bg-gradient-to-br from-primary to-secondary border-white/40 shadow hover:scale-105 active:scale-95'
+                }`}
+              >
+                <span className={`transition-transform duration-300 ${faceUp ? 'scale-100' : 'scale-0'}`}>{card.emoji}</span>
+                {!faceUp && <span className="absolute text-white/80 text-2xl font-black">?</span>}
+              </button>
+            )
+          })}
+        </div>
+        {(!started || won) && (
+          <div className="absolute inset-0 rounded-[20px] bg-black/60 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3 p-6 text-center">
+            <div className="text-5xl">{won ? '🎉' : '🧠'}</div>
+            <p className="text-white text-2xl font-black">{won ? '¡Completado!' : 'Memoria'}</p>
+            {won ? (
+              <p className="text-white/90 font-bold">Movimientos: {moves} · Récord: {best > 0 ? best : moves}</p>
+            ) : (
+              <p className="text-white/80 text-sm font-bold">Encuentra las 8 parejas con los menos movimientos</p>
+            )}
+            <button
+              onClick={startGame}
+              className="btn-glow bg-gradient-to-r from-primary to-secondary text-white font-bold py-3 px-8 rounded-full text-lg"
+            >
+              {won ? '↻ Jugar de nuevo' : '▶ Jugar'}
+            </button>
+          </div>
+        )}
+      </div>
+      <p className="text-center text-xs font-bold text-slate-400 mt-3">Toca dos cartas para voltearlas · Memoriza las parejas</p>
+    </div>
+  )
+}
+
 export default function App() {
   const [studentProfile, setStudentProfile] = useState<StudentProfile>(initialStudentProfile)
   const [familyProfile, setFamilyProfile] = useState<FamilyProfile>(initialFamilyProfile)
-  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'snake' | 'flappy' | 'catch' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents' | 'profile-type'>(BOOT_HASH ? 'learn' : 'welcome')
+  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'snake' | 'flappy' | 'catch' | 'memory' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents' | 'profile-type'>(BOOT_HASH ? 'learn' : 'welcome')
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null)
   const [learnView, setLearnView] = useState<'hub' | 'kid' | 'guide' | 'exam'>(BOOT_HASH ? (BOOT_HASH.view === 'tema' ? 'kid' : BOOT_HASH.view === 'guia' ? 'guide' : BOOT_HASH.view === 'examen' ? 'exam' : 'hub') : 'hub')
   const [activeKidId, setActiveKidId] = useState<string | null>(BOOT_HASH && BOOT_HASH.view === 'tema' ? BOOT_HASH.id : null)
@@ -5372,6 +5514,38 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
       )
     }
 
+    case 'memory': {
+      const custMemory = getCustomization();
+      const memoryColors = getTextColorForTheme(custMemory.backgroundValue)
+      return (
+        <div className="min-h-screen pb-16" style={{ background: custMemory.backgroundValue, backgroundSize: custMemory.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
+          <div className="max-w-5xl mx-auto px-6 md:px-8 pt-10 md:pt-14 pb-10 animate-slide-up">
+            <div className="flex items-center justify-between gap-3 mb-6">
+              <button
+                onClick={() => navigateTo('games')}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-secondary/10 text-slate-600 hover:text-secondary text-sm font-bold shadow-sm transition-colors shrink-0"
+              >
+                ← Juegos
+              </button>
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="text-xl">🧠</span>
+                <span className="font-black text-sm md:text-base truncate" style={{ color: memoryColors.primary }}>Memoria</span>
+              </div>
+              <span className="px-3 py-1.5 rounded-full bg-secondary/15 text-secondary text-xs font-black uppercase tracking-wider shrink-0">Nuevo</span>
+            </div>
+            <div className="text-center mb-6">
+              <h1 className="text-3xl md:text-4xl font-black gradient-text mb-2">Memoria 🧠</h1>
+              <p className="font-bold" style={{ color: memoryColors.secondary }}>Encuentra las parejas con menos movimientos.</p>
+            </div>
+            <MemoryGame />
+            <footer className="mt-10 text-center">
+              <p className="text-slate-500 text-sm">Hablemos Claro · Aprende con juegos 🎮</p>
+            </footer>
+          </div>
+        </div>
+      )
+    }
+
     case 'games':
       const cust9 = getCustomization();
       const gamesBadgeCount = profileType === 'family' ? familyProfile.familyBadges.filter(b => b.unlocked).length : getBadges().filter(b => b.unlocked).length;
@@ -5379,6 +5553,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
        const snakeBestHub = parseInt(safeGet('hablemos-claro-snake-best') ?? '0', 10) || 0
        const flappyBestHub = parseInt(safeGet('hablemos-claro-flappy-best') ?? '0', 10) || 0
        const catchBestHub = parseInt(safeGet('hablemos-claro-catch-best') ?? '0', 10) || 0
+       const memoryBestHub = parseInt(safeGet('hablemos-claro-memory-best') ?? '0', 10) || 0
       return (
         <div className="min-h-screen pb-24" style={{ background: cust9.backgroundValue, backgroundSize: cust9.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           {/* Decoración de fondo */}
@@ -5466,6 +5641,30 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                 </div>
                 <div className="shrink-0 hidden md:flex items-center gap-1 text-slate-400 group-hover:text-warning transition-colors">
                   <span className="text-2xl">⭐</span>
+                </div>
+              </div>
+            </button>
+
+            {/* Memoria - Encuentra las parejas */}
+            <button
+              onClick={() => navigateTo('memory')}
+              className="group w-full mb-8 text-left relative overflow-hidden rounded-[28px] bg-gradient-to-br from-secondary via-primary to-secondary p-[2px] shadow-xl shadow-secondary/20 hover:shadow-2xl hover:scale-[1.01] transition-all duration-300"
+            >
+              <div className="bg-white rounded-[26px] p-6 md:p-8 flex items-center gap-4 md:gap-6">
+                <div className="w-16 h-16 md:w-20 md:h-20 shrink-0 rounded-2xl bg-gradient-to-br from-secondary to-primary flex items-center justify-center text-4xl md:text-5xl shadow-lg shadow-secondary/30 group-hover:scale-110 transition-transform duration-300">
+                  🧠
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 mb-1">
+                    <h2 className="text-2xl md:text-3xl font-black text-secondary">Memoria</h2>
+                    <span className="px-2.5 py-1 rounded-full bg-secondary/15 text-secondary text-[11px] font-black uppercase tracking-wider animate-pulse">Nuevo</span>
+                  </div>
+                  <p className="text-gray-600 text-base md:text-lg">Encuentra las 8 parejas de valores con los menos movimientos.</p>
+                  <p className="text-slate-500 text-sm font-black mt-1">{memoryBestHub > 0 ? `🏆 Récord: ${memoryBestHub} movimientos` : '🎮 Juega y marca tu récord'}</p>
+                  <p className="text-secondary text-sm font-bold mt-1 group-hover:underline">▶ Jugar ahora →</p>
+                </div>
+                <div className="shrink-0 hidden md:flex items-center gap-1 text-slate-400 group-hover:text-secondary transition-colors">
+                  <span className="text-2xl">🃏</span>
                 </div>
               </div>
             </button>
