@@ -165,9 +165,8 @@ const reelsMessages: { id: string; author: string; message: string; time: string
    { name: 'Tierra', type: 'gradient', value: 'linear-gradient(135deg, #7c2d12 0%, #9a3412 50%, #3b1500 100%)' },
    { name: 'Cereza', type: 'gradient', value: 'linear-gradient(135deg, #fce7f3 0%, #f9a8d4 50%, #faf5ff 100%)' },
    { name: 'Melocotón', type: 'gradient', value: 'linear-gradient(135deg, #ffedd5 0%, #fdba74 50%, #fefce8 100%)' },
-   { name: 'Hielo', type: 'solid', value: '#f8fafc' },
-   { name: 'Nieve', type: 'solid', value: '#ffffff' },
-   { name: 'Loto', type: 'solid', value: '#fdf4ff' },
+    { name: 'Hielo', type: 'solid', value: '#f8fafc' },
+    { name: 'Loto', type: 'solid', value: '#fdf4ff' },
  ]
 
 // Determina colores de texto según el fondo del tema (oscuro = blanco, claro = oscuro)
@@ -465,10 +464,10 @@ const translations = {
   },
 }
 
- const defaultCustomization: ProfileCustomization = {
-   themeColor: '#2563EB',
-   backgroundType: 'solid',
-   backgroundValue: '#ffffff',
+  const defaultCustomization: ProfileCustomization = {
+    themeColor: '#2563EB',
+    backgroundType: 'solid',
+    backgroundValue: '#f8fafc',
    cardStyle: 'glass',
    decorations: [],
  }
