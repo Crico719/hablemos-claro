@@ -1844,7 +1844,7 @@ function SnakeGame() {
   )
 }
 
-// Flappy Bird con las mejoras de Brain Flight: física suave, vidas, XP y preguntas
+// Flappy Bird: física suave, vidas, XP y preguntas
 const FLAPPY_W = 480
 const FLAPPY_H = 600
 const FLAPPY_GRAV = 2100
@@ -2260,13 +2260,10 @@ function FlappyGame() {
   )
 }
 
-// Brain Flight — juego HTML5 (GDevelop export) hosteado en GitHub Pages
-const BRAIN_FLIGHT_URL = 'https://crico719.github.io/brain-flight/?v=15'
-
 export default function App() {
   const [studentProfile, setStudentProfile] = useState<StudentProfile>(initialStudentProfile)
   const [familyProfile, setFamilyProfile] = useState<FamilyProfile>(initialFamilyProfile)
-  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'brainflight' | 'snake' | 'flappy' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents' | 'profile-type'>(BOOT_HASH ? 'learn' : 'welcome')
+  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'snake' | 'flappy' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents' | 'profile-type'>(BOOT_HASH ? 'learn' : 'welcome')
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null)
   const [learnView, setLearnView] = useState<'hub' | 'kid' | 'guide' | 'exam'>(BOOT_HASH ? (BOOT_HASH.view === 'tema' ? 'kid' : BOOT_HASH.view === 'guia' ? 'guide' : BOOT_HASH.view === 'examen' ? 'exam' : 'hub') : 'hub')
   const [activeKidId, setActiveKidId] = useState<string | null>(BOOT_HASH && BOOT_HASH.view === 'tema' ? BOOT_HASH.id : null)
@@ -3314,7 +3311,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                    </div>
                    <div className="flex-1 min-w-0">
                      <h3 className="text-xl md:text-2xl font-black" style={{ color: textColors.primary}}>¿Listo para jugar?</h3>
-                     <p className="text-sm md:text-base mt-1" style={{ color: textColors.secondary}}>Brain Flight te espera: esquiva, recoge energía y supera tu mejor puntaje.</p>
+                      <p className="text-sm md:text-base mt-1" style={{ color: textColors.secondary}}>Flappy, Snake y más te esperan: juega, aprende y supera tu mejor puntaje.</p>
                    </div>
                    <span className="shrink-0 inline-flex items-center gap-1 font-bold group-hover:translate-x-1 transition-transform" style={{ color: textColors.primary}}>
                      Jugar ahora →
@@ -4733,40 +4730,6 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
         </div>
       )
 
-    case 'brainflight':
-      return (
-        <div className="min-h-screen flex flex-col bg-[#0b1020]">
-          {/* Header del juego */}
-          <div className="flex items-center justify-between gap-3 px-4 md:px-6 py-3 bg-[#111731] border-b border-white/10 shrink-0">
-            <button
-              onClick={() => navigateTo('games')}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-sm font-bold transition-colors shrink-0"
-            >
-              ← Juegos
-            </button>
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="text-xl">🧠</span>
-              <span className="text-white font-black text-sm md:text-base truncate">Brain Flight</span>
-            </div>
-            <button
-              onClick={() => window.open(BRAIN_FLIGHT_URL, '_blank', 'noopener,noreferrer')}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-sm font-bold transition-colors shrink-0"
-              title="Abrir en una pestaña nueva"
-            >
-              ↗ Abrir
-            </button>
-          </div>
-          {/* Juego a pantalla completa */}
-          <iframe
-            src={BRAIN_FLIGHT_URL}
-            title="Brain Flight"
-            className="flex-1 w-full border-0"
-            allow="autoplay; fullscreen; gamepad; clipboard-write; encrypted-media"
-            allowFullScreen
-          />
-        </div>
-      )
-
     case 'snake': {
       const custSnake = getCustomization();
       return (
@@ -4852,29 +4815,6 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
               <h1 className="text-4xl md:text-5xl font-black gradient-text mb-3">¡Divertirse y aprender!</h1>
               <p className="text-slate-600 text-lg max-w-lg mx-auto">Juega, aprende sobre integridad y desbloquea insignias con cada desafío.</p>
             </div>
-
-            {/* Brain Flight - Tarjeta principal */}
-            <button
-              onClick={() => navigateTo('brainflight')}
-              className="group w-full mb-8 text-left relative overflow-hidden rounded-[28px] bg-gradient-to-br from-primary via-secondary to-primary p-[2px] shadow-xl shadow-primary/20 hover:shadow-2xl hover:scale-[1.01] transition-all duration-300"
-            >
-              <div className="bg-white rounded-[26px] p-6 md:p-8 flex items-center gap-4 md:gap-6">
-                <div className="w-16 h-16 md:w-20 md:h-20 shrink-0 rounded-2xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-4xl md:text-5xl shadow-lg shadow-primary/30 group-hover:scale-110 transition-transform duration-300">
-                  🧠
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-1">
-                    <h2 className="text-2xl md:text-3xl font-black text-primary">Brain Flight</h2>
-                    <span className="px-2.5 py-1 rounded-full bg-success/15 text-success text-[11px] font-black uppercase tracking-wider animate-pulse">Nuevo</span>
-                  </div>
-                  <p className="text-gray-600 text-base md:text-lg">Pilota tu cerebro: esquiva obstáculos, recoge energía y supera tu mejor puntaje.</p>
-                  <p className="text-primary text-sm font-bold mt-1 group-hover:underline">▶ Jugar ahora →</p>
-                </div>
-                <div className="shrink-0 hidden md:flex items-center gap-1 text-slate-400 group-hover:text-primary transition-colors">
-                  <span className="text-2xl">🕹️</span>
-                </div>
-              </div>
-            </button>
 
             {/* Snake - Juego clásico */}
             <button
@@ -4963,10 +4903,10 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
             {/* CTA principal */}
             <div className="text-center mt-10">
               <button
-                onClick={() => navigateTo('brainflight')}
+                onClick={() => navigateTo('flappy')}
                 className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 text-white text-lg font-bold rounded-full px-10 py-4 bg-gradient-to-r from-primary to-secondary shadow-lg shadow-primary/30 hover:shadow-xl hover:scale-105 active:scale-[0.98] transition-all duration-200"
               >
-                🚀 Jugar Brain Flight
+                🚀 Jugar Flappy
                 <span className="transition-transform duration-200 group-hover:translate-x-1">→</span>
               </button>
             </div>
