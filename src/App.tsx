@@ -1832,7 +1832,7 @@ function SnakeGame() {
           </div>
         </div>
       )}
-      <div className="grid grid-cols-3 gap-2 mt-4 max-w-[240px] mx-auto">
+      <div className="grid grid-cols-3 gap-2 mt-4 max-w-[240px] mx-auto snake-dpad">
         <span />
         <button onClick={() => setDir(0, -1)} aria-label="Arriba" className="py-3 rounded-2xl bg-white border-2 border-slate-200 text-xl font-black text-slate-700 active:bg-primary/10">▲</button>
         <span />
@@ -4355,7 +4355,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
     case 'snake': {
       const custSnake = getCustomization();
       return (
-        <div className="min-h-screen pb-16" style={{ background: custSnake.backgroundValue, backgroundSize: custSnake.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
+        <div className="min-h-screen pb-16 snake-screen" style={{ background: custSnake.backgroundValue, backgroundSize: custSnake.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           <div className="max-w-5xl mx-auto px-6 md:px-8 pt-10 md:pt-14 pb-10 animate-slide-up">
             <div className="flex items-center justify-between gap-3 mb-6">
               <button
