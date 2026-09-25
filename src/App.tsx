@@ -5,7 +5,7 @@ import './index.css'
 // Tipos para la aplicación
 type UserRole = 'parent' | 'child'
 type LearningTopic = 'coima' | 'recognition' | 'impact' | 'consequences' | 'prevention' | 'ethics' | 'citizen' | 'test'
-type BadgeType = 'topics-explorer' | 'game-master' | 'flappy-star'
+type BadgeType = 'topics-explorer' | 'game-master' | 'flappy-star' | 'snake-master'
 type ProfileType = 'student' | 'family'
 
 interface Badge {
@@ -58,7 +58,7 @@ interface FamilyMember {
   activities: number
 }
 
-type FamilyBadgeId = 'first-conversation' | 'first-learning' | 'united-family' | 'great-conversationalists' | 'against-corruption' | 'committed-family'
+type FamilyBadgeId = 'first-conversation' | 'first-learning' | 'united-family' | 'great-conversationalists' | 'against-corruption'
 
 interface FamilyBadge {
   id: FamilyBadgeId
@@ -105,6 +105,7 @@ const allBadges: Badge[] = [
   { id: 'topics-explorer', name: 'Explorador de Temas', emoji: '📚', color: '#3B82F6', unlocked: false },
   { id: 'game-master', name: 'Maestro del Juego', emoji: '🎮', color: '#8B5CF6', unlocked: false },
   { id: 'flappy-star', name: 'Estrella Flappy', emoji: '⭐', color: '#F59E0B', unlocked: false },
+  { id: 'snake-master', name: 'Maestro Snake', emoji: '🐍', color: '#10B981', unlocked: false },
 ]
 
 const defaultFamilyBadges: FamilyBadge[] = [
@@ -1687,7 +1688,7 @@ const SNAKE_SPEEDS = { slow: 210, normal: 150, fast: 100 } as const
 type SnakeSpeed = keyof typeof SNAKE_SPEEDS
 const SNAKE_SPEED_LABELS: Record<SnakeSpeed, string> = { slow: '🐢 Lenta', normal: '🚶 Normal', fast: '🚀 Rápida' }
 
-function SnakeGame() {
+function SnakeGame({ onSnakeBest }: { onSnakeBest?: (best: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const [score, setScore] = useState(0)
   const [best, setBest] = useState<number>(() => {
@@ -1705,6 +1706,7 @@ function SnakeGame() {
   const foodRef = useRef<SnakePoint>({ x: 14, y: 10 })
   const scoreRef = useRef(0)
   const speedRef = useRef(150)
+  const bestRef = useRef(0)
   const runningRef = useRef(false)
   const touchRef = useRef<{ x: number; y: number } | null>(null)
   const gameWrapRef = useRef<HTMLDivElement | null>(null)
@@ -1796,13 +1798,12 @@ function SnakeGame() {
   const endGame = () => {
     setRunning(false)
     setGameOver(true)
-    setBest(prev => {
-      if (scoreRef.current > prev) {
-        safeSet('hablemos-claro-snake-best', String(scoreRef.current))
-        return scoreRef.current
-      }
-      return prev
-    })
+    if (scoreRef.current > bestRef.current) {
+      bestRef.current = scoreRef.current
+      safeSet('hablemos-claro-snake-best', String(scoreRef.current))
+      setBest(scoreRef.current)
+      onSnakeBest?.(scoreRef.current)
+    }
   }
 
   const setDir = (x: number, y: number) => {    const q = queueRef.current
@@ -1848,6 +1849,7 @@ function SnakeGame() {
     runningRef.current = running
     quizOpenRef.current = quiz !== null
     speedModeRef.current = speedMode
+    if (best > bestRef.current) bestRef.current = best
   })
 
   useEffect(() => {
@@ -1949,7 +1951,10 @@ function SnakeGame() {
             <div className="text-5xl">{gameOver ? '💀' : '🐍'}</div>
             <p className="text-white text-2xl font-black">{gameOver ? '¡Fin del juego!' : 'Snake'}</p>
             {gameOver && (
+              <>
               <p className="text-white/90 font-bold">Puntaje: {score} · Récord: {Math.max(best, score)}</p>
+              <p className="text-white/80 text-sm font-bold">{Math.max(best, score) >= 30 ? '🏅 ¡Insignia Maestro Snake desbloqueada!' : `🏅 Insignia Maestro Snake: ${Math.max(best, score)}/30`}</p>
+              </>
             )}
             {gameOver && (
               <div className="w-full">
@@ -2850,7 +2855,6 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
         case 'united-family': return profile.members.length > 0 && profile.members.every(m => m.activities >= 1)
         case 'great-conversationalists': return conv >= 5
         case 'against-corruption': return corruptionTopics.filter(t => (tp[t] ?? 0) >= 100).length >= 3
-        case 'committed-family': return acts >= 3 && conv >= 3
       }
     }
     let updated = profile
@@ -2905,6 +2909,26 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
       setStudentProfile(updated)
       saveStudentProfile(updated)
       const nb = badges.find(b => b.id === 'flappy-star')
+      if (nb) {
+        setEarnedBadge({ ...nb })
+        setShowBadgeCelebration(true)
+      }
+    }
+
+    // Insignia Maestro Snake: récord de 30 manzanas en Snake
+    const awardSnakeMaster = (bestScore: number) => {
+      if (profileType !== 'student') return
+      if (bestScore < 30) return
+      const current = studentProfile.progress.badges
+      const withBadge = current.some(b => b.id === 'snake-master')
+        ? current
+        : [...current, { id: 'snake-master', name: 'Maestro Snake', emoji: '🐍', color: '#10B981', unlocked: false } as Badge]
+      if (withBadge.some(b => b.id === 'snake-master' && b.unlocked)) return
+      const badges = withBadge.map(b => (b.id === 'snake-master' ? { ...b, unlocked: true } : b))
+      const updated = { ...studentProfile, progress: { ...studentProfile.progress, badges } }
+      setStudentProfile(updated)
+      saveStudentProfile(updated)
+      const nb = badges.find(b => b.id === 'snake-master')
       if (nb) {
         setEarnedBadge({ ...nb })
         setShowBadgeCelebration(true)
@@ -5021,7 +5045,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
               <h1 className="text-3xl md:text-4xl font-black gradient-text mb-2">Snake 🐍</h1>
               <p className="font-bold" style={{ color: getTextColorForTheme(custSnake.backgroundValue).secondary }}>Come, crece y no choques.</p>
             </div>
-            <SnakeGame />
+            <SnakeGame onSnakeBest={awardSnakeMaster} />
             <footer className="mt-10 text-center">
               <p className="text-slate-500 text-sm">Hablemos Claro · Aprende con juegos 🎮</p>
             </footer>
