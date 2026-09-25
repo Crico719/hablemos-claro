@@ -1487,6 +1487,10 @@ function SnakeGame() {
   const speedRef = useRef(150)
   const runningRef = useRef(false)
   const touchRef = useRef<{ x: number; y: number } | null>(null)
+  const [quiz, setQuiz] = useState<ExamQuestion | null>(null)
+  const [quizPick, setQuizPick] = useState<number | null>(null)
+  const quizCountRef = useRef(0)
+  const quizOpenRef = useRef(false)
 
   const randomFood = (snake: SnakePoint[]): SnakePoint => {
     const free: SnakePoint[] = []
@@ -1590,6 +1594,7 @@ function SnakeGame() {
 
   useEffect(() => {
     runningRef.current = running
+    quizOpenRef.current = quiz !== null
   })
 
   useEffect(() => {
@@ -1622,6 +1627,15 @@ function SnakeGame() {
         setScore(scoreRef.current)
         speedRef.current = Math.max(70, speedRef.current - 4)
         foodRef.current = randomFood(snake)
+        if (scoreRef.current % 15 === 0) {
+          const q = examQuestions[quizCountRef.current % examQuestions.length]
+          if (q) {
+            quizCountRef.current += 1
+            setQuizPick(null)
+            setQuiz(q)
+            setRunning(false)
+          }
+        }
       } else {
         snake.pop()
       }
@@ -1639,7 +1653,7 @@ function SnakeGame() {
       else if (k === 'arrowleft' || k === 'a') setDir(-1, 0)
       else if (k === 'arrowright' || k === 'd') setDir(1, 0)
       else if (k === ' ' || k === 'enter') {
-        if (!runningRef.current) startGame()
+        if (!runningRef.current && !quizOpenRef.current) startGame()
       }
     }
     window.addEventListener('keydown', onKey)
@@ -1658,7 +1672,7 @@ function SnakeGame() {
           width={SNAKE_SIZE}
           height={SNAKE_SIZE}
           className="w-full h-auto rounded-[20px] border-4 border-white shadow-xl shadow-indigo-500/10 touch-none select-none"
-          onClick={() => { if (!running) startGame() }}
+          onClick={() => { if (!running && quiz === null) startGame() }}
           onTouchStart={e => {
             const t = e.touches[0]
             touchRef.current = t ? { x: t.clientX, y: t.clientY } : null
@@ -1697,6 +1711,56 @@ function SnakeGame() {
           </div>
         )}
       </div>
+      {quiz && (
+        <div className="absolute inset-0 rounded-[20px] bg-black/70 backdrop-blur-[2px] flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-5 md:p-6 w-full max-w-[360px] text-center max-h-full overflow-y-auto">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-[11px] font-black uppercase tracking-wider">🧠 Pausa de integridad</span>
+            <p className="text-slate-800 text-lg font-bold leading-snug mt-3">{quiz.question}</p>
+            <div className="space-y-2 mt-4 text-left">
+              {quiz.options.map((op, oi) => {
+                const picked = quizPick === oi
+                const showRight = quizPick !== null && oi === quiz.correct
+                const showWrong = picked && oi !== quiz.correct
+                return (
+                  <button
+                    key={oi}
+                    disabled={quizPick !== null}
+                    onClick={() => {
+                      setQuizPick(oi)
+                      if (oi === quiz.correct) {
+                        scoreRef.current += 3
+                        setScore(scoreRef.current)
+                      }
+                    }}
+                    className={`w-full py-3 px-4 rounded-xl text-left font-bold border-2 transition-all ${
+                      showRight
+                        ? 'bg-success/15 border-success text-success'
+                        : showWrong
+                          ? 'bg-warning/10 border-warning text-slate-800'
+                          : picked
+                            ? 'bg-primary/10 border-primary text-slate-800'
+                            : 'bg-white border-slate-200 text-slate-800 hover:border-primary/60'
+                    } ${quizPick !== null ? 'cursor-default' : ''}`}
+                  >
+                    {op}
+                  </button>
+                )
+              })}
+            </div>
+            {quizPick !== null && (
+              <div className="mt-4">
+                <p className={`font-black mb-3 ${quizPick === quiz.correct ? 'text-success' : 'text-warning'}`}>{quizPick === quiz.correct ? '✅ ¡Correcto! +3 puntos' : `❌ La correcta era: ${quiz.options[quiz.correct]}`}</p>
+                <button
+                  onClick={() => { setQuiz(null); setQuizPick(null); queueRef.current = []; setRunning(true) }}
+                  className="btn-glow bg-gradient-to-r from-primary to-secondary text-white font-bold py-3 px-8 rounded-full text-lg w-full"
+                >
+                  Continuar ▶
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
       <div className="grid grid-cols-3 gap-2 mt-4 max-w-[240px] mx-auto">
         <span />
         <button onClick={() => setDir(0, -1)} aria-label="Arriba" className="py-3 rounded-2xl bg-white border-2 border-slate-200 text-xl font-black text-slate-700 active:bg-primary/10">▲</button>
