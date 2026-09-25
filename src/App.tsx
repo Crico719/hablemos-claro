@@ -3068,7 +3068,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                       const firstUndone = PARENT_GUIDES.findIndex(g => !guidesDone.includes(g.id))
                       const openGuide = (g: ParentGuide) => { setActiveGuideId(g.id); setLearnView('guide'); setShowFeedback(false) }
                       return (
-                        <section className="relative">
+                        <section className="relative temas-road">
                           {PARENT_GUIDES.map((g, i) => {
                             const done = guidesDone.includes(g.id)
                             const isCurrent = i === firstUndone
@@ -3078,7 +3078,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                               <RoadmapReveal key={g.id}>
                                 <div className={`relative py-12 md:py-20 ${locked ? 'opacity-75' : ''}`}>
                                   {/* segmento de línea */}
-                                  <div aria-hidden className={`absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[3px] rounded-full transition-colors duration-500 ${
+                                  <div aria-hidden className={`absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[3px] temas-roadline rounded-full transition-colors duration-500 ${
                                     done
                                       ? 'bg-gradient-to-b from-success to-emerald-400'
                                       : isCurrent
@@ -3086,7 +3086,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                                         : 'bg-secondary-100'
                                   }`} />
                                   {/* nodo */}
-                                  <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 top-1/2 z-10">
+                                  <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 top-1/2 z-10 temas-roadnode">
                                     <button
                                       onClick={locked ? undefined : () => openGuide(g)}
                                       disabled={!!locked}
@@ -3105,7 +3105,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                                     </button>
                                   </div>
                                   {/* contenido */}
-                                  <div className={`w-[calc(50%-2.5rem)] md:w-[calc(50%-6rem)] ${even ? 'mr-auto' : 'ml-auto'}`}>
+                                  <div className={`w-[calc(50%-2.5rem)] md:w-[calc(50%-6rem)] temas-roadcard ${even ? 'mr-auto' : 'ml-auto'}`}>
                                     <div className={`bg-white rounded-[20px] border p-4 md:p-5 text-center shadow-sm transition-all duration-300 ${
                                       done ? 'border-success/20' : isCurrent ? 'border-secondary/30 shadow-md shadow-secondary/10' : 'border-slate-100'
                                     }`}>
