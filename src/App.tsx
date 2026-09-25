@@ -1492,6 +1492,8 @@ function SnakeGame() {
   const speedRef = useRef(150)
   const runningRef = useRef(false)
   const touchRef = useRef<{ x: number; y: number } | null>(null)
+  const gameWrapRef = useRef<HTMLDivElement | null>(null)
+  const [isFs, setIsFs] = useState(false)
   const [quiz, setQuiz] = useState<ExamQuestion | null>(null)
   const [quizPick, setQuizPick] = useState<number | null>(null)
   const quizCountRef = useRef(0)
@@ -1588,14 +1590,44 @@ function SnakeGame() {
     })
   }
 
-  const setDir = (x: number, y: number) => {
-    const q = queueRef.current
+  const setDir = (x: number, y: number) => {    const q = queueRef.current
     const last = q.length > 0 ? q[q.length - 1] : dirRef.current
     if (!last) return
     if ((x !== -last.x || y !== -last.y) && (x !== last.x || y !== last.y)) {
       if (q.length < 3) q.push({ x, y })
     }
   }
+
+  const toggleFs = () => {
+    const el = gameWrapRef.current
+    if (typeof document !== 'undefined' && document.fullscreenElement) {
+      try {
+        const p = document.exitFullscreen() as unknown as Promise<void> | undefined
+        if (p && typeof p.catch === 'function') p.catch(() => undefined)
+      } catch { /* noop */ }
+      setIsFs(false)
+    } else if (el) {
+      try {
+        const req = el.requestFullscreen ? el.requestFullscreen() : (el as unknown as { webkitRequestFullscreen?: () => void }).webkitRequestFullscreen?.call(el)
+        if (req && typeof (req as unknown as { catch?: unknown }).catch === 'function') {
+          (req as unknown as Promise<void>).catch(() => undefined)
+        }
+      } catch { /* respaldo visual abajo */ }
+      setIsFs(true)
+    }
+  }
+
+  useEffect(() => {
+    const onFs = () => {
+      if (typeof document !== 'undefined') setIsFs(!!document.fullscreenElement)
+    }
+    document.addEventListener('fullscreenchange', onFs)
+    document.addEventListener('webkitfullscreenchange', onFs as EventListener)
+    return () => {
+      document.removeEventListener('fullscreenchange', onFs)
+      document.removeEventListener('webkitfullscreenchange', onFs as EventListener)
+    }
+  }, [])
 
   useEffect(() => {
     runningRef.current = running
@@ -1667,10 +1699,13 @@ function SnakeGame() {
   }, [])
 
   return (
-    <div className="w-full max-w-[440px] mx-auto">
+    <div ref={gameWrapRef} className={`w-full max-w-[440px] mx-auto${isFs ? ' snake-fs' : ''}`}>
       <div className="flex items-center justify-center gap-3 mb-4">
         <div className="px-4 py-2 rounded-2xl bg-white/80 border border-slate-200 font-black text-slate-800">🍎 {score}</div>
         <div className="px-4 py-2 rounded-2xl bg-white/80 border border-slate-200 font-black text-slate-800">🏆 {best}</div>
+        <button onClick={toggleFs} aria-label="Pantalla completa" className="px-4 py-2 rounded-2xl bg-white/80 border border-slate-200 font-black text-slate-800 hover:bg-white active:scale-95 transition-all">
+          {isFs ? '🗗 Salir' : '⛶ Completa'}
+        </button>
       </div>
       <div className="relative">
         <canvas

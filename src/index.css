@@ -351,6 +351,17 @@ body {
   }
 }
 
+/* ===== Snake a pantalla completa (respaldo visual si el navegador no lo permite) ===== */
+.snake-fs {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 60 !important;
+  max-width: 100% !important;
+  overflow-y: auto !important;
+  background: linear-gradient(180deg, #0b2417 0%, #071a10 100%) !important;
+  padding: max(1rem, env(safe-area-inset-top)) 1rem max(1rem, env(safe-area-inset-bottom)) !important;
+}
+
 /* ===== Pulido global ===== */
 html {
   scroll-behavior: smooth;
