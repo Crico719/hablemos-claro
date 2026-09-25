@@ -305,6 +305,38 @@ body {
   }
 }
 
+/* ===== Camino de Temas en celular: línea a la izquierda, tarjetas anchas ===== */
+@media (max-width: 768px) {
+  .temas-page .temas-roadline {
+    left: 1.75rem !important;
+    translate: none !important;
+    transform: none !important;
+    margin-left: -1.5px !important;
+  }
+  .temas-page .temas-roadnode {
+    left: 1.75rem !important;
+    translate: none !important;
+    transform: none !important;
+    margin-left: -28px !important;
+    margin-top: -28px !important;
+  }
+  .temas-page .temas-roadcard {
+    width: calc(100% - 4.25rem) !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+  }
+  .temas-page .temas-roadcard > div {
+    padding: 1.25rem 1.1rem !important;
+  }
+  .temas-page .temas-roadcard h4 {
+    font-size: 1.1rem !important;
+    line-height: 1.35 !important;
+  }
+  .temas-page .temas-roadcard p {
+    line-height: 1.5 !important;
+  }
+}
+
 /* ===== Pulido global ===== */
 html {
   scroll-behavior: smooth;
