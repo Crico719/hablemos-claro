@@ -116,6 +116,24 @@ body {
   animation: float 3s ease-in-out infinite;
 }
 
+/* ===== Duli: flotación + respiración del muñeco ===== */
+@keyframes duliFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.duli-float {
+  animation: duliFloat 3s ease-in-out infinite;
+}
+@keyframes duliBreathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+.duli-breathe {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: duliBreathe 4s ease-in-out infinite;
+}
+
 .glass-card {
   background: rgba(255, 255, 255, 0.82);
   backdrop-filter: blur(24px);
@@ -453,7 +471,9 @@ button {
     transition-duration: 0.01ms !important;
   }
   .duli-eyes,
-  .duli-wing {
+  .duli-wing,
+  .duli-float,
+  .duli-breathe {
     animation: none !important;
   }
   html {

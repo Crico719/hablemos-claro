@@ -1597,7 +1597,8 @@ const initialFamilyProfile = getStoredFamilyProfile()
 // Mascota Duli — búho guía de la Academia de Integridad
 function DuliMascot({ className = '' }: { className?: string }) {
   return (
-    <svg viewBox="0 0 200 210" className={className} role="img" aria-label="Duli, el búho de la academia" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 200 210" className={`${className} duli-float`} role="img" aria-label="Duli, el búho de la academia" xmlns="http://www.w3.org/2000/svg">
+      <g className="duli-breathe">
       {/* patas */}
       <ellipse cx="76" cy="199" rx="18" ry="8" fill="#FF9600" />
       <ellipse cx="124" cy="199" rx="18" ry="8" fill="#FF9600" />
@@ -1629,6 +1630,7 @@ function DuliMascot({ className = '' }: { className?: string }) {
       <path d="M106 64 Q128 52 150 64" stroke="#3F6D12" strokeWidth="7" fill="none" strokeLinecap="round" />
       {/* pico */}
       <path d="M78 120 L122 120 L100 154 Z" fill="#FF9600" stroke="#E58500" strokeWidth="2" strokeLinejoin="round" />
+      </g>
     </svg>
   )
 }
@@ -3937,7 +3939,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                   <div aria-hidden className="pointer-events-none absolute bottom-6 left-8 text-4xl opacity-30">☁️</div>
                   <div className="relative flex flex-col items-center gap-3">
                     <div className="flex items-center justify-center gap-4 pt-1">
-                      <div className="w-20 h-20 md:w-24 md:h-24 shrink-0 animate-float" style={{ filter: 'drop-shadow(0 10px 18px rgba(15,23,42,0.3))' }}>
+                        <div className="w-20 h-20 md:w-24 md:h-24 shrink-0" style={{ filter: 'drop-shadow(0 10px 18px rgba(15,23,42,0.3))' }}>
                         <DuliMascot className="w-full h-full" />
                       </div>
                       <div className="text-left bg-white text-slate-800 rounded-2xl rounded-bl-sm px-4 py-3 shadow-xl border border-white/80 max-w-[230px]">
@@ -4229,7 +4231,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                     <h2 className="text-3xl md:text-4xl font-black gradient-text leading-tight max-w-xl">{activeKid.title}</h2>
                     <p className="text-slate-600 text-base md:text-lg leading-relaxed max-w-lg mt-1">{activeKid.desc}</p>
                     <div className="inline-flex items-center gap-2 bg-white/90 border border-slate-100 rounded-full pl-1.5 pr-4 py-1.5 shadow-sm">
-                      <DuliMascot className="w-8 h-8 animate-float" />
+                      <DuliMascot className="w-8 h-8" />
                       <span className="text-xs font-black text-slate-600">¡Tú puedes! Aprende y gana XP 💪</span>
                     </div>
                     <div className="flex items-center gap-3 w-full max-w-[360px] mt-2 temas-stepline">
@@ -4872,7 +4874,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                 <p className="text-[11px] font-black text-slate-700 leading-snug">{duliTip}</p>
                 <span className="absolute -bottom-1.5 -right-1.5 w-4 h-4 bg-white border-r border-b border-slate-100 rotate-45" aria-hidden />
               </div>
-              <div className="w-14 h-14 md:w-16 md:h-16 shrink-0 animate-float pointer-events-auto" style={{ filter: 'drop-shadow(0 8px 16px rgba(30,41,82,0.25))' }}>
+              <div className="w-14 h-14 md:w-16 md:h-16 shrink-0 pointer-events-auto" style={{ filter: 'drop-shadow(0 8px 16px rgba(30,41,82,0.25))' }}>
                 <DuliMascot className="w-full h-full" />
               </div>
             </div>
