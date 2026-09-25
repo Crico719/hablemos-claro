@@ -1468,6 +1468,9 @@ type SnakePoint = { x: number; y: number }
 const SNAKE_COLS = 20
 const SNAKE_ROWS = 20
 const SNAKE_SIZE = 400
+const SNAKE_SPEEDS = { slow: 210, normal: 150, fast: 100 } as const
+type SnakeSpeed = keyof typeof SNAKE_SPEEDS
+const SNAKE_SPEED_LABELS: Record<SnakeSpeed, string> = { slow: '🐢 Lenta', normal: '🚶 Normal', fast: '🚀 Rápida' }
 
 function SnakeGame() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -1479,6 +1482,8 @@ function SnakeGame() {
   const [running, setRunning] = useState(false)
   const [gameOver, setGameOver] = useState(false)
   const [started, setStarted] = useState(false)
+  const [speedMode, setSpeedMode] = useState<SnakeSpeed>('normal')
+  const speedModeRef = useRef<SnakeSpeed>('normal')
   const snakeRef = useRef<SnakePoint[]>([{ x: 10, y: 10 }, { x: 9, y: 10 }, { x: 8, y: 10 }])
   const dirRef = useRef<SnakePoint>({ x: 1, y: 0 })
   const queueRef = useRef<SnakePoint[]>([])
@@ -1564,7 +1569,7 @@ function SnakeGame() {
     queueRef.current = []
     foodRef.current = randomFood(init)
     scoreRef.current = 0
-    speedRef.current = 150
+    speedRef.current = SNAKE_SPEEDS[speedModeRef.current]
     setScore(0)
     setGameOver(false)
     setStarted(true)
@@ -1595,6 +1600,7 @@ function SnakeGame() {
   useEffect(() => {
     runningRef.current = running
     quizOpenRef.current = quiz !== null
+    speedModeRef.current = speedMode
   })
 
   useEffect(() => {
@@ -1696,9 +1702,39 @@ function SnakeGame() {
             {gameOver && (
               <p className="text-white/90 font-bold">Puntaje: {score} · Récord: {Math.max(best, score)}</p>
             )}
+            {gameOver && (
+              <div className="w-full">
+                <p className="text-white/70 text-xs font-black uppercase tracking-wider mb-2">Velocidad</p>
+                <div className="flex gap-2 justify-center">
+                  {(['slow', 'normal', 'fast'] as SnakeSpeed[]).map(m => (
+                    <button
+                      key={m}
+                      onClick={() => setSpeedMode(m)}
+                      className={`flex-1 py-2 rounded-full text-sm font-black transition-all ${speedMode === m ? 'bg-white text-slate-800 shadow' : 'bg-white/15 text-white/80 hover:bg-white/25'}`}
+                    >
+                      {SNAKE_SPEED_LABELS[m]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
             {!gameOver && (
               <p className="text-white/80 text-sm font-bold">Come las manzanas 🍎 · No choques 🧱</p>
             )}
+            <div className="w-full">
+              <p className="text-white/70 text-xs font-black uppercase tracking-wider mb-2">Velocidad</p>
+              <div className="flex gap-2 justify-center">
+                {(['slow', 'normal', 'fast'] as SnakeSpeed[]).map(m => (
+                  <button
+                    key={m}
+                    onClick={() => setSpeedMode(m)}
+                    className={`flex-1 py-2 rounded-full text-sm font-black transition-all ${speedMode === m ? 'bg-white text-slate-800 shadow' : 'bg-white/15 text-white/80 hover:bg-white/25'}`}
+                  >
+                    {SNAKE_SPEED_LABELS[m]}
+                  </button>
+                ))}
+              </div>
+            </div>
             <button
               onClick={startGame}
               className="btn-glow bg-gradient-to-r from-primary to-secondary text-white font-bold py-3 px-8 rounded-full text-lg"
