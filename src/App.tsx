@@ -2929,7 +2929,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                       const firstUndone = KIDS_TOPICS.findIndex(k => !kidsDone.includes(k.id))
                       const openTopic = (k: KidTopic) => { setActiveKidId(k.id); setLearnView('kid'); setShowFeedback(false); setTopicStep(0); setAnsweredOpt(null); setRevealedCases([]); setReflectNote(''); setTfAnswers({}); setTfRevealed(false); setBlankInputs({}); setBlanksChecked(false) }
                       return (
-                        <section className="relative">
+                        <section className="relative temas-road">
                           {KIDS_TOPICS.map((k, i) => {
                             const done = kidsDone.includes(k.id)
                             const isCurrent = i === firstUndone
