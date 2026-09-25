@@ -2511,10 +2511,263 @@ function FlappyGame({ onFlappyXpTotal }: { onFlappyXpTotal?: (total: number) => 
   )
 }
 
+// Atrapa la honestidad: mueve la canasta, atrapa valores y esquiva trampas
+const CATCH_W = 480
+const CATCH_H = 600
+const CATCH_GOOD = ['⭐', '❤️', '🤝', '📚', '⚖️', '🛡️']
+const CATCH_BAD = ['💰', '🃏', '💸']
+
+type CatchPhase = 'idle' | 'playing' | 'over'
+type CatchItem = { x: number; y: number; emoji: string; bad: boolean }
+
+function CatchGame() {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const [score, setScore] = useState(0)
+  const [best, setBest] = useState<number>(() => {
+    const n = parseInt(safeGet('hablemos-claro-catch-best') ?? '0', 10)
+    return Number.isFinite(n) && n > 0 ? n : 0
+  })
+  const [lives, setLives] = useState(3)
+  const [phase, setPhase] = useState<CatchPhase>('idle')
+  const basketXRef = useRef(CATCH_W / 2)
+  const itemsRef = useRef<CatchItem[]>([])
+  const spawnRef = useRef(0.6)
+  const invulnRef = useRef(0)
+  const keysRef = useRef<{ left: boolean; right: boolean }>({ left: false, right: false })
+  const holdRef = useRef<{ left: boolean; right: boolean }>({ left: false, right: false })
+  const draggingRef = useRef(false)
+  const scoreRef = useRef(0)
+  const livesRef = useRef(3)
+  const phaseRef = useRef<CatchPhase>('idle')
+
+  useEffect(() => {
+    phaseRef.current = phase
+  })
+
+  const resetRun = (toPlaying: boolean) => {
+    basketXRef.current = CATCH_W / 2
+    itemsRef.current = []
+    spawnRef.current = 0.6
+    invulnRef.current = 0
+    scoreRef.current = 0
+    livesRef.current = 3
+    setScore(0)
+    setLives(3)
+    setPhase(toPlaying ? 'playing' : 'idle')
+  }
+
+  const endGame = () => {
+    setPhase('over')
+    if (scoreRef.current > best) {
+      safeSet('hablemos-claro-catch-best', String(scoreRef.current))
+      setBest(scoreRef.current)
+    }
+  }
+
+  const draw = () => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    const sky = ctx.createLinearGradient(0, 0, 0, CATCH_H)
+    sky.addColorStop(0, '#BFE8FF')
+    sky.addColorStop(1, '#9FD4F5')
+    ctx.fillStyle = sky
+    ctx.fillRect(0, 0, CATCH_W, CATCH_H)
+    ctx.fillStyle = '#69c24a'
+    ctx.fillRect(0, CATCH_H - 24, CATCH_W, 24)
+    ctx.fillStyle = '#2f6b2f'
+    ctx.fillRect(0, CATCH_H - 24, CATCH_W, 5)
+    ctx.font = '30px serif'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    itemsRef.current.forEach(it => {
+      ctx.fillText(it.emoji, it.x, it.y)
+    })
+    const bx = basketXRef.current
+    const by = CATCH_H - 56
+    if (invulnRef.current <= 0 || Math.floor(performance.now() / 150) % 2 === 0) {
+      ctx.fillStyle = '#8B5A2B'
+      ctx.beginPath()
+      if (typeof ctx.roundRect === 'function') ctx.roundRect(bx - 48, by - 14, 96, 30, 8)
+      else ctx.rect(bx - 48, by - 14, 96, 30)
+      ctx.fill()
+      ctx.fillStyle = '#5d3a17'
+      ctx.fillRect(bx - 48, by - 14, 96, 7)
+    }
+  }
+
+  const canvasX = (clientX: number) => {
+    const canvas = canvasRef.current
+    if (!canvas) return CATCH_W / 2
+    const r = canvas.getBoundingClientRect()
+    return ((clientX - r.left) / Math.max(1, r.width)) * CATCH_W
+  }
+
+  useEffect(() => {
+    draw()
+  }, [])
+
+  useEffect(() => {
+    let raf = 0
+    let last = performance.now()
+    const loop = (t: number) => {
+      const dt = Math.min(0.033, Math.max(0.001, (t - last) / 1000))
+      last = t
+      if (phaseRef.current === 'playing') {
+        const sc = scoreRef.current
+        const speed = 380
+        if (keysRef.current.left || holdRef.current.left) basketXRef.current -= speed * dt
+        if (keysRef.current.right || holdRef.current.right) basketXRef.current += speed * dt
+        basketXRef.current = Math.max(52, Math.min(CATCH_W - 52, basketXRef.current))
+        spawnRef.current -= dt
+        if (spawnRef.current <= 0) {
+          spawnRef.current = Math.max(0.35, 0.9 - sc * 0.008)
+          const bad = Math.random() < 0.28
+          const pool = bad ? CATCH_BAD : CATCH_GOOD
+          const emoji = pool[Math.floor(Math.random() * pool.length)] ?? (bad ? '💰' : '⭐')
+          itemsRef.current.push({ x: 30 + Math.random() * (CATCH_W - 60), y: -20, emoji, bad })
+        }
+        const fall = Math.min(420, 180 + sc * 4)
+        const by = CATCH_H - 56
+        if (invulnRef.current > 0) invulnRef.current -= dt
+        const kept: CatchItem[] = []
+        for (const it of itemsRef.current) {
+          it.y += fall * dt
+          const caught = it.y >= by - 16 && it.y <= by + 18 && Math.abs(it.x - basketXRef.current) < 52
+          if (caught) {
+            if (it.bad) {
+              if (invulnRef.current <= 0) {
+                livesRef.current -= 1
+                setLives(livesRef.current)
+                invulnRef.current = 1
+                if (livesRef.current <= 0) {
+                  endGame()
+                  break
+                }
+              }
+            } else {
+              scoreRef.current += 1
+              setScore(scoreRef.current)
+            }
+            continue
+          }
+          if (it.y < CATCH_H + 30) kept.push(it)
+        }
+        itemsRef.current = kept
+      }
+      draw()
+      raf = requestAnimationFrame(loop)
+    }
+    raf = requestAnimationFrame(loop)
+    return () => cancelAnimationFrame(raf)
+  }, [])
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const k = e.key.toLowerCase()
+      if (k === 'arrowleft' || k === 'arrowright' || k === ' ') e.preventDefault()
+      if (k === 'arrowleft' || k === 'a') keysRef.current.left = true
+      else if (k === 'arrowright' || k === 'd') keysRef.current.right = true
+      else if (k === ' ' || k === 'enter') {
+        if (phaseRef.current === 'idle' || phaseRef.current === 'over') resetRun(true)
+      }
+    }
+    const onKeyUp = (e: KeyboardEvent) => {
+      const k = e.key.toLowerCase()
+      if (k === 'arrowleft' || k === 'a') keysRef.current.left = false
+      else if (k === 'arrowright' || k === 'd') keysRef.current.right = false
+    }
+    window.addEventListener('keydown', onKey)
+    window.addEventListener('keyup', onKeyUp)
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      window.removeEventListener('keyup', onKeyUp)
+    }
+  }, [])
+
+  return (
+    <div className="w-full max-w-[520px] mx-auto">
+      <div className="flex items-center justify-center gap-2 md:gap-3 mb-4 flex-wrap">
+        <div className="px-4 py-2 rounded-2xl bg-white/80 border border-slate-200 font-black text-slate-800">❤️ {lives}</div>
+        <div className="px-4 py-2 rounded-2xl bg-white/80 border border-slate-200 font-black text-slate-800">⭐ {score}</div>
+        <div className="px-4 py-2 rounded-2xl bg-white/80 border border-slate-200 font-black text-slate-800">🏆 {best}</div>
+      </div>
+      <p className="text-center text-xs font-bold text-slate-500 mb-2">Atrapa ⭐❤️🤝 · Evita 💰🃏💸</p>
+      <div className="relative">
+        <canvas
+          ref={canvasRef}
+          width={CATCH_W}
+          height={CATCH_H}
+          className="w-full h-auto rounded-[20px] border-4 border-white shadow-xl shadow-indigo-500/10 touch-none select-none"
+          onPointerDown={e => {
+            if (phaseRef.current === 'playing') {
+              draggingRef.current = true
+              basketXRef.current = Math.max(52, Math.min(CATCH_W - 52, canvasX(e.clientX)))
+            }
+          }}
+          onPointerMove={e => {
+            if (draggingRef.current && phaseRef.current === 'playing') {
+              basketXRef.current = Math.max(52, Math.min(CATCH_W - 52, canvasX(e.clientX)))
+            }
+          }}
+          onPointerUp={() => { draggingRef.current = false }}
+          onPointerCancel={() => { draggingRef.current = false }}
+          onPointerLeave={() => { draggingRef.current = false }}
+        />
+        {phase !== 'playing' && (
+          <div className="absolute inset-0 rounded-[20px] bg-black/60 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3 p-6 text-center">
+            <div className="text-5xl">{phase === 'over' ? '💀' : '🧺'}</div>
+            <p className="text-white text-2xl font-black">{phase === 'over' ? '¡Fin del juego!' : 'Atrapa la honestidad'}</p>
+            {phase === 'over' && (
+              <p className="text-white/90 font-bold">Puntaje: {score} · Récord: {Math.max(best, score)}</p>
+            )}
+            {phase === 'idle' && (
+              <p className="text-white/80 text-sm font-bold">Mueve la canasta y atrapa valores · Esquiva coimas y trampas</p>
+            )}
+            <button
+              onClick={() => resetRun(true)}
+              className="btn-glow bg-gradient-to-r from-primary to-secondary text-white font-bold py-3 px-8 rounded-full text-lg"
+            >
+              {phase === 'over' ? '↻ Jugar de nuevo' : '▶ Jugar'}
+            </button>
+            {phase === 'idle' && (
+              <p className="text-white/60 text-xs font-bold">Flechas / AD · Arrastra en celular · Espacio para empezar</p>
+            )}
+          </div>
+        )}
+      </div>
+      <div className="flex items-center justify-center gap-3 mt-4">
+        <button
+          aria-label="Izquierda"
+          className="px-8 py-3 rounded-2xl bg-white border-2 border-slate-200 text-xl font-black text-slate-700 active:bg-primary/10 select-none touch-none"
+          onPointerDown={() => { holdRef.current.left = true }}
+          onPointerUp={() => { holdRef.current.left = false }}
+          onPointerLeave={() => { holdRef.current.left = false }}
+          onPointerCancel={() => { holdRef.current.left = false }}
+        >
+          ◀
+        </button>
+        <button
+          aria-label="Derecha"
+          className="px-8 py-3 rounded-2xl bg-white border-2 border-slate-200 text-xl font-black text-slate-700 active:bg-primary/10 select-none touch-none"
+          onPointerDown={() => { holdRef.current.right = true }}
+          onPointerUp={() => { holdRef.current.right = false }}
+          onPointerLeave={() => { holdRef.current.right = false }}
+          onPointerCancel={() => { holdRef.current.right = false }}
+        >
+          ▶
+        </button>
+      </div>
+      <p className="text-center text-xs font-bold text-slate-400 mt-3">Flechas / AD · Arrastra o usa los botones en celular</p>
+    </div>
+  )
+}
+
 export default function App() {
   const [studentProfile, setStudentProfile] = useState<StudentProfile>(initialStudentProfile)
   const [familyProfile, setFamilyProfile] = useState<FamilyProfile>(initialFamilyProfile)
-  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'snake' | 'flappy' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents' | 'profile-type'>(BOOT_HASH ? 'learn' : 'welcome')
+  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'snake' | 'flappy' | 'catch' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents' | 'profile-type'>(BOOT_HASH ? 'learn' : 'welcome')
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null)
   const [learnView, setLearnView] = useState<'hub' | 'kid' | 'guide' | 'exam'>(BOOT_HASH ? (BOOT_HASH.view === 'tema' ? 'kid' : BOOT_HASH.view === 'guia' ? 'guide' : BOOT_HASH.view === 'examen' ? 'exam' : 'hub') : 'hub')
   const [activeKidId, setActiveKidId] = useState<string | null>(BOOT_HASH && BOOT_HASH.view === 'tema' ? BOOT_HASH.id : null)
@@ -5086,12 +5339,46 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
       )
     }
 
+    case 'catch': {
+      const custCatch = getCustomization();
+      const catchColors = getTextColorForTheme(custCatch.backgroundValue)
+      const catchBestHub = parseInt(safeGet('hablemos-claro-catch-best') ?? '0', 10) || 0
+      return (
+        <div className="min-h-screen pb-16" style={{ background: custCatch.backgroundValue, backgroundSize: custCatch.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
+          <div className="max-w-5xl mx-auto px-6 md:px-8 pt-10 md:pt-14 pb-10 animate-slide-up">
+            <div className="flex items-center justify-between gap-3 mb-6">
+              <button
+                onClick={() => navigateTo('games')}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-warning/10 text-slate-600 hover:text-warning text-sm font-bold shadow-sm transition-colors shrink-0"
+              >
+                ← Juegos
+              </button>
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="text-xl">🧺</span>
+                <span className="font-black text-sm md:text-base truncate" style={{ color: catchColors.primary }}>Atrapa la honestidad</span>
+              </div>
+              <span className="px-3 py-1.5 rounded-full bg-warning/15 text-warning text-xs font-black uppercase tracking-wider shrink-0">Nuevo{catchBestHub > 0 ? ` · 🏆 ${catchBestHub}` : ''}</span>
+            </div>
+            <div className="text-center mb-6">
+              <h1 className="text-3xl md:text-4xl font-black gradient-text mb-2">Atrapa la honestidad 🧺</h1>
+              <p className="font-bold" style={{ color: catchColors.secondary }}>Atrapa valores, esquiva coimas y trampas.</p>
+            </div>
+            <CatchGame />
+            <footer className="mt-10 text-center">
+              <p className="text-slate-500 text-sm">Hablemos Claro · Aprende con juegos 🎮</p>
+            </footer>
+          </div>
+        </div>
+      )
+    }
+
     case 'games':
       const cust9 = getCustomization();
       const gamesBadgeCount = profileType === 'family' ? familyProfile.familyBadges.filter(b => b.unlocked).length : getBadges().filter(b => b.unlocked).length;
        const gamesBadgeTotal = profileType === 'family' ? familyProfile.familyBadges.length : getBadges().length;
        const snakeBestHub = parseInt(safeGet('hablemos-claro-snake-best') ?? '0', 10) || 0
        const flappyBestHub = parseInt(safeGet('hablemos-claro-flappy-best') ?? '0', 10) || 0
+       const catchBestHub = parseInt(safeGet('hablemos-claro-catch-best') ?? '0', 10) || 0
       return (
         <div className="min-h-screen pb-24" style={{ background: cust9.backgroundValue, backgroundSize: cust9.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           {/* Decoración de fondo */}
@@ -5155,6 +5442,30 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                 </div>
                 <div className="shrink-0 hidden md:flex items-center gap-1 text-slate-400 group-hover:text-primary transition-colors">
                   <span className="text-2xl">🕹️</span>
+                </div>
+              </div>
+            </button>
+
+            {/* Atrapa la honestidad */}
+            <button
+              onClick={() => navigateTo('catch')}
+              className="group w-full mb-8 text-left relative overflow-hidden rounded-[28px] bg-gradient-to-br from-warning via-alert to-warning p-[2px] shadow-xl shadow-warning/20 hover:shadow-2xl hover:scale-[1.01] transition-all duration-300"
+            >
+              <div className="bg-white rounded-[26px] p-6 md:p-8 flex items-center gap-4 md:gap-6">
+                <div className="w-16 h-16 md:w-20 md:h-20 shrink-0 rounded-2xl bg-gradient-to-br from-warning to-alert flex items-center justify-center text-4xl md:text-5xl shadow-lg shadow-warning/30 group-hover:scale-110 transition-transform duration-300">
+                  🧺
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 mb-1">
+                    <h2 className="text-2xl md:text-3xl font-black text-warning">Atrapa la honestidad</h2>
+                    <span className="px-2.5 py-1 rounded-full bg-warning/15 text-warning text-[11px] font-black uppercase tracking-wider animate-pulse">Nuevo</span>
+                  </div>
+                  <p className="text-gray-600 text-base md:text-lg">Mueve la canasta, atrapa valores y esquiva coimas y trampas.</p>
+                  <p className="text-slate-500 text-sm font-black mt-1">{catchBestHub > 0 ? `🏆 Récord: ${catchBestHub}` : '🎮 Juega y marca tu récord'}</p>
+                  <p className="text-warning text-sm font-bold mt-1 group-hover:underline">▶ Jugar ahora →</p>
+                </div>
+                <div className="shrink-0 hidden md:flex items-center gap-1 text-slate-400 group-hover:text-warning transition-colors">
+                  <span className="text-2xl">⭐</span>
                 </div>
               </div>
             </button>
