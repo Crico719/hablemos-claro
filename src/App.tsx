@@ -1663,7 +1663,6 @@ function SnakeGame() {
       if (head.x === foodRef.current.x && head.y === foodRef.current.y) {
         scoreRef.current += 1
         setScore(scoreRef.current)
-        speedRef.current = Math.max(70, speedRef.current - 4)
         foodRef.current = randomFood(snake)
         if (scoreRef.current % 15 === 0) {
           const q = examQuestions[quizCountRef.current % examQuestions.length]
