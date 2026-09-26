@@ -4044,7 +4044,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
       const aboutSteps = [
         { icon: '🎨', title: 'Crea tu avatar', desc: 'Elige tu personaje, fondo y hazlo único.', ring: 'text-primary', chip: 'bg-primary/10' },
         { icon: '📚', title: 'Aprende temas', desc: '10 temas con juegos de verdadero o falso, completar y casos. ¡Responde todo bien para avanzar!', ring: 'text-secondary', chip: 'bg-secondary/10' },
-        { icon: '🎮', title: 'Juega Snake y Flappy', desc: 'Come manzanas, vuela entre torres, responde preguntas y marca tu récord 🏆.', ring: 'text-warning', chip: 'bg-warning/10' },
+        { icon: '🎮', title: 'Juega y gana insignias', desc: 'Snake, Flappy, Atrapa, Memoria y Corazón Valiente: juega, responde y marca tu récord 🏆.', ring: 'text-warning', chip: 'bg-warning/10' },
         { icon: '💬', title: 'Conversa en familia', desc: 'Preguntas y reto familiar para hablar juntos en casa.', ring: 'text-success', chip: 'bg-success/10' },
       ];
       return (
@@ -4082,7 +4082,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                 <div>
                   <h2 className="font-extrabold text-dark text-lg mb-1">¿De qué trata?</h2>
                   <p className="text-gray-600 leading-relaxed">
-                    <strong>Hablemos Claro</strong> es para aprender en familia a reconocer <strong>coimas</strong> y a elegir lo honesto. Con temas interactivos, juegos como <strong>Snake y Flappy</strong>, insignias y conversaciones: ¡sin aburrimiento! 🚀
+                    <strong>Hablemos Claro</strong> es para aprender en familia a reconocer <strong>coimas</strong> y a elegir lo honesto. Con temas interactivos, 5 juegos, insignias y conversaciones: ¡sin aburrimiento! 🚀
                   </p>
                 </div>
               </div>
@@ -4124,6 +4124,9 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                 <span className="px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-bold">🗣️ Quechua</span>
                 <span className="px-3 py-1.5 rounded-full bg-success/10 text-success text-sm font-bold">🐍 Snake</span>
                 <span className="px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-bold">🐦 Flappy</span>
+                <span className="px-3 py-1.5 rounded-full bg-warning/10 text-warning text-sm font-bold">🧺 Atrapa</span>
+                <span className="px-3 py-1.5 rounded-full bg-secondary/10 text-secondary text-sm font-bold">🧠 Memoria</span>
+                <span className="px-3 py-1.5 rounded-full bg-alert/10 text-alert text-sm font-bold">💜 Valiente</span>
                 <span className="px-3 py-1.5 rounded-full bg-secondary/10 text-secondary text-sm font-bold">📱 Vista móvil</span>
               </div>
             </div>
