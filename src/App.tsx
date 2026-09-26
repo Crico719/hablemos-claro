@@ -2795,13 +2795,14 @@ function MemoryGame() {
   const matchTimeoutRef = useRef<number | null>(null)
 
   useEffect(() => {
+    setDeck(buildDeck())
     return () => {
       if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current)
       if (matchTimeoutRef.current !== null) window.clearTimeout(matchTimeoutRef.current)
     }
   }, [])
 
-  const startGame = () => {
+  const buildDeck = (): MemoryCard[] => {
     const cards: MemoryCard[] = []
     MEMORY_EMOJIS.forEach(emoji => {
       cards.push({ uid: cards.length, emoji })
@@ -2816,7 +2817,11 @@ function MemoryGame() {
         cards[j] = a
       }
     }
-    setDeck(cards)
+    return cards
+  }
+
+  const startGame = () => {
+    setDeck(buildDeck())
     setFlipped([])
     setMatched([])
     setMoves(0)
@@ -2885,7 +2890,7 @@ function MemoryGame() {
       </div>
       <div className="relative">
         <div className="grid grid-cols-4 gap-2.5 md:gap-3">
-          {(started ? deck : []).map((card, idx) => {
+          {deck.map((card, idx) => {
             const faceUp = flipped.includes(idx) || matched.includes(idx)
             const done = matched.includes(idx)
             return (
@@ -2908,9 +2913,9 @@ function MemoryGame() {
           })}
         </div>
         {(!started || won) && (
-          <div className="absolute inset-0 rounded-[20px] bg-black/60 backdrop-blur-[2px] flex flex-col items-center justify-center gap-4 p-7 text-center">
-            <div className="text-5xl">{won ? '🎉' : '🧠'}</div>
-            <p className="text-white text-2xl font-black leading-snug">{won ? '¡Completado!' : 'Memoria'}</p>
+          <div className="absolute inset-0 rounded-[20px] bg-black/60 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3 p-6 text-center overflow-y-auto">
+            <div className="text-4xl md:text-5xl shrink-0">{won ? '🎉' : '🧠'}</div>
+            <p className="text-white text-xl md:text-2xl font-black leading-snug shrink-0">{won ? '¡Completado!' : 'Memoria'}</p>
             {won ? (
               <p className="text-white/90 font-bold leading-relaxed">Movimientos: {moves} · Récord: {best > 0 ? best : moves}</p>
             ) : (
