@@ -2878,13 +2878,13 @@ function MemoryGame() {
 
   return (
     <div className="w-full max-w-[520px] mx-auto">
-      <div className="flex items-center justify-center gap-2 md:gap-3 mb-4 flex-wrap">
-        <div className="px-4 py-2 rounded-2xl bg-white/80 border border-slate-200 font-black text-slate-800">👣 {moves}</div>
-        <div className="px-4 py-2 rounded-2xl bg-white/80 border border-slate-200 font-black text-slate-800">✅ {matched.length / 2}/{MEMORY_EMOJIS.length}</div>
-        <div className="px-4 py-2 rounded-2xl bg-white/80 border border-slate-200 font-black text-slate-800">🏆 {best > 0 ? best : '–'}</div>
+      <div className="flex items-center justify-center gap-2.5 md:gap-3 mb-5 flex-wrap">
+        <div className="px-5 py-2.5 rounded-2xl bg-white/80 border border-slate-200 font-black text-slate-800">👣 {moves}</div>
+        <div className="px-5 py-2.5 rounded-2xl bg-white/80 border border-slate-200 font-black text-slate-800">✅ {matched.length / 2}/{MEMORY_EMOJIS.length}</div>
+        <div className="px-5 py-2.5 rounded-2xl bg-white/80 border border-slate-200 font-black text-slate-800">🏆 {best > 0 ? best : '–'}</div>
       </div>
       <div className="relative">
-        <div className="grid grid-cols-4 gap-2 md:gap-3">
+        <div className="grid grid-cols-4 gap-2.5 md:gap-3">
           {(started ? deck : []).map((card, idx) => {
             const faceUp = flipped.includes(idx) || matched.includes(idx)
             const done = matched.includes(idx)
@@ -2893,7 +2893,7 @@ function MemoryGame() {
                 key={card.uid}
                 onClick={() => flipCard(idx)}
                 aria-label={faceUp ? card.emoji : 'Carta tapada'}
-                className={`aspect-square rounded-2xl text-3xl md:text-4xl flex items-center justify-center transition-all duration-300 border-2 relative ${
+                className={`aspect-square rounded-2xl text-4xl md:text-5xl flex items-center justify-center transition-all duration-300 border-2 relative ${
                   faceUp
                     ? done
                       ? 'bg-success/15 border-success shadow-md scale-[1.02]'
@@ -2902,19 +2902,19 @@ function MemoryGame() {
                 }`}
               >
                 <span className={`transition-transform duration-300 ${faceUp ? 'scale-100' : 'scale-0'}`}>{card.emoji}</span>
-                {!faceUp && <span className="absolute text-white/80 text-2xl font-black">?</span>}
+                {!faceUp && <span className="absolute text-white/80 text-3xl font-black">?</span>}
               </button>
             )
           })}
         </div>
         {(!started || won) && (
-          <div className="absolute inset-0 rounded-[20px] bg-black/60 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3 p-6 text-center">
+          <div className="absolute inset-0 rounded-[20px] bg-black/60 backdrop-blur-[2px] flex flex-col items-center justify-center gap-4 p-7 text-center">
             <div className="text-5xl">{won ? '🎉' : '🧠'}</div>
-            <p className="text-white text-2xl font-black">{won ? '¡Completado!' : 'Memoria'}</p>
+            <p className="text-white text-2xl font-black leading-snug">{won ? '¡Completado!' : 'Memoria'}</p>
             {won ? (
-              <p className="text-white/90 font-bold">Movimientos: {moves} · Récord: {best > 0 ? best : moves}</p>
+              <p className="text-white/90 font-bold leading-relaxed">Movimientos: {moves} · Récord: {best > 0 ? best : moves}</p>
             ) : (
-              <p className="text-white/80 text-sm font-bold">Encuentra las 8 parejas con los menos movimientos</p>
+              <p className="text-white/80 text-sm font-bold leading-relaxed">Encuentra las 8 parejas con los menos movimientos</p>
             )}
             <button
               onClick={startGame}
@@ -2926,18 +2926,18 @@ function MemoryGame() {
         )}
       </div>
       {lastMatch !== null && started && !won && (
-        <div className="mt-3 bg-white rounded-2xl border-2 border-primary/20 p-4 shadow-md animate-fade-in">
+        <div className="mt-4 bg-white rounded-2xl border-2 border-primary/20 p-5 shadow-md animate-fade-in">
           <div className="flex items-start gap-3">
             <div className="text-4xl shrink-0">{lastMatch}</div>
             <div className="flex-1 text-left">
-              <p className="font-black text-slate-800">{MEMORY_MEANINGS[lastMatch]?.name ?? lastMatch}</p>
-              <p className="text-sm text-slate-600 leading-relaxed">{MEMORY_MEANINGS[lastMatch]?.desc ?? ''}</p>
+              <p className="font-black text-slate-800 text-lg leading-snug">{MEMORY_MEANINGS[lastMatch]?.name ?? lastMatch}</p>
+              <p className="text-[15px] text-slate-600 leading-relaxed mt-1">{MEMORY_MEANINGS[lastMatch]?.desc ?? ''}</p>
             </div>
             <button onClick={() => setLastMatch(null)} aria-label="Cerrar" className="text-slate-400 hover:text-slate-600 font-black px-1 shrink-0">✕</button>
           </div>
         </div>
       )}
-      <p className="text-center text-xs font-bold text-slate-400 mt-3">Toca dos cartas para voltearlas · Memoriza las parejas</p>
+      <p className="text-center text-sm font-bold text-slate-400 mt-4 leading-relaxed">Toca dos cartas para voltearlas · Memoriza las parejas</p>
     </div>
   )
 }
