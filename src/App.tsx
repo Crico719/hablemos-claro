@@ -3131,8 +3131,8 @@ function DodgeGame({ onDodgeAllComplete }: { onDodgeAllComplete?: () => void }) 
               bulletsRef.current = []
               if (livesRef.current <= 0) {
                 endGame()
-                break
               }
+              break
             }
           }
         }
