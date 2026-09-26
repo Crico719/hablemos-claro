@@ -3298,6 +3298,7 @@ export default function App() {
   const [familyActivityIndex, setFamilyActivityIndex] = useState(0)
   const [familyDoneList, setFamilyDoneList] = useState<number[]>([])
   const [familyWeeklyAction, setFamilyWeeklyAction] = useState<number | null>(null)
+  const [activityNeedMore, setActivityNeedMore] = useState(false)
   const [userAnswers, setUserAnswers] = useState<number[]>([])
   const [showFeedback, setShowFeedback] = useState(false)
   const [feedbackMessage, setFeedbackMessage] = useState<string>('')
@@ -6591,13 +6592,25 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                     ← Anterior
                   </button>
                   <button
-                    onClick={() => setFamilyActivityIndex(prev => (prev < totalPrompts - 1 ? prev + 1 : totalPrompts))}
+                    onClick={() => {
+                      if (isLastPrompt && familyDoneList.length < 5) {
+                        setActivityNeedMore(true)
+                      } else {
+                        setActivityNeedMore(false)
+                        setFamilyActivityIndex(prev => (prev < totalPrompts - 1 ? prev + 1 : totalPrompts))
+                      }
+                    }}
                     className="flex-1 py-3.5 px-6 rounded-2xl text-sm font-black text-white shadow-lg transition-all hover:scale-[1.02]"
                     style={{ background: isLastPrompt ? 'linear-gradient(135deg, #F59E0B, #EA580C)' : 'linear-gradient(135deg, #7C3AED, #2563EB)' }}
                   >
                     {isLastPrompt ? '🏁 Terminar' : 'Siguiente →'}
                   </button>
                 </div>
+                {activityNeedMore && familyDoneList.length < 5 && (
+                  <p className="mt-3 text-center text-sm font-black rounded-2xl px-4 py-3 shadow-sm border" style={{ backgroundColor: '#FFF7ED', color: '#C2410C', borderColor: '#FDBA74' }}>
+                    🔒 Marca al menos 5 preguntas como conversadas para completar la actividad (llevas {familyDoneList.length}/5). ¡Padres e hijos juntos!
+                  </p>
+                )}
               </>
             ) : (
               // Completado
@@ -6640,6 +6653,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                       setFamilyActivityIndex(0);
                       setFamilyDoneList([]);
                       setFamilyWeeklyAction(null);
+                      setActivityNeedMore(false);
                     }}
                     className="w-full py-3.5 rounded-2xl text-white font-black transition-all hover:scale-[1.01] shadow-lg"
                     style={{ background: 'linear-gradient(135deg, #7C3AED, #2563EB)' }}
