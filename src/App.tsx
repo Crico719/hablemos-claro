@@ -2766,6 +2766,16 @@ function CatchGame() {
 
 // Juego de Memoria: encuentra las parejas de valores con menos movimientos
 const MEMORY_EMOJIS = ['⭐', '❤️', '🤝', '📚', '⚖️', '🛡️', '🌱', '🕊️']
+const MEMORY_MEANINGS: Record<string, { name: string; desc: string }> = {
+  '⭐': { name: 'Integridad', desc: 'Hacer lo correcto aunque nadie mire. Así nace la confianza.' },
+  '❤️': { name: 'Respeto', desc: 'Tratar bien a todos, sin burlas ni daño.' },
+  '🤝': { name: 'Ayuda', desc: 'Apoyar a quien lo necesita sin pedir nada a cambio.' },
+  '📚': { name: 'Educación', desc: 'Aprender cada día te hace más fuerte y libre.' },
+  '⚖️': { name: 'Justicia', desc: 'Dar a cada uno lo que le corresponde, sin favores injustos.' },
+  '🛡️': { name: 'Honestidad', desc: 'Decir la verdad y no quedarte con lo ajeno.' },
+  '🌱': { name: 'Valores', desc: 'Como una planta: si los cuidas cada día, crecen contigo.' },
+  '🕊️': { name: 'Paz', desc: 'Vivir tranquilos resolviendo los problemas hablando.' },
+}
 type MemoryCard = { uid: number; emoji: string }
 
 function MemoryGame() {
@@ -2779,12 +2789,15 @@ function MemoryGame() {
   })
   const [started, setStarted] = useState(false)
   const [won, setWon] = useState(false)
+  const [lastMatch, setLastMatch] = useState<string | null>(null)
   const lockRef = useRef(false)
   const timeoutRef = useRef<number | null>(null)
+  const matchTimeoutRef = useRef<number | null>(null)
 
   useEffect(() => {
     return () => {
       if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current)
+      if (matchTimeoutRef.current !== null) window.clearTimeout(matchTimeoutRef.current)
     }
   }, [])
 
@@ -2808,10 +2821,15 @@ function MemoryGame() {
     setMatched([])
     setMoves(0)
     setWon(false)
+    setLastMatch(null)
     lockRef.current = false
     if (timeoutRef.current !== null) {
       window.clearTimeout(timeoutRef.current)
       timeoutRef.current = null
+    }
+    if (matchTimeoutRef.current !== null) {
+      window.clearTimeout(matchTimeoutRef.current)
+      matchTimeoutRef.current = null
     }
     setStarted(true)
   }
@@ -2831,6 +2849,12 @@ function MemoryGame() {
         const nm = [...matched, a, b]
         setMatched(nm)
         setFlipped([])
+        setLastMatch(ca.emoji)
+        if (matchTimeoutRef.current !== null) window.clearTimeout(matchTimeoutRef.current)
+        matchTimeoutRef.current = window.setTimeout(() => {
+          setLastMatch(null)
+          matchTimeoutRef.current = null
+        }, 6000)
         if (nm.length === deck.length && deck.length > 0) {
           setWon(true)
           setBest(prev => {
@@ -2901,6 +2925,18 @@ function MemoryGame() {
           </div>
         )}
       </div>
+      {lastMatch !== null && started && !won && (
+        <div className="mt-3 bg-white rounded-2xl border-2 border-primary/20 p-4 shadow-md animate-fade-in">
+          <div className="flex items-start gap-3">
+            <div className="text-4xl shrink-0">{lastMatch}</div>
+            <div className="flex-1 text-left">
+              <p className="font-black text-slate-800">{MEMORY_MEANINGS[lastMatch]?.name ?? lastMatch}</p>
+              <p className="text-sm text-slate-600 leading-relaxed">{MEMORY_MEANINGS[lastMatch]?.desc ?? ''}</p>
+            </div>
+            <button onClick={() => setLastMatch(null)} aria-label="Cerrar" className="text-slate-400 hover:text-slate-600 font-black px-1 shrink-0">✕</button>
+          </div>
+        </div>
+      )}
       <p className="text-center text-xs font-bold text-slate-400 mt-3">Toca dos cartas para voltearlas · Memoriza las parejas</p>
     </div>
   )
