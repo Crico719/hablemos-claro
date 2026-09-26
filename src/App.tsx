@@ -5,7 +5,7 @@ import './index.css'
 // Tipos para la aplicación
 type UserRole = 'parent' | 'child'
 type LearningTopic = 'coima' | 'recognition' | 'impact' | 'consequences' | 'prevention' | 'ethics' | 'citizen' | 'test'
-type BadgeType = 'topics-explorer' | 'game-master' | 'flappy-star' | 'snake-master'
+type BadgeType = 'topics-explorer' | 'game-master' | 'flappy-star' | 'snake-master' | 'catch-master' | 'memory-master'
 type ProfileType = 'student' | 'family'
 
 interface Badge {
@@ -106,6 +106,8 @@ const allBadges: Badge[] = [
   { id: 'game-master', name: 'Maestro del Juego', emoji: '🎮', color: '#8B5CF6', unlocked: false },
   { id: 'flappy-star', name: 'Estrella Flappy', emoji: '⭐', color: '#F59E0B', unlocked: false },
   { id: 'snake-master', name: 'Maestro Snake', emoji: '🐍', color: '#10B981', unlocked: false },
+  { id: 'catch-master', name: 'Atrapa Valores', emoji: '🧺', color: '#EC4899', unlocked: false },
+  { id: 'memory-master', name: 'Mente Maestra', emoji: '🧠', color: '#14B8B6', unlocked: false },
 ]
 
 const defaultFamilyBadges: FamilyBadge[] = [
@@ -2520,7 +2522,7 @@ const CATCH_BAD = ['💰', '🃏', '💸']
 type CatchPhase = 'idle' | 'playing' | 'over'
 type CatchItem = { x: number; y: number; emoji: string; bad: boolean }
 
-function CatchGame() {
+function CatchGame({ onCatchBest }: { onCatchBest?: (best: number) => void }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const [score, setScore] = useState(0)
   const [best, setBest] = useState<number>(() => {
@@ -2539,9 +2541,11 @@ function CatchGame() {
   const scoreRef = useRef(0)
   const livesRef = useRef(3)
   const phaseRef = useRef<CatchPhase>('idle')
+  const bestRef = useRef(0)
 
   useEffect(() => {
     phaseRef.current = phase
+    if (best > bestRef.current) bestRef.current = best
   })
 
   const resetRun = (toPlaying: boolean) => {
@@ -2558,9 +2562,11 @@ function CatchGame() {
 
   const endGame = () => {
     setPhase('over')
-    if (scoreRef.current > best) {
+    if (scoreRef.current > bestRef.current) {
+      bestRef.current = scoreRef.current
       safeSet('hablemos-claro-catch-best', String(scoreRef.current))
       setBest(scoreRef.current)
+      onCatchBest?.(scoreRef.current)
     }
   }
 
@@ -2720,7 +2726,10 @@ function CatchGame() {
             <div className="text-5xl">{phase === 'over' ? '💀' : '🧺'}</div>
             <p className="text-white text-2xl font-black">{phase === 'over' ? '¡Fin del juego!' : 'Atrapa la honestidad'}</p>
             {phase === 'over' && (
+              <>
               <p className="text-white/90 font-bold">Puntaje: {score} · Récord: {Math.max(best, score)}</p>
+              <p className="text-white/80 text-sm font-bold">{Math.max(best, score) >= 40 ? '🏅 ¡Insignia Atrapa Valores desbloqueada!' : `🏅 Insignia Atrapa Valores: ${Math.max(best, score)}/40`}</p>
+              </>
             )}
             {phase === 'idle' && (
               <p className="text-white/80 text-sm font-bold">Mueve la canasta y atrapa valores · Esquiva coimas y trampas</p>
@@ -2778,7 +2787,7 @@ const MEMORY_MEANINGS: Record<string, { name: string; desc: string }> = {
 }
 type MemoryCard = { uid: number; emoji: string }
 
-function MemoryGame() {
+function MemoryGame({ onMemoryWin }: { onMemoryWin?: (moves: number) => void }) {
   const [deck, setDeck] = useState<MemoryCard[]>([])
   const [flipped, setFlipped] = useState<number[]>([])
   const [matched, setMatched] = useState<number[]>([])
@@ -2869,6 +2878,7 @@ function MemoryGame() {
             }
             return prev
           })
+          onMemoryWin?.(newMoves)
         }
       } else {
         lockRef.current = true
@@ -2920,6 +2930,9 @@ function MemoryGame() {
               <p className="text-white/90 font-bold leading-relaxed">Movimientos: {moves} · Récord: {best > 0 ? best : moves}</p>
             ) : (
               <p className="text-white/80 text-sm font-bold leading-relaxed">Encuentra las 8 parejas con los menos movimientos</p>
+            )}
+            {won && (
+              <p className="text-white/80 text-sm font-bold leading-relaxed">{moves <= 20 ? '🏅 ¡Insignia Mente Maestra desbloqueada!' : `🏅 Insignia Mente Maestra: gana con 20 o menos (hiciste ${moves})`}</p>
             )}
             <button
               onClick={startGame}
@@ -3365,6 +3378,46 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
       setStudentProfile(updated)
       saveStudentProfile(updated)
       const nb = badges.find(b => b.id === 'snake-master')
+      if (nb) {
+        setEarnedBadge({ ...nb })
+        setShowBadgeCelebration(true)
+      }
+    }
+
+    // Insignia Atrapa Valores: récord de 40 puntos en Atrapa la honestidad
+    const awardCatchMaster = (bestScore: number) => {
+      if (profileType !== 'student') return
+      if (bestScore < 40) return
+      const current = studentProfile.progress.badges
+      const withBadge = current.some(b => b.id === 'catch-master')
+        ? current
+        : [...current, { id: 'catch-master', name: 'Atrapa Valores', emoji: '🧺', color: '#EC4899', unlocked: false } as Badge]
+      if (withBadge.some(b => b.id === 'catch-master' && b.unlocked)) return
+      const badges = withBadge.map(b => (b.id === 'catch-master' ? { ...b, unlocked: true } : b))
+      const updated = { ...studentProfile, progress: { ...studentProfile.progress, badges } }
+      setStudentProfile(updated)
+      saveStudentProfile(updated)
+      const nb = badges.find(b => b.id === 'catch-master')
+      if (nb) {
+        setEarnedBadge({ ...nb })
+        setShowBadgeCelebration(true)
+      }
+    }
+
+    // Insignia Mente Maestra: completar Memoria con 20 movimientos o menos
+    const awardMemoryWin = (moves: number) => {
+      if (profileType !== 'student') return
+      if (moves > 20) return
+      const current = studentProfile.progress.badges
+      const withBadge = current.some(b => b.id === 'memory-master')
+        ? current
+        : [...current, { id: 'memory-master', name: 'Mente Maestra', emoji: '🧠', color: '#14B8B6', unlocked: false } as Badge]
+      if (withBadge.some(b => b.id === 'memory-master' && b.unlocked)) return
+      const badges = withBadge.map(b => (b.id === 'memory-master' ? { ...b, unlocked: true } : b))
+      const updated = { ...studentProfile, progress: { ...studentProfile.progress, badges } }
+      setStudentProfile(updated)
+      saveStudentProfile(updated)
+      const nb = badges.find(b => b.id === 'memory-master')
       if (nb) {
         setEarnedBadge({ ...nb })
         setShowBadgeCelebration(true)
@@ -5546,7 +5599,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
               <h1 className="text-3xl md:text-4xl font-black gradient-text mb-2">Atrapa la honestidad 🧺</h1>
               <p className="font-bold" style={{ color: catchColors.secondary }}>Atrapa valores, esquiva coimas y trampas.</p>
             </div>
-            <CatchGame />
+            <CatchGame onCatchBest={awardCatchMaster} />
             <footer className="mt-10 text-center">
               <p className="text-slate-500 text-sm">Hablemos Claro · Aprende con juegos 🎮</p>
             </footer>
@@ -5578,7 +5631,7 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
               <h1 className="text-3xl md:text-4xl font-black gradient-text mb-2">Memoria 🧠</h1>
               <p className="font-bold" style={{ color: memoryColors.secondary }}>Encuentra las parejas con menos movimientos.</p>
             </div>
-            <MemoryGame />
+            <MemoryGame onMemoryWin={awardMemoryWin} />
             <footer className="mt-10 text-center">
               <p className="text-slate-500 text-sm">Hablemos Claro · Aprende con juegos 🎮</p>
             </footer>
