@@ -5,7 +5,7 @@ import './index.css'
 // Tipos para la aplicación
 type UserRole = 'parent' | 'child'
 type LearningTopic = 'coima' | 'recognition' | 'impact' | 'consequences' | 'prevention' | 'ethics' | 'citizen' | 'test'
-type BadgeType = 'topics-explorer' | 'game-master' | 'flappy-star' | 'snake-master' | 'catch-master' | 'memory-master'
+type BadgeType = 'topics-explorer' | 'game-master' | 'flappy-star' | 'snake-master' | 'catch-master' | 'memory-master' | 'dodge-master'
 type ProfileType = 'student' | 'family'
 
 interface Badge {
@@ -108,6 +108,7 @@ const allBadges: Badge[] = [
   { id: 'snake-master', name: 'Maestro Snake', emoji: '🐍', color: '#10B981', unlocked: false },
   { id: 'catch-master', name: 'Atrapa Valores', emoji: '🧺', color: '#EC4899', unlocked: false },
   { id: 'memory-master', name: 'Mente Maestra', emoji: '🧠', color: '#14B8B6', unlocked: false },
+  { id: 'dodge-master', name: 'Corazón Valiente', emoji: '💜', color: '#F43F5E', unlocked: false },
 ]
 
 const defaultFamilyBadges: FamilyBadge[] = [
@@ -2960,10 +2961,327 @@ function MemoryGame({ onMemoryWin }: { onMemoryWin?: (moves: number) => void }) 
   )
 }
 
+// Corazón Valiente: esquiva ataques en la arena con 3 niveles de dificultad
+const DODGE_W = 480
+const DODGE_H = 600
+const DODGE_LEVELS = [
+  { id: 'normal', label: '🌱 Normal', time: 30, spawn: 0.7, bspd: 150 },
+  { id: 'dificil', label: '🔥 Difícil', time: 40, spawn: 0.5, bspd: 210 },
+  { id: 'imposible', label: '💀 Imposible', time: 50, spawn: 0.32, bspd: 280 },
+] as const
+type DodgeLevelId = typeof DODGE_LEVELS[number]['id']
+type DodgePhase = 'menu' | 'playing' | 'clear' | 'over'
+type DodgeBullet = { x: number; y: number; vx: number; vy: number; emoji: string }
+
+function DodgeGame({ onDodgeAllComplete }: { onDodgeAllComplete?: () => void }) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const [level, setLevel] = useState<DodgeLevelId>('normal')
+  const [phase, setPhase] = useState<DodgePhase>('menu')
+  const [lives, setLives] = useState(3)
+  const [timeLeft, setTimeLeft] = useState(30)
+  const [completed, setCompleted] = useState<string[]>(() => {
+    const v = safeParse(safeGet('hablemos-claro-dodge-levels'))
+    return Array.isArray(v) ? v.filter(x => typeof x === 'string') : []
+  })
+  const pxRef = useRef(DODGE_W / 2)
+  const pyRef = useRef(360)
+  const bulletsRef = useRef<DodgeBullet[]>([])
+  const spawnRef = useRef(0)
+  const timeRef = useRef(0)
+  const invulnRef = useRef(0)
+  const livesRef = useRef(3)
+  const phaseRef = useRef<DodgePhase>('menu')
+  const levelRef = useRef<DodgeLevelId>('normal')
+  const keysRef = useRef<{ up: boolean; down: boolean; left: boolean; right: boolean }>({ up: false, down: false, left: false, right: false })
+  const holdRef = useRef<{ up: boolean; down: boolean; left: boolean; right: boolean }>({ up: false, down: false, left: false, right: false })
+  const dragRef = useRef(false)
+
+  useEffect(() => {
+    phaseRef.current = phase
+    levelRef.current = level
+  })
+
+  const levelCfg = (id: DodgeLevelId) => DODGE_LEVELS.find(l => l.id === id) ?? DODGE_LEVELS[0]
+  const arena = { x0: 70, y0: 110, x1: DODGE_W - 70, y1: DODGE_H - 90 }
+
+  const startLevel = (id: DodgeLevelId) => {
+    const cfg = levelCfg(id)
+    pxRef.current = DODGE_W / 2
+    pyRef.current = 360
+    bulletsRef.current = []
+    spawnRef.current = 0.5
+    timeRef.current = cfg.time
+    invulnRef.current = 0
+    livesRef.current = 3
+    setLives(3)
+    setTimeLeft(cfg.time)
+    setLevel(id)
+    setPhase('playing')
+  }
+
+  const endGame = () => {
+    setPhase('over')
+  }
+
+  const clearLevel = () => {
+    setPhase('clear')
+    setCompleted(prev => {
+      const id = levelRef.current
+      const next = prev.includes(id) ? prev : [...prev, id]
+      safeSet('hablemos-claro-dodge-levels', JSON.stringify(next))
+      if (next.length >= 3) onDodgeAllComplete?.()
+      return next
+    })
+  }
+
+  const draw = () => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    const bg = ctx.createLinearGradient(0, 0, 0, DODGE_H)
+    bg.addColorStop(0, '#141126')
+    bg.addColorStop(1, '#0b1020')
+    ctx.fillStyle = bg
+    ctx.fillRect(0, 0, DODGE_W, DODGE_H)
+    ctx.strokeStyle = 'rgba(255,255,255,0.25)'
+    ctx.lineWidth = 3
+    ctx.strokeRect(arena.x0, arena.y0, arena.x1 - arena.x0, arena.y1 - arena.y0)
+    ctx.font = '22px serif'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    bulletsRef.current.forEach(b => {
+      ctx.fillText(b.emoji, b.x, b.y)
+    })
+    if (phaseRef.current !== 'menu') {
+      const blink = invulnRef.current > 0 && Math.floor(performance.now() / 150) % 2 === 0
+      ctx.globalAlpha = blink ? 0.4 : 1
+      ctx.font = '30px serif'
+      ctx.fillText('❤️', pxRef.current, pyRef.current)
+      ctx.globalAlpha = 1
+    }
+  }
+
+  const canvasPos = (clientX: number, clientY: number) => {
+    const canvas = canvasRef.current
+    if (!canvas) return null
+    const r = canvas.getBoundingClientRect()
+    return {
+      x: ((clientX - r.left) / Math.max(1, r.width)) * DODGE_W,
+      y: ((clientY - r.top) / Math.max(1, r.height)) * DODGE_H,
+    }
+  }
+
+  useEffect(() => {
+    draw()
+  }, [])
+
+  useEffect(() => {
+    let raf = 0
+    let last = performance.now()
+    const loop = (t: number) => {
+      const dt = Math.min(0.033, Math.max(0.001, (t - last) / 1000))
+      last = t
+      if (phaseRef.current === 'playing') {
+        const cfg = levelCfg(levelRef.current)
+        const sp = 270
+        const k = keysRef.current
+        const h = holdRef.current
+        let mx = 0
+        let my = 0
+        if (k.left || h.left) mx -= 1
+        if (k.right || h.right) mx += 1
+        if (k.up || h.up) my -= 1
+        if (k.down || h.down) my += 1
+        if (mx !== 0 || my !== 0) {
+          const len = Math.hypot(mx, my)
+          pxRef.current += (mx / len) * sp * dt
+          pyRef.current += (my / len) * sp * dt
+        }
+        pxRef.current = Math.max(arena.x0 + 14, Math.min(arena.x1 - 14, pxRef.current))
+        pyRef.current = Math.max(arena.y0 + 14, Math.min(arena.y1 - 14, pyRef.current))
+        spawnRef.current -= dt
+        if (spawnRef.current <= 0) {
+          spawnRef.current = cfg.spawn
+          const side = Math.floor(Math.random() * 4)
+          const bx = side === 0 ? arena.x0 + Math.random() * (arena.x1 - arena.x0) : side === 1 ? arena.x0 + Math.random() * (arena.x1 - arena.x0) : side === 2 ? arena.x0 : arena.x1
+          const by = side === 0 ? arena.y0 : side === 1 ? arena.y1 : arena.y0 + Math.random() * (arena.y1 - arena.y0)
+          const ang = Math.atan2(pyRef.current - by, pxRef.current - bx) + (Math.random() - 0.5) * 0.5
+          const spd = cfg.bspd * (0.85 + Math.random() * 0.3)
+          const pool = ['💰', '🃏', '💸']
+          const emoji = pool[Math.floor(Math.random() * pool.length)] ?? '💰'
+          bulletsRef.current.push({ x: bx, y: by, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd, emoji })
+        }
+        const kept: DodgeBullet[] = []
+        for (const b of bulletsRef.current) {
+          b.x += b.vx * dt
+          b.y += b.vy * dt
+          if (b.x > -30 && b.x < DODGE_W + 30 && b.y > -30 && b.y < DODGE_H + 30) kept.push(b)
+        }
+        bulletsRef.current = kept
+        if (invulnRef.current > 0) invulnRef.current -= dt
+        else {
+          for (const b of bulletsRef.current) {
+            const dx = b.x - pxRef.current
+            const dy = b.y - pyRef.current
+            if (dx * dx + dy * dy < 24 * 24) {
+              livesRef.current -= 1
+              setLives(livesRef.current)
+              invulnRef.current = 1
+              bulletsRef.current = []
+              if (livesRef.current <= 0) {
+                endGame()
+                break
+              }
+            }
+          }
+        }
+        timeRef.current -= dt
+        setTimeLeft(Math.max(0, Math.ceil(timeRef.current)))
+        if (timeRef.current <= 0) {
+          clearLevel()
+        }
+      }
+      draw()
+      raf = requestAnimationFrame(loop)
+    }
+    raf = requestAnimationFrame(loop)
+    return () => cancelAnimationFrame(raf)
+  }, [])
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const k = e.key.toLowerCase()
+      if (k.startsWith('arrow')) e.preventDefault()
+      if (k === 'arrowup' || k === 'w') keysRef.current.up = true
+      else if (k === 'arrowdown' || k === 's') keysRef.current.down = true
+      else if (k === 'arrowleft' || k === 'a') keysRef.current.left = true
+      else if (k === 'arrowright' || k === 'd') keysRef.current.right = true
+    }
+    const onKeyUp = (e: KeyboardEvent) => {
+      const k = e.key.toLowerCase()
+      if (k === 'arrowup' || k === 'w') keysRef.current.up = false
+      else if (k === 'arrowdown' || k === 's') keysRef.current.down = false
+      else if (k === 'arrowleft' || k === 'a') keysRef.current.left = false
+      else if (k === 'arrowright' || k === 'd') keysRef.current.right = false
+    }
+    window.addEventListener('keydown', onKey)
+    window.addEventListener('keyup', onKeyUp)
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      window.removeEventListener('keyup', onKeyUp)
+    }
+  }, [])
+
+  return (
+    <div className="w-full max-w-[520px] mx-auto">
+      <div className="flex items-center justify-center gap-2 md:gap-3 mb-4 flex-wrap">
+        <div className="px-4 py-2 rounded-2xl bg-white/80 border border-slate-200 font-black text-slate-800">❤️ {lives}</div>
+        <div className="px-4 py-2 rounded-2xl bg-white/80 border border-slate-200 font-black text-slate-800">⏱️ {timeLeft}s</div>
+        <div className="px-4 py-2 rounded-2xl bg-white/80 border border-slate-200 font-black text-slate-800">🏅 {completed.length}/3</div>
+      </div>
+      <div className="relative">
+        <canvas
+          ref={canvasRef}
+          width={DODGE_W}
+          height={DODGE_H}
+          className="w-full h-auto rounded-[20px] border-4 border-white shadow-xl shadow-indigo-500/10 touch-none select-none"
+          onPointerDown={e => {
+            if (phaseRef.current !== 'playing') return
+            const p = canvasPos(e.clientX, e.clientY)
+            if (!p) return
+            dragRef.current = true
+            pxRef.current = Math.max(arena.x0 + 14, Math.min(arena.x1 - 14, p.x))
+            pyRef.current = Math.max(arena.y0 + 14, Math.min(arena.y1 - 14, p.y))
+          }}
+          onPointerMove={e => {
+            if (!dragRef.current || phaseRef.current !== 'playing') return
+            const p = canvasPos(e.clientX, e.clientY)
+            if (!p) return
+            pxRef.current = Math.max(arena.x0 + 14, Math.min(arena.x1 - 14, p.x))
+            pyRef.current = Math.max(arena.y0 + 14, Math.min(arena.y1 - 14, p.y))
+          }}
+          onPointerUp={() => { dragRef.current = false }}
+          onPointerCancel={() => { dragRef.current = false }}
+          onPointerLeave={() => { dragRef.current = false }}
+        />
+        {phase !== 'playing' && (
+          <div className="absolute inset-0 rounded-[20px] bg-black/60 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3 p-6 text-center overflow-y-auto">
+            {phase === 'menu' && (
+              <>
+                <div className="text-5xl">💜</div>
+                <p className="text-white text-2xl font-black leading-snug">Corazón Valiente</p>
+                <p className="text-white/80 text-sm font-bold leading-relaxed">Esquiva los ataques sin salir de la arena · Completa los 3 niveles</p>
+                <div className="flex flex-col gap-2 w-full max-w-[280px]">
+                  {DODGE_LEVELS.map(lv => (
+                    <button
+                      key={lv.id}
+                      onClick={() => startLevel(lv.id)}
+                      className="w-full py-3 px-4 rounded-2xl font-black text-white bg-white/15 border border-white/25 hover:bg-white/25 active:scale-95 transition-all flex items-center justify-between"
+                    >
+                      <span>{lv.label}</span>
+                      <span className="text-sm">{completed.includes(lv.id) ? '✅' : `${lv.time}s`}</span>
+                    </button>
+                  ))}
+                </div>
+                <p className="text-white/60 text-xs font-bold leading-relaxed">Flechas / WASD · Arrastra en celular</p>
+              </>
+            )}
+            {phase === 'clear' && (
+              <>
+                <div className="text-5xl">🎉</div>
+                <p className="text-white text-2xl font-black leading-snug">¡Nivel superado!</p>
+                <p className="text-white/90 font-bold leading-relaxed">Completados: {completed.length}/3 niveles</p>
+                <p className="text-white/80 text-sm font-bold leading-relaxed">{completed.length >= 3 ? '🏅 ¡Insignia Corazón Valiente desbloqueada!' : 'Sigue con el siguiente nivel'}</p>
+                <div className="flex flex-col gap-2 w-full max-w-[280px]">
+                  <button
+                    onClick={() => setPhase('menu')}
+                    className="btn-glow bg-gradient-to-r from-primary to-secondary text-white font-bold py-3 px-8 rounded-full text-lg w-full"
+                  >
+                    Niveles ▶
+                  </button>
+                  <button
+                    onClick={() => startLevel(level)}
+                    className="bg-white/15 border border-white/25 text-white font-bold py-3 px-8 rounded-full w-full hover:bg-white/25"
+                  >
+                    ↻ Repetir nivel
+                  </button>
+                </div>
+              </>
+            )}
+            {phase === 'over' && (
+              <>
+                <div className="text-5xl">💔</div>
+                <p className="text-white text-2xl font-black leading-snug">¡Te alcanzaron!</p>
+                <p className="text-white/80 text-sm font-bold leading-relaxed">Inténtalo de nuevo, valiente</p>
+                <button
+                  onClick={() => startLevel(level)}
+                  className="btn-glow bg-gradient-to-r from-primary to-secondary text-white font-bold py-3 px-8 rounded-full text-lg w-full max-w-[280px]"
+                >
+                  ↻ Reintentar
+                </button>
+              </>
+            )}
+          </div>
+        )}
+      </div>
+      <div className="grid grid-cols-3 gap-2 mt-4 max-w-[240px] mx-auto snake-dpad">
+        <span />
+        <button aria-label="Arriba" className="py-3 rounded-2xl bg-white border-2 border-slate-200 text-xl font-black text-slate-700 active:bg-primary/10 select-none touch-none" onPointerDown={() => { holdRef.current.up = true }} onPointerUp={() => { holdRef.current.up = false }} onPointerLeave={() => { holdRef.current.up = false }} onPointerCancel={() => { holdRef.current.up = false }}>▲</button>
+        <span />
+        <button aria-label="Izquierda" className="py-3 rounded-2xl bg-white border-2 border-slate-200 text-xl font-black text-slate-700 active:bg-primary/10 select-none touch-none" onPointerDown={() => { holdRef.current.left = true }} onPointerUp={() => { holdRef.current.left = false }} onPointerLeave={() => { holdRef.current.left = false }} onPointerCancel={() => { holdRef.current.left = false }}>◀</button>
+        <button aria-label="Abajo" className="py-3 rounded-2xl bg-white border-2 border-slate-200 text-xl font-black text-slate-700 active:bg-primary/10 select-none touch-none" onPointerDown={() => { holdRef.current.down = true }} onPointerUp={() => { holdRef.current.down = false }} onPointerLeave={() => { holdRef.current.down = false }} onPointerCancel={() => { holdRef.current.down = false }}>▼</button>
+        <button aria-label="Derecha" className="py-3 rounded-2xl bg-white border-2 border-slate-200 text-xl font-black text-slate-700 active:bg-primary/10 select-none touch-none" onPointerDown={() => { holdRef.current.right = true }} onPointerUp={() => { holdRef.current.right = false }} onPointerLeave={() => { holdRef.current.right = false }} onPointerCancel={() => { holdRef.current.right = false }}>▶</button>
+      </div>
+      <p className="text-center text-xs font-bold text-slate-400 mt-3">Flechas / WASD · Arrastra o usa los botones en celular</p>
+    </div>
+  )
+}
+
 export default function App() {
   const [studentProfile, setStudentProfile] = useState<StudentProfile>(initialStudentProfile)
   const [familyProfile, setFamilyProfile] = useState<FamilyProfile>(initialFamilyProfile)
-  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'snake' | 'flappy' | 'catch' | 'memory' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents' | 'profile-type'>(BOOT_HASH ? 'learn' : 'welcome')
+  const [currentScreen, setCurrentScreen] = useState<'welcome' | 'about' | 'avatar' | 'config' | 'home' | 'reels' | 'learn' | 'quiz' | 'result' | 'games' | 'snake' | 'flappy' | 'catch' | 'memory' | 'dodge' | 'converse' | 'activity' | 'cases' | 'profile' | 'content-for-parents' | 'profile-type'>(BOOT_HASH ? 'learn' : 'welcome')
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null)
   const [learnView, setLearnView] = useState<'hub' | 'kid' | 'guide' | 'exam'>(BOOT_HASH ? (BOOT_HASH.view === 'tema' ? 'kid' : BOOT_HASH.view === 'guia' ? 'guide' : BOOT_HASH.view === 'examen' ? 'exam' : 'hub') : 'hub')
   const [activeKidId, setActiveKidId] = useState<string | null>(BOOT_HASH && BOOT_HASH.view === 'tema' ? BOOT_HASH.id : null)
@@ -3418,6 +3736,25 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
       setStudentProfile(updated)
       saveStudentProfile(updated)
       const nb = badges.find(b => b.id === 'memory-master')
+      if (nb) {
+        setEarnedBadge({ ...nb })
+        setShowBadgeCelebration(true)
+      }
+    }
+
+    // Insignia Corazón Valiente: completar los 3 niveles de esquive
+    const awardDodgeMaster = () => {
+      if (profileType !== 'student') return
+      const current = studentProfile.progress.badges
+      const withBadge = current.some(b => b.id === 'dodge-master')
+        ? current
+        : [...current, { id: 'dodge-master', name: 'Corazón Valiente', emoji: '💜', color: '#F43F5E', unlocked: false } as Badge]
+      if (withBadge.some(b => b.id === 'dodge-master' && b.unlocked)) return
+      const badges = withBadge.map(b => (b.id === 'dodge-master' ? { ...b, unlocked: true } : b))
+      const updated = { ...studentProfile, progress: { ...studentProfile.progress, badges } }
+      setStudentProfile(updated)
+      saveStudentProfile(updated)
+      const nb = badges.find(b => b.id === 'dodge-master')
       if (nb) {
         setEarnedBadge({ ...nb })
         setShowBadgeCelebration(true)
@@ -5640,6 +5977,38 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
       )
     }
 
+    case 'dodge': {
+      const custDodge = getCustomization();
+      const dodgeColors = getTextColorForTheme(custDodge.backgroundValue)
+      return (
+        <div className="min-h-screen pb-16" style={{ background: custDodge.backgroundValue, backgroundSize: custDodge.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
+          <div className="max-w-5xl mx-auto px-6 md:px-8 pt-10 md:pt-14 pb-10 animate-slide-up">
+            <div className="flex items-center justify-between gap-3 mb-6">
+              <button
+                onClick={() => navigateTo('games')}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 text-sm font-bold shadow-sm transition-colors shrink-0"
+              >
+                ← Juegos
+              </button>
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="text-xl">💜</span>
+                <span className="font-black text-sm md:text-base truncate" style={{ color: dodgeColors.primary }}>Corazón Valiente</span>
+              </div>
+              <span className="px-3 py-1.5 rounded-full bg-rose-100 text-rose-600 text-xs font-black uppercase tracking-wider shrink-0">Nuevo</span>
+            </div>
+            <div className="text-center mb-6">
+              <h1 className="text-3xl md:text-4xl font-black gradient-text mb-2">Corazón Valiente 💜</h1>
+              <p className="font-bold" style={{ color: dodgeColors.secondary }}>Esquiva, sobrevive y conquista los 3 niveles.</p>
+            </div>
+            <DodgeGame onDodgeAllComplete={awardDodgeMaster} />
+            <footer className="mt-10 text-center">
+              <p className="text-slate-500 text-sm">Hablemos Claro · Aprende con juegos 🎮</p>
+            </footer>
+          </div>
+        </div>
+      )
+    }
+
     case 'games':
       const cust9 = getCustomization();
       const gamesBadgeCount = profileType === 'family' ? familyProfile.familyBadges.filter(b => b.unlocked).length : getBadges().filter(b => b.unlocked).length;
@@ -5648,6 +6017,10 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
        const flappyBestHub = parseInt(safeGet('hablemos-claro-flappy-best') ?? '0', 10) || 0
        const catchBestHub = parseInt(safeGet('hablemos-claro-catch-best') ?? '0', 10) || 0
        const memoryBestHub = parseInt(safeGet('hablemos-claro-memory-best') ?? '0', 10) || 0
+       const dodgeHub = (() => {
+         const v = safeParse(safeGet('hablemos-claro-dodge-levels'))
+         return Array.isArray(v) ? v.filter(x => typeof x === 'string').length : 0
+       })()
       return (
         <div className="min-h-screen pb-24" style={{ background: cust9.backgroundValue, backgroundSize: cust9.backgroundType === 'pattern' ? '50px 50px' : 'cover' }}>
           {/* Decoración de fondo */}
@@ -5759,6 +6132,30 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                 </div>
                 <div className="shrink-0 hidden md:flex items-center gap-1 text-slate-400 group-hover:text-secondary transition-colors">
                   <span className="text-2xl">🃏</span>
+                </div>
+              </div>
+            </button>
+
+            {/* Corazón Valiente - Esquiva en la arena */}
+            <button
+              onClick={() => navigateTo('dodge')}
+              className="group w-full mb-8 text-left relative overflow-hidden rounded-[28px] bg-gradient-to-br from-rose-500 via-fuchsia-500 to-secondary p-[2px] shadow-xl shadow-rose-500/20 hover:shadow-2xl hover:scale-[1.01] transition-all duration-300"
+            >
+              <div className="bg-white rounded-[26px] p-6 md:p-8 flex items-center gap-4 md:gap-6">
+                <div className="w-16 h-16 md:w-20 md:h-20 shrink-0 rounded-2xl bg-gradient-to-br from-rose-500 to-fuchsia-600 flex items-center justify-center text-4xl md:text-5xl shadow-lg shadow-rose-500/30 group-hover:scale-110 transition-transform duration-300">
+                  💜
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 mb-1">
+                    <h2 className="text-2xl md:text-3xl font-black text-rose-600">Corazón Valiente</h2>
+                    <span className="px-2.5 py-1 rounded-full bg-rose-100 text-rose-600 text-[11px] font-black uppercase tracking-wider animate-pulse">Nuevo</span>
+                  </div>
+                  <p className="text-gray-600 text-base md:text-lg">Esquiva los ataques en la arena y supera los 3 niveles.</p>
+                  <p className="text-slate-500 text-sm font-black mt-1">{dodgeHub > 0 ? `🏅 Niveles: ${dodgeHub}/3` : '🎮 Juega y supera los niveles'}</p>
+                  <p className="text-rose-600 text-sm font-bold mt-1 group-hover:underline">▶ Jugar ahora →</p>
+                </div>
+                <div className="shrink-0 hidden md:flex items-center gap-1 text-slate-400 group-hover:text-rose-500 transition-colors">
+                  <span className="text-2xl">🎯</span>
                 </div>
               </div>
             </button>
