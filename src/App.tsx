@@ -6021,6 +6021,8 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
        const flappyBestHub = parseInt(safeGet('hablemos-claro-flappy-best') ?? '0', 10) || 0
        const catchBestHub = parseInt(safeGet('hablemos-claro-catch-best') ?? '0', 10) || 0
        const memoryBestHub = parseInt(safeGet('hablemos-claro-memory-best') ?? '0', 10) || 0
+       const studentBadgeList = studentProfile.progress.badges
+       const gameBadge = (id: BadgeType) => studentBadgeList.find(b => b.id === id)
        const dodgeHub = (() => {
          const v = safeParse(safeGet('hablemos-claro-dodge-levels'))
          return Array.isArray(v) ? v.filter(x => typeof x === 'string').length : 0
@@ -6060,6 +6062,11 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                   </div>
                   <p className="text-gray-600 text-base md:text-lg">Come manzanas, crece y no choques con los bordes ni contigo mismo.</p>
                   <p className="text-slate-500 text-sm font-black mt-1">{snakeBestHub > 0 ? `🏆 Récord: ${snakeBestHub}` : '🎮 Juega y marca tu récord'}</p>
+                  {(() => {
+                    const b = gameBadge('snake-master')
+                    if (!b) return null
+                    return <p className={`text-sm font-black mt-1 ${b.unlocked ? 'text-warning' : 'text-slate-400'}`}>{b.unlocked ? `🏅 ${b.emoji} ${b.name} ¡desbloqueada!` : `🔒 Insignia ${b.emoji} ${b.name} (récord 30)`}</p>
+                  })()}
                   <p className="text-success text-sm font-bold mt-1 group-hover:underline">▶ Jugar ahora →</p>
                 </div>
                 <div className="shrink-0 hidden md:flex items-center gap-1 text-slate-400 group-hover:text-success transition-colors">
@@ -6084,6 +6091,11 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                   </div>
                   <p className="text-gray-600 text-base md:text-lg">Vuela entre torres, suma puntos y responde preguntas de integridad.</p>
                   <p className="text-slate-500 text-sm font-black mt-1">{flappyBestHub > 0 ? `🏆 Récord: ${flappyBestHub}` : '🎮 Juega y marca tu récord'}</p>
+                  {(() => {
+                    const b = gameBadge('flappy-star')
+                    if (!b) return null
+                    return <p className={`text-sm font-black mt-1 ${b.unlocked ? 'text-warning' : 'text-slate-400'}`}>{b.unlocked ? `🏅 ${b.emoji} ${b.name} ¡desbloqueada!` : `🔒 Insignia ${b.emoji} ${b.name} (500 XP)`}</p>
+                  })()}
                   <p className="text-primary text-sm font-bold mt-1 group-hover:underline">▶ Jugar ahora →</p>
                 </div>
                 <div className="shrink-0 hidden md:flex items-center gap-1 text-slate-400 group-hover:text-primary transition-colors">
@@ -6108,6 +6120,11 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                   </div>
                   <p className="text-gray-600 text-base md:text-lg">Mueve la canasta, atrapa valores y esquiva coimas y trampas.</p>
                   <p className="text-slate-500 text-sm font-black mt-1">{catchBestHub > 0 ? `🏆 Récord: ${catchBestHub}` : '🎮 Juega y marca tu récord'}</p>
+                  {(() => {
+                    const b = gameBadge('catch-master')
+                    if (!b) return null
+                    return <p className={`text-sm font-black mt-1 ${b.unlocked ? 'text-warning' : 'text-slate-400'}`}>{b.unlocked ? `🏅 ${b.emoji} ${b.name} ¡desbloqueada!` : `🔒 Insignia ${b.emoji} ${b.name} (récord 40)`}</p>
+                  })()}
                   <p className="text-warning text-sm font-bold mt-1 group-hover:underline">▶ Jugar ahora →</p>
                 </div>
                 <div className="shrink-0 hidden md:flex items-center gap-1 text-slate-400 group-hover:text-warning transition-colors">
@@ -6132,6 +6149,11 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                   </div>
                   <p className="text-gray-600 text-base md:text-lg">Encuentra las 8 parejas de valores con los menos movimientos.</p>
                   <p className="text-slate-500 text-sm font-black mt-1">{memoryBestHub > 0 ? `🏆 Récord: ${memoryBestHub} movimientos` : '🎮 Juega y marca tu récord'}</p>
+                  {(() => {
+                    const b = gameBadge('memory-master')
+                    if (!b) return null
+                    return <p className={`text-sm font-black mt-1 ${b.unlocked ? 'text-warning' : 'text-slate-400'}`}>{b.unlocked ? `🏅 ${b.emoji} ${b.name} ¡desbloqueada!` : `🔒 Insignia ${b.emoji} ${b.name} (20 movimientos o menos)`}</p>
+                  })()}
                   <p className="text-secondary text-sm font-bold mt-1 group-hover:underline">▶ Jugar ahora →</p>
                 </div>
                 <div className="shrink-0 hidden md:flex items-center gap-1 text-slate-400 group-hover:text-secondary transition-colors">
@@ -6156,6 +6178,11 @@ const [conversationTurn, setConversationTurn] = useState<'kid' | 'parent'>('kid'
                   </div>
                   <p className="text-gray-600 text-base md:text-lg">Esquiva los ataques en la arena y supera los 3 niveles.</p>
                   <p className="text-slate-500 text-sm font-black mt-1">{dodgeHub > 0 ? `🏅 Niveles: ${dodgeHub}/3` : '🎮 Juega y supera los niveles'}</p>
+                  {(() => {
+                    const b = gameBadge('dodge-master')
+                    if (!b) return null
+                    return <p className={`text-sm font-black mt-1 ${b.unlocked ? 'text-warning' : 'text-slate-400'}`}>{b.unlocked ? `🏅 ${b.emoji} ${b.name} ¡desbloqueada!` : `🔒 Insignia ${b.emoji} ${b.name} (3 niveles)`}</p>
+                  })()}
                   <p className="text-rose-600 text-sm font-bold mt-1 group-hover:underline">▶ Jugar ahora →</p>
                 </div>
                 <div className="shrink-0 hidden md:flex items-center gap-1 text-slate-400 group-hover:text-rose-500 transition-colors">
